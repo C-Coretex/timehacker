@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Application", "TimeHacker\TimeHacker.Application.csproj", "{11720307-848C-438F-9BD1-5C7F6C76CFE7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Domain", "TimeHacker.Domain\TimeHacker.Domain.csproj", "{91456F96-5566-40B4-AB2E-102FA42CBA55}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Persistence", "TimeHacker.Persistence\TimeHacker.Persistence.csproj", "{0CF9CB4A-12C6-4F2A-AB6B-D0487360CD75}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{AF693F57-B57E-4B6D-935B-C9E42D458AB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers.Domain", "Helpers.Domain\Helpers.Domain.csproj", "{0CD870AB-E251-4F97-A66C-06E45E0D26F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers.Domain", "Helpers.Domain\Helpers.Domain.csproj", "{0CD870AB-E251-4F97-A66C-06E45E0D26F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers.DB", "Helpers.DB\Helpers.DB.csproj", "{FB88B4CA-2855-4D0F-BEA5-59AC8D31882F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers.DB", "Helpers.DB\Helpers.DB.csproj", "{FB88B4CA-2855-4D0F-BEA5-59AC8D31882F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Application", "TimeHacker.Application\TimeHacker.Application.csproj", "{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{11720307-848C-438F-9BD1-5C7F6C76CFE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11720307-848C-438F-9BD1-5C7F6C76CFE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11720307-848C-438F-9BD1-5C7F6C76CFE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11720307-848C-438F-9BD1-5C7F6C76CFE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91456F96-5566-40B4-AB2E-102FA42CBA55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91456F96-5566-40B4-AB2E-102FA42CBA55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91456F96-5566-40B4-AB2E-102FA42CBA55}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,6 +37,10 @@ Global
 		{FB88B4CA-2855-4D0F-BEA5-59AC8D31882F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB88B4CA-2855-4D0F-BEA5-59AC8D31882F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB88B4CA-2855-4D0F-BEA5-59AC8D31882F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

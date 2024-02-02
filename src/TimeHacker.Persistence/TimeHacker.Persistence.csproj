@@ -14,4 +14,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

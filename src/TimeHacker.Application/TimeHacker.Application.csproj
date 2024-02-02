@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="BusinessLogic\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
   <ItemGroup>
