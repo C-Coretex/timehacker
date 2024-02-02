@@ -10,7 +10,7 @@ namespace Helpers.DB.Abstractions.Classes
 {
     public class DbContextBase<TContext> : DbContext where TContext : DbContext
     {
-        private readonly string _connectionString = null;
+        private readonly string? _connectionString = null;
         public DbContextBase(DbContextOptions<TContext> options) : base(options)
         { }
         public DbContextBase(string connectionString)

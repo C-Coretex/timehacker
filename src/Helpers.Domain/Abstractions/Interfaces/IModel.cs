@@ -10,6 +10,6 @@ namespace Helpers.Domain.Abstractions.Interfaces
     public interface IModel
     {
         [Key]
-        public int Id { get; set; }
+        public int Id { get; init; }
     }
 }
