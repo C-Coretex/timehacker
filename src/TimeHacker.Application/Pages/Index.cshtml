@@ -7,4 +7,43 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <button class="btn btn-primary js-add-dynamic-task-button" data-bs-toggle="modal" data-bs-target="#dynamicTaskModal">Add Dynamic Task</button>
+    <button class="btn btn-primary js-add-fixed-task-button" data-bs-toggle="modal" data-bs-target="#fixedTaskModal">Add Fixed Task</button>
+
+    <div class="modal fade" id="dynamicTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dynamicTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="dynamicTaskModalLabel">Add Dynamic Task</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dynamicTaskForm" method="post" asp-page-handler="Form1Handler">
+                        <!-- Form 1 fields and controls go here -->
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="fixedTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="fixedTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="fixedTaskModalLabel">Add Fixed Task</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="fixedTaskForm" method="post" asp-page-handler="Form2Handler">
+                        <!-- Form 2 fields and controls go here -->
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<script src="~/js/index/index.js"></script>

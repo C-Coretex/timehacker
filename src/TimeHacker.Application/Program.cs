@@ -26,7 +26,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

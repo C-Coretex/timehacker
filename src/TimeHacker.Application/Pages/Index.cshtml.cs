@@ -23,5 +23,19 @@ namespace TimeHacker.Pages
 
             return Page();
         }
+
+        // Handle Form 1 submission
+        public IActionResult OnPostForm1Handler()
+        {
+            // Logic for handling Form 1 submission
+            return RedirectToPage();
+        }
+
+        // Handle Form 2 submission
+        public IActionResult OnPostForm2Handler()
+        {
+            // Logic for handling Form 2 submission
+            return Page();
+        }
     }
 }
