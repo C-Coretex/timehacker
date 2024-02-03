@@ -1,4 +1,5 @@
-/*
+
 $(".js-add-fixed-task-button").on("click", function () {
-    $("#fixed-task-container").removeAttr("hidden");
-})*/
+    console.log("clicked");
+    //$("#fixed-task-container").removeAttr("hidden");
+})

@@ -18,8 +18,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="dynamicTaskForm" method="post" asp-page-handler="Form1Handler">
-                        <!-- Form 1 fields and controls go here -->
+                    <form id="dynamicTaskForm" method="post" asp-page-handler="DynamicTaskFormHandler">
+                        <label for="name">Name:</label> 
+                        <input id="name" type="text" name="name"> <br />
+                        <label for="description">Description:</label>
+                        <input id="description" type="text" name="description"> <br />
+                        <label for="category">Category:</label>
+                        <input id="category" type="text" name="category"> <br />
+                        <label for="priority">Priority:</label>
+                        <input id="priority" type="number" name="priority" min="0"> <br />
+                        <label for="minTimeToFinish">Min Time To Finish:</label>
+                        <input id="minTimeToFinish" type="time" name="minTimeToFinish" min="00:00" max="23:59" pattern="[0-2][0-9]:[0-5][0-9]"> <br />
+                        <label for="maxTimeToFinish">Max Time To Finish:</label>
+                        <input id="maxTimeToFinish" type="time" name="maxTimeToFinish"> <br />
+                        <label for="optimalTimeToFinish">Optimal Time To Finish:</label>
+                        <input id="optimalTimeToFinish" type="time" name="optimalTimeToFinish"> <br />
                         <button type="submit">Submit</button>
                     </form>
                 </div>
@@ -35,8 +48,19 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="fixedTaskForm" method="post" asp-page-handler="Form2Handler">
-                        <!-- Form 2 fields and controls go here -->
+                    <form id="fixedTaskForm" method="post" asp-page-handler="FixedTaskFormHandler">
+                        <label for="name">Name:</label>
+                        <input id="name" type="text" name="name"> <br />
+                        <label for="description">Description:</label>
+                        <input id="description" type="text" name="description"> <br />
+                        <label for="category">Category:</label>
+                        <input id="category" type="text" name="category"> <br />
+                        <label for="priority">Priority:</label>
+                        <input id="priority" type="number" name="priority" min="0"> <br />
+                        <label for="startTimestamp">Start Timestamp:</label>
+                        <input id="startTimestamp" type="datetime-local" name="startTimestamp"> <br />
+                        <label for="endTimestamp">End Timestamp:</label>
+                        <input id="endTimestamp" type="datetime-local" name="endTimestamp"> <br />
                         <button type="submit">Submit</button>
                     </form>
                 </div>
