@@ -4,6 +4,9 @@
     ViewData["Title"] = "Home page";
 }
 
+<link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
+<script src="~/lib/flatpickr/flatpickr.min.js"></script>
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
@@ -19,20 +22,20 @@
                 </div>
                 <div class="modal-body">
                     <form id="dynamicTaskForm" method="post" asp-page-handler="DynamicTaskFormHandler">
-                        <label for="name">Name:</label> 
-                        <input id="name" type="text" name="name"> <br />
-                        <label for="description">Description:</label>
-                        <input id="description" type="text" name="description"> <br />
-                        <label for="category">Category:</label>
-                        <input id="category" type="text" name="category"> <br />
-                        <label for="priority">Priority:</label>
-                        <input id="priority" type="number" name="priority" min="0"> <br />
-                        <label for="minTimeToFinish">Min Time To Finish:</label>
-                        <input id="minTimeToFinish" type="time" name="minTimeToFinish" min="00:00" max="23:59" pattern="[0-2][0-9]:[0-5][0-9]"> <br />
-                        <label for="maxTimeToFinish">Max Time To Finish:</label>
-                        <input id="maxTimeToFinish" type="time" name="maxTimeToFinish"> <br />
-                        <label for="optimalTimeToFinish">Optimal Time To Finish:</label>
-                        <input id="optimalTimeToFinish" type="time" name="optimalTimeToFinish"> <br />
+                        <label for="dynamicTaskName">Name:</label>
+                        <input id="dynamicTaskName" type="text" name="name" > <br />
+                        <label for="dynamicTaskDescription">Description:</label>
+                        <input id="dynamicTaskDescription" type="text" name="description"> <br />
+                        <label for="dynamicTaskCategory">Category:</label>
+                        <input id="dynamicTaskCategory" type="text" name="category" required> <br />
+                        <label for="dynamicTaskPriority">Priority:</label>
+                        <input id="dynamicTaskPriority" type="number" name="priority" min="0" required> <br />
+                        <label for="dynamicTaskMinTimeToFinish">Min Time To Finish:</label>
+                        <input id="dynamicTaskMinTimeToFinish" type="text" name="minTimeToFinish" required> <br />
+                        <label for="dynamicTaskMaxTimeToFinish">Max Time To Finish:</label>
+                        <input id="dynamicTaskMaxTimeToFinish" type="time" name="maxTimeToFinish" required> <br />
+                        <label for="dynamicTaskOptimalTimeToFinish">Optimal Time To Finish:</label>
+                        <input id="dynamicTaskOptimalTimeToFinish" type="time" name="optimalTimeToFinish"> <br />
                         <button type="submit">Submit</button>
                     </form>
                 </div>
@@ -49,18 +52,18 @@
                 </div>
                 <div class="modal-body">
                     <form id="fixedTaskForm" method="post" asp-page-handler="FixedTaskFormHandler">
-                        <label for="name">Name:</label>
-                        <input id="name" type="text" name="name"> <br />
-                        <label for="description">Description:</label>
-                        <input id="description" type="text" name="description"> <br />
-                        <label for="category">Category:</label>
-                        <input id="category" type="text" name="category"> <br />
-                        <label for="priority">Priority:</label>
-                        <input id="priority" type="number" name="priority" min="0"> <br />
-                        <label for="startTimestamp">Start Timestamp:</label>
-                        <input id="startTimestamp" type="datetime-local" name="startTimestamp"> <br />
-                        <label for="endTimestamp">End Timestamp:</label>
-                        <input id="endTimestamp" type="datetime-local" name="endTimestamp"> <br />
+                        <label for="fixedTaskName">Name:</label>
+                        <input id="fixedTaskName" type="text" name="name" required> <br />
+                        <label for="fixedTaskDescription">Description:</label>
+                        <input id="fixedTaskDescription" type="text" name="description"> <br />
+                        <label for="fixedTaskCategory">Category:</label>
+                        <input id="fixedTaskCategory" type="text" name="category" required> <br />
+                        <label for="fixedTaskPriority">Priority:</label>
+                        <input id="fixedTaskPriority" type="number" name="priority" min="0" required> <br />
+                        <label for="fixedTaskStartTimestamp">Start Timestamp:</label>
+                        <input id="fixedTaskStartTimestamp" type="datetime-local" name="startTimestamp" required> <br />
+                        <label for="fixedTaskEndTimestamp">End Timestamp:</label>
+                        <input id="fixedTaskEndTimestamp" type="datetime-local" name="endTimestamp" required> <br />
                         <button type="submit">Submit</button>
                     </form>
                 </div>

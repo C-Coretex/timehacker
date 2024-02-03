@@ -1,6 +1,8 @@
+using Helpers.Domain.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Models.Tasks;
@@ -61,6 +63,16 @@ namespace TimeHacker.Pages
                 OptimalTimeToFinish = optimalTimeToFinish
             };
 
+            if(!dynamicTask.IsObjectValid(out var validationResults))
+            {
+                foreach (var validationResult in validationResults)
+                {
+                    ModelState.AddModelError(validationResult.MemberNames.First(), validationResult.ErrorMessage ?? "");
+                }
+
+                return Page();
+            }
+
             await _dynamicTasksServiceCommand.AddAsync(dynamicTask);
 
             return RedirectToPage();
@@ -87,10 +99,19 @@ namespace TimeHacker.Pages
                 EndTimestamp = endTimestamp
             };
 
+            if (!fixedTask.IsObjectValid(out var validationResults))
+            {
+                foreach (var validationResult in validationResults)
+                {
+                    ModelState.AddModelError(validationResult.MemberNames.First(), validationResult.ErrorMessage ?? "");
+                }
+
+                return Page();
+            }
+
             await _fixedTasksServiceCommand.AddAsync(fixedTask);
 
             return RedirectToPage();
-            //return Page();
         }
     }
 }
