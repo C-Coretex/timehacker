@@ -1,5 +1,3 @@
-console.log("aaaa");
-
 $("#dynamicTaskMinTimeToFinish").flatpickr({
     enableTime: true,
     noCalendar: true,
@@ -27,13 +25,16 @@ $("#dynamicTaskOptimalTimeToFinish").flatpickr({
     static: true
 });
 
-$(".js-add-dynamic-task-button").on("click", function () {
-    console.log("clicked1");
+$("#fixedTaskStartTimestamp").flatpickr({
+    enableTime: true,
+    dateFormat: "d-m-Y H:i",
+    time_24hr: true,
+    static: true
+});
 
-    //$("#fixed-task-container").removeAttr("hidden");
-})
-
-$(".js-add-fixed-task-button").on("click", function () {
-    console.log("clicked2");
-    //$("#fixed-task-container").removeAttr("hidden");
-})
+$("#fixedTaskEndTimestamp").flatpickr({
+    enableTime: true,
+    dateFormat: "d-m-Y H:i",
+    time_24hr: true,
+    static: true
+});

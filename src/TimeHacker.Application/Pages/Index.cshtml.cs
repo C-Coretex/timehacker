@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using TimeHacker.Application.Models.PageModels;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Models.Tasks;
 
 namespace TimeHacker.Pages
 {
+
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
@@ -16,6 +18,21 @@ namespace TimeHacker.Pages
         private readonly ClaimsPrincipal? _user;
         private readonly IDynamicTasksServiceCommand _dynamicTasksServiceCommand;
         private readonly IFixedTasksServiceCommand _fixedTasksServiceCommand;
+
+        public enum OpenModalType
+        {
+            None,
+            DynamicTask,
+            FixedTask,
+        }
+
+        [TempData]
+        public int? OpenModal { get; set; }
+
+        [BindProperty]
+        public InputDynamicTaskModel InputDynamicTaskModel { get; set; }
+        [BindProperty]
+        public InputFixedTaskModel InputFixedTaskModel { get; set; }
 
         public IndexModel(
             ILogger<IndexModel> logger, 
@@ -41,26 +58,25 @@ namespace TimeHacker.Pages
         }
 
 
-        public async Task<IActionResult> OnPostDynamicTaskFormHandler(
-            string name, 
-            string description, 
-            string category, 
-            uint priority, 
-            TimeSpan minTimeToFinish, 
-            TimeSpan maxTimeToFinish,
-            TimeSpan optimalTimeToFinish)
+        public async Task<IActionResult> OnPostDynamicTaskFormHandler()
         {
+            if (!ModelState.IsValid)
+            {
+                OpenModal = (int)OpenModalType.DynamicTask;
+                return Page();
+            }
+
             var userId = _user?.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User not found");
             var dynamicTask = new DynamicTask
             {
                 UserId = userId,
-                Name = name,
-                Description = description,
-                Category = category,
-                Priority = priority,
-                MinTimeToFinish = minTimeToFinish,
-                MaxTimeToFinish = maxTimeToFinish,
-                OptimalTimeToFinish = optimalTimeToFinish
+                Name = InputDynamicTaskModel.Name,
+                Description = InputDynamicTaskModel.Description,
+                Category = InputDynamicTaskModel.Category,
+                Priority = InputDynamicTaskModel.Priority,
+                MinTimeToFinish = InputDynamicTaskModel.MinTimeToFinish,
+                MaxTimeToFinish = InputDynamicTaskModel.MaxTimeToFinish,
+                OptimalTimeToFinish = InputDynamicTaskModel.OptimalTimeToFinish
             };
 
             if(!dynamicTask.IsObjectValid(out var validationResults))
@@ -78,25 +94,25 @@ namespace TimeHacker.Pages
             return RedirectToPage();
         }
 
-
-        public async Task<IActionResult> OnPostFixedTaskFormHandler(
-            string name,
-            string description,
-            string category,
-            uint priority,
-            DateTime startTimestamp,
-            DateTime endTimestamp)
+        
+        public async Task<IActionResult> OnPostFixedTaskFormHandler()
         {
+            if (!ModelState.IsValid)
+            {
+                OpenModal = (int)OpenModalType.FixedTask;
+                return Page();
+            }
+
             var userId = _user?.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("User not found");
             var fixedTask = new FixedTask
             {
                 UserId = userId,
-                Name = name,
-                Description = description,
-                Category = category,
-                Priority = priority,
-                StartTimestamp = startTimestamp,
-                EndTimestamp = endTimestamp
+                Name = InputFixedTaskModel.Name,
+                Description = InputFixedTaskModel.Description,
+                Category = InputFixedTaskModel.Category,
+                Priority = InputFixedTaskModel.Priority,
+                StartTimestamp = InputFixedTaskModel.StartTimestamp,
+                EndTimestamp = InputFixedTaskModel.EndTimestamp
             };
 
             if (!fixedTask.IsObjectValid(out var validationResults))

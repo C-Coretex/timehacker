@@ -11,16 +11,16 @@ var identityConnectionString = builder.Configuration.GetConnectionString("Identi
 builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(identityConnectionString));
 
-var timeHaclerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
+var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
 builder.Services.AddDbContext<TimeHackerDBContext>(options =>
-    options.UseSqlServer(timeHaclerConnectionString));
+    options.UseSqlServer(timeHackerConnectionString));
 
 builder.Services.AddTimeHackerPersistenceServices();
 #endregion
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<IdentityDbContext>();
 
 builder.Services.AddControllers();

@@ -12,17 +12,7 @@
             @Html.DisplayFor(m => m.DynamicTasks)
         </div>
         <div class="col-sm">
-            @foreach (var task in Model.FixedTasks)
-            {
-                <div>
-                <div>@task.Name</div>
-                <div>@task.Description</div>
-                <div>@task.Category</div>
-                <div>@task.Priority</div>
-                <div>@task.StartTimestamp</div>
-                <div>@task.EndTimestamp</div>
-                </div>
-            }
+            @Html.DisplayFor(m => m.FixedTasks)
         </div>
     </div>
 </div>
