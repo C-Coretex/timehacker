@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="BusinessLogic\" />
-    <Folder Include="Controllers\" />
     <Folder Include="wwwroot\js\index\" />
     <Folder Include="wwwroot\js\calendar\" />
   </ItemGroup>

@@ -13,6 +13,7 @@ namespace TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks
     }
     public interface IDynamicTasksServiceQuery : IServiceQueryBase<DynamicTask>
     {
+        public IQueryable<DynamicTask> GetAllByUserId(string userId);
     }
 
     public class DynamicTasksService : ServiceBase<IDynamicTasksServiceCommand, IDynamicTasksServiceQuery, DynamicTask>

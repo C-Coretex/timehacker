@@ -7,13 +7,15 @@
 <link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
 <script src="~/lib/flatpickr/flatpickr.min.js"></script>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <button class="btn btn-primary js-add-dynamic-task-button" data-bs-toggle="modal" data-bs-target="#dynamicTaskModal">Add Dynamic Task</button>
-    <button class="btn btn-primary js-add-fixed-task-button" data-bs-toggle="modal" data-bs-target="#fixedTaskModal">Add Fixed Task</button>
+<div class="text-center h-100" style="padding-bottom: 20px">
+    <div style="height: 20%; min-height: 130px;">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <button class="btn btn-primary js-add-dynamic-task-button" data-bs-toggle="modal" data-bs-target="#dynamicTaskModal">Add Dynamic Task</button>
+        <button class="btn btn-primary js-add-fixed-task-button" data-bs-toggle="modal" data-bs-target="#fixedTaskModal">Add Fixed Task</button>
+    </div>
 
-    <div id="calculator_react" style="height: 600px"></div>
+    <div id="calculator_react" style="height: 80%"></div>
 
     <div class="modal fade" id="dynamicTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="fixedTaskModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -113,5 +115,5 @@
 }
 
 <script src="~/js/index/index.js"></script>
-<link rel="stylesheet" href="~/js//calendar/calendar/build/static/css/main.2b9db368.css" asp-append-version="true" />
-<script src="~/js//calendar/calendar/build/static/js/main.415fbeb1.js"></script>
+<link rel="stylesheet" href="~/js/calendar/build/main.css" asp-append-version="true" />
+<script src="~/js/calendar/build/main.js"></script>

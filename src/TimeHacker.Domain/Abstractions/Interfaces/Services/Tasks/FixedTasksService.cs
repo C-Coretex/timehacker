@@ -13,6 +13,7 @@ namespace TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks
     }
     public interface IFixedTasksServiceQuery : IServiceQueryBase<FixedTask>
     {
+        public IQueryable<FixedTask> GetAllByUserId(string userId);
     }
 
     public class FixedTasksService : ServiceBase<IFixedTasksServiceCommand, IFixedTasksServiceQuery, FixedTask>

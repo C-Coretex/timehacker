@@ -18,5 +18,10 @@ namespace TimeHacker.Persistence.Services.Tasks
     public class FixedTasksServiceQuery : ServiceQueryBase<FixedTask>, IFixedTasksServiceQuery
     {
         public FixedTasksServiceQuery(TimeHackerDBContext dbContext) : base(dbContext.FixedTasks) { }
+
+        public IQueryable<FixedTask> GetAllByUserId(string userId)
+        {
+            return GetAll().Where(x => x.UserId == userId);
+        }
     }
 }

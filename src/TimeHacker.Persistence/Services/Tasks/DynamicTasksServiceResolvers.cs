@@ -17,5 +17,10 @@ namespace TimeHacker.Persistence.Services.Tasks
     public class DynamicTasksServiceQuery : ServiceQueryBase<DynamicTask>, IDynamicTasksServiceQuery
     {
         public DynamicTasksServiceQuery(TimeHackerDBContext dbContext) : base(dbContext.DynamicTasks) { }
+
+        public IQueryable<DynamicTask> GetAllByUserId(string userId)
+        {
+            return GetAll().Where(x => x.UserId == userId);
+        }
     }
 }

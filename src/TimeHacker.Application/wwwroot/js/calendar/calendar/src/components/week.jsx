@@ -10,18 +10,18 @@ function Week() {
   const [hoursOfDay, setHoursOfDay] = useState(Array.from({ length: 23 }, (_, i) => i + 1));
 
   return (
-    <div className='w-full h-full flex justify-center'>
-      <div className='w-full h-full flex flex-col justify-center items-center'>
-        <div className='pl-11 w-full h-fit flex flex-row justify-center'>
+    <div className='tw-w-full tw-h-full tw-flex tw-justify-center'>
+      <div className='tw-w-full tw-h-full tw-flex tw-flex-col tw-justify-center tw-items-center'>
+        <div className='tw-pl-11 tw-w-full tw-h-fit tw-flex tw-flex-row tw-justify-center'>
           {
-            daysOfWeek.map((d => <div key={uuid()} className='w-[15%] flex justify-center'>{d.dayName}</div>))
+            daysOfWeek.map((d => <div key={uuid()} className='tw-w-[15%] tw-flex tw-justify-center'>{d.dayName}</div>))
           }
         </div>
-        <div className='w-full h-[90%] relative border-black border-2'>
+        <div className='tw-w-full tw-h-[90%] tw-relative tw-border-black tw-border-2 tw-border-solid'>
           <Hours hoursOfDay={hoursOfDay} />
 
-          <div className='w-full h-full absolute z-10'>
-            <div className='pl-11 w-full h-full flex flex-row'>
+          <div className='tw-w-full tw-h-full tw-absolute tw-z-10'>
+            <div className='tw-pl-11 tw-w-full tw-h-full tw-flex tw-flex-row'>
               {
                 daysOfWeek.map((d => <DayOfWeek key={uuid()} day={d.day} isSelected={d.isSelected} />))
               }
@@ -35,14 +35,14 @@ function Week() {
 }
 
 function Hours({ hoursOfDay }) {
-  return <div className='w-full h-full absolute z-20'>
-    <div className='w-full h-full flex flex-col justify-between'>
+  return <div className='tw-w-full tw-h-full tw-absolute tw-z-20'>
+    <div className='tw-w-full tw-h-full tw-flex tw-flex-col tw-justify-between'>
       <div></div>
       {
         hoursOfDay.map((h) =>
-          <div className='w-full h-[2px] flex flex-row items-center' key={uuid()}>
-            <div className='ml-1 mr-1'>{String(h).padStart(2, 0)}:00</div>
-            <div className='w-full h-[2px] bg-gray-400 opacity-80' key={uuid()} />
+          <div className='tw-w-full tw-h-[2px] tw-flex tw-flex-row tw-items-center' key={uuid()}>
+            <div className='tw-ml-1 tw-mr-1'>{String(h).padStart(2, 0)}:00</div>
+            <div className='tw-w-full tw-h-[2px] tw-bg-gray-400 tw-opacity-80' key={uuid()} />
           </div>
         )
       }

@@ -8,9 +8,9 @@ function DayOfWeek({ day, isSelected }) {
   //console.log(hoursOfDay)
 
   return (
-    <div className='h-full w-full'>
-      <div className={`h-full w-full border-black border-l-2 ${isSelected ? 'bg-slate-200' : ''}`}>
-        <div className={`h-full flex flex-col justify-between w-fit`}>
+    <div className='tw-h-full tw-w-full'>
+      <div className={`tw-h-full tw-w-full tw-border-black tw-border-0 tw-border-l-2 tw-border-solid ${isSelected ? 'tw-bg-slate-200' : ''}`}>
+        <div className={`tw-h-full tw-flex tw-flex-col tw-justify-between tw-w-fit`}>
           {
             hoursOfDay.map((h) =>
               <div key={uuid()}>{<p>{/*h*/}</p>}</div>

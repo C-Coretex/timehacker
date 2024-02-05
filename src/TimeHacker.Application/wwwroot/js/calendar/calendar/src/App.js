@@ -4,8 +4,8 @@ import Week from './components/week'
 
 function App() {
   return (
-    <div className='h-full'>
-      <div className='flex flex-row items-center justify-center p-4 h-full'>
+    <div className='tw-h-full'>
+      <div className='tw-flex tw-flex-row tw-items-center tw-justify-center tw-p-4 tw-h-full'>
         <Week />
       </div>
     </div>
