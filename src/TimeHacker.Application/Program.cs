@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TimeHacker.Application.BusinessLogic.Services;
 using TimeHacker.Data;
 using TimeHacker.Persistence.Context;
 using TimeHacker.Persistence.Extensions;
@@ -20,8 +21,13 @@ builder.Services.AddTimeHackerPersistenceServices();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddEntityFrameworkStores<IdentityDbContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(o =>
+{
+    o.Password.RequireDigit = true;
+    o.Password.RequiredLength = 6;
+}).AddEntityFrameworkStores<IdentityDbContext>();
+
+AddBusinessLogicServices(builder.Services);
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
@@ -54,3 +60,9 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+IServiceCollection AddBusinessLogicServices(IServiceCollection services)
+{
+    services.AddScoped<TasksService>();
+    return services;
+}
