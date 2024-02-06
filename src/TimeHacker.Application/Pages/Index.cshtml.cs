@@ -29,9 +29,7 @@ namespace TimeHacker.Pages
         [TempData]
         public int? OpenModal { get; set; }
 
-        [BindProperty]
         public InputDynamicTaskModel InputDynamicTaskModel { get; set; }
-        [BindProperty]
         public InputFixedTaskModel InputFixedTaskModel { get; set; }
 
         public IndexModel(
@@ -58,7 +56,7 @@ namespace TimeHacker.Pages
         }
 
 
-        public async Task<IActionResult> OnPostDynamicTaskFormHandler()
+        public async Task<IActionResult> OnPostDynamicTaskFormHandler(InputDynamicTaskModel inputDynamicTaskModel)
         {
             if (!ModelState.IsValid)
             {
@@ -70,13 +68,13 @@ namespace TimeHacker.Pages
             var dynamicTask = new DynamicTask
             {
                 UserId = userId,
-                Name = InputDynamicTaskModel.Name,
-                Description = InputDynamicTaskModel.Description,
-                Category = InputDynamicTaskModel.Category,
-                Priority = InputDynamicTaskModel.Priority,
-                MinTimeToFinish = InputDynamicTaskModel.MinTimeToFinish,
-                MaxTimeToFinish = InputDynamicTaskModel.MaxTimeToFinish,
-                OptimalTimeToFinish = InputDynamicTaskModel.OptimalTimeToFinish
+                Name = inputDynamicTaskModel.Name,
+                Description = inputDynamicTaskModel.Description,
+                Category = inputDynamicTaskModel.Category,
+                Priority = inputDynamicTaskModel.Priority,
+                MinTimeToFinish = inputDynamicTaskModel.MinTimeToFinish,
+                MaxTimeToFinish = inputDynamicTaskModel.MaxTimeToFinish,
+                OptimalTimeToFinish = inputDynamicTaskModel.OptimalTimeToFinish
             };
 
             if(!dynamicTask.IsObjectValid(out var validationResults))
@@ -95,7 +93,7 @@ namespace TimeHacker.Pages
         }
 
         
-        public async Task<IActionResult> OnPostFixedTaskFormHandler()
+        public async Task<IActionResult> OnPostFixedTaskFormHandler(InputFixedTaskModel inputFixedTaskModel)
         {
             if (!ModelState.IsValid)
             {
@@ -107,12 +105,12 @@ namespace TimeHacker.Pages
             var fixedTask = new FixedTask
             {
                 UserId = userId,
-                Name = InputFixedTaskModel.Name,
-                Description = InputFixedTaskModel.Description,
-                Category = InputFixedTaskModel.Category,
-                Priority = InputFixedTaskModel.Priority,
-                StartTimestamp = InputFixedTaskModel.StartTimestamp,
-                EndTimestamp = InputFixedTaskModel.EndTimestamp
+                Name = inputFixedTaskModel.Name,
+                Description = inputFixedTaskModel.Description,
+                Category = inputFixedTaskModel.Category,
+                Priority = inputFixedTaskModel.Priority,
+                StartTimestamp = inputFixedTaskModel.StartTimestamp,
+                EndTimestamp = inputFixedTaskModel.EndTimestamp
             };
 
             if (!fixedTask.IsObjectValid(out var validationResults))

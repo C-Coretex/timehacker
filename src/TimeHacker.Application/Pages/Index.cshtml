@@ -66,8 +66,8 @@
                 <div class="modal-body">
                     <form id="fixedTaskForm" method="post" asp-page-handler="FixedTaskFormHandler">
                         <label asp-for="InputFixedTaskModel.Name">Name:</label> <br />
-                        <input asp-for="InputDynamicTaskModel.Name" id="dynamicTaskName" type="text" required> <br />
-                        <span asp-validation-for="InputDynamicTaskModel.Name" class="text-danger"></span>
+                        <input asp-for="InputFixedTaskModel.Name" id="fixedTaskName" type="text" required> <br />
+                        <span asp-validation-for="InputFixedTaskModel.Name" class="text-danger"></span>
                         <label asp-for="InputFixedTaskModel.Description">Description:</label> <br />
                         <input asp-for="InputFixedTaskModel.Description" id="fixedTaskDescription" type="text"> <br />
                         <span asp-validation-for="InputFixedTaskModel.Description" class="text-danger"></span>
