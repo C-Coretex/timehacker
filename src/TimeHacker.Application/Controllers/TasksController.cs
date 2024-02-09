@@ -6,6 +6,8 @@ using TimeHacker.Domain.BusinessLogic.Services;
 namespace TimeHacker.Application.Controllers
 {
     [Authorize]
+    [ApiController]
+    [Route("/api/[controller]")]
     public class TasksController : ControllerBase
     {
         private readonly TasksService _tasksService;
@@ -14,7 +16,7 @@ namespace TimeHacker.Application.Controllers
             _tasksService = tasksService;
         }
 
-        [HttpGet]
+        [HttpGet("GetTasksForDay")]
         public async Task<IActionResult> GetTasksForDay(string date)
         {
             try

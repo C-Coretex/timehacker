@@ -2,9 +2,14 @@ import moment from 'moment'
 import DayOfWeek from './dayOfWeek';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { API_URL } from '../tools/variables'
 
 function Week() {
   const [mondayOfSelectedWeek, setMondayOfSelectedWeek] = useState(moment().startOf('isoWeek'))
+
+  useEffect(() => {
+    getTasksForDay()
+  }, [])
 
   useEffect(() => {
     setdaysOfWeek(getDaysOfWeek())
@@ -26,6 +31,20 @@ function Week() {
     let addDaysCount = isAddAction ? 7 : -7;
 
     setMondayOfSelectedWeek(moment(mondayOfSelectedWeek).add(addDaysCount, 'days'))
+  }
+
+  function getTasksForDay(date) {
+    if (!date)
+      date = moment()
+
+    fetch(`${API_URL}/Tasks/GetTasksForDay?date=${date.format('DD.MM.YYYY')}`)
+      .then(result => result.json())
+      .then((result) => {
+        console.log('success')
+      },
+      (error) => {
+        console.log('error')
+      })
   }
 
   return (

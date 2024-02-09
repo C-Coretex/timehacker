@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
-using TimeHacker.Domain.Models.Tasks;
+using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Application.Pages
 {

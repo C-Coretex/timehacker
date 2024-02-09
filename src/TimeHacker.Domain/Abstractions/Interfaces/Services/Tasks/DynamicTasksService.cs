@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TimeHacker.Domain.Models.Tasks;
+using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks
 {

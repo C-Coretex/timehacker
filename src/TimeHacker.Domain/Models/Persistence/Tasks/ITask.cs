@@ -1,7 +1,7 @@
 ﻿using Helpers.Domain.Abstractions.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
-namespace TimeHacker.Domain.Models.Tasks
+namespace TimeHacker.Domain.Models.Persistence.Tasks
 {
     public interface ITask : IModel
     {

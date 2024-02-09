@@ -1,10 +1,15 @@
-﻿using TimeHacker.Domain.Models.Tasks;
+﻿using TimeHacker.Domain.Models.BusinessLogicModels;
+using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Domain.Models.ReturnModels
 {
+    public class TaskContainerReturn
+    {
+        public ITask Task { get; set; }
+        public TimeRange TimeRange { get; set; }
+    }
     public class TasksForDayReturn
     {
-        public IEnumerable<DynamicTask> DynamicTasks { get; set; }
-        public IEnumerable<FixedTask> FixedTasks { get; set; }
+        public List<TaskContainerReturn> TasksTimeline { get; set; } = new();
     }
 }

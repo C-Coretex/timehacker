@@ -1,16 +1,13 @@
-﻿using Helpers.Domain.Abstractions.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TimeHacker.Domain.Models.Tasks
+namespace TimeHacker.Domain.Models.Persistence.Tasks
 {
     [Index(nameof(UserId))]
     [Index(nameof(Category))]
     [Index(nameof(IsCompleted))]
     [Index(nameof(CreatedTimestamp))]
-    [Index(nameof(StartTimestamp))]
-    public class FixedTask : ITask
+    public class DynamicTask : ITask
     {
         [Key]
         public int Id { get; init; }
@@ -32,13 +29,15 @@ namespace TimeHacker.Domain.Models.Tasks
         public uint Priority { get; set; }
 
         [Required]
+        public TimeSpan MinTimeToFinish { get; set; }
+
+        [Required]
+        public TimeSpan MaxTimeToFinish { get; set; }
+
+        public TimeSpan? OptimalTimeToFinish { get; set; }
+
+        [Required]
         public bool IsCompleted { get; set; } = false;
-
-        [Required]
-        public DateTime StartTimestamp { get; set; }
-
-        [Required]
-        public DateTime EndTimestamp { get; set; }
 
         [Required]
         public DateTime CreatedTimestamp { get; set; } = DateTime.Now;

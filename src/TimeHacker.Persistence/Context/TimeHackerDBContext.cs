@@ -6,7 +6,7 @@ using System.Formats.Tar;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TimeHacker.Domain.Models.Tasks;
+using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Persistence.Context
 {
