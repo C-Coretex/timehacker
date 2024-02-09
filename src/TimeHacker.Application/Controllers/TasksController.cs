@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeHacker.Application.BusinessLogic.Services;
+using System.Globalization;
+using TimeHacker.Domain.BusinessLogic.Services;
 
 namespace TimeHacker.Application.Controllers
 {
@@ -11,6 +12,22 @@ namespace TimeHacker.Application.Controllers
         public TasksController(TasksService tasksService)
         {
             _tasksService = tasksService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTasksForDay(string date)
+        {
+            try
+            {
+                var dateParsed = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                var data = await _tasksService.GetTasksForDay(dateParsed);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         /*[HttpGet]

@@ -4,40 +4,28 @@ import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 function Week() {
-  const [selectedYear, setSelectedYear] = useState(moment().year())
-  const [selectedWeek, setSelectedWeek] = useState(moment().week())
-  const mondayOfSelectedWeek = useRef(moment().day("Monday").week(selectedWeek))
-  
-  useEffect(() => {
-    let currentDay = moment().year(selectedYear).day("Monday").week(selectedWeek)
+  const [mondayOfSelectedWeek, setMondayOfSelectedWeek] = useState(moment().startOf('isoWeek'))
 
-    mondayOfSelectedWeek.current = currentDay
-    setdaysOfWeek(getDaysOfWeek(currentDay))
-  }, [selectedWeek])
+  useEffect(() => {
+    setdaysOfWeek(getDaysOfWeek())
+  }, [mondayOfSelectedWeek])
 
   const [daysOfWeek, setdaysOfWeek] = useState(getDaysOfWeek());
 
   const [hoursOfDay, setHoursOfDay] = useState(Array.from({ length: 23 }, (_, i) => i + 1));
 
-  function getDaysOfWeek(currentDay)
+  function getDaysOfWeek()
   {
-    if(currentDay == null || currentDay == undefined)
-      currentDay = mondayOfSelectedWeek.current
-
     return Array.from(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], (x, i) => {
-      return { day: moment(currentDay).add(i, 'days'), dayName: x, isSelected: i + 1 == moment().day() }
+      let day = moment(mondayOfSelectedWeek).add(i, 'days')
+      return { day: day, dayName: x, isSelected: day.isSame(moment(), 'day') }
     })
   }
 
   function changeSelectedWeek(isAddAction) {
-    let addWeeksCount = isAddAction ? 1 : -1;
+    let addDaysCount = isAddAction ? 7 : -7;
 
-    if(selectedWeek + addWeeksCount > moment(selectedYear).weeksInYear())
-      setSelectedYear(selectedYear + 1)
-    if(selectedWeek + addWeeksCount == 0)
-      setSelectedYear(selectedYear - 1)
-
-    setSelectedWeek(moment().week(selectedWeek).add(addWeeksCount, 'week').week())
+    setMondayOfSelectedWeek(moment(mondayOfSelectedWeek).add(addDaysCount, 'days'))
   }
 
   return (

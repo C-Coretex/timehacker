@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TimeHacker.Application.BusinessLogic.Services;
 using TimeHacker.Data;
+using TimeHacker.Domain.BusinessLogic.Services;
 using TimeHacker.Persistence.Context;
 using TimeHacker.Persistence.Extensions;
 
