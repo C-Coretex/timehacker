@@ -5,6 +5,7 @@ namespace TimeHacker.Domain.Models.ReturnModels
 {
     public class TaskContainerReturn
     {
+        public bool IsFixed { get; set; }
         public ITask Task { get; set; }
         public TimeRange TimeRange { get; set; }
     }

@@ -11,9 +11,11 @@ namespace TimeHacker.Application.Controllers
     public class TasksController : ControllerBase
     {
         private readonly TasksService _tasksService;
-        public TasksController(TasksService tasksService)
+        private readonly ILogger<TasksController> _logger;
+        public TasksController(TasksService tasksService, ILogger<TasksController> logger)
         {
             _tasksService = tasksService;
+            _logger = logger;
         }
 
         [HttpGet("GetTasksForDay")]
@@ -28,6 +30,7 @@ namespace TimeHacker.Application.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "Error while getting tasks for day");
                 return BadRequest(e.Message);
             }
         }

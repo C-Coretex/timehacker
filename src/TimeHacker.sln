@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers.DB", "Helpers.DB\He
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Application", "TimeHacker.Application\TimeHacker.Application.csproj", "{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeHacker.Tests", "TimeHacker.Tests\TimeHacker.Tests.csproj", "{ADFB07ED-9BFB-428A-A172-A732F5C41F23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADFB07ED-9BFB-428A-A172-A732F5C41F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADFB07ED-9BFB-428A-A172-A732F5C41F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADFB07ED-9BFB-428A-A172-A732F5C41F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADFB07ED-9BFB-428A-A172-A732F5C41F23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

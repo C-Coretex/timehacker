@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
+using TimeHacker.Domain.BusinessLogic.Helpers;
 using TimeHacker.Domain.Models.BusinessLogicModels;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 using TimeHacker.Domain.Models.ReturnModels;
@@ -26,26 +27,39 @@ namespace TimeHacker.Domain.BusinessLogic.Services
 
             var dynamicTasks = await _dynamicTasksServiceQuery.GetAllByUserId(userId)
                                                             .ToListAsync();
-            var fixedTasks = await _fixedTasksServiceQuery.GetAllByUserId(userId)
+
+            var fixedTasks = _fixedTasksServiceQuery.GetAllByUserId(userId)
                                                             .Where(ft => ft.StartTimestamp.Date == date)
                                                             .OrderBy(ft => ft.StartTimestamp)
-                                                            .ToListAsync();
+                                                            .AsAsyncEnumerable();
 
             var timeRanges = new List<TimeRange>();
 
-            foreach(var fixedTask in fixedTasks)
+            await foreach(var fixedTask in fixedTasks)
             {
                 var taskContainer = new TaskContainerReturn
                 {
                     Task = fixedTask,
+                    IsFixed = true,
                     TimeRange = new TimeRange(fixedTask.StartTimestamp.TimeOfDay, fixedTask.EndTimestamp.TimeOfDay)
                 };
 
                 returnData.TasksTimeline.Add(taskContainer);
             }
 
+            var startTimeSpan = new TimeSpan(0, 0, 0);
+            var timeBacklash = new TimeSpan(0, 5, 0);
+            foreach(var takenTimeRange in returnData.TasksTimeline.Select(tt => tt.TimeRange))
+            {
+                var timeRange = new TimeRange(startTimeSpan, takenTimeRange.Start - timeBacklash);
 
+                var tasks = DynamicTasksHelpers.GetDynamicTasksForTimeRange(dynamicTasks, timeRange);
+                returnData.TasksTimeline.AddRange(tasks);
 
+                startTimeSpan = takenTimeRange.End + timeBacklash;
+            }
+
+            returnData.TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList();
             return returnData;
         }
     }
