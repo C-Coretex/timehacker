@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -39,23 +40,52 @@ namespace TimeHacker.Tests
                     _fixedTasksServiceCommand.Object);
             }
         }
+
         public IndexModelTests()
         {
             (_userManagerMock, _signInManagerMock) = SignInManagerMocker.GetIdentityMocks<IdentityUser>();
 
+            _httpContextAccessor.Setup(x => x.HttpContext.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+            {
+                new(ClaimTypes.Name, "TestUser"),
+                new(ClaimTypes.NameIdentifier, "TestIdentifier")
+            })));
+
             _signInManagerMock.Setup(x => x.IsSignedIn(It.IsAny<ClaimsPrincipal>())).Returns(true);
+        }
+
+        [Fact]
+        public void OnGet_ShouldRedirectToLanding_IfUserIsNotSignedIn()
+        {
+            // Arrange
+            _signInManagerMock.Setup(x => x.IsSignedIn(It.IsAny<ClaimsPrincipal>())).Returns(false);
+
+            var indexModel = _indexModel;
+
+            // Act
+            var result = indexModel.OnGet();
+
+            // Assert
+            Assert.IsType<RedirectToPageResult>(result);
+            Assert.Equal("/Landing", ((RedirectToPageResult)result).PageName);
+        }
+        [Fact]
+        public void OnGet_ShouldReturnPage_IfUserIsSignedIn()
+        {
+            // Arrange
+            var indexModel = _indexModel;
+
+            // Act
+            var result = indexModel.OnGet();
+
+            // Assert
+            Assert.IsAssignableFrom<PageResult>(result);
         }
 
         [Fact]
         public async Task OnPostDynamicTaskFormHandler_ShouldAddDynamicTask_WhenModelStateIsValid()
         {
             // Arrange
-            _httpContextAccessor.Setup(x => x.HttpContext.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, "TestUser"),
-                new Claim(ClaimTypes.NameIdentifier, "TestIdentifier")
-            })));
-
             var indexModel = _indexModel;
 
             var dynamicTaskList = new List<DynamicTask>();
@@ -87,7 +117,6 @@ namespace TimeHacker.Tests
             //check if element is in the list
             Assert.Contains(dynamicTaskList, x => x.Name == inputDynamicTaskModel.Name && x.Category == inputDynamicTaskModel.Category);
         }
-
         [Fact]
         public async Task OnPostDynamicTaskFormHandler_ShouldReturnException_IfUserIdIsEmpty()
         {
@@ -108,9 +137,116 @@ namespace TimeHacker.Tests
             };
 
             // Act
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await indexModel.OnPostDynamicTaskFormHandler(inputDynamicTaskModel));
+            var func = async () => await indexModel.OnPostDynamicTaskFormHandler(inputDynamicTaskModel);
 
             // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(func);
+        }
+        [Fact]
+        public async Task OnPostDynamicTaskFormHandler_ShouldReturnException_IfModelStateIsInvalid()
+        {
+            // Arrange
+            var indexModel = _indexModel;
+
+            var inputDynamicTaskModel = new InputDynamicTaskModel
+            {
+                Name = null,
+                Description = "Test Description",
+                Category = "Test Category",
+                MaxTimeToFinish = new(2, 0, 0),
+                MinTimeToFinish = new(0, 30, 0),
+                OptimalTimeToFinish = new(1, 25, 0),
+                Priority = 2
+            };
+
+            // Act
+            var result = await indexModel.OnPostDynamicTaskFormHandler(inputDynamicTaskModel);
+
+            // Assert
+            Assert.IsType<PageResult>(result);
+            Assert.False(indexModel.ModelState.IsValid);
+        }
+
+        [Fact]
+        public async Task OnPostFixedTaskFormHandler_ShouldAddFixedTask_WhenModelStateIsValid()
+        {
+            // Arrange
+            var indexModel = _indexModel;
+
+            var fixedTaskList = new List<FixedTask>();
+
+            _fixedTasksServiceCommand.Setup(x => x.AddAsync(It.IsAny<FixedTask>(), It.IsAny<bool>()))
+                .Callback<FixedTask, bool>((fixedTask, saveChanges) =>
+                {
+                    if (saveChanges)
+                        fixedTaskList.Add(fixedTask);
+                })
+                .Returns<FixedTask, bool>((fixedTask, saveChanges) => Task.FromResult(fixedTask));
+
+            var inputFixedTaskModel = new InputFixedTaskModel
+            {
+                Name = "Test Name",
+                Description = "Test Description",
+                Category = "Test Category",
+                EndTimestamp = DateTime.Now.AddHours(-1).ToString("dd-MM-yyyy HH:mm"),
+                StartTimestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm"),
+                Priority = 2
+            };
+
+            // Act
+            var result = await indexModel.OnPostFixedTaskFormHandler(inputFixedTaskModel);
+
+            // Assert
+            Assert.IsType<RedirectToPageResult>(result);
+            //check if element is in the list
+            Assert.Contains(fixedTaskList, x => x.Name == inputFixedTaskModel.Name && x.Category == inputFixedTaskModel.Category);
+        }
+        [Fact]
+        public async Task OnPostFixedTaskFormHandler_ShouldReturnException_IfUserIdIsEmpty()
+        {
+            // Arrange
+            _httpContextAccessor.Setup(x => x.HttpContext.User).Returns((ClaimsPrincipal)null);
+
+            var indexModel = _indexModel;
+
+            var inputFixedTaskModel = new InputFixedTaskModel
+            {
+                Name = "Test Name",
+                Description = "Test Description",
+                Category = "Test Category",
+                EndTimestamp = DateTime.Now.AddHours(-1).ToString("dd-MM-yyyy HH:mm"),
+                StartTimestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm"),
+                Priority = 2
+            };
+
+            // Act
+            var func = async () => await indexModel.OnPostFixedTaskFormHandler(inputFixedTaskModel);
+
+            // Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(func);
+        }
+        [Fact]
+        public async Task OnPostFixedTaskFormHandler_ShouldReturnException_IfModelStateIsInvalid()
+        {
+            // Arrange
+            var indexModel = _indexModel;
+
+            var inputFixedTaskModel = new InputFixedTaskModel
+            {
+                Name = null,
+                Description = "Test Description",
+                Category = "Test Category",
+                EndTimestamp = DateTime.Now.AddHours(-1).ToString("dd-MM-yyyy HH:mm"),
+                StartTimestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm"),
+                Priority = 2
+            };
+
+            // Act
+            var result = await indexModel.OnPostFixedTaskFormHandler(inputFixedTaskModel);
+
+            // Assert
+            Assert.IsType<PageResult>(result);
+            Assert.False(indexModel.ModelState.IsValid);
         }
     }
 }
