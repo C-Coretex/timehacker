@@ -29,7 +29,7 @@ namespace TimeHacker.Domain.BusinessLogic.Services
                                                             .ToListAsync();
 
             var fixedTasks = _fixedTasksServiceQuery.GetAllByUserId(userId)
-                                                            .Where(ft => ft.StartTimestamp.Date == date)
+                                                            .Where(ft => ft.StartTimestamp.Date == date.Date)
                                                             .OrderBy(ft => ft.StartTimestamp)
                                                             .AsAsyncEnumerable();
 

@@ -4,16 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using TimeHacker.Application.Models.PageModels;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
-using TimeHacker.Domain.BusinessLogic.Services;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 using TimeHacker.Pages;
 using TimeHacker.Tests.Helpers;
@@ -22,12 +15,14 @@ namespace TimeHacker.Tests
 {
     public class IndexModelTests
     {
+        #region Mocks
         private readonly Mock<ILogger<IndexModel>> _logger = new();
-        private readonly Mock<UserManager<IdentityUser>> _userManagerMock;
         private readonly Mock<SignInManager<IdentityUser>> _signInManagerMock;
         private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new();
         private readonly Mock<IDynamicTasksServiceCommand> _dynamicTasksServiceCommand = new();
         private readonly Mock<IFixedTasksServiceCommand> _fixedTasksServiceCommand = new();
+        #endregion
+
         private IndexModel _indexModel
         {
             get
@@ -43,7 +38,7 @@ namespace TimeHacker.Tests
 
         public IndexModelTests()
         {
-            (_userManagerMock, _signInManagerMock) = SignInManagerMocker.GetIdentityMocks<IdentityUser>();
+            (_, _signInManagerMock) = SignInManagerMocker.GetIdentityMocks<IdentityUser>();
 
             _httpContextAccessor.Setup(x => x.HttpContext.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
             {
