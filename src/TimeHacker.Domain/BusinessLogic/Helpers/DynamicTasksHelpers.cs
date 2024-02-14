@@ -8,7 +8,9 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
     {
         public static IEnumerable<TaskContainerReturn> GetDynamicTasksForTimeRange(IEnumerable<DynamicTask> dynamicTasks, TimeRange timeRange)
         {
-            throw new NotImplementedException();
+
+
+            return [];
         }
     }
 }

@@ -37,7 +37,7 @@
                             <input asp-for="InputDynamicTaskModel.Category" id="dynamicTaskCategory" type="text" required> <br />
                             <span asp-validation-for="InputDynamicTaskModel.Category" class="text-danger"></span>
                             <label asp-for="InputDynamicTaskModel.Priority">Priority:</label> <br />
-                            <input asp-for="InputDynamicTaskModel.Priority" id="dynamicTaskPriority" type="number" min="0" required> <br />
+                            <input asp-for="InputDynamicTaskModel.Priority" id="dynamicTaskPriority" type="number" min="0" value="2" required> <br />
                             <span asp-validation-for="InputDynamicTaskModel.Priority" class="text-danger"></span>
                             <label asp-for="InputDynamicTaskModel.MinTimeToFinish">Min Time To Finish:</label> <br />
                             <input asp-for="InputDynamicTaskModel.MinTimeToFinish" id="dynamicTaskMinTimeToFinish" type="time" required> <br />
@@ -75,7 +75,7 @@
                         <input asp-for="InputFixedTaskModel.Category" id="fixedTaskCategory" type="text" required> <br />
                         <span asp-validation-for="InputFixedTaskModel.Category" class="text-danger"></span>
                         <label asp-for="InputFixedTaskModel.Priority">Priority:</label> <br />
-                        <input asp-for="InputFixedTaskModel.Priority" id="fixedTaskPriority" type="number" min="0" required> <br />
+                        <input asp-for="InputFixedTaskModel.Priority" id="fixedTaskPriority" type="number" min="0" value="2" required> <br />
                         <span asp-validation-for="InputFixedTaskModel.Priority" class="text-danger"></span>
                         <label asp-for="InputFixedTaskModel.StartTimestamp">Start Timestamp:</label> <br />
                         <input asp-for="InputFixedTaskModel.StartTimestamp" id="fixedTaskStartTimestamp" type="datetime-local" required> <br />

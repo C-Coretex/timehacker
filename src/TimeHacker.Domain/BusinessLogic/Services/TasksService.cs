@@ -47,16 +47,26 @@ namespace TimeHacker.Domain.BusinessLogic.Services
                 returnData.TasksTimeline.Add(taskContainer);
             }
 
-            var startTimeSpan = new TimeSpan(0, 0, 0);
-            var timeBacklash = new TimeSpan(0, 5, 0);
+            var startTimeSpan = Constants.DefaultConstants.StartOfDay;
+            TimeRange timeRange;
             foreach(var takenTimeRange in returnData.TasksTimeline.Select(tt => tt.TimeRange))
             {
-                var timeRange = new TimeRange(startTimeSpan, takenTimeRange.Start - timeBacklash);
+                timeRange = new TimeRange(startTimeSpan, takenTimeRange.Start - Constants.DefaultConstants.TimeBacklashBetweenTasks);
 
+                if (timeRange.Start < timeRange.End)
+                {
+                    var tasks = DynamicTasksHelpers.GetDynamicTasksForTimeRange(dynamicTasks, timeRange);
+                    returnData.TasksTimeline.AddRange(tasks);
+                }
+
+                startTimeSpan = takenTimeRange.End + Constants.DefaultConstants.TimeBacklashBetweenTasks;
+            }
+
+            timeRange = new TimeRange(startTimeSpan, Constants.DefaultConstants.EndOfDay);
+            if(timeRange.Start < timeRange.End)
+            {
                 var tasks = DynamicTasksHelpers.GetDynamicTasksForTimeRange(dynamicTasks, timeRange);
                 returnData.TasksTimeline.AddRange(tasks);
-
-                startTimeSpan = takenTimeRange.End + timeBacklash;
             }
 
             returnData.TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList();
