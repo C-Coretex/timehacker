@@ -74,15 +74,12 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 var distinctTasks = possibleTaskTimeline.DistinctBy(dt => dt.Task.Id).ToList();
                 var tasksCountOfUses = possibleTaskTimeline.Sum(dt => dt.CountOfUses);
                 var prioritySum = distinctTasks.Sum(dt => dt.Task.Priority);
-                var score = (float)(tasksCountOfUses + prioritySum / distinctTasks.Count);
+                var score = (float)((tasksCountOfUses + prioritySum) / distinctTasks.Count);
 
                 possibleTimelines.Add((possibleTaskTimeline, 1 / score));
             }
 
-            //Random.Shared.Next(2);
             var totalScore = possibleTimelines.Sum(pt => pt.Score);
-
-
             var randomValue = totalScore * (float)Random.Shared.NextDouble();
             possibleTimelines = possibleTimelines.OrderBy(pt => pt.Score).ToList();
 
@@ -93,7 +90,7 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                     return possibleTimeline.DynamicTasks;
             }
 
-            return possibleTimelines.Last().DynamicTasks;
+            return [];
         }
     }
 }
