@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.BusinessLogic.Helpers;
 using TimeHacker.Domain.Models.BusinessLogicModels;
@@ -13,22 +13,26 @@ namespace TimeHacker.Domain.BusinessLogic.Services
     {
         private readonly IDynamicTasksServiceQuery _dynamicTasksServiceQuery;
         private readonly IFixedTasksServiceQuery _fixedTasksServiceQuery;
-        private readonly string userId;
-        public TasksService(IDynamicTasksServiceQuery dynamicTasksServiceQuery, IFixedTasksServiceQuery fixedTasksServiceQuery, IHttpContextAccessor httpContextAccessor)
+        private readonly IUserAccessor _userAccessor;
+        public TasksService(IDynamicTasksServiceQuery dynamicTasksServiceQuery, IFixedTasksServiceQuery fixedTasksServiceQuery, IUserAccessor userAccessor)
         {
             _dynamicTasksServiceQuery = dynamicTasksServiceQuery;
             _fixedTasksServiceQuery = fixedTasksServiceQuery;
-            userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+
+            if(!userAccessor.IsUserValid)
+                throw new ArgumentNullException(nameof(userAccessor.UserId));
+
+            _userAccessor = userAccessor;
         }
 
         public async Task<TasksForDayReturn> GetTasksForDay(DateTime date)
         {
             var returnData = new TasksForDayReturn();
 
-            var dynamicTasks = await _dynamicTasksServiceQuery.GetAllByUserId(userId)
+            var dynamicTasks = await _dynamicTasksServiceQuery.GetAllByUserId(_userAccessor.UserId)
                                                             .ToListAsync();
 
-            var fixedTasks = _fixedTasksServiceQuery.GetAllByUserId(userId)
+            var fixedTasks = _fixedTasksServiceQuery.GetAllByUserId(_userAccessor.UserId)
                                                             .Where(ft => ft.StartTimestamp.Date == date.Date)
                                                             .OrderBy(ft => ft.StartTimestamp)
                                                             .AsAsyncEnumerable();
@@ -49,6 +53,7 @@ namespace TimeHacker.Domain.BusinessLogic.Services
 
             var startTimeSpan = Constants.DefaultConstants.StartOfDay;
             TimeRange timeRange;
+            var dynamicTasksTimeline = new List<TaskContainerReturn>();
             foreach(var takenTimeRange in returnData.TasksTimeline.Select(tt => tt.TimeRange))
             {
                 timeRange = new TimeRange(startTimeSpan, takenTimeRange.Start - Constants.DefaultConstants.TimeBacklashBetweenTasks);
@@ -56,7 +61,7 @@ namespace TimeHacker.Domain.BusinessLogic.Services
                 if (timeRange.Start < timeRange.End)
                 {
                     var tasks = DynamicTasksHelpers.GetDynamicTasksForTimeRange(dynamicTasks, timeRange);
-                    returnData.TasksTimeline.AddRange(tasks);
+                    dynamicTasksTimeline.AddRange(tasks);
                 }
 
                 startTimeSpan = takenTimeRange.End + Constants.DefaultConstants.TimeBacklashBetweenTasks;
@@ -66,8 +71,10 @@ namespace TimeHacker.Domain.BusinessLogic.Services
             if(timeRange.Start < timeRange.End)
             {
                 var tasks = DynamicTasksHelpers.GetDynamicTasksForTimeRange(dynamicTasks, timeRange);
-                returnData.TasksTimeline.AddRange(tasks);
+                dynamicTasksTimeline.AddRange(tasks);
             }
+
+            returnData.TasksTimeline.AddRange(dynamicTasksTimeline);
 
             returnData.TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList();
             return returnData;

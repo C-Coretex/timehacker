@@ -1,6 +1,6 @@
 ﻿namespace TimeHacker.Application.Models.PageModels
 {
-    public class InputFixedTaskModel
+    public record InputFixedTaskModel
     {
         public string Name { get; set; }
         public string? Description { get; set; }

@@ -37,7 +37,8 @@ namespace TimeHacker.Pages
             SignInManager<IdentityUser> signInManager,
             IHttpContextAccessor httpContextAccessor,
             IDynamicTasksServiceCommand dynamicTasksServiceCommand,
-            IFixedTasksServiceCommand fixedTasksServiceCommand)
+            IFixedTasksServiceCommand fixedTasksServiceCommand
+        )
         {
             _logger = logger;
             _user = httpContextAccessor.HttpContext?.User;

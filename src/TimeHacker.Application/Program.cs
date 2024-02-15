@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TimeHacker.Application.Helpers;
 using TimeHacker.Data;
+using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.BusinessLogic.Services;
 using TimeHacker.Persistence.Context;
 using TimeHacker.Persistence.Extensions;
@@ -61,8 +63,9 @@ app.MapRazorPages();
 
 app.Run();
 
-IServiceCollection AddBusinessLogicServices(IServiceCollection services)
+static IServiceCollection AddBusinessLogicServices(IServiceCollection services)
 {
     services.AddScoped<TasksService>();
+    services.AddScoped<IUserAccessor, UserAccessor>();
     return services;
 }

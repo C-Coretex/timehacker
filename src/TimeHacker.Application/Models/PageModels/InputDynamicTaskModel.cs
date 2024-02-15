@@ -2,7 +2,7 @@
 
 namespace TimeHacker.Application.Models.PageModels
 {
-    public class InputDynamicTaskModel
+    public record InputDynamicTaskModel
     {
         public string Name { get; set; }
         public string? Description { get; set; }
