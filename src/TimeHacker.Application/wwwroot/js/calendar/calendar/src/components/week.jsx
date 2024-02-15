@@ -2,7 +2,7 @@ import moment from 'moment'
 import DayOfWeek from './dayOfWeek';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { API_URL } from '../tools/variables'
+import { API_URL, TEST_RESULT_FOR_DAY } from '../tools/variables'
 
 function Week() {
   const [mondayOfSelectedWeek, setMondayOfSelectedWeek] = useState(moment().startOf('isoWeek'))
@@ -40,11 +40,13 @@ function Week() {
     fetch(`${API_URL}/Tasks/GetTasksForDay?date=${date.format('DD.MM.YYYY')}`)
       .then(result => result.json())
       .then((result) => {
-        console.log('success')
+        console.log(result)
       },
       (error) => {
         console.log('error')
       })
+
+      console.log(TEST_RESULT_FOR_DAY)
   }
 
   return (
@@ -76,7 +78,7 @@ function Week() {
           <div className='tw-w-full tw-h-full tw-absolute tw-z-10'>
             <div className='tw-pl-11 tw-w-full tw-h-full tw-flex tw-flex-row'>
               {
-                daysOfWeek.map((d => <DayOfWeek key={uuid()} day={d.day} isSelected={d.isSelected} />))
+                daysOfWeek.map((d => <DayOfWeek key={uuid()} day={d.day} isSelected={d.isSelected} tasks={TEST_RESULT_FOR_DAY} />))
               }
             </div>
           </div>
@@ -95,7 +97,7 @@ function Hours({ hoursOfDay }) {
         hoursOfDay.map((h) =>
           <div className='tw-w-full tw-h-[2px] tw-flex tw-flex-row tw-items-center' key={uuid()}>
             <div className='tw-ml-1 tw-mr-1 tw-select-none'>{String(h).padStart(2, 0)}:00</div>
-            <div className='tw-w-full tw-h-[2px] tw-bg-gray-400 tw-opacity-80' key={uuid()} />
+            <div className='tw-w-full tw-h-[2px] tw-bg-gray-400 tw-opacity-40' key={uuid()} />
           </div>
         )
       }

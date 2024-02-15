@@ -76,6 +76,9 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 var prioritySum = distinctTasks.Sum(dt => dt.Task.Priority);
                 var score = (float)((tasksCountOfUses + prioritySum) / distinctTasks.Count);
 
+                if (possibleTaskTimeline.Max(tt => tt.TimeRange.End) < timeRange.End)
+                    score += 10; // penalty, if the task timeline is shorter than the time range
+
                 possibleTimelines.Add((possibleTaskTimeline, 1 / score));
             }
 
