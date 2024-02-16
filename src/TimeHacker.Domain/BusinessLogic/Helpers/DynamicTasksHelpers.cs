@@ -33,7 +33,19 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
 
             var possibleTimelines = new List<(IEnumerable<DynamicTaskContainer> DynamicTasks, float Score)>();
 
-            foreach (var dynamicTask in dynamicTasks)
+            //limit count of iterations (for performance)
+            var takeCount = timeToFinish switch
+            {
+                var t when t.TotalHours < 2 => 6,
+                var t when t.TotalHours < 4 => 5,
+                var t when t.TotalHours < 6 => 3,
+                var t when t.TotalHours < 8 => 2,
+                _ => 1
+            };
+
+            var chosenDynamicTasks = dynamicTasks.OrderBy(dt => new Guid()).Take(takeCount); // shuffle the tasks and take only 5 of them
+
+            foreach (var dynamicTask in chosenDynamicTasks)
             {
                 TimeSpan taskTime;
                 if (dynamicTask.Task.OptimalTimeToFinish != null && dynamicTask.Task.OptimalTimeToFinish.Value != TimeSpan.Zero)
@@ -76,8 +88,8 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 var prioritySum = distinctTasks.Sum(dt => dt.Task.Priority);
                 var score = (float)((tasksCountOfUses + prioritySum) / distinctTasks.Count);
 
-                if (possibleTaskTimeline.Max(tt => tt.TimeRange.End) < timeRange.End)
-                    score += 10; // penalty, if the task timeline is shorter than the time range
+                var maxTimeRangeEnd = possibleTaskTimeline.Max(tt => tt.TimeRange.End);
+                score += (maxTimeRangeEnd - timeRange.End).Minutes; // penalty for not using the whole time range
 
                 possibleTimelines.Add((possibleTaskTimeline, 1 / score));
             }

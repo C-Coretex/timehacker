@@ -5,26 +5,35 @@ import { v4 as uuid } from 'uuid';
 import { API_URL, TEST_RESULT_FOR_DAY } from '../tools/variables'
 
 function Week() {
+  const hoursOfDay = Array.from({ length: 23 }, (_, i) => i + 1);
+
   const [mondayOfSelectedWeek, setMondayOfSelectedWeek] = useState(moment().startOf('isoWeek'))
+  const [daysOfWeek, setdaysOfWeek] = useState([]);
 
   useEffect(() => {
-    getTasksForDay()
-  }, [])
-
-  useEffect(() => {
-    setdaysOfWeek(getDaysOfWeek())
+    setDaysOfWeekCallback()
   }, [mondayOfSelectedWeek])
 
-  const [daysOfWeek, setdaysOfWeek] = useState(getDaysOfWeek());
 
-  const [hoursOfDay, setHoursOfDay] = useState(Array.from({ length: 23 }, (_, i) => i + 1));
-
-  function getDaysOfWeek()
-  {
-    return Array.from(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], (x, i) => {
+  function setDaysOfWeekCallback() {
+    let days = Array.from(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], (x, i) => {
       let day = moment(mondayOfSelectedWeek).add(i, 'days')
       return { day: day, dayName: x, isSelected: day.isSame(moment(), 'day') }
     })
+
+    
+    getTasksForDays(days.map(d => d.day)).then((result) =>
+    {
+      let tasks = result 
+      setdaysOfWeek(days.map((day, i) => {
+        return { day: day.day, dayName: day.dayName, isSelected: day.isSelected, tasks: tasks[i] }
+      }))
+    }
+    )
+      .catch(error => {
+        // Handle errors if necessary
+        console.error(error);
+      });
   }
 
   function changeSelectedWeek(isAddAction) {
@@ -33,20 +42,21 @@ function Week() {
     setMondayOfSelectedWeek(moment(mondayOfSelectedWeek).add(addDaysCount, 'days'))
   }
 
-  function getTasksForDay(date) {
-    if (!date)
-      date = moment()
-
-    fetch(`${API_URL}/Tasks/GetTasksForDay?date=${date.format('DD.MM.YYYY')}`)
+  function getTasksForDays(dates) {
+    return fetch(`${API_URL}/Tasks/GetTasksForDays`,
+      {
+        method: "POST",
+        body: JSON.stringify(dates),
+        headers: new Headers({ 'content-type': 'application/json', 'accept': 'application/json' }),
+      })
       .then(result => result.json())
       .then((result) => {
-        console.log(result)
+        return result
       },
-      (error) => {
-        console.log('error')
-      })
-
-      console.log(TEST_RESULT_FOR_DAY)
+        (error) => {
+          console.log(error)
+          throw error; // Rethrow the error to propagate it further if needed
+        })
   }
 
   return (
@@ -59,7 +69,7 @@ function Week() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 9-3 3m0 0 3 3m-3-3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
             </div>
-            
+
             <div className='tw-w-1/2 tw-h-fit hover:tw-cursor-pointer hover:*:tw-stroke-blue-500' onClick={() => changeSelectedWeek(true)}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -78,7 +88,7 @@ function Week() {
           <div className='tw-w-full tw-h-full tw-absolute tw-z-10'>
             <div className='tw-pl-11 tw-w-full tw-h-full tw-flex tw-flex-row'>
               {
-                daysOfWeek.map((d => <DayOfWeek key={uuid()} day={d.day} isSelected={d.isSelected} tasks={TEST_RESULT_FOR_DAY} />))
+                daysOfWeek.map((d => <DayOfWeek key={uuid()} day={d.day} isSelected={d.isSelected} tasks={d.tasks} />))
               }
             </div>
           </div>

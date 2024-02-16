@@ -11,6 +11,7 @@ namespace TimeHacker.Domain.Models.ReturnModels
     }
     public class TasksForDayReturn
     {
+        public DateOnly Date { get; set; }
         public List<TaskContainerReturn> TasksTimeline { get; set; } = new();
     }
 }

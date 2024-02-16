@@ -1,6 +1,8 @@
 import moment from 'moment'
+import React from 'react'
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { POSSIBLE_COLORS_FOR_TASK } from '../tools/variables'
 
 function DayOfWeek({ day, isSelected, tasks }) {
   tasks = tasks.tasksTimeline
@@ -15,17 +17,29 @@ function DayOfWeek({ day, isSelected, tasks }) {
   }
 
   useEffect(() => {
+    let lastTaskEndMinutes = 0
+
     let taskElementsTemp = tasks.map((taskContainer) => {
       const startMinutes = getMinutesFromTimestamp(taskContainer.timeRange.start)
       const endMinutes = getMinutesFromTimestamp(taskContainer.timeRange.end)
       const taskTimelineInMinutes = endMinutes - startMinutes
 
-      let height = countOfMinutesInDay / taskTimelineInMinutes
+      let height = (100 / countOfMinutesInDay) * taskTimelineInMinutes
+      let emptyTaskHeight = 0
+      if(startMinutes > lastTaskEndMinutes)
+        emptyTaskHeight = (100 / countOfMinutesInDay) * (startMinutes - lastTaskEndMinutes)
+
+      lastTaskEndMinutes = endMinutes
 
       return (
-        <div className='tw-bg-red-700 tw-opacity-75 tw-outline tw-outline-1 tw-outline-black' style={{ height: `${height}%` }}>
-
+      <React.Fragment key={uuid()}>
+        <div style={{ height: `${emptyTaskHeight}%` }}>
+          
         </div>
+        <div className='tw-opacity-80 tw-flex tw-flex-row tw-items-center tw-justify-start tw-rounded-sm' style={{ height: `${height}%`, backgroundColor: POSSIBLE_COLORS_FOR_TASK[Math.floor(Math.random() * POSSIBLE_COLORS_FOR_TASK.length)] }}>
+          <span className='tw-text-sm tw-pr-1'>{taskContainer.task.name}</span> <span className='tw-text-sm'>{(`${taskContainer.timeRange.start} - ${taskContainer.timeRange.end}`)}</span>
+        </div>
+      </React.Fragment>
       )
     })
 
@@ -34,8 +48,8 @@ function DayOfWeek({ day, isSelected, tasks }) {
 
   return (
     <div className='tw-h-full tw-w-full tw-z-50'>
-      <div className={`tw-h-full tw-w-full tw-border-black tw-border-0 tw-border-l-2 tw-border-solid ${isSelected ? 'tw-bg-slate-200' : ''}`}>
-        <div className={`tw-h-full tw-flex tw-flex-col tw-justify-between tw-w-full`}>
+      <div className={`tw-h-full tw-w-full tw-border-black tw-border-0 tw-border-l-2 tw-border-solid tw-opacity-95 ${isSelected ? 'tw-bg-slate-200' : ''}`}>
+        <div className={`tw-p-1 tw-h-full tw-flex tw-flex-col tw-justify-between tw-w-full`}>
           {
             taskElements
           }

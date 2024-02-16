@@ -7,6 +7,7 @@ function App() {
   let api = window.location.href
   api = api.replace(window.location.pathname, "/")
   api += 'api'
+  //api = 'https://localhost:7112/api'
   setApiUrl(api)
 
   return (

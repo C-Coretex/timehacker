@@ -35,10 +35,20 @@ namespace TimeHacker.Application.Controllers
             }
         }
 
-        /*[HttpGet]
-        public Task<IActionResult> GetTasks()
+        [HttpPost("GetTasksForDays")]
+        public async Task<IActionResult> GetTasksForDays([FromBody] IEnumerable<DateTime> dates)
         {
-            return _tasksService.GetTasks();
-        }*/
+            try
+            {
+                var data = await _tasksService.GetTasksForDays(dates);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while getting tasks for days");
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

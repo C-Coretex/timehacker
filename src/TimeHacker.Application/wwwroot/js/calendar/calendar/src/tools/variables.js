@@ -3,6 +3,25 @@ export function setApiUrl(newUrl) {
     API_URL = newUrl
 }
 
+export const POSSIBLE_COLORS_FOR_TASK = [
+    '#FFCCE5',
+    '#FC766AFF',
+    '#5B84B1FF',
+    '#5F4B8BFF',
+    '#97BC62FF',
+    '#0063B2FF',
+    '#E94B3CFF',
+    '#DAA03DFF',
+    '#333D79FF',
+    '#FFA177FF',
+    '#A13941FF',
+    '#964F4CFF',
+    '#567572FF',
+    '#8BBEE8FF',
+    '#7DB46CFF',
+    '#EEB238FF'
+]
+
 export const TEST_RESULT_FOR_DAY = {
     "tasksTimeline": [
         {
@@ -277,23 +296,7 @@ export const TEST_RESULT_FOR_DAY = {
                 "end": "13:49:00"
             }
         },
-        {
-            "isFixed": true,
-            "task": {
-                "userId": "2d206f01-0d24-4640-8023-c0a0f03d20ca",
-                "name": "task1",
-                "description": "test aaa",
-                "category": "bbbn",
-                "priority": 1,
-                "isCompleted": false,
-                "createdTimestamp": "2024-02-03T13:54:42.9891843",
-                "id": 1
-            },
-            "timeRange": {
-                "start": "13:54:00",
-                "end": "14:20:00"
-            }
-        },
+
         {
             "isFixed": false,
             "task": {

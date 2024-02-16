@@ -31,8 +31,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(o =>
 
 AddBusinessLogicServices(builder.Services);
 
+
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
+ 
 
 var app = builder.Build();
 
