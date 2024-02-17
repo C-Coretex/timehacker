@@ -31,7 +31,6 @@ function Week() {
     }
     )
       .catch(error => {
-        // Handle errors if necessary
         console.error(error);
       });
   }
@@ -55,7 +54,7 @@ function Week() {
       },
         (error) => {
           console.log(error)
-          throw error; // Rethrow the error to propagate it further if needed
+          throw error;
         })
   }
 
@@ -82,7 +81,7 @@ function Week() {
             }
           </div>
         </div>
-        <div className='tw-w-full tw-h-[90%] tw-relative tw-border-black tw-border-2 tw-border-solid'>
+        <div className='tw-w-full tw-h-full tw-relative tw-border-black tw-border-2 tw-border-solid'>
           <Hours hoursOfDay={hoursOfDay} />
 
           <div className='tw-w-full tw-h-full tw-absolute tw-z-10'>
@@ -100,7 +99,7 @@ function Week() {
 }
 
 function Hours({ hoursOfDay }) {
-  return <div className='tw-w-full tw-h-full tw-absolute tw-z-20'>
+  return <div className='tw-w-full tw-h-full tw-absolute tw-z-20 tw-select-none'>
     <div className='tw-w-full tw-h-full tw-flex tw-flex-col tw-justify-between'>
       <div></div>
       {

@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div className='tw-h-full'>
-      <div className='tw-flex tw-flex-row tw-items-center tw-justify-center tw-p-4 tw-h-full'>
+      <div className='tw-flex tw-flex-row tw-items-center tw-justify-center tw-h-full'>
         <Week />
       </div>
     </div>

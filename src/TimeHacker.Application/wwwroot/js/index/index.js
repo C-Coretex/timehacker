@@ -38,3 +38,19 @@ $("#fixedTaskEndTimestamp").flatpickr({
     time_24hr: true,
     static: true
 });
+
+$(".js-add-fixed-task-button").on("click", () => {
+    $("#addFixedTaskLi").addClass("active");
+    $("#addDynamicTaskLi").removeClass("active");
+
+    $("#fixedTaskModal").removeClass("d-none");
+    $("#dynamicTaskModal").addClass("d-none");
+});
+
+$(".js-add-dynamic-task-button").on("click", () => {
+    $("#addDynamicTaskLi").addClass("active");
+    $("#addFixedTaskLi").removeClass("active");
+
+    $("#dynamicTaskModal").removeClass("d-none");
+    $("#fixedTaskModal").addClass("d-none");
+});

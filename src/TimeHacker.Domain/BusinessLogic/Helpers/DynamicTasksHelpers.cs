@@ -89,7 +89,7 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 var score = (float)((tasksCountOfUses + prioritySum) / distinctTasks.Count);
 
                 var maxTimeRangeEnd = possibleTaskTimeline.Max(tt => tt.TimeRange.End);
-                score += (maxTimeRangeEnd - timeRange.End).Minutes; // penalty for not using the whole time range
+                score += (timeRange.End - maxTimeRangeEnd).Minutes; // penalty for not using the whole time range
 
                 possibleTimelines.Add((possibleTaskTimeline, 1 / score));
             }

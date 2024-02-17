@@ -47,8 +47,8 @@ function DayOfWeek({ day, isSelected, tasks }) {
   }, [])
 
   return (
-    <div className='tw-h-full tw-w-full tw-z-50'>
-      <div className={`tw-h-full tw-w-full tw-border-black tw-border-0 tw-border-l-2 tw-border-solid tw-opacity-95 ${isSelected ? 'tw-bg-slate-200' : ''}`}>
+    <div className='tw-h-full tw-w-full'>
+      <div className={`tw-h-full tw-w-full tw-border-black tw-border-0 tw-border-l-2 tw-border-solid tw-opacity-95 ${isSelected ? 'tw-bg-green-300' : ''}`}>
         <div className={`tw-p-1 tw-h-full tw-flex tw-flex-col tw-justify-between tw-w-full`}>
           {
             taskElements

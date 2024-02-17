@@ -27,6 +27,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(o =>
 {
     o.Password.RequireDigit = true;
     o.Password.RequiredLength = 6;
+    o.Password.RequireLowercase = true;
+    o.Password.RequireUppercase = true;
+    o.Password.RequireNonAlphanumeric = false;
 }).AddEntityFrameworkStores<IdentityDbContext>();
 
 AddBusinessLogicServices(builder.Services);
@@ -34,7 +37,7 @@ AddBusinessLogicServices(builder.Services);
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
- 
+builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
 

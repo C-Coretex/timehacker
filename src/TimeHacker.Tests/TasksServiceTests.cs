@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.BusinessLogic.Services;
 using TimeHacker.Domain.Models.Persistence.Tasks;
@@ -18,19 +19,16 @@ namespace TimeHacker.Tests
         #region Mocks
         private readonly Mock<IDynamicTasksServiceQuery> _dynamicTasksServiceQuery = new();
         private readonly Mock<IFixedTasksServiceQuery> _fixedTasksServiceQuery = new();
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessor = new();
+        private readonly Mock<IUserAccessor> _userAccessor = new();
         #endregion
 
         TasksService _tasksService;
         public TasksServiceTests()
         {
-            _httpContextAccessor.Setup(x => x.HttpContext.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-            {
-                new(ClaimTypes.Name, "TestUser"),
-                new(ClaimTypes.NameIdentifier, "TestIdentifier")
-            })));
+            _userAccessor.Setup(x => x.UserId).Returns("TestIdentifier");
+            _userAccessor.Setup(x => x.IsUserValid).Returns(true);
 
-            _tasksService = new TasksService(_dynamicTasksServiceQuery.Object, _fixedTasksServiceQuery.Object, _httpContextAccessor.Object);
+            _tasksService = new TasksService(_dynamicTasksServiceQuery.Object, _fixedTasksServiceQuery.Object, _userAccessor.Object);
         }
 
 
@@ -41,11 +39,6 @@ namespace TimeHacker.Tests
             // Arrange
             var date = DateTime.Now;
             var userId = "TestIdentifier";
-            _httpContextAccessor.Setup(x => x.HttpContext.User).Returns(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-            {
-                new(ClaimTypes.Name, "TestUser"),
-                new(ClaimTypes.NameIdentifier, userId)
-            })));
 
             var dynamicTasks = new List<DynamicTask>
             {
