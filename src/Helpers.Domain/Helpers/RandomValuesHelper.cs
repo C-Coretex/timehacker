@@ -14,7 +14,7 @@ namespace Helpers.Domain.Helpers
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count), "Count must be greater than or equal to 0");
 
-            var entriesList = entries.ToList();
+            var entriesList = entries.OrderBy(e => e.Weight).ToList();
             if (count > entriesList.Count)
                 count = entriesList.Count;
 

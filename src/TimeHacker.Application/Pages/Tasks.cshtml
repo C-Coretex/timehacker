@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
 <script src="~/lib/flatpickr/flatpickr.min.js"></script>
 
-<div class="text-center">
+<div class="text-center h-100">
     <div class="nav nav-tabs">
         <li class="nav-item">
             <button class="nav-link active js-open-fixed-tasks-button" id="openFixedTasksLi">Fixed Tasks</button>
@@ -18,13 +18,42 @@
         </li>
 
     </div>
-    <div class="row">
-        <div class="col-sm js-fixed-tasks">
-            @Html.DisplayFor(m => m.FixedTasks)
-        </div>
-        <div class="col-sm js-dynamic-tasks d-none">
-            @Html.DisplayFor(m => m.DynamicTasks)
-        </div>
+    <div class="js-fixed-task">
+        <table class="table js-fixed-tasks">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>StartTimestamp</th>
+                    <th>EndTimestamp</th>
+                    <th>Controls</th>
+                </tr>
+            </thead>
+            <tbody>
+                @Html.DisplayFor(m => m.FixedTasks)
+            </tbody>
+        </table>
+    </div>
+    <div class="js-dynamic-tasks d-none">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>MinTimeToFinish</th>
+                    <th>MaxTimeToFinish</th>
+                    <th>OptimalTimeToFinish</th>
+                    <th>Controls</th>
+                </tr>
+            </thead>
+            <tbody>
+                @Html.DisplayFor(m => m.DynamicTasks)
+            </tbody>
+        </table>
     </div>
 </div>
 
