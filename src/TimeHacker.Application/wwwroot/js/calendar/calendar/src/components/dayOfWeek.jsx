@@ -36,12 +36,14 @@ function DayOfWeek({ day, isSelected, tasks }) {
         <div style={{ height: `${emptyTaskHeight}%` }}>
           
         </div>
-        <div className='tw-opacity-80 tw-flex tw-flex-row tw-items-center tw-justify-start tw-rounded-sm' style={{ height: `${height}%`, backgroundColor: POSSIBLE_COLORS_FOR_TASK[Math.floor(Math.random() * POSSIBLE_COLORS_FOR_TASK.length)] }}>
+        <div className='tw-opacity-80 tw-flex tw-flex-row tw-items-center tw-justify-start tw-rounded-sm hover:tw-cursor-pointer p-1' style={{ height: `${height}%`, backgroundColor: POSSIBLE_COLORS_FOR_TASK[Math.floor(Math.random() * POSSIBLE_COLORS_FOR_TASK.length)] }}>
           <span className='tw-text-sm tw-pr-1'>{taskContainer.task.name}</span> <span className='tw-text-sm'>{(`${taskContainer.timeRange.start} - ${taskContainer.timeRange.end}`)}</span>
         </div>
       </React.Fragment>
       )
     })
+
+
 
     setTaskElements(taskElementsTemp)
   }, [])
@@ -49,7 +51,7 @@ function DayOfWeek({ day, isSelected, tasks }) {
   return (
     <div className='tw-h-full tw-w-full'>
       <div className={`tw-h-full tw-w-full tw-border-black tw-border-0 tw-border-l-2 tw-border-solid tw-opacity-95 ${isSelected ? 'tw-bg-green-300' : ''}`}>
-        <div className={`tw-p-1 tw-h-full tw-flex tw-flex-col tw-justify-between tw-w-full`}>
+        <div className={`tw-p-1 tw-h-full tw-flex tw-flex-col tw-justify-start tw-w-full`}>
           {
             taskElements
           }

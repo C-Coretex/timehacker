@@ -1,4 +1,5 @@
 ﻿@page
+@using TimeHacker.Application.Pages
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -9,7 +10,7 @@
 
 <div class="text-center h-100" style="padding-bottom: 5px">
     <div class="p-2 d-flex flex-row align-items-center justify-content-start border rounded" style="height: 70px;">
-        <button class="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Add task">
+        <button class="btn btn-primary m-2 js-open-add-task-modal" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Add task">
             <svg style="width: 25px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
@@ -28,62 +29,92 @@
                         <li class="nav-item">
                             <button class="nav-link js-add-dynamic-task-button" id="addDynamicTaskLi">Add Dynamic Task</button>
                         </li>
-
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
                     <div>
                         <div id="fixedTaskModal">
                             <form id="fixedTaskForm" method="post" asp-page-handler="FixedTaskFormHandler">
-                                <label asp-for="InputFixedTaskModel.Name">Name:</label> <br />
-                                <input asp-for="InputFixedTaskModel.Name" id="fixedTaskName" type="text" required> <br />
-                                <span asp-validation-for="InputFixedTaskModel.Name" class="text-danger"></span>
-                                <label asp-for="InputFixedTaskModel.Description">Description:</label> <br />
-                                <input asp-for="InputFixedTaskModel.Description" id="fixedTaskDescription" type="text"> <br />
-                                <span asp-validation-for="InputFixedTaskModel.Description" class="text-danger"></span>
-                                <label asp-for="InputFixedTaskModel.Category">Category:</label> <br />
-                                <input asp-for="InputFixedTaskModel.Category" id="fixedTaskCategory" type="text" required> <br />
-                                <span asp-validation-for="InputFixedTaskModel.Category" class="text-danger"></span>
-                                <label asp-for="InputFixedTaskModel.Priority">Priority:</label> <br />
-                                <input asp-for="InputFixedTaskModel.Priority" id="fixedTaskPriority" type="number" min="0" value="2" required> <br />
-                                <span asp-validation-for="InputFixedTaskModel.Priority" class="text-danger"></span>
-                                <label asp-for="InputFixedTaskModel.StartTimestamp">Start Timestamp:</label> <br />
-                                <input asp-for="InputFixedTaskModel.StartTimestamp" id="fixedTaskStartTimestamp" type="datetime-local" required> <br />
-                                <span asp-validation-for="InputFixedTaskModel.StartTimestamp" class="text-danger"></span>
-                                <label asp-for="InputFixedTaskModel.EndTimestamp">End Timestamp:</label> <br />
-                                <input asp-for="InputFixedTaskModel.EndTimestamp" id="fixedTaskEndTimestamp" type="datetime-local" required> <br />
-                                <span asp-validation-for="InputFixedTaskModel.EndTimestamp" class="text-danger"></span>
-                                <button type="submit">Submit</button>
+                                <div class="form-group">
+                                    <label asp-for="InputFixedTaskModel.Name">Name:</label> <br />
+                                    <input class="form-control" asp-for="InputFixedTaskModel.Name" id="fixedTaskName" type="text" required> <br />
+                                    <span asp-validation-for="InputFixedTaskModel.Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="InputFixedTaskModel.Description">Description:</label> <br />
+                                    <textarea class="form-control" asp-for="InputFixedTaskModel.Description" id="fixedTaskDescription" type="text" ></textarea> <br />
+                                    <span asp-validation-for="InputFixedTaskModel.Description" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="InputFixedTaskModel.Category">Category:</label> <br />
+                                    <input class="form-control" asp-for="InputFixedTaskModel.Category" id="fixedTaskCategory" type="text" required> <br />
+                                    <span asp-validation-for="InputFixedTaskModel.Category" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="InputFixedTaskModel.Priority">Priority:</label> <br />
+                                    <input class="form-control" asp-for="InputFixedTaskModel.Priority" id="fixedTaskPriority" type="number" min="0" value="3" required> <br />
+                                    <span asp-validation-for="InputFixedTaskModel.Priority" class="text-danger"></span>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <label asp-for="InputFixedTaskModel.StartTimestamp">Start Timestamp:</label> <br />
+                                        <input class="form-control" asp-for="InputFixedTaskModel.StartTimestamp" id="fixedTaskStartTimestamp" type="datetime-local" required> <br />
+                                        <span asp-validation-for="InputFixedTaskModel.StartTimestamp" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <label asp-for="InputFixedTaskModel.EndTimestamp">End Timestamp:</label> <br />
+                                        <input class="form-control" asp-for="InputFixedTaskModel.EndTimestamp" id="fixedTaskEndTimestamp" type="datetime-local" required> <br />
+                                        <span asp-validation-for="InputFixedTaskModel.EndTimestamp" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary mt-3" type="submit">Submit</button>
                             </form>
                         </div>
 
                         <div class="d-none" id="dynamicTaskModal">
                             <form id="dynamicTaskForm" method="post" asp-page-handler="DynamicTaskFormHandler">
                                 <div class="flex-column">
-                                    <label asp-for="InputDynamicTaskModel.Name">Name:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.Name" id="dynamicTaskName" type="text" required> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.Name" class="text-danger"></span>
-                                    <label asp-for="InputDynamicTaskModel.Description">Description:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.Description" id="dynamicTaskDescription" type="text"> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.Description" class="text-danger"></span>
-                                    <label asp-for="InputDynamicTaskModel.Category">Category:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.Category" id="dynamicTaskCategory" type="text" required> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.Category" class="text-danger"></span>
-                                    <label asp-for="InputDynamicTaskModel.Priority">Priority:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.Priority" id="dynamicTaskPriority" type="number" min="0" value="2" required> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.Priority" class="text-danger"></span>
-                                    <label asp-for="InputDynamicTaskModel.MinTimeToFinish">Min Time To Finish:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.MinTimeToFinish" id="dynamicTaskMinTimeToFinish" type="time" required> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.MinTimeToFinish" class="text-danger"></span>
-                                    <label asp-for="InputDynamicTaskModel.MaxTimeToFinish">Max Time To Finish:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.MaxTimeToFinish" id="dynamicTaskMaxTimeToFinish" type="time" required> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.MaxTimeToFinish" class="text-danger"></span>
-                                    <label asp-for="InputDynamicTaskModel.OptimalTimeToFinish">Optimal Time To Finish:</label> <br />
-                                    <input asp-for="InputDynamicTaskModel.OptimalTimeToFinish" id="dynamicTaskOptimalTimeToFinish" type="time"> <br />
-                                    <span asp-validation-for="InputDynamicTaskModel.OptimalTimeToFinish" class="text-danger"></span>
+                                    <div class="form-group">
+                                        <label asp-for="InputDynamicTaskModel.Name">Name:</label> <br />
+                                        <input class="form-control" asp-for="InputDynamicTaskModel.Name" id="dynamicTaskName" type="text" required> <br />
+                                        <span asp-validation-for="InputDynamicTaskModel.Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="InputDynamicTaskModel.Description">Description:</label> <br />
+                                        <textarea class="form-control" asp-for="InputDynamicTaskModel.Description" id="dynamicTaskDescription" type="text"></textarea> <br />
+                                        <span asp-validation-for="InputDynamicTaskModel.Description" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="InputDynamicTaskModel.Category">Category:</label> <br />
+                                        <input class="form-control" asp-for="InputDynamicTaskModel.Category" id="dynamicTaskCategory" type="text" required> <br />
+                                        <span asp-validation-for="InputDynamicTaskModel.Category" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="InputDynamicTaskModel.Priority">Priority:</label> <br />
+                                        <input class="form-control" asp-for="InputDynamicTaskModel.Priority" id="dynamicTaskPriority" type="number" min="0" value="3" required> <br />
+                                        <span asp-validation-for="InputDynamicTaskModel.Priority" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col">
+                                            <label asp-for="InputDynamicTaskModel.MinTimeToFinish">Min Time To Finish:</label> <br />
+                                            <input class="form-control" asp-for="InputDynamicTaskModel.MinTimeToFinish" id="dynamicTaskMinTimeToFinish" type="time" required> <br />
+                                            <span asp-validation-for="InputDynamicTaskModel.MinTimeToFinish" class="text-danger"></span>
+                                        </div>
+                                        <div class="col">
+                                            <label asp-for="InputDynamicTaskModel.MaxTimeToFinish">Max Time To Finish:</label> <br />
+                                            <input class="form-control" asp-for="InputDynamicTaskModel.MaxTimeToFinish" id="dynamicTaskMaxTimeToFinish" type="time" required> <br />
+                                            <span asp-validation-for="InputDynamicTaskModel.MaxTimeToFinish" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="InputDynamicTaskModel.OptimalTimeToFinish">Optimal Time To Finish:</label> <br />
+                                        <input class="form-control" asp-for="InputDynamicTaskModel.OptimalTimeToFinish" id="dynamicTaskOptimalTimeToFinish" type="time"> <br />
+                                        <span asp-validation-for="InputDynamicTaskModel.OptimalTimeToFinish" class="text-danger"></span>
+                                    </div>
                                 </div>
-                                <button type="submit">Submit</button>
+                                <button class="btn btn-primary mt-3" type="submit">Submit</button>
                             </form>
                         </div>
                     </div>
@@ -95,12 +126,13 @@
 
 @{
     var openModal = Model.OpenModal as int? ?? (int)IndexModel.OpenModalType.None;
-     
+
     switch (openModal)
     {
         case (int)IndexModel.OpenModalType.DynamicTask:
             <script>
                 $(document).ready(function () {
+                    $('.js-open-add-task-modal').click();
                     $('.js-add-dynamic-task-button').click();
                 });
             </script>
@@ -108,6 +140,7 @@
         case (int)IndexModel.OpenModalType.FixedTask:
             <script>
                 $(document).ready(function () {
+                    $('.js-open-add-task-modal').click();
                     $('.js-add-fixed-task-button').click();
                 });
             </script>

@@ -99,7 +99,7 @@ function Week() {
 }
 
 function Hours({ hoursOfDay }) {
-  return <div className='tw-w-full tw-h-full tw-absolute tw-z-20 tw-select-none'>
+  return <div className='tw-w-full tw-h-full tw-absolute tw-z-20 tw-select-none tw-pointer-events-none'>
     <div className='tw-w-full tw-h-full tw-flex tw-flex-col tw-justify-between'>
       <div></div>
       {

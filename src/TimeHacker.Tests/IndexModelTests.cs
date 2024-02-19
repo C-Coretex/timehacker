@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 using TimeHacker.Application.Models.PageModels;
+using TimeHacker.Application.Pages;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Models.Persistence.Tasks;
-using TimeHacker.Pages;
 using TimeHacker.Tests.Helpers;
 
 namespace TimeHacker.Tests

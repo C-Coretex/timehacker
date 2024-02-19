@@ -8,7 +8,7 @@ using TimeHacker.Application.Models.PageModels;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 
-namespace TimeHacker.Pages
+namespace TimeHacker.Application.Pages
 {
 
     public class IndexModel : PageModel

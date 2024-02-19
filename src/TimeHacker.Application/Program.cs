@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Application.Helpers;
-using TimeHacker.Data;
 using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.BusinessLogic.Services;
 using TimeHacker.Persistence.Context;
 using TimeHacker.Persistence.Extensions;
+using TimeHacker.Persistence.IdentityData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +33,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(o =>
 }).AddEntityFrameworkStores<IdentityDbContext>();
 
 AddBusinessLogicServices(builder.Services);
-
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();

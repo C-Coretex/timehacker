@@ -1,0 +1,31 @@
+﻿@page
+@using TimeHacker.Application.Pages
+@model TasksAndEventsModel
+@{
+    ViewData["Title"] = "Tasks and Events";
+}
+
+<link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
+<script src="~/lib/flatpickr/flatpickr.min.js"></script>
+
+<div class="text-center">
+    <div class="nav nav-tabs">
+        <li class="nav-item">
+            <button class="nav-link active js-open-fixed-tasks-button" id="openFixedTasksLi">Fixed Tasks</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link js-open-dynamic-tasks-button" id="openDynamicTasksLi">Dynamic Tasks</button>
+        </li>
+
+    </div>
+    <div class="row">
+        <div class="col-sm js-fixed-tasks">
+            @Html.DisplayFor(m => m.FixedTasks)
+        </div>
+        <div class="col-sm js-dynamic-tasks d-none">
+            @Html.DisplayFor(m => m.DynamicTasks)
+        </div>
+    </div>
+</div>
+
+<script src="~/js/tasks/tasks.js"></script>

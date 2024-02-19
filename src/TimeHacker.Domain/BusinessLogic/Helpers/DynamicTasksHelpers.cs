@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Helpers.Domain.Helpers;
+using System.Security.Cryptography;
 using TimeHacker.Domain.Models.BusinessLogicModels;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 using TimeHacker.Domain.Models.ReturnModels;
@@ -43,7 +44,8 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 _ => 1
             };
 
-            var chosenDynamicTasks = dynamicTasks.OrderBy(dt => new Guid()).Take(takeCount); // shuffle the tasks and take only 5 of them
+            var weightedDynamicTasks = dynamicTasks.Select(dt => (dt, (float)(dt.CountOfUses + dt.Task.Priority))).ToList();
+            var chosenDynamicTasks = RandomValuesHelper.GetRandomEntries(weightedDynamicTasks, takeCount).ToList(); // shuffle the tasks and take only several of them
 
             foreach (var dynamicTask in chosenDynamicTasks)
             {
@@ -94,18 +96,8 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 possibleTimelines.Add((possibleTaskTimeline, 1 / score));
             }
 
-            var totalScore = possibleTimelines.Sum(pt => pt.Score);
-            var randomValue = totalScore * (float)Random.Shared.NextDouble();
-            possibleTimelines = possibleTimelines.OrderBy(pt => pt.Score).ToList();
-
-            foreach(var possibleTimeline in possibleTimelines)
-            {
-                randomValue -= possibleTimeline.Score;
-                if(randomValue <= 0)
-                    return possibleTimeline.DynamicTasks;
-            }
-
-            return [];
+            var randomDynamicTask = RandomValuesHelper.GetRandomEntries(possibleTimelines, 1).First();
+            return randomDynamicTask;
         }
     }
 }

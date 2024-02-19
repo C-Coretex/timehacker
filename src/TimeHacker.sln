@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpers.DB", "Helpers.DB\He
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Application", "TimeHacker.Application\TimeHacker.Application.csproj", "{2DCEE9BF-9DA8-48E5-A2D1-5993D828C398}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeHacker.Tests", "TimeHacker.Tests\TimeHacker.Tests.csproj", "{ADFB07ED-9BFB-428A-A172-A732F5C41F23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Tests", "TimeHacker.Tests\TimeHacker.Tests.csproj", "{ADFB07ED-9BFB-428A-A172-A732F5C41F23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
