@@ -2,7 +2,7 @@
 @using TimeHacker.Application.Pages
 @model TasksAndEventsModel
 @{
-    ViewData["Title"] = "Tasks and Events";
+    ViewData["Title"] = "Tasks";
 }
 
 <link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
@@ -54,6 +54,38 @@
                 @Html.DisplayFor(m => m.DynamicTasks)
             </tbody>
         </table>
+    </div>
+
+    <div class="modal fade" id="editFixedTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editFixedTaskModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="nav nav-tabs">
+                        <h4>Edit Fixed Task</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editDynamicTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editDynamicTaskModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="nav nav-tabs">
+                        <h4>Edit Dynamic Task</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
