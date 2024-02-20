@@ -22,5 +22,10 @@ namespace Helpers.DB.Abstractions.Classes.GenericServices
         {
             return GetAll().FirstOrDefault(x => x.Id.Equals(id));
         }
+
+        public virtual Task<TModel?> GetByIdAsync(int id)
+        {
+            return GetAll().FirstOrDefaultAsync(x => x.Id.Equals(id));
+        }
     }
 }

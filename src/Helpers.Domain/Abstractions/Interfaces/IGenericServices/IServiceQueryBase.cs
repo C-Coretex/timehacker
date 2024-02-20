@@ -10,5 +10,6 @@ namespace Helpers.Domain.Abstractions.Interfaces.IGenericServices
     {
         public IQueryable<TModel> GetAll();
         public TModel? GetById(int id);
+        public Task<TModel?> GetByIdAsync(int id);
     }
 }

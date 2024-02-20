@@ -1,3 +1,5 @@
+const baseUrl = window.location.origin + '/api'
+
 $('.js-open-fixed-tasks-button').on('click', () => {
     $('#openFixedTasksLi').addClass('active')
     $('#openDynamicTasksLi').removeClass('active')
@@ -19,14 +21,32 @@ $('.js-button-edit-fixed-task').on('click', function () {
     const self = this
     const taskContainer = $(this).closest('.task-container')
     const taskId = $(taskContainer).attr('item-id')
-    console.log(taskId)
+    const editFixedTaskModal = $("#editFixedTaskModal");
+
+    fetch(`${baseUrl}/tasks/getfixedtaskbyid?id=${taskId}`, {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(response => {
+        console.log(response)
+    })
+    .catch(error => console.log(error))
 })
 
 $('.js-button-delete-fixed-task').on('click', function () {
     const self = this
     const taskContainer = $(this).closest('.task-container')
     const taskId = $(taskContainer).attr('item-id')
-    console.log(taskId)
+
+    fetch(`${baseUrl}/tasks/deletefixedtask?id=${taskId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            $(taskContainer).remove()
+        }
+    })
+    .catch(error => console.log(error))
 })
 
 
@@ -34,12 +54,31 @@ $('.js-button-edit-dynamic-task').on('click', function () {
     const self = this
     const taskContainer = $(this).closest('.task-container')
     const taskId = $(taskContainer).attr('item-id')
-    console.log(taskId)
+
+    const editDynamicTaskModal = $("#editDynamicTaskModal");
+
+    fetch(`${baseUrl}/tasks/getdynamictaskbyid?id=${taskId}`, {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(response => {
+        console.log(response)
+    })
+    .catch(error => console.log(error))
 })
 
 $('.js-button-delete-dynamic-task').on('click', function () {
     const self = this
     const taskContainer = $(this).closest('.task-container')
     const taskId = $(taskContainer).attr('item-id')
-    console.log(taskId)
+
+    fetch(`${baseUrl}/tasks/deletedynamictask?id=${taskId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            $(taskContainer).remove()
+        }
+    })
+    .catch(error => console.log(error))
 })

@@ -50,5 +50,69 @@ namespace TimeHacker.Application.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpGet("GetFixedTaskById")]
+        public async Task<IActionResult> GetFixedTaskById(int id)
+        {
+            try
+            {
+                var data = await _tasksService.GetFixedTaskById(id);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while getting fixed task by id");
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("GetDynamicTaskById")]
+        public async Task<IActionResult> GetDynamicTaskById(int id)
+        {
+            try
+            {
+                var data = await _tasksService.GetDynamicTaskById(id);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while getting dynamic task by id");
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("DeleteFixedTask")]
+        public async Task<IActionResult> DeleteFixedTask(int id)
+        {
+            try
+            {
+                await _tasksService.DeleteFixedTask(id);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while deleting task");
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("DeleteDynamicTask")]
+        public async Task<IActionResult> DeleteDynamicTask(int id)
+        {
+            try
+            {
+                await _tasksService.DeleteDynamicTask(id);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while deleting task");
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
