@@ -11,6 +11,7 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
         public static IEnumerable<TaskContainerReturn> GetDynamicTasksForTimeRange(IEnumerable<DynamicTask> dynamicTasks, TimeRange timeRange)
         {
             var dynamicTaskContainers = dynamicTasks
+                .Where(dt => dt.MaxTimeToFinish.TotalMinutes > 0)
                 .Select(dt => new DynamicTaskContainer(dt))
                 .ToList();
 
@@ -44,8 +45,8 @@ namespace TimeHacker.Domain.BusinessLogic.Helpers
                 _ => 1
             };
 
-            var weightedDynamicTasks = dynamicTasks.Select(dt => (dt, 1 / (float)(dt.CountOfUses + dt.Task.Priority))).ToList();
-            var chosenDynamicTasks = RandomValuesHelper.GetRandomEntries(weightedDynamicTasks, takeCount); // shuffle the tasks and take only several of them
+            var weightedDynamicTasks = dynamicTasks.Select(dt => (dt, 1 / (float)(dt.CountOfUses + dt.Task.Priority + 1))).ToList();
+            var chosenDynamicTasks = RandomValuesHelper.GetRandomEntries(weightedDynamicTasks, takeCount).ToList(); // shuffle the tasks and take only several of them
 
             foreach (var dynamicTask in chosenDynamicTasks)
             {
