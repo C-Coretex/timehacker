@@ -20,12 +20,12 @@ namespace Helpers.DB.Abstractions.Classes.GenericServices
 
         public virtual TModel? GetById(int id)
         {
-            return GetAll().FirstOrDefault(x => x.Id.Equals(id));
+            return dbSet.AsNoTracking().FirstOrDefault(x => x.Id.Equals(id));
         }
 
-        public virtual Task<TModel?> GetByIdAsync(int id)
+        public virtual async Task<TModel?> GetByIdAsync(int id)
         {
-            return GetAll().FirstOrDefaultAsync(x => x.Id.Equals(id));
+            return await dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id.Equals(id));
         }
     }
 }

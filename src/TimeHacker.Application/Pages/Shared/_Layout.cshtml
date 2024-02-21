@@ -25,7 +25,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1">
                         @if (isUserLoggedIn)
                         {
                             <li class="nav-item me-1 nav-item-li">
@@ -44,17 +44,22 @@
                                     Tasks
                                 </a>
                             </li>
-                            }
-                        </ul>
+                        }
+                    </ul>
 
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container h-100 w-100 ms-0 me-0 mw-100" style="padding-top: 70px">
-        <main role="main" class="pb-3 h-100">
-            @RenderBody()
+    <div class="container h-100 w-100 ms-0 me-0 mw-100" style="padding-top: 58px">
+        <main role="main" class="pb-3 h-100 padding-bottom: 5px;">
+            <div class="p-2 mb-2 d-flex flex-row align-items-center justify-content-start border rounded" style="height: 70px;">
+                @await RenderSectionAsync("Toolbar", required: false)
+            </div>
+            <div class="w-100" style="height: calc(100% - 70px)">
+                @RenderBody()
+            </div>
         </main>
     </div>
     <script src="~/js/site.js" asp-append-version="true"></script>

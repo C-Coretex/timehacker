@@ -8,16 +8,17 @@
 <link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
 <script src="~/lib/flatpickr/flatpickr.min.js"></script>
 
-<div class="text-center h-100" style="padding-bottom: 5px; margin-top: -12px;">
-    <div class="p-2 d-flex flex-row align-items-center justify-content-start border rounded" style="height: 70px;">
-        <button class="btn btn-primary m-2 js-open-add-task-modal" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Add task">
-            <svg style="width: 25px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-        </button>
-    </div>
+@section Toolbar {
+    <button class="btn btn-primary m-2 js-open-add-task-modal" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Add task">
+        <svg style="width: 25px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+    </button>
+}
 
-    <div id="calculator_react" style="height: calc(100% - 70px)"></div>
+<div class="text-center h-100">
+
+    <div class="h-100" id="calculator_react"></div>
     <div class="modal fade" id="addTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addTaskModal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
