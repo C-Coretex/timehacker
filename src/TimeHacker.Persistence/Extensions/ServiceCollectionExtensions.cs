@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
+using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks.UserTasks;
 using TimeHacker.Persistence.Services.Tasks;
+using TimeHacker.Persistence.Services.Tasks.UserTasks;
 
 namespace TimeHacker.Persistence.Extensions
 {
@@ -16,6 +18,9 @@ namespace TimeHacker.Persistence.Extensions
         {
             services.AddDataService<IDynamicTasksServiceCommand, DynamicTasksServiceCommand, IDynamicTasksServiceQuery, DynamicTasksServiceQuery, DynamicTasksService>();
             services.AddDataService<IFixedTasksServiceCommand, FixedTasksServiceCommand, IFixedTasksServiceQuery, FixedTasksServiceQuery, FixedTasksService>();
+
+            services.AddDataService<IDynamicUserTasksServiceCommand, DynamicUserTasksServiceCommand, IDynamicUserTasksServiceQuery, DynamicUserTasksServiceQuery, DynamicUserTasksService>();
+            services.AddDataService<IFixedUserTasksServiceCommand, FixedUserTasksServiceCommand, IFixedUserTasksServiceQuery, FixedUserTasksServiceQuery, FixedUserTasksService>();
 
             return services;
         }

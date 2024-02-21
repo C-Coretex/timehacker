@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
+using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks.UserTasks;
 using TimeHacker.Domain.BusinessLogic.Helpers;
 using TimeHacker.Domain.Models.BusinessLogicModels;
 using TimeHacker.Domain.Models.Persistence.Tasks;
@@ -13,13 +14,13 @@ namespace TimeHacker.Domain.BusinessLogic.Services
 {
     public class TasksService
     {
-        private readonly DynamicTasksService _dynamicTasksService;
-        private readonly FixedTasksService _fixedTasksService;
+        private readonly DynamicUserTasksService _dynamicUserTasksService;
+        private readonly FixedUserTasksService _fixedUserTasksService;
         private readonly IUserAccessor _userAccessor;
-        public TasksService(DynamicTasksService dynamicTasksService, FixedTasksService fixedTasksService, IUserAccessor userAccessor)
+        public TasksService(DynamicUserTasksService dynamicTasksService, FixedUserTasksService fixedTasksService, IUserAccessor userAccessor)
         {
-            _dynamicTasksService = dynamicTasksService;
-            _fixedTasksService = fixedTasksService;
+            _dynamicUserTasksService = dynamicTasksService;
+            _fixedUserTasksService = fixedTasksService;
 
             if(!userAccessor.IsUserValid)
                 throw new ArgumentNullException(nameof(userAccessor.UserId));
@@ -34,12 +35,12 @@ namespace TimeHacker.Domain.BusinessLogic.Services
                 Date = new DateOnly(date.Year, date.Month, date.Day)
             };
 
-            var fixedTasks = _fixedTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
+            var fixedTasks = _fixedUserTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
                                                 .Where(ft => ft.StartTimestamp.Date == date.Date)
                                                 .OrderBy(ft => ft.StartTimestamp)
                                                 .AsAsyncEnumerable();
 
-            var dynamicTasks = await _dynamicTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
+            var dynamicTasks = await _dynamicUserTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
                                                             .ToListAsync();
 
             var fixedTasksTimeline = GetFixedTasksAsync(fixedTasks);
@@ -55,12 +56,12 @@ namespace TimeHacker.Domain.BusinessLogic.Services
         }
         public async Task<IEnumerable<TasksForDayReturn>> GetTasksForDays(IEnumerable<DateTime> dates)
         {
-            var fixedTasks = await _fixedTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
+            var fixedTasks = await _fixedUserTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
                                                             .Where(ft => dates.Any(d => d.Date == ft.StartTimestamp.Date))
                                                             .OrderBy(ft => ft.StartTimestamp)
                                                             .ToListAsync();
 
-            var dynamicTasks = await _dynamicTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
+            var dynamicTasks = await _dynamicUserTasksService.Queries.GetAllByUserId(_userAccessor.UserId)
                                                             .ToListAsync();
 
             var tasksForDays = new List<TasksForDayReturn>();
@@ -90,20 +91,20 @@ namespace TimeHacker.Domain.BusinessLogic.Services
 
         public async Task<FixedTask?> GetFixedTaskById(int id)
         {
-            return await _fixedTasksService.Queries.GetByIdAsync(id);
+            return await _fixedUserTasksService.Queries.GetByIdAsync(id);
         }
         public async Task<DynamicTask?> GetDynamicTaskById(int id)
         {
-            return await _dynamicTasksService.Queries.GetByIdAsync(id);
+            return await _dynamicUserTasksService.Queries.GetByIdAsync(id);
         }
 
         public async Task DeleteFixedTask(int taskId)
         {
-            await _fixedTasksService.Commands.DeleteAsync(taskId);
+            await _fixedUserTasksService.Commands.DeleteAsync(taskId);
         }
         public async Task DeleteDynamicTask(int taskId)
         {
-            await _dynamicTasksService.Commands.DeleteAsync(taskId);
+            await _dynamicUserTasksService.Commands.DeleteAsync(taskId);
         }
 
         protected async IAsyncEnumerable<TaskContainerReturn> GetFixedTasksAsync(IAsyncEnumerable<FixedTask> fixedTasks)
