@@ -8,8 +8,6 @@ using System.Security.Claims;
 using TimeHacker.Application.Models.PageModels;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Models.Persistence.Tasks;
-using static TimeHacker.Application.Pages.IndexModel;
-using TimeHacker.Persistence.Services.Tasks;
 
 namespace TimeHacker.Application.Pages
 {
@@ -22,8 +20,8 @@ namespace TimeHacker.Application.Pages
 
         public InputDynamicTaskModel InputDynamicTaskModel { get; set; }
         public InputFixedTaskModel InputFixedTaskModel { get; set; }
-        public IEnumerable<DynamicTask> DynamicTasks { get; set; } = Enumerable.Empty<DynamicTask>();
-        public IEnumerable<FixedTask> FixedTasks { get; set; } = Enumerable.Empty<FixedTask>();
+        public IEnumerable<DynamicTask> DynamicTasks { get; set; } = [];
+        public IEnumerable<FixedTask> FixedTasks { get; set; } = [];
 
         public TasksModel(ILogger<TasksModel> logger, DynamicTasksService dynamicTasksService, FixedTasksService fixedTasksService, IHttpContextAccessor httpContextAccessor)
         {

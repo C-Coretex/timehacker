@@ -1,3 +1,23 @@
+$("#fixedTaskStartTimestamp").flatpickr({
+    enableTime: true,
+    dateFormat: "d-m-Y H:i",
+    time_24hr: true,
+    static: true,
+    locale: {
+        firstDayOfWeek: 1
+    }
+});
+
+$("#fixedTaskEndTimestamp").flatpickr({
+    enableTime: true,
+    dateFormat: "d-m-Y H:i",
+    time_24hr: true,
+    static: true,
+    locale: {
+        firstDayOfWeek: 1
+    }
+});
+
 $("#dynamicTaskMinTimeToFinish").flatpickr({
     enableTime: true,
     noCalendar: true,
@@ -23,26 +43,6 @@ $("#dynamicTaskOptimalTimeToFinish").flatpickr({
     time_24hr: true,
     defaultDate: "00:00",
     static: true
-});
-
-$("#fixedTaskStartTimestamp").flatpickr({
-    enableTime: true,
-    dateFormat: "d-m-Y H:i",
-    time_24hr: true,
-    static: true,
-    locale: {
-        firstDayOfWeek: 1
-    }
-});
-
-$("#fixedTaskEndTimestamp").flatpickr({
-    enableTime: true,
-    dateFormat: "d-m-Y H:i",
-    time_24hr: true,
-    static: true,
-    locale: {
-        firstDayOfWeek: 1
-    }
 });
 
 $(".js-add-fixed-task-button").on("click", () => {
