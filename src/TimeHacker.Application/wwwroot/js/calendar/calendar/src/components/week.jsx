@@ -21,10 +21,9 @@ function Week() {
       return { day: day, dayName: x, isSelected: day.isSame(moment(), 'day') }
     })
 
-    
-    getTasksForDays(days.map(d => d.day)).then((result) =>
-    {
-      let tasks = result 
+
+    getTasksForDays(days.map(d => d.day)).then((result) => {
+      let tasks = result
       setdaysOfWeek(days.map((day, i) => {
         return { day: day.day, dayName: day.dayName, isSelected: day.isSelected, tasks: tasks[i] }
       }))
@@ -63,13 +62,19 @@ function Week() {
       <div className='tw-w-full tw-h-full tw-flex tw-flex-col tw-justify-center tw-items-center'>
         <div className='tw-flex tw-flex-row tw-w-full tw-h-fit'>
           <div className='tw-w-11 tw-flex tw-flex-row tw-items-center tw-justify-center'>
-            <div className='tw-w-1/2 tw-h-fit hover:tw-cursor-pointer hover:*:tw-stroke-blue-500' onClick={() => changeSelectedWeek(false)}>
+            <div
+              className='tw-w-1/2 tw-h-fit hover:tw-cursor-pointer hover:*:tw-stroke-blue-500'
+              onClick={() => changeSelectedWeek(false)}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 9-3 3m0 0 3 3m-3-3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
             </div>
 
-            <div className='tw-w-1/2 tw-h-fit hover:tw-cursor-pointer hover:*:tw-stroke-blue-500' onClick={() => changeSelectedWeek(true)}>
+            <div
+              className='tw-w-1/2 tw-h-fit hover:tw-cursor-pointer hover:*:tw-stroke-blue-500'
+              onClick={() => changeSelectedWeek(true)}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>

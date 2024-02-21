@@ -26,7 +26,6 @@ const dynamicTaskMinTimeToFinish = $("#dynamicTaskMinTimeToFinish").flatpickr({
     dateFormat: "H:i",
     time_24hr: true,
     defaultDate: "00:00",
-    altInput: true,
     static: true
 });
 
@@ -36,7 +35,6 @@ const dynamicTaskMaxTimeToFinish = $("#dynamicTaskMaxTimeToFinish").flatpickr({
     dateFormat: "H:i",
     time_24hr: true,
     defaultDate: "00:00",
-    altInput: true,
     static: true
 });
 
@@ -46,7 +44,6 @@ const dynamicTaskOptimalTimeToFinish = $("#dynamicTaskOptimalTimeToFinish").flat
     dateFormat: "H:i",
     time_24hr: true,
     defaultDate: "00:00",
-    altInput: true,
     static: true
 });
 
@@ -117,25 +114,24 @@ $('.js-button-edit-dynamic-task').on('click', function () {
     })
         .then(response => response.json())
         .then(response => {
-            console.log(response)
-
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskName', response.name)
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskDescription', response.description)
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskCategory', response.category)
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskPriority', response.priority)
-            setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskMinTimeToFinish', response.minTimeToFinish)
-
-            console.log(response.maxTimeToFinish)
-            const test = response.maxTimeToFinish.split(':')
-            const date = new Date()
-            date.setHours(test[0])
-            date.setMinutes(test[1])
-            dynamicTaskMaxTimeToFinish.setDate(date)
-            //setValueToFIrstChild(editDynamicTaskModal, '#dynamicTaskMaxTimeToFinish', response.maxTImeToFinish)
-            setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskOptimalTimeToFinish', response.optimalTimeToFinish)
+            setTimeFlatpickr(dynamicTaskMinTimeToFinish, response.minTimeToFinish)
+            setTimeFlatpickr(dynamicTaskMaxTimeToFinish, response.maxTimeToFinish)
+            setTimeFlatpickr(dynamicTaskOptimalTimeToFinish, response.optimalTimeToFinish)
         })
         .catch(error => console.log(error))
 })
+
+function setTimeFlatpickr(flatpickrInstance, time) {
+    const timeArray = time.split(':')
+    const date = new Date()
+    date.setHours(timeArray[0])
+    date.setMinutes(timeArray[1])
+    flatpickrInstance.setDate(date)
+}
 
 $('.js-button-delete-dynamic-task').on('click', function () {
     const self = this
