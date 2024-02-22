@@ -75,6 +75,7 @@ $('.js-button-edit-fixed-task').on('click', function () {
     })
         .then(response => response.json())
         .then(response => {
+            setValueToFirstChild(editFixedTaskModal, '#fixedTaskId', taskId)
             setValueToFirstChild(editFixedTaskModal, '#fixedTaskName', response.name)
             setValueToFirstChild(editFixedTaskModal, '#fixedTaskDescription', response.description)
             setValueToFirstChild(editFixedTaskModal, '#fixedTaskCategory', response.category)
@@ -114,6 +115,7 @@ $('.js-button-edit-dynamic-task').on('click', function () {
     })
         .then(response => response.json())
         .then(response => {
+            setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskId', taskId)
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskName', response.name)
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskDescription', response.description)
             setValueToFirstChild(editDynamicTaskModal, '#dynamicTaskCategory', response.category)

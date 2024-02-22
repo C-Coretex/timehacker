@@ -69,6 +69,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="fixedTaskForm" method="post" asp-page-handler="FixedTaskFormHandler">
+                        <input class="d-none" id="fixedTaskId" name="id" type="number" required>
                         <div class="form-group">
                             <label asp-for="InputFixedTaskModel.Name">Name:</label> <br />
                             <input class="form-control" asp-for="InputFixedTaskModel.Name" id="fixedTaskName" type="text" required> <br />
@@ -118,6 +119,7 @@
 
                 <div class="modal-body">
                     <form id="dynamicTaskForm" method="post" asp-page-handler="DynamicTaskFormHandler">
+                        <input class="d-none" id="dynamicTaskId" name="id" type="number" required>
                         <div class="flex-column">
                             <div class="form-group">
                                 <label asp-for="InputDynamicTaskModel.Name">Name:</label> <br />

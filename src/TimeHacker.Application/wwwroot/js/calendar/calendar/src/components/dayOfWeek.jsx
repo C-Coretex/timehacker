@@ -31,6 +31,7 @@ function DayOfWeek({ day, isSelected, tasks }) {
 
       lastTaskEndMinutes = endMinutes
 
+      //in future - use absolute positioning with top and bottom instead of precentages, so we can have more than one task in one time range
       return (
       <React.Fragment key={uuid()}>
         <div style={{ height: `${emptyTaskHeight}%` }}>

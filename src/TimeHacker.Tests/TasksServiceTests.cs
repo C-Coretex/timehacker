@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
+using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks.UserTasks;
 using TimeHacker.Domain.BusinessLogic.Services;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 
@@ -17,8 +18,10 @@ namespace TimeHacker.Tests
     public class TasksServiceTests
     {
         #region Mocks
-        private readonly Mock<IDynamicTasksServiceQuery> _dynamicTasksServiceQuery = new();
-        private readonly Mock<IFixedTasksServiceQuery> _fixedTasksServiceQuery = new();
+        private readonly Mock<IDynamicUserTasksServiceQuery> _dynamicUserTasksServiceQuery = new();
+        private readonly Mock<IDynamicUserTasksServiceCommand> _dynamicUserTasksServiceCommand = new();
+        private readonly Mock<IFixedUserTasksServiceQuery> _fixedUserTasksServiceQuery = new();
+        private readonly Mock<IFixedUserTasksServiceCommand> _fixedUserTasksServiceCommand = new();
         private readonly Mock<IUserAccessor> _userAccessor = new();
         #endregion
 
@@ -28,10 +31,10 @@ namespace TimeHacker.Tests
             _userAccessor.Setup(x => x.UserId).Returns("TestIdentifier");
             _userAccessor.Setup(x => x.IsUserValid).Returns(true);
 
-            _tasksService = new TasksService(_dynamicTasksServiceQuery.Object, _fixedTasksServiceQuery.Object, _userAccessor.Object);
+            var dynamicUserTasksService = new DynamicUserTasksService(_dynamicUserTasksServiceCommand.Object, _dynamicUserTasksServiceQuery.Object);
+            var fixedUserTasksService = new FixedUserTasksService(_fixedUserTasksServiceCommand.Object, _fixedUserTasksServiceQuery.Object);
+            _tasksService = new TasksService(dynamicUserTasksService, fixedUserTasksService, _userAccessor.Object);
         }
-
-
 
         [Fact]
         public async Task GetTasksForDay_ShouldReturnTasksForDay()
@@ -77,7 +80,7 @@ namespace TimeHacker.Tests
                 },
             };
             var mockDynamicTasks = dynamicTasks.AsQueryable().BuildMock();
-            _dynamicTasksServiceQuery.Setup(x => x.GetAllByUserId(userId)).Returns(mockDynamicTasks.Where(x => x.UserId == userId));
+            _dynamicUserTasksServiceQuery.Setup(x => x.GetAllByUserId(userId)).Returns(mockDynamicTasks.Where(x => x.UserId == userId));
 
             var fixedTasks = new List<FixedTask>
             {
@@ -126,7 +129,7 @@ namespace TimeHacker.Tests
                 },
             };
             var mockFixedTasks = fixedTasks.AsQueryable().BuildMock();
-            _fixedTasksServiceQuery.Setup(x => x.GetAllByUserId(userId)).Returns(mockFixedTasks.Where(x => x.UserId == userId));
+            _fixedUserTasksServiceQuery.Setup(x => x.GetAllByUserId(userId)).Returns(mockFixedTasks.Where(x => x.UserId == userId));
 
             // Act
             var result = await _tasksService.GetTasksForDay(date.Date);

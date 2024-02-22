@@ -1,10 +1,4 @@
 ﻿using Helpers.DB.Abstractions.Classes.GenericServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 using TimeHacker.Persistence.Context;
