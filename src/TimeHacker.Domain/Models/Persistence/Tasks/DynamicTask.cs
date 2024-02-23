@@ -40,9 +40,6 @@ namespace TimeHacker.Domain.Models.Persistence.Tasks
         [Required]
         public DateTime CreatedTimestamp { get; set; } = DateTime.Now;
 
-        [NotMapped]
         public List<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
-        [NotMapped]
-        public List<Category> Categories { get; set; } = [];
     }
 }

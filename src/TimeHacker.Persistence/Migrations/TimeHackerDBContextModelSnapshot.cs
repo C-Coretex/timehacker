@@ -64,6 +64,8 @@ namespace TimeHacker.Persistence.Migrations
 
                     b.HasKey("CategoryId", "DynamicTaskId");
 
+                    b.HasIndex("DynamicTaskId");
+
                     b.ToTable("CategoryDynamicTasks");
                 });
 
@@ -76,6 +78,8 @@ namespace TimeHacker.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CategoryId", "FixedTaskId");
+
+                    b.HasIndex("FixedTaskId");
 
                     b.ToTable("CategoryFixedTasks");
                 });
@@ -177,6 +181,61 @@ namespace TimeHacker.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FixedTasks");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Models.Persistence.Categories.CategoryDynamicTask", b =>
+                {
+                    b.HasOne("TimeHacker.Domain.Models.Persistence.Categories.Category", "Category")
+                        .WithMany("CategoryDynamicTasks")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeHacker.Domain.Models.Persistence.Tasks.DynamicTask", "DynamicTask")
+                        .WithMany("CategoryDynamicTasks")
+                        .HasForeignKey("DynamicTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("DynamicTask");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Models.Persistence.Categories.CategoryFixedTask", b =>
+                {
+                    b.HasOne("TimeHacker.Domain.Models.Persistence.Categories.Category", "Category")
+                        .WithMany("CategoryFixedTasks")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeHacker.Domain.Models.Persistence.Tasks.FixedTask", "FixedTask")
+                        .WithMany("CategoryFixedTasks")
+                        .HasForeignKey("FixedTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("FixedTask");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Models.Persistence.Categories.Category", b =>
+                {
+                    b.Navigation("CategoryDynamicTasks");
+
+                    b.Navigation("CategoryFixedTasks");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Models.Persistence.Tasks.DynamicTask", b =>
+                {
+                    b.Navigation("CategoryDynamicTasks");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Models.Persistence.Tasks.FixedTask", b =>
+                {
+                    b.Navigation("CategoryFixedTasks");
                 });
 #pragma warning restore 612, 618
         }

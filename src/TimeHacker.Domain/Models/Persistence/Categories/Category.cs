@@ -26,14 +26,9 @@ namespace TimeHacker.Domain.Models.Persistence.Categories
         [Required]
         public Color Color { get; set; }
 
-        [NotMapped]
-        public List<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
-        [NotMapped]
-        public List<FixedTask> FixedTasks { get; set; } = [];
 
-        [NotMapped]
+        public List<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
+
         public List<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
-        [NotMapped]
-        public List<DynamicTask> DynamicTasks { get; set; } = [];
     }
 }

@@ -10,9 +10,7 @@ namespace TimeHacker.Domain.Models.Persistence.Categories
         public int CategoryId { get; set; }
         public int DynamicTaskId { get; set; }
 
-        [NotMapped]
         public Category Category { get; set; } = null!;
-        [NotMapped]
         public DynamicTask DynamicTask { get; set; } = null!;
     }
 }

@@ -5,7 +5,7 @@
 namespace TimeHacker.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class CategoryToTasks_ManyToMany : Migration
+    public partial class AddCategoryRelations_ManyToMany : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,6 +36,18 @@ namespace TimeHacker.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoryDynamicTasks", x => new { x.CategoryId, x.DynamicTaskId });
+                    table.ForeignKey(
+                        name: "FK_CategoryDynamicTasks_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryDynamicTasks_DynamicTasks_DynamicTaskId",
+                        column: x => x.DynamicTaskId,
+                        principalTable: "DynamicTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,7 +60,29 @@ namespace TimeHacker.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoryFixedTasks", x => new { x.CategoryId, x.FixedTaskId });
+                    table.ForeignKey(
+                        name: "FK_CategoryFixedTasks_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryFixedTasks_FixedTasks_FixedTaskId",
+                        column: x => x.FixedTaskId,
+                        principalTable: "FixedTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryDynamicTasks_DynamicTaskId",
+                table: "CategoryDynamicTasks",
+                column: "DynamicTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryFixedTasks_FixedTaskId",
+                table: "CategoryFixedTasks",
+                column: "FixedTaskId");
         }
 
         /// <inheritdoc />
