@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TimeHacker.Domain.Models.Persistence.Categories;
 
 namespace TimeHacker.Domain.Models.Persistence.Tasks
 {
     [Index(nameof(UserId))]
-    [Index(nameof(Category))]
     [Index(nameof(IsCompleted))]
     [Index(nameof(CreatedTimestamp))]
     [Index(nameof(StartTimestamp))]
@@ -26,9 +26,6 @@ namespace TimeHacker.Domain.Models.Persistence.Tasks
         public string? Description { get; set; }
 
         [Required]
-        public string Category { get; set; }
-
-        [Required]
         public uint Priority { get; set; }
 
         [Required]
@@ -42,5 +39,10 @@ namespace TimeHacker.Domain.Models.Persistence.Tasks
 
         [Required]
         public DateTime CreatedTimestamp { get; set; } = DateTime.Now;
+
+        [NotMapped]
+        public List<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
+        [NotMapped]
+        public List<Category> Categories { get; set; } = [];
     }
 }

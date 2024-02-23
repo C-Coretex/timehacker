@@ -6,7 +6,7 @@ namespace TimeHacker.Application.Models.PageModels
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-        public string Category { get; set; }
+        public IEnumerable<int> CategoryIds { get; set; }
         public uint Priority { get; set; }
         public TimeSpan MinTimeToFinish { get; set; }
         public TimeSpan MaxTimeToFinish { get; set; }

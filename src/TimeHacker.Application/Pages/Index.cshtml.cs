@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Security.Claims;
 using TimeHacker.Application.Models.PageModels;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
+using TimeHacker.Domain.Models.Persistence.Categories;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Application.Pages
@@ -73,12 +74,16 @@ namespace TimeHacker.Application.Pages
                     UserId = userId,
                     Name = inputDynamicTaskModel.Name,
                     Description = inputDynamicTaskModel.Description,
-                    Category = inputDynamicTaskModel.Category,
                     Priority = inputDynamicTaskModel.Priority,
                     MinTimeToFinish = inputDynamicTaskModel.MinTimeToFinish,
                     MaxTimeToFinish = inputDynamicTaskModel.MaxTimeToFinish,
-                    OptimalTimeToFinish = inputDynamicTaskModel.OptimalTimeToFinish
+                    OptimalTimeToFinish = inputDynamicTaskModel.OptimalTimeToFinish,
                 };
+                /*dynamicTask.CategoryDynamicTasks = inputDynamicTaskModel.CategoryIds.Select(cId => new CategoryDynamicTask()
+                {
+                    DynamicTask = dynamicTask,
+                    CategoryId = cId,
+                }).ToList();*/
 
                 if (!dynamicTask.IsObjectValid(out var validationResults))
                 {
@@ -118,12 +123,16 @@ namespace TimeHacker.Application.Pages
                     UserId = userId,
                     Name = inputFixedTaskModel.Name,
                     Description = inputFixedTaskModel.Description,
-                    Category = inputFixedTaskModel.Category,
                     Priority = inputFixedTaskModel.Priority,
                     StartTimestamp = DateTime.ParseExact(inputFixedTaskModel.StartTimestamp, "dd-MM-yyyy HH:mm", CultureInfo.InvariantCulture),
                     EndTimestamp = DateTime.ParseExact(inputFixedTaskModel.EndTimestamp, "dd-MM-yyyy HH:mm", CultureInfo.InvariantCulture)
                 };
-
+                /*fixedTask.CategoryFixedTasks = inputFixedTaskModel.CategoryIds.Select(cId => new CategoryFixedTask()
+                {
+                    FixedTask = fixedTask,
+                    CategoryId = cId,
+                }).ToList();
+                */
                 if (!fixedTask.IsObjectValid(out var validationResults))
                 {
                     foreach (var validationResult in validationResults)

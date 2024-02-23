@@ -97,7 +97,6 @@ namespace TimeHacker.Tests
             {
                 Name = "Test Name",
                 Description = "Test Description",
-                Category = "Test Category",
                 MaxTimeToFinish = new (2, 0, 0),
                 MinTimeToFinish = new(0, 30, 0),
                 OptimalTimeToFinish = new(1, 25, 0),
@@ -110,7 +109,7 @@ namespace TimeHacker.Tests
             // Assert
             Assert.IsType<RedirectToPageResult>(result);
             //check if element is in the list
-            Assert.Contains(dynamicTaskList, x => x.Name == inputDynamicTaskModel.Name && x.Category == inputDynamicTaskModel.Category);
+            Assert.Contains(dynamicTaskList, x => x.Name == inputDynamicTaskModel.Name);
         }
         [Fact]
         public async Task OnPostDynamicTaskFormHandler_ShouldReturnException_IfUserIdIsEmpty()
@@ -124,7 +123,6 @@ namespace TimeHacker.Tests
             {
                 Name = "Test Name",
                 Description = "Test Description",
-                Category = "Test Category",
                 MaxTimeToFinish = new(2, 0, 0),
                 MinTimeToFinish = new(0, 30, 0),
                 OptimalTimeToFinish = new(1, 25, 0),
@@ -147,7 +145,6 @@ namespace TimeHacker.Tests
             {
                 Name = null,
                 Description = "Test Description",
-                Category = "Test Category",
                 MaxTimeToFinish = new(2, 0, 0),
                 MinTimeToFinish = new(0, 30, 0),
                 OptimalTimeToFinish = new(1, 25, 0),
@@ -182,7 +179,6 @@ namespace TimeHacker.Tests
             {
                 Name = "Test Name",
                 Description = "Test Description",
-                Category = "Test Category",
                 EndTimestamp = DateTime.Now.AddHours(-1).ToString("dd-MM-yyyy HH:mm"),
                 StartTimestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm"),
                 Priority = 2
@@ -194,7 +190,7 @@ namespace TimeHacker.Tests
             // Assert
             Assert.IsType<RedirectToPageResult>(result);
             //check if element is in the list
-            Assert.Contains(fixedTaskList, x => x.Name == inputFixedTaskModel.Name && x.Category == inputFixedTaskModel.Category);
+            Assert.Contains(fixedTaskList, x => x.Name == inputFixedTaskModel.Name);
         }
         [Fact]
         public async Task OnPostFixedTaskFormHandler_ShouldReturnException_IfUserIdIsEmpty()
@@ -208,7 +204,6 @@ namespace TimeHacker.Tests
             {
                 Name = "Test Name",
                 Description = "Test Description",
-                Category = "Test Category",
                 EndTimestamp = DateTime.Now.AddHours(-1).ToString("dd-MM-yyyy HH:mm"),
                 StartTimestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm"),
                 Priority = 2
@@ -230,7 +225,6 @@ namespace TimeHacker.Tests
             {
                 Name = null,
                 Description = "Test Description",
-                Category = "Test Category",
                 EndTimestamp = DateTime.Now.AddHours(-1).ToString("dd-MM-yyyy HH:mm"),
                 StartTimestamp = DateTime.Now.ToString("dd-MM-yyyy HH:mm"),
                 Priority = 2

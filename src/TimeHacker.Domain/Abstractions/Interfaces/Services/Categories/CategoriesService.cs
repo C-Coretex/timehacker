@@ -1,13 +1,7 @@
 ﻿using Helpers.Domain.Abstractions.Interfaces.IGenericServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TimeHacker.Domain.Models.Persistence;
-using TimeHacker.Domain.Models.Persistence.Tasks;
+using TimeHacker.Domain.Models.Persistence.Categories;
 
-namespace TimeHacker.Domain.Abstractions.Interfaces.Services
+namespace TimeHacker.Domain.Abstractions.Interfaces.Services.Categories
 {
     public interface ICategoriesServiceCommand : IServiceCommandBase<Category>
     {

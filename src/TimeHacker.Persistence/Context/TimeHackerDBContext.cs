@@ -1,7 +1,8 @@
 ﻿using Helpers.DB.Abstractions.Classes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System.Drawing;
-using TimeHacker.Domain.Models.Persistence;
+using TimeHacker.Domain.Models.Persistence.Categories;
 using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Persistence.Context
@@ -18,11 +19,13 @@ namespace TimeHacker.Persistence.Context
                 .HasConversion(
                     v => v.ToArgb(), 
                     v => Color.FromArgb(v)
-                );
+            );
         }
 
         internal DbSet<FixedTask> FixedTasks { get; set; }
         internal DbSet<DynamicTask> DynamicTasks { get; set; }
         internal DbSet<Category> Categories { get; set; }
+        internal DbSet<CategoryFixedTask> CategoryFixedTasks { get; set; }
+        internal DbSet<CategoryDynamicTask> CategoryDynamicTasks { get; set; }
     }
 }
