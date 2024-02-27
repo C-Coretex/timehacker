@@ -1,12 +1,9 @@
 ﻿using Helpers.Domain.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TimeHacker.Domain.Abstractions.Interfaces.Services.Categories;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
 using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks.UserTasks;
+using TimeHacker.Persistence.Services.Categories;
 using TimeHacker.Persistence.Services.Tasks;
 using TimeHacker.Persistence.Services.Tasks.UserTasks;
 
@@ -21,6 +18,8 @@ namespace TimeHacker.Persistence.Extensions
 
             services.AddDataService<IDynamicUserTasksServiceCommand, DynamicUserTasksServiceCommand, IDynamicUserTasksServiceQuery, DynamicUserTasksServiceQuery, DynamicUserTasksService>();
             services.AddDataService<IFixedUserTasksServiceCommand, FixedUserTasksServiceCommand, IFixedUserTasksServiceQuery, FixedUserTasksServiceQuery, FixedUserTasksService>();
+
+            services.AddDataService<ICategoriesServiceCommand, CategoriesServiceCommand, ICategoriesServiceQuery, CategoriesServiceQuery, CategoriesService>();
 
             return services;
         }

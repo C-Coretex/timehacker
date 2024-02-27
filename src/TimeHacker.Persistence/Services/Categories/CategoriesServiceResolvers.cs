@@ -13,5 +13,10 @@ namespace TimeHacker.Persistence.Services.Categories
     public class CategoriesServiceQuery : ServiceQueryBase<Category>, ICategoriesServiceQuery
     {
         public CategoriesServiceQuery(TimeHackerDBContext dbContext) : base(dbContext.Categories) { }
+
+        public IQueryable<Category> GetCategoriesForUserId(string userId)
+        {
+            return GetAll().Where(c => string.IsNullOrEmpty(c.UserId) || c.UserId == userId);
+        }
     }
 }

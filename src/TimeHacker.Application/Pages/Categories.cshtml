@@ -7,3 +7,20 @@
 @section Toolbar {
 }
 
+<table class="table js-fixed-tasks">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Color</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var category in Model.Categories)
+        {
+            <td>@category.Name</td>
+            <td>@category.Description</td>
+            <td>@category.Color</td>
+        }
+    </tbody>
+</table>

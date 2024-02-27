@@ -8,6 +8,7 @@ namespace TimeHacker.Domain.Abstractions.Interfaces.Services.Categories
     }
     public interface ICategoriesServiceQuery : IServiceQueryBase<Category>
     {
+        public IQueryable<Category> GetCategoriesForUserId(string userId);
     }
 
     public class CategoriesService : ServiceBase<ICategoriesServiceCommand, ICategoriesServiceQuery, Category>

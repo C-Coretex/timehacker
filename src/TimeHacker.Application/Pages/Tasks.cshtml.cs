@@ -1,4 +1,5 @@
 using Helpers.Domain.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,14 @@ using TimeHacker.Domain.Models.Persistence.Tasks;
 
 namespace TimeHacker.Application.Pages
 {
+    [Authorize]
     public class TasksModel : PageModel
     {
         private readonly ILogger<TasksModel> _logger;
         private readonly DynamicTasksService _dynamicTasksService;
         private readonly FixedTasksService _fixedTasksService;
         private readonly string _userId;
+        private readonly bool _isSignedIn;
 
         public InputDynamicTaskModel InputDynamicTaskModel { get; set; }
         public InputFixedTaskModel InputFixedTaskModel { get; set; }
