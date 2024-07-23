@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Helpers.Domain\Helpers.Domain.csproj" />
+    <ProjectReference Include="..\TimeHacker.Comain.Contracts\TimeHacker.Domain.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

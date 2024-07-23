@@ -1,15 +1,12 @@
-using Helpers.Domain.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using System.Globalization;
 using System.Security.Claims;
-using TimeHacker.Application.Models.PageModels;
-using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
-using TimeHacker.Domain.Models.Persistence.Categories;
-using TimeHacker.Domain.Models.Persistence.Tasks;
+using TimeHacker.Application.Models.Input.Tasks;
+using TimeHacker.Domain.Contracts.Entities.Tasks;
+using TimeHacker.Domain.Contracts.IServices.Tasks;
+using TimeHacker.Helpers.Domain.Extensions;
 
 namespace TimeHacker.Application.Pages
 {
@@ -17,8 +14,8 @@ namespace TimeHacker.Application.Pages
     public class TasksModel : PageModel
     {
         private readonly ILogger<TasksModel> _logger;
-        private readonly DynamicTasksService _dynamicTasksService;
-        private readonly FixedTasksService _fixedTasksService;
+        private readonly IDynamicTaskService _dynamicTasksService;
+        private readonly IFixedTaskService _fixedTasksService;
         private readonly string _userId;
         private readonly bool _isSignedIn;
 
@@ -27,7 +24,7 @@ namespace TimeHacker.Application.Pages
         public IEnumerable<DynamicTask> DynamicTasks { get; set; } = [];
         public IEnumerable<FixedTask> FixedTasks { get; set; } = [];
 
-        public TasksModel(ILogger<TasksModel> logger, DynamicTasksService dynamicTasksService, FixedTasksService fixedTasksService, IHttpContextAccessor httpContextAccessor)
+        public TasksModel(ILogger<TasksModel> logger, IDynamicTaskService dynamicTasksService, IFixedTaskService fixedTasksService, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _dynamicTasksService = dynamicTasksService;
@@ -38,8 +35,8 @@ namespace TimeHacker.Application.Pages
 
         public void OnGet()
         {
-            DynamicTasks = _dynamicTasksService.Queries.GetAllByUserId(_userId).AsNoTracking();
-            FixedTasks = _fixedTasksService.Queries.GetAllByUserId(_userId).AsNoTracking();
+            DynamicTasks = _dynamicTasksService.GetAll();
+            FixedTasks = _fixedTasksService.GetAll();
         }
 
         public async Task<IActionResult> OnPostDynamicTaskFormHandler(int id, InputDynamicTaskModel inputDynamicTaskModel)
@@ -78,7 +75,7 @@ namespace TimeHacker.Application.Pages
                     return Page();
                 }
 
-                await _dynamicTasksService.Commands.UpdateAsync(dynamicTask);
+                await _dynamicTasksService.UpdateAsync(dynamicTask);
             }
             catch (Exception e)
             {
@@ -125,7 +122,7 @@ namespace TimeHacker.Application.Pages
                     return Page();
                 }
 
-                await _fixedTasksService.Commands.UpdateAsync(fixedTask);
+                await _fixedTasksService.UpdateAsync(fixedTask);
             }
             catch (Exception e)
             {

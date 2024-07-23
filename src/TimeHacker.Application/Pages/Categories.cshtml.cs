@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
-using TimeHacker.Domain.Abstractions.Interfaces.Services.Categories;
-using TimeHacker.Domain.Models.Persistence.Categories;
+using TimeHacker.Domain.Contracts.Entities.Categories;
+using TimeHacker.Domain.Contracts.IServices.Categories;
 
 namespace TimeHacker.Application.Pages
 {
@@ -12,11 +11,11 @@ namespace TimeHacker.Application.Pages
     {
         private readonly ILogger<CategoriesModel> _logger;
         private readonly string _userId;
-        private CategoriesService _categoriesService { get; set; }
+        private ICategoryService _categoriesService { get; set; }
 
         public IEnumerable<Category> Categories { get; set; }
 
-        public CategoriesModel(ILogger<CategoriesModel> logger, CategoriesService categoriesService, IHttpContextAccessor httpContextAccessor)
+        public CategoriesModel(ILogger<CategoriesModel> logger, ICategoryService categoriesService, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _categoriesService = categoriesService;
@@ -26,7 +25,7 @@ namespace TimeHacker.Application.Pages
         
         public void OnGet()
         {
-            Categories = _categoriesService.Queries.GetCategoriesForUserId(_userId).ToList();//filter by (EMPTY or user id)
+            Categories = _categoriesService.GetAll().ToList();//filter by (EMPTY or user id)
         }
     }
 }

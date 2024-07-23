@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Application.Helpers;
-using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
-using TimeHacker.Domain.BusinessLogic.Services;
-using TimeHacker.Persistence.Context;
+using TimeHacker.Domain.Contracts.IModels;
+using TimeHacker.Infrastructure;
 using TimeHacker.Persistence.Extensions;
 using TimeHacker.Persistence.IdentityData;
+using TimeHacker.Domain.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +17,9 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(identityConnectionString));
 
 var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
-builder.Services.AddDbContext<TimeHackerDBContext>(options =>
-    options.UseSqlServer(timeHackerConnectionString));
 
-builder.Services.AddTimeHackerPersistenceServices();
+builder.Services.RegisterRepositories(timeHackerConnectionString);
+builder.Services.RegisterServices();
 #endregion
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -32,11 +33,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(o =>
     o.Password.RequireNonAlphanumeric = false;
 }).AddEntityFrameworkStores<IdentityDbContext>();
 
-AddBusinessLogicServices(builder.Services);
+AddApplicationServices(builder.Services);
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.WebHost.UseStaticWebAssets();
+
+var mapper = GetMapperConfiguration().CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 
@@ -67,9 +71,24 @@ app.MapRazorPages();
 
 app.Run();
 
-static IServiceCollection AddBusinessLogicServices(IServiceCollection services)
+static IServiceCollection AddApplicationServices(IServiceCollection services)
 {
-    services.AddScoped<TasksService>();
     services.AddScoped<IUserAccessor, UserAccessor>();
+
     return services;
+}
+
+static MapperConfiguration GetMapperConfiguration()
+{
+    var types = AppDomain.CurrentDomain
+                        .GetAssemblies()
+                        .Where(x => x.FullName!.StartsWith("TimeHacker."))
+                        .SelectMany(s => s.GetTypes())
+                        .Where(p => typeof(Profile).IsAssignableFrom(p));
+
+    return new MapperConfiguration(cfg =>
+    {
+        foreach (var type in types)
+            cfg.AddProfile(type);
+    });
 }

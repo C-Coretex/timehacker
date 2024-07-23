@@ -1,13 +1,12 @@
-using Helpers.Domain.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Globalization;
 using System.Security.Claims;
-using TimeHacker.Application.Models.PageModels;
-using TimeHacker.Domain.Abstractions.Interfaces.Services.Tasks;
-using TimeHacker.Domain.Models.Persistence.Categories;
-using TimeHacker.Domain.Models.Persistence.Tasks;
+using TimeHacker.Application.Models.Input.Tasks;
+using TimeHacker.Domain.Contracts.Entities.Tasks;
+using TimeHacker.Domain.Contracts.IServices.Tasks;
+using TimeHacker.Helpers.Domain.Extensions;
 
 namespace TimeHacker.Application.Pages
 {
@@ -17,8 +16,8 @@ namespace TimeHacker.Application.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly bool _isSignedIn;
         private readonly ClaimsPrincipal? _user;
-        private readonly IDynamicTasksServiceCommand _dynamicTasksServiceCommand;
-        private readonly IFixedTasksServiceCommand _fixedTasksServiceCommand;
+        private readonly IDynamicTaskService _dynamicTasksService;
+        private readonly IFixedTaskService _fixedTasksService;
 
         public enum OpenModalType
         {
@@ -37,16 +36,16 @@ namespace TimeHacker.Application.Pages
             ILogger<IndexModel> logger,
             SignInManager<IdentityUser> signInManager,
             IHttpContextAccessor httpContextAccessor,
-            IDynamicTasksServiceCommand dynamicTasksServiceCommand,
-            IFixedTasksServiceCommand fixedTasksServiceCommand
+            IDynamicTaskService dynamicTasksServiceCommand,
+            IFixedTaskService fixedTasksServiceCommand
         )
         {
             _logger = logger;
             _user = httpContextAccessor.HttpContext?.User;
             _isSignedIn = _user != null && signInManager.IsSignedIn(_user);
 
-            _dynamicTasksServiceCommand = dynamicTasksServiceCommand;
-            _fixedTasksServiceCommand = fixedTasksServiceCommand;
+            _dynamicTasksService = dynamicTasksServiceCommand;
+            _fixedTasksService = fixedTasksServiceCommand;
         }
 
         public IActionResult OnGet()
@@ -95,7 +94,7 @@ namespace TimeHacker.Application.Pages
                     return Page();
                 }
 
-                await _dynamicTasksServiceCommand.AddAsync(dynamicTask);
+                await _dynamicTasksService.AddAsync(dynamicTask);
             }
             catch (Exception e)
             {
@@ -143,7 +142,7 @@ namespace TimeHacker.Application.Pages
                     return Page();
                 }
 
-                await _fixedTasksServiceCommand.AddAsync(fixedTask);
+                await _fixedTasksService.AddAsync(fixedTask);
             }
             catch (Exception e)
             {

@@ -1,12 +1,11 @@
 ﻿using System.Security.Claims;
-using TimeHacker.Domain.Abstractions.Interfaces.Helpers;
+using TimeHacker.Domain.Contracts.IModels;
 
 namespace TimeHacker.Application.Helpers
 {
     public class UserAccessor: IUserAccessor
     {
-        public string? UserId { get; init; }
-        public bool IsUserValid => ValidateUser();
+        public new bool IsUserValid => ValidateUser();
         public UserAccessor(IHttpContextAccessor httpContextAccessor)
         {
             UserId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
