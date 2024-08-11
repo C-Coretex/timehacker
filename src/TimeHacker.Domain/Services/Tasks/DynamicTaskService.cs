@@ -11,7 +11,7 @@ namespace TimeHacker.Domain.Services.Tasks
         private readonly IUserAccessor _userAccessor;
         private readonly IDynamicTaskRepository _dynamicTaskRepository;
 
-        public DynamicTaskService(IUserAccessor userAccessor, IDynamicTaskRepository dynamicTaskRepository)
+        public DynamicTaskService(IDynamicTaskRepository dynamicTaskRepository, IUserAccessor userAccessor)
         {
             _userAccessor = userAccessor;
             _dynamicTaskRepository = dynamicTaskRepository;

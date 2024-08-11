@@ -33,7 +33,7 @@ namespace TimeHacker.Domain.Services.Categories
                 return;
 
             if (category.UserId != userId)
-                throw new ArgumentException("User can only delete its own tasks.");
+                throw new ArgumentException("User can only delete its own categories.");
 
             await _categoryRepository.DeleteAsync(category);
         }
@@ -54,7 +54,7 @@ namespace TimeHacker.Domain.Services.Categories
             var userId = _userAccessor.UserId;
 
             if (category == null || category.Id == 0)
-                throw new ArgumentException("Task must be valid");
+                throw new ArgumentException("Category must be valid");
 
 
             var oldCategory = await _categoryRepository.GetByIdAsync(category.Id);
@@ -65,7 +65,7 @@ namespace TimeHacker.Domain.Services.Categories
             }
 
             if (oldCategory.UserId != userId)
-                throw new ArgumentException("User can only edit its own tasks.");
+                throw new ArgumentException("User can only edit its own categories.");
 
             category.UserId = userId;
             await _categoryRepository.UpdateAsync(category);

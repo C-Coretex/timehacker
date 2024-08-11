@@ -11,7 +11,7 @@ namespace TimeHacker.Domain.Services.Tasks
         private readonly IUserAccessor _userAccessor;
         private readonly IFixedTaskRepository _fixedTaskRepository;
 
-        public FixedTaskService(IUserAccessor userAccessor, IFixedTaskRepository FixedTaskRepository)
+        public FixedTaskService(IFixedTaskRepository FixedTaskRepository, IUserAccessor userAccessor)
         {
             _userAccessor = userAccessor;
             _fixedTaskRepository = FixedTaskRepository;
