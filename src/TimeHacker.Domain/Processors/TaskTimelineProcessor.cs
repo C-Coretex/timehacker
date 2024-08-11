@@ -34,7 +34,7 @@ namespace TimeHacker.Domain.Processors
         {
             return fixedTasks.Select(fixedTask => new TaskContainerReturn()
             {
-                Task = fixedTask,
+                Task = new TaskBase(fixedTask),
                 IsFixed = true,
                 TimeRange = new TimeRange(fixedTask.StartTimestamp.TimeOfDay, fixedTask.EndTimestamp.TimeOfDay)
             });
@@ -78,7 +78,7 @@ namespace TimeHacker.Domain.Processors
             var dynamicTaskContainerTimeline = GetDynamicTasksForTimeRangeRecursive(dynamicTaskContainers, timeRange);
             var dynamicTaskTimeline = dynamicTaskContainerTimeline.Select(dt => new TaskContainerReturn
             {
-                Task = dt.Task,
+                Task = new TaskBase(dt.Task),
                 IsFixed = false,
                 TimeRange = dt.TimeRange
             });

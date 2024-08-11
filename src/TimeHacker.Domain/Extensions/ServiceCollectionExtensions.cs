@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TimeHacker.Domain.Contracts.IServices.Categories;
+using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Services.Categories;
+using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
 
 namespace TimeHacker.Domain.Extensions
@@ -10,10 +12,12 @@ namespace TimeHacker.Domain.Extensions
     {
         public static IServiceCollection RegisterServices(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<Contracts.IServices.Categories.ICategoryService, CategoryService>();
+            serviceCollection.AddScoped<ICategoryService, CategoryService>();
+
+            serviceCollection.AddScoped<IScheduleSnapshotService, ScheduleSnapshotService>();
 
             serviceCollection.AddScoped<IDynamicTaskService, DynamicTaskService>();
-            serviceCollection.AddScoped<Contracts.IServices.Tasks.IFixedTaskService, FixedTaskService>();
+            serviceCollection.AddScoped<IFixedTaskService, FixedTaskService>();
             serviceCollection.AddScoped<ITaskService, TaskService>();
 
             return serviceCollection;

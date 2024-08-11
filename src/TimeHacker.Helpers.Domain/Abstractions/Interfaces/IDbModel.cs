@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
+﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
 {
-    public interface IDbModel<T>
+    public interface IDbModel<T>: IDbModel
     {
-        [Key]
         public T Id { get; init; }
+    }
+
+    public interface IDbModel
+    {
     }
 }

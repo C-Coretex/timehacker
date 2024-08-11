@@ -6,5 +6,6 @@ namespace TimeHacker.Domain.Contracts.IServices.Tasks
     {
         Task<TasksForDayReturn> GetTasksForDay(DateTime date);
         IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(IEnumerable<DateTime> dates);
+        IAsyncEnumerable<TasksForDayReturn> RefreshTasksForDays(IEnumerable<DateTime> dates);
     }
 }

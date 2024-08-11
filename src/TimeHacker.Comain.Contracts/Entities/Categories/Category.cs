@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Drawing;
+﻿using System.Drawing;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.Categories

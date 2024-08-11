@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Domain.Contracts.Entities.Categories;
+﻿using TimeHacker.Domain.Contracts.Entities.Categories;
 
 namespace TimeHacker.Domain.Contracts.Entities.Tasks
 {

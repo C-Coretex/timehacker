@@ -63,6 +63,47 @@ $('.js-open-dynamic-tasks-button').on('click', () => {
     $('.js-fixed-tasks').addClass('d-none')
 })
 
+function getDatesForCurrentWeek() {
+    const dates = [];
+    const today = new Date();
+
+    // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    const dayOfWeek = today.getDay();
+
+    // Calculate the date of the Monday of the current week
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+    // Add each day of the week to the dates array
+    for (let i = 0; i < 7; i++) {
+        const currentDay = new Date(monday);
+        currentDay.setDate(monday.getDate() + i);
+        dates.push(currentDay.toISOString().split('T')[0]); // Save the date as 'YYYY-MM-DD'
+    }
+
+    return dates;
+}
+
+$('.js-refresh').on('click', () => {
+    console.log('aa')
+    const thisWeekDates = getDatesForCurrentWeek();
+
+    // Make the AJAX POST request
+    $.ajax({
+        url: '/api/Tasks/RefreshTasksForDays',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(thisWeekDates),
+        success: (response) => {
+            console.log('Tasks refreshed successfully:', response);
+            // Handle success (e.g., update the UI)
+        },
+        error: (xhr, status, error) => {
+            console.error('Error refreshing tasks:', status, error);
+            // Handle error (e.g., show an error message)
+        }
+    });
+})
 
 $('.js-button-edit-fixed-task').on('click', function () {
     const self = this

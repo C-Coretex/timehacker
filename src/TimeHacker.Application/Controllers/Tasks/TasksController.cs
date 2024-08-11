@@ -50,5 +50,21 @@ namespace TimeHacker.Application.Controllers.Tasks
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("RefreshTasksForDays")]
+        public IActionResult RefreshTasksForDays([FromBody] IEnumerable<DateTime> dates)
+        {
+            try
+            {
+                var data = _taskService.RefreshTasksForDays(dates);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while refreshing tasks for days");
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
