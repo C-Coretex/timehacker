@@ -3,7 +3,7 @@ System to help you organize tasks and events.
 
 The system will automatically arrange your tasks, depending on your preferences and interests.
 
-Built with Clean Architecture.
+~~Built with Clean Architecture.~~
 
 Stack:
 - ASP.NET
