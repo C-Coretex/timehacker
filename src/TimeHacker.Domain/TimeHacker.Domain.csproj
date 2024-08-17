@@ -13,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TimeHacker.Comain.Contracts\TimeHacker.Domain.Contracts.csproj" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
+    <ProjectReference Include="..\TimeHacker.Domain.Contracts\TimeHacker.Domain.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

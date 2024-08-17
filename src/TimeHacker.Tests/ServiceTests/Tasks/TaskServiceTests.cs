@@ -36,7 +36,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
 
             var dynamicTasksService = new DynamicTaskService(_dynamicUserTasksRepository.Object, _userAccessor);
             var fixedTasksService = new FixedTaskService(_fixedUserTasksRepository.Object, _userAccessor);
-            var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, _userAccessor);
+            var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, null, _userAccessor);
             var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
             var mapper = new Mapper(mapperConfiguration);
             _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService, mapper);
