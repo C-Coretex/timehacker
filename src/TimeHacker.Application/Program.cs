@@ -39,9 +39,6 @@ builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.WebHost.UseStaticWebAssets();
 
-var mapper = GetMapperConfiguration().CreateMapper();
-builder.Services.AddSingleton(mapper);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -76,19 +73,4 @@ static IServiceCollection AddApplicationServices(IServiceCollection services)
     services.AddScoped<IUserAccessor, UserAccessor>();
 
     return services;
-}
-
-static MapperConfiguration GetMapperConfiguration()
-{
-    var types = AppDomain.CurrentDomain
-                        .GetAssemblies()
-                        .Where(x => x.FullName!.StartsWith("TimeHacker."))
-                        .SelectMany(s => s.GetTypes())
-                        .Where(p => typeof(Profile).IsAssignableFrom(p));
-
-    return new MapperConfiguration(cfg =>
-    {
-        foreach (var type in types)
-            cfg.AddProfile(type);
-    });
 }

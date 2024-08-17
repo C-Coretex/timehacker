@@ -8,7 +8,6 @@ namespace TimeHacker.Domain.Contracts.Entities.Tasks
         public string Name { get; set; }
         public string? Description { get; set; }
         public uint Priority { get; set; }
-        public bool IsCompleted { get; set; }
         public DateTime CreatedTimestamp { get; set; }
     }
 }

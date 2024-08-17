@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoMapper;
+using FluentAssertions;
 using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
@@ -9,6 +10,8 @@ using TimeHacker.Domain.Contracts.IRepositories.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
+using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Tests.Helpers;
 using TimeHacker.Tests.Mocks;
 
 namespace TimeHacker.Tests.ServiceTests.Tasks
@@ -34,7 +37,9 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
             var dynamicTasksService = new DynamicTaskService(_dynamicUserTasksRepository.Object, _userAccessor);
             var fixedTasksService = new FixedTaskService(_fixedUserTasksRepository.Object, _userAccessor);
             var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, _userAccessor);
-            _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService);
+            var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
+            var mapper = new Mapper(mapperConfiguration);
+            _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService, mapper);
         }
 
         [Fact]
@@ -89,7 +94,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
             var result2 = await _tasksService.GetTasksForDays(dates).ToListAsync();
 
             // Assert
-            result1.Should().BeEquivalentTo(result2);
+            result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         }
 
         [Fact]
@@ -107,9 +112,9 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
             var result4 = await _tasksService.GetTasksForDays(dates).ToListAsync();
 
             // Assert
-            result1.Should().BeEquivalentTo(result2);
-            result2.Should().NotBeEquivalentTo(result3);
-            result3.Should().BeEquivalentTo(result4);
+            result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
+            result2.Should().NotBeEquivalentTo(result3, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
+            result3.Should().BeEquivalentTo(result4, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         }
 
         [Fact]
@@ -166,7 +171,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
                     OptimalTimeToFinish = new TimeSpan(0, 45, 0),
                 },
             };
-            _dynamicUserTasksRepository.Setup(x => x.GetAll(It.IsAny<bool>())).Returns(dynamicTasks.AsQueryable().BuildMock());
+            _dynamicUserTasksRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<DynamicTask>[]>())).Returns(dynamicTasks.AsQueryable().BuildMock());
 
             var fixedTasks = new List<FixedTask>
             {
@@ -210,10 +215,11 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
                     EndTimestamp = date.AddHours(3).AddMinutes(30),
                 },
             };
-            _fixedUserTasksRepository.Setup(x => x.GetAll(It.IsAny<bool>())).Returns(fixedTasks.AsQueryable().BuildMock());
+            _fixedUserTasksRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<FixedTask>[]>())).Returns(fixedTasks.AsQueryable().BuildMock());
 
             var scheduleSnapshots = new List<ScheduleSnapshot>();
-            _scheduleSnapshotRepository.Setup(x => x.GetAll(It.IsAny<bool>())).Returns(scheduleSnapshots.AsQueryable().BuildMock());
+            _scheduleSnapshotRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>())).Returns(scheduleSnapshots.AsQueryable().BuildMock());
+            _scheduleSnapshotRepository.Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>())).Returns(scheduleSnapshots.AsQueryable().BuildMock());
             _scheduleSnapshotRepository.Setup(x => x.AddAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>())).Callback<ScheduleSnapshot, bool>((model, saveChanges) =>
             {
                 scheduleSnapshots.Add(model);

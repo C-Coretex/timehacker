@@ -1,8 +1,11 @@
-﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
+﻿using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+
+namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
 {
     public interface IRepositoryBase<TModel> where TModel : class, IDbModel, new()
     {
-        IQueryable<TModel> GetAll(bool asNoTracking = true);
+        IQueryable<TModel> GetAll(params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
+        IQueryable<TModel> GetAll(bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
         TModel Add(TModel model, bool saveChanges = true);
         Task<TModel> AddAsync(TModel model, bool saveChanges = true);
         IEnumerable<TModel> AddRange(IEnumerable<TModel> models, bool saveChanges = true);
@@ -21,8 +24,8 @@
 
     public interface IRepositoryBase<TModel, TId>: IRepositoryBase<TModel> where TModel : class, IDbModel<TId>, new()
     {
-        TModel? GetById(TId id, bool asNoTracking = true);
-        Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true);
+        TModel? GetById(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
+        Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
         void Delete(TId id, bool saveChanges = true);
         Task DeleteAsync(TId id, bool saveChanges = true);
         void DeleteRange(IEnumerable<TId> ids, bool saveChanges = true);

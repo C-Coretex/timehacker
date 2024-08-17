@@ -14,8 +14,6 @@ namespace TimeHacker.Domain.Contracts.Entities.Tasks
 
         public uint Priority { get; set; }
 
-        public bool IsCompleted { get; set; } = false;
-
         public DateTime StartTimestamp { get; set; }
 
         public DateTime EndTimestamp { get; set; }
@@ -23,6 +21,6 @@ namespace TimeHacker.Domain.Contracts.Entities.Tasks
         public DateTime CreatedTimestamp { get; set; } = DateTime.Now;
 
         
-        public List<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
+        public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
     }
 }

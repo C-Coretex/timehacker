@@ -1,6 +1,6 @@
 ﻿using Helpers.DB.Abstractions.Classes;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
+using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
@@ -18,11 +18,17 @@ namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
             _dbSet = dbSet;
         }
 
-        public virtual IQueryable<TModel> GetAll(bool asNoTracking = true)
+        public virtual IQueryable<TModel> GetAll(params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates) => GetAll(true, includeExpansionDelegates);
+
+        public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
         {
             var query = _dbSet.AsQueryable();
             if (asNoTracking)
                 query = query.AsNoTracking();
+
+            foreach (var includeExpansionDelegate in includeExpansionDelegates)
+                query = includeExpansionDelegate(query);
+
             return query;
         }
 
@@ -99,14 +105,14 @@ namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
         public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet): base(dbContext, dbSet)
         { }
 
-        public virtual TModel? GetById(TId id, bool asNoTracking = true)
+        public virtual TModel? GetById(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
         {
-            return GetAll(asNoTracking).FirstOrDefault(x => x.Id!.Equals(id));
+            return GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefault(x => x.Id!.Equals(id));
         }
 
-        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true)
+        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
         {
-            return await GetAll(asNoTracking).FirstOrDefaultAsync(x => x.Id!.Equals(id));
+            return await GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefaultAsync(x => x.Id!.Equals(id));
         }
 
         public virtual void Delete(TId id, bool saveChanges = true)

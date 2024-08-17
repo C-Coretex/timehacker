@@ -16,8 +16,8 @@ namespace TimeHacker.Domain.Contracts.Entities.Categories
         public Color Color { get; set; }
 
 
-        public List<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
+        public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
 
-        public List<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
+        public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
     }
 }

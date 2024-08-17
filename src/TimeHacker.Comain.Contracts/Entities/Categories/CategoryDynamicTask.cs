@@ -7,7 +7,7 @@ namespace TimeHacker.Domain.Contracts.Entities.Categories
         public int CategoryId { get; set; }
         public int DynamicTaskId { get; set; }
 
-        public Category Category { get; set; } = null!;
-        public DynamicTask DynamicTask { get; set; } = null!;
+        public virtual Category Category { get; set; } = null!;
+        public virtual DynamicTask DynamicTask { get; set; } = null!;
     }
 }

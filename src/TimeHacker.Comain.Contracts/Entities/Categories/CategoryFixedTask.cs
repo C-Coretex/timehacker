@@ -7,7 +7,7 @@ namespace TimeHacker.Domain.Contracts.Entities.Categories
         public int CategoryId { get; set; }
         public int FixedTaskId { get; set; }
 
-        public Category Category { get; set; } = null!;
-        public FixedTask FixedTask { get; set; } = null!;
+        public virtual Category Category { get; set; } = null!;
+        public virtual FixedTask FixedTask { get; set; } = null!;
     }
 }

@@ -3,6 +3,8 @@ using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
+using TimeHacker.Domain.IncludeExpansionDelegates;
+using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 
 namespace TimeHacker.Domain.Services.ScheduleSnapshots
 {
@@ -20,19 +22,53 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
 
         public async Task Add(ScheduleSnapshot scheduleSnapshot)
         {
+            var updatedTimestamp = DateTime.UtcNow;
+
             scheduleSnapshot.UserId = _userAccessor.UserId!;
-            scheduleSnapshot.LastUpdateTimestamp = DateTime.UtcNow;
+            scheduleSnapshot.LastUpdateTimestamp = updatedTimestamp;
+
+            foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
+            {
+                scheduledTask.Date = scheduleSnapshot.Date;
+                scheduledTask.UserId = _userAccessor.UserId!;
+                scheduledTask.UpdatedTimestamp = updatedTimestamp;
+            }
+            foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
+            {
+                scheduledCategory.Date = scheduleSnapshot.Date;
+                scheduledCategory.UserId = _userAccessor.UserId!;
+                scheduledCategory.UpdatedTimestamp = updatedTimestamp;
+            }
+
             await _scheduleSnapshotRepository.AddAsync(scheduleSnapshot);
         }
 
         public Task<ScheduleSnapshot?> GetBy(DateOnly date)
         {
-            return _scheduleSnapshotRepository.GetAll().FirstOrDefaultAsync(x => x.UserId == _userAccessor.UserId! && x.Date == date);
+            var query = _scheduleSnapshotRepository.GetAll(false, IncludeExpansionScheduleSnapshots.IncludeScheduledTasks, IncludeExpansionScheduleSnapshots.IncludeScheduledCategories);
+
+            return query.FirstOrDefaultAsync(x => x.UserId == _userAccessor.UserId! && x.Date == date);
         }
 
         public async Task Update(ScheduleSnapshot scheduleSnapshot)
         {
-            scheduleSnapshot.LastUpdateTimestamp = DateTime.UtcNow;
+            var updatedTimestamp = DateTime.UtcNow;
+
+            scheduleSnapshot.LastUpdateTimestamp = updatedTimestamp;
+
+            foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
+            {
+                scheduledTask.Date = scheduleSnapshot.Date;
+                scheduledTask.UserId = _userAccessor.UserId!;
+                scheduledTask.UpdatedTimestamp = updatedTimestamp;
+            }
+            foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
+            {
+                scheduledCategory.Date = scheduleSnapshot.Date;
+                scheduledCategory.UserId = _userAccessor.UserId!;
+                scheduledCategory.UpdatedTimestamp = updatedTimestamp;
+            }
+
             await _scheduleSnapshotRepository.UpdateAsync(scheduleSnapshot);
         }
     }

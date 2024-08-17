@@ -14,8 +14,7 @@ namespace TimeHacker.Domain.Contracts.Entities.Tasks
         public TimeSpan MaxTimeToFinish { get; set; }
         public TimeSpan? OptimalTimeToFinish { get; set; }
 
-        public bool IsCompleted { get; set; } = false;
         public DateTime CreatedTimestamp { get; set; } = DateTime.Now;
-        public List<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
+        public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
     }
 }

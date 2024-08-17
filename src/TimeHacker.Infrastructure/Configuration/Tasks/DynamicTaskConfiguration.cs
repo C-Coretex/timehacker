@@ -10,7 +10,6 @@ namespace TimeHacker.Infrastructure.Configuration.Tasks
         {
             builder.HasKey(x => x.Id);
             builder.HasIndex(x => x.UserId);
-            builder.HasIndex(x => x.IsCompleted);
             builder.HasIndex(x => x.CreatedTimestamp);
 
             builder.Property(x => x.UserId).IsRequired().HasMaxLength(450);
@@ -19,7 +18,6 @@ namespace TimeHacker.Infrastructure.Configuration.Tasks
             builder.Property(x => x.Priority).IsRequired();
             builder.Property(x => x.MinTimeToFinish).IsRequired();
             builder.Property(x => x.MaxTimeToFinish).IsRequired();
-            builder.Property(x => x.IsCompleted).IsRequired();
             builder.Property(x => x.CreatedTimestamp).IsRequired();
         }
     }

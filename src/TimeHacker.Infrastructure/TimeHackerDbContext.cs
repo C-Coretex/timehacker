@@ -19,6 +19,8 @@ namespace TimeHacker.Infrastructure
         internal DbSet<CategoryDynamicTask> CategoryDynamicTask { get; set; }
 
         //ScheduleSnapshots
+        internal DbSet<ScheduledTask> ScheduledTask { get; set; }
+        internal DbSet<ScheduledCategory> ScheduledCategory { get; set; }
         internal DbSet<ScheduleSnapshot> ScheduleSnapshot { get; set; }
 
         //Tasks

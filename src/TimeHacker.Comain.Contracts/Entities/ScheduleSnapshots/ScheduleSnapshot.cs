@@ -1,5 +1,4 @@
-﻿using TimeHacker.Domain.Contracts.Models.ReturnModels;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 {
@@ -10,6 +9,7 @@ namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 
         public DateTime LastUpdateTimestamp { get; set; }
 
-        public TasksForDayReturn? ScheduleData { get; set; }
+        public virtual ICollection<ScheduledTask> ScheduledTasks { get; set; }
+        public virtual ICollection<ScheduledCategory> ScheduledCategories { get; set; }
     }
 }
