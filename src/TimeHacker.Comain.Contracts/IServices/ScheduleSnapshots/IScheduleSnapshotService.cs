@@ -7,5 +7,7 @@ namespace TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots
         Task<ScheduleSnapshot?> GetBy(DateOnly date);
         Task Add(ScheduleSnapshot scheduleSnapshot);
         Task Update(ScheduleSnapshot scheduleSnapshot);
+
+        Task<ScheduledTask?> GetScheduledTaskBy(ulong id);
     }
 }

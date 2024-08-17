@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
+using TimeHacker.Domain.Services.Tasks;
 
 namespace TimeHacker.Application.Controllers.Tasks
 {
@@ -11,10 +13,13 @@ namespace TimeHacker.Application.Controllers.Tasks
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly IScheduleSnapshotService _scheduleSnapshotService;
         private readonly ILogger<TasksController> _logger;
-        public TasksController(ITaskService taskService, ILogger<TasksController> logger)
+        public TasksController(ITaskService taskService, IScheduleSnapshotService scheduleSnapshotService, ILogger<TasksController> logger)
         {
             _taskService = taskService;
+            _scheduleSnapshotService = scheduleSnapshotService;
+
             _logger = logger;
         }
 
@@ -63,6 +68,22 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while refreshing tasks for days");
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("GetScheduledTaskById/{id}")]
+        public async Task<IActionResult> GetScheduledTaskById(ulong id)
+        {
+            try
+            {
+                var data = await _scheduleSnapshotService.GetScheduledTaskBy(id);
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while getting fixed task by id");
                 return BadRequest(e.Message);
             }
         }

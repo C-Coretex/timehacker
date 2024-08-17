@@ -4,18 +4,20 @@ using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.IncludeExpansionDelegates;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 
 namespace TimeHacker.Domain.Services.ScheduleSnapshots
 {
     public class ScheduleSnapshotService: IScheduleSnapshotService
     {
         private readonly IScheduleSnapshotRepository _scheduleSnapshotRepository;
+        private readonly IScheduledTaskRepository _scheduledTaskRepository;
         private readonly IUserAccessor _userAccessor;
 
-        public ScheduleSnapshotService(IScheduleSnapshotRepository scheduleSnapshotRepository, IUserAccessor userAccessor)
+        public ScheduleSnapshotService(IScheduleSnapshotRepository scheduleSnapshotRepository, IScheduledTaskRepository scheduledTaskRepository, IUserAccessor userAccessor)
         {
             _scheduleSnapshotRepository = scheduleSnapshotRepository;
+            _scheduledTaskRepository = scheduledTaskRepository;
+
             _userAccessor = userAccessor;
         }
 
@@ -70,6 +72,18 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             }
 
             await _scheduleSnapshotRepository.UpdateAsync(scheduleSnapshot);
+        }
+
+        public async Task<ScheduledTask?> GetScheduledTaskBy(ulong id)
+        {
+            var scheduledTask = await _scheduledTaskRepository.GetByIdAsync(id);
+            if (scheduledTask == null)
+                return null;
+
+            if (scheduledTask.UserId != _userAccessor.UserId)
+                throw new ArgumentException("User can only get its own tasks.");
+
+            return scheduledTask;
         }
     }
 }
