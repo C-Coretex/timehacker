@@ -6,7 +6,6 @@ using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TimeHacker.Domain.Extensions
 {
@@ -17,6 +16,8 @@ namespace TimeHacker.Domain.Extensions
             serviceCollection.AddScoped<ICategoryService, CategoryService>();
 
             serviceCollection.AddScoped<IScheduleSnapshotService, ScheduleSnapshotService>();
+            serviceCollection.AddScoped<IScheduledTaskService, ScheduledTaskService>();
+            serviceCollection.AddScoped<IScheduledCategoryService, ScheduledCategoryService>();
 
             serviceCollection.AddScoped<IDynamicTaskService, DynamicTaskService>();
             serviceCollection.AddScoped<IFixedTaskService, FixedTaskService>();

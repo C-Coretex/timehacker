@@ -14,11 +14,13 @@ namespace TimeHacker.Application.Controllers.Tasks
     {
         private readonly ITaskService _taskService;
         private readonly IScheduleSnapshotService _scheduleSnapshotService;
+        private readonly IScheduledTaskService _scheduledTaskService;
         private readonly ILogger<TasksController> _logger;
-        public TasksController(ITaskService taskService, IScheduleSnapshotService scheduleSnapshotService, ILogger<TasksController> logger)
+        public TasksController(ITaskService taskService, IScheduleSnapshotService scheduleSnapshotService, IScheduledTaskService scheduledTaskService, ILogger<TasksController> logger)
         {
             _taskService = taskService;
             _scheduleSnapshotService = scheduleSnapshotService;
+            _scheduledTaskService = scheduledTaskService;
 
             _logger = logger;
         }
@@ -73,11 +75,11 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpGet("GetScheduledTaskById/{id}")]
-        public async Task<IActionResult> GetScheduledTaskById(ulong id)
+        public async Task<IActionResult> GetScheduledTaskById(Guid id)
         {
             try
             {
-                var data = await _scheduleSnapshotService.GetScheduledTaskBy(id);
+                var data = await _scheduledTaskService.GetBy(id);
 
                 return Ok(data);
             }

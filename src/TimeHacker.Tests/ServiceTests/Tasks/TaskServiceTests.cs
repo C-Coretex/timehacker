@@ -36,7 +36,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
 
             var dynamicTasksService = new DynamicTaskService(_dynamicUserTasksRepository.Object, _userAccessor);
             var fixedTasksService = new FixedTaskService(_fixedUserTasksRepository.Object, _userAccessor);
-            var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, null, _userAccessor);
+            var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, _userAccessor);
             var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
             var mapper = new Mapper(mapperConfiguration);
             _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService, mapper);
@@ -223,13 +223,14 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
             _scheduleSnapshotRepository.Setup(x => x.AddAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>())).Callback<ScheduleSnapshot, bool>((model, saveChanges) =>
             {
                 scheduleSnapshots.Add(model);
-            });
+            }).Returns<ScheduleSnapshot, bool>((model, saveChanges) => Task.FromResult(model));
+
             _scheduleSnapshotRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>())).Callback<ScheduleSnapshot, bool>((model, saveChanges) =>
             {
                 var existingObj = scheduleSnapshots.FirstOrDefault(x => x.UserId == model.UserId && x.Date == model.Date)!;
                 scheduleSnapshots.Remove(existingObj);
                 scheduleSnapshots.Add(model);
-            });
+            }).Returns<ScheduleSnapshot, bool>((model, saveChanges) => Task.FromResult(model));
         }
 
         #endregion

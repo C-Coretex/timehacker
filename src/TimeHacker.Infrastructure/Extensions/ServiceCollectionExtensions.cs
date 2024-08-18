@@ -21,6 +21,7 @@ namespace TimeHacker.Persistence.Extensions
 
             services.AddScoped<IScheduleSnapshotRepository, ScheduleSnapshotRepository>();
             services.AddScoped<IScheduledTaskRepository, ScheduledTaskRepository>();
+            services.AddScoped<IScheduledCategoryRepository, ScheduledCategoryRepository>();
 
             services.AddScoped<IFixedTaskRepository, FixedTaskRepository>();
             services.AddScoped<IDynamicTaskRepository, DynamicTaskRepository>();

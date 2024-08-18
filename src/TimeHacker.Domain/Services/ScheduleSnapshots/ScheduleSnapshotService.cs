@@ -10,19 +10,17 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
     public class ScheduleSnapshotService: IScheduleSnapshotService
     {
         private readonly IScheduleSnapshotRepository _scheduleSnapshotRepository;
-        private readonly IScheduledTaskRepository _scheduledTaskRepository;
         private readonly IUserAccessor _userAccessor;
 
-        public ScheduleSnapshotService(IScheduleSnapshotRepository scheduleSnapshotRepository, IScheduledTaskRepository scheduledTaskRepository, IUserAccessor userAccessor)
+        public ScheduleSnapshotService(IScheduleSnapshotRepository scheduleSnapshotRepository, IUserAccessor userAccessor)
         {
             _scheduleSnapshotRepository = scheduleSnapshotRepository;
-            _scheduledTaskRepository = scheduledTaskRepository;
 
             _userAccessor = userAccessor;
         }
 
 
-        public async Task Add(ScheduleSnapshot scheduleSnapshot)
+        public Task<ScheduleSnapshot> Add(ScheduleSnapshot scheduleSnapshot)
         {
             var updatedTimestamp = DateTime.UtcNow;
 
@@ -42,7 +40,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
-            await _scheduleSnapshotRepository.AddAsync(scheduleSnapshot);
+            return _scheduleSnapshotRepository.AddAsync(scheduleSnapshot);
         }
 
         public Task<ScheduleSnapshot?> GetBy(DateOnly date)
@@ -52,7 +50,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             return query.FirstOrDefaultAsync(x => x.UserId == _userAccessor.UserId! && x.Date == date);
         }
 
-        public async Task Update(ScheduleSnapshot scheduleSnapshot)
+        public Task<ScheduleSnapshot> Update(ScheduleSnapshot scheduleSnapshot)
         {
             var updatedTimestamp = DateTime.UtcNow;
 
@@ -71,19 +69,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
-            await _scheduleSnapshotRepository.UpdateAsync(scheduleSnapshot);
-        }
-
-        public async Task<ScheduledTask?> GetScheduledTaskBy(ulong id)
-        {
-            var scheduledTask = await _scheduledTaskRepository.GetByIdAsync(id);
-            if (scheduledTask == null)
-                return null;
-
-            if (scheduledTask.UserId != _userAccessor.UserId)
-                throw new ArgumentException("User can only get its own tasks.");
-
-            return scheduledTask;
+            return _scheduleSnapshotRepository.UpdateAsync(scheduleSnapshot);
         }
     }
 }

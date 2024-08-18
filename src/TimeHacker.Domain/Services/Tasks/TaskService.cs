@@ -45,9 +45,9 @@ namespace TimeHacker.Domain.Services.Tasks
             var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasks, dynamicTasks, date);
 
             snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
+            snapshot = await _scheduleSnapshotService.Add(snapshot);
 
-            await _scheduleSnapshotService.Add(snapshot);
-            return tasksForDay;
+            return _mapper.Map<TasksForDayReturn>(snapshot);
         }
 
         public async IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(IEnumerable<DateTime> dates)
@@ -72,9 +72,9 @@ namespace TimeHacker.Domain.Services.Tasks
                     var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, dynamicTasks, date);
 
                     snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
+                    snapshot = await _scheduleSnapshotService.Add(snapshot);
 
-                    await _scheduleSnapshotService.Add(snapshot);
-                    yield return tasksForDay;
+                    yield return _mapper.Map<TasksForDayReturn>(snapshot);
                 }
             }
         }
@@ -98,11 +98,11 @@ namespace TimeHacker.Domain.Services.Tasks
                 _mapper.Map(tasksForDay, snapshot);
 
                 if (snapshot.UserId == null)
-                    await _scheduleSnapshotService.Add(snapshot);
+                    snapshot = await _scheduleSnapshotService.Add(snapshot);
                 else
-                    await _scheduleSnapshotService.Update(snapshot);
+                    snapshot = await _scheduleSnapshotService.Update(snapshot);
 
-                yield return tasksForDay;
+                yield return _mapper.Map<TasksForDayReturn>(snapshot);
             }
         }
     }

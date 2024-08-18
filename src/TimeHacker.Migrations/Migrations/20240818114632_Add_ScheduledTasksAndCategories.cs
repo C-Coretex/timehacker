@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TimeHacker.Migrations.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_ScheduledTasks : Migration
+    public partial class Add_ScheduledTasksAndCategories : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,8 +35,7 @@ namespace TimeHacker.Migrations.Migrations
                 name: "ScheduledCategory",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ParentCategoryId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
@@ -61,10 +60,9 @@ namespace TimeHacker.Migrations.Migrations
                 name: "ScheduledTask",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ParentTaskId = table.Column<int>(type: "int", nullable: false),
-                    ScheduledCategoryId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
+                    ScheduledCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     IsFixed = table.Column<bool>(type: "bit", nullable: false),

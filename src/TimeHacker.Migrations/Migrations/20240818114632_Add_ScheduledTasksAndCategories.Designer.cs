@@ -12,8 +12,8 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(MigrationsDbContext))]
-    [Migration("20240817153643_Add_ScheduledTasks")]
-    partial class Add_ScheduledTasks
+    [Migration("20240818114632_Add_ScheduledTasksAndCategories")]
+    partial class Add_ScheduledTasksAndCategories
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,11 +106,9 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Color")
                         .HasColumnType("int");
@@ -150,11 +148,9 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledTask", b =>
                 {
-                    b.Property<decimal>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<decimal>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -181,8 +177,8 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<long>("Priority")
                         .HasColumnType("bigint");
 
-                    b.Property<decimal?>("ScheduledCategoryId")
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<Guid?>("ScheduledCategoryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("time");

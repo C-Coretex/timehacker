@@ -3,11 +3,11 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 {
-    public class ScheduledTask : IDbModel<ulong>
+    public class ScheduledTask : IDbModel<Guid>
     {
-        public ulong Id { get; init; }
+        public Guid Id { get; init; }
         public int ParentTaskId { get; init; }
-        public ulong? ScheduledCategoryId { get; init; }
+        public Guid? ScheduledCategoryId { get; init; }
 
         public string UserId { get; set; }
         public DateOnly Date { get; set; }
