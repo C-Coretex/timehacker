@@ -20,6 +20,10 @@ namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
             builder.HasOne(x => x.ScheduledCategory).WithMany(x => x.ScheduledTasks)
                    .HasForeignKey(x => x.ScheduledCategoryId).HasPrincipalKey(x => x.Id)
                    .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.HasOne(x => x.ScheduleEntity).WithMany(x => x.ScheduledTasks)
+                    .HasForeignKey(x => x.ParentScheduleEntity).HasPrincipalKey(x => x.Id)
+                    .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

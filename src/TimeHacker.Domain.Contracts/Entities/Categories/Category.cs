@@ -7,11 +7,11 @@ namespace TimeHacker.Domain.Contracts.Entities.Categories
     {
         public int Id { get; init; }
 
-        public string? UserId { get; set; }
+        public string UserId { get; set; }
 
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public Color Color { get; set; }
 

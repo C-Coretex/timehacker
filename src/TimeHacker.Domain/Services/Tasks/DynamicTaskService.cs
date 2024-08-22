@@ -25,7 +25,7 @@ namespace TimeHacker.Domain.Services.Tasks
             await _dynamicTaskRepository.AddAsync(task);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(uint id)
         {
             var userId = _userAccessor.UserId;
             var task = await _dynamicTaskRepository.GetByIdAsync(id);
@@ -44,7 +44,7 @@ namespace TimeHacker.Domain.Services.Tasks
             return _dynamicTaskRepository.GetAll().Where(x => x.UserId == userId);
         }
 
-        public Task<DynamicTask?> GetByIdAsync(int id)
+        public Task<DynamicTask?> GetByIdAsync(uint id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }

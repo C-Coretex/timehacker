@@ -25,7 +25,7 @@ namespace TimeHacker.Domain.Services.Tasks
             await _fixedTaskRepository.AddAsync(task);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(uint id)
         {
             var userId = _userAccessor.UserId;
             var task = await _fixedTaskRepository.GetByIdAsync(id);
@@ -44,9 +44,9 @@ namespace TimeHacker.Domain.Services.Tasks
             return _fixedTaskRepository.GetAll().Where(x => x.UserId == userId);
         }
 
-        public Task<FixedTask?> GetByIdAsync(int id)
+        public Task<FixedTask?> GetByIdAsync(uint id)
         {
-            return GetAll().FirstOrDefaultAsync(x => x.Id == id);
+            return GetByIdAsync(id);
         }
 
         public async Task UpdateAsync(FixedTask task)

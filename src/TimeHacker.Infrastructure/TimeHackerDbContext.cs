@@ -22,6 +22,7 @@ namespace TimeHacker.Infrastructure
         internal DbSet<ScheduledTask> ScheduledTask { get; set; }
         internal DbSet<ScheduledCategory> ScheduledCategory { get; set; }
         internal DbSet<ScheduleSnapshot> ScheduleSnapshot { get; set; }
+        internal DbSet<ScheduleEntity> ScheduleEntity { get; set; }
 
         //Tasks
         internal DbSet<FixedTask> FixedTask { get; set; }

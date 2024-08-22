@@ -6,9 +6,9 @@ namespace TimeHacker.Domain.Contracts.IServices.Tasks
     {
         /// <returns>Query with filtration by user id applied.</returns>
         public IQueryable<FixedTask> GetAll();
-        Task<FixedTask?> GetByIdAsync(int id);
+        Task<FixedTask?> GetByIdAsync(uint id);
         public Task UpdateAsync(FixedTask task);
-        public Task DeleteAsync(int id);
+        public Task DeleteAsync(uint id);
         public Task AddAsync(FixedTask task);
     }
 }

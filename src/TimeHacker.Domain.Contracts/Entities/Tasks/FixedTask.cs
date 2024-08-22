@@ -4,7 +4,7 @@ namespace TimeHacker.Domain.Contracts.Entities.Tasks
 {
     public class FixedTask : ITask
     {
-        public int Id { get; init; }
+        public uint Id { get; init; }
 
         public string UserId { get; set; }
 

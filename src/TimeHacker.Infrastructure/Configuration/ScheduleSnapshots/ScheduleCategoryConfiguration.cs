@@ -19,6 +19,10 @@ namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
                 v => v.ToArgb(),
                 v => Color.FromArgb(v)
             );
+
+            builder.HasOne(x => x.ScheduleEntity).WithMany(x => x.ScheduledCategories)
+                    .HasForeignKey(x => x.ParentScheduleEntity).HasPrincipalKey(x => x.Id)
+                    .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }
