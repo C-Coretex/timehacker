@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TimeHacker.Domain.Contracts.Models.EntityModels.Enums
 {
-    public enum RepeatsOnEnum
+    public enum DayOfWeekEnum
     {
         Monday = 1,
         Tuesday = 2,

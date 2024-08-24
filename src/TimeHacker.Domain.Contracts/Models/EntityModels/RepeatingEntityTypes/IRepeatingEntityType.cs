@@ -2,5 +2,6 @@
 {
     public interface IRepeatingEntityType
     {
+        DateOnly GetNextTaskDate(DateOnly startingFrom);
     }
 }

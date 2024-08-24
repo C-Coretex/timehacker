@@ -22,7 +22,7 @@ namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
             var jsonSerializerOptions = new JsonSerializerOptions();
             builder.Property(x => x.RepeatingEntity).HasConversion(
                 v => JsonSerializer.SerializeToUtf8Bytes(v, jsonSerializerOptions),
-                v => JsonSerializer.Deserialize<RepeatingEntity>(v, jsonSerializerOptions)!);
+                v => JsonSerializer.Deserialize<RepeatingEntityModel>(v, jsonSerializerOptions)!);
         }
     }
 }

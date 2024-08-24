@@ -101,7 +101,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateTime>("LastTaskCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("RepeatingEntity")
+                    b.Property<byte[]>("RepeatingEntityModel")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 

@@ -18,5 +18,27 @@
                 _monthDayToRepeat = value;
             }
         }
+
+        public DateOnly GetNextTaskDate(DateOnly startingFrom)
+        {
+            const int maxIterations = 12;
+            var startingDay = startingFrom.Day;
+
+            //Reset to 1-st day
+            startingFrom.AddDays(-startingFrom.Day);
+            if (startingDay > MonthDayToRepeat)
+                startingFrom.AddMonths(1);
+
+            for (var i = 0; i < maxIterations; i++)
+            {
+                var maxDayInMonth = DateTime.DaysInMonth(startingFrom.Year, startingFrom.Month);
+                if (maxDayInMonth >= MonthDayToRepeat)
+                    return startingFrom.AddDays(MonthDayToRepeat);
+
+                startingFrom.AddMonths(1);
+            }
+
+            throw new Exception("No next task date found");
+        }
     }
 }

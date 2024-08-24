@@ -1,13 +1,16 @@
 ﻿using TimeHacker.Domain.Contracts.Entities.Categories;
+using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Domain.Contracts.IServices.Categories
 {
     public interface ICategoryService
     {
-        public IQueryable<Category> GetAll();
+        IQueryable<Category> GetAll();
         Task<Category?> GetByIdAsync(uint id);
-        public Task UpdateAsync(Category task);
-        public Task DeleteAsync(uint id);
-        public Task AddAsync(Category task);
+        Task UpdateAsync(Category task);
+        Task DeleteAsync(uint id);
+        Task AddAsync(Category task);
+
+        Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint categoryId);
     }
 }

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Drawing;
 using TimeHacker.Domain.Contracts.Entities.Categories;
+using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.Entities.Tasks;
 
 namespace TimeHacker.Infrastructure.Configuration.Categories
 {
@@ -19,6 +21,10 @@ namespace TimeHacker.Infrastructure.Configuration.Categories
                 v => v.ToArgb(),
                 v => Color.FromArgb(v)
             );
+
+            builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.Category)
+                .HasForeignKey<FixedTask>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

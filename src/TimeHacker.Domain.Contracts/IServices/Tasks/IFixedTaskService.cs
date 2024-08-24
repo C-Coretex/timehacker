@@ -1,14 +1,17 @@
-﻿using TimeHacker.Domain.Contracts.Entities.Tasks;
+﻿using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.Entities.Tasks;
 
 namespace TimeHacker.Domain.Contracts.IServices.Tasks
 {
     public interface IFixedTaskService
     {
         /// <returns>Query with filtration by user id applied.</returns>
-        public IQueryable<FixedTask> GetAll();
+        IQueryable<FixedTask> GetAll();
         Task<FixedTask?> GetByIdAsync(uint id);
-        public Task UpdateAsync(FixedTask task);
-        public Task DeleteAsync(uint id);
-        public Task AddAsync(FixedTask task);
+        Task UpdateAsync(FixedTask task);
+        Task DeleteAsync(uint id);
+        Task AddAsync(FixedTask task);
+
+        Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint taskId);
     }
 }

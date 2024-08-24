@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 
 namespace TimeHacker.Infrastructure.Configuration.Tasks
@@ -20,6 +21,10 @@ namespace TimeHacker.Infrastructure.Configuration.Tasks
             builder.Property(x => x.StartTimestamp).IsRequired();
             builder.Property(x => x.EndTimestamp).IsRequired();
             builder.Property(x => x.CreatedTimestamp).IsRequired();
+
+            builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.FixedTask)
+                .HasForeignKey<FixedTask>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

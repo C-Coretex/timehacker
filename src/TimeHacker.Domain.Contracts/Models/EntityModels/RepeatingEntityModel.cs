@@ -3,7 +3,7 @@ using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Domain.Contracts.Models.EntityModels
 {
-    public class RepeatingEntity
+    public class RepeatingEntityModel
     {
         public RepeatingEntityTypeEnum EntityType { get; set; }
 

@@ -2,11 +2,16 @@
 {
     public class DayRepeatingEntity: IRepeatingEntityType
     {
-        public byte DaysCountToRepeat { get; set; }
+        private byte DaysCountToRepeat { get; set; }
 
         public DayRepeatingEntity(byte daysCountToRepeat)
         {
             DaysCountToRepeat = daysCountToRepeat;
+        }
+
+        public DateOnly GetNextTaskDate(DateOnly startingFrom)
+        {
+            return startingFrom.AddDays(DaysCountToRepeat);
         }
     }
 }
