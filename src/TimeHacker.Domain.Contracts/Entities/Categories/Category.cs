@@ -3,9 +3,9 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.Categories
 {
-    public class Category : IDbModel<int>
+    public class Category : IDbModel<uint>
     {
-        public int Id { get; init; }
+        public uint Id { get; init; }
 
         public string UserId { get; set; }
 

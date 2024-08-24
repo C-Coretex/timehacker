@@ -46,7 +46,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public Task<FixedTask?> GetByIdAsync(uint id)
         {
-            return GetByIdAsync(id);
+            return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task UpdateAsync(FixedTask task)

@@ -11,7 +11,7 @@ namespace TimeHacker.Infrastructure.Configuration.Categories
             builder.HasKey(x => new { x.CategoryId, x.FixedTaskId });
 
             builder.HasOne(x => x.FixedTask).WithMany(x => x.CategoryFixedTasks)
-                   .HasForeignKey(x => x.CategoryId).HasPrincipalKey(x => x.Id)
+                   .HasForeignKey(x => x.FixedTaskId).HasPrincipalKey(x => x.Id)
                    .OnDelete(DeleteBehavior.ClientCascade);
             builder.HasOne(x => x.Category).WithMany(x => x.CategoryFixedTasks)
                    .HasForeignKey(x => x.CategoryId).HasPrincipalKey(x => x.Id)

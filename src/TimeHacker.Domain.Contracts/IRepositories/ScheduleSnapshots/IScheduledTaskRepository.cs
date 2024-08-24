@@ -3,6 +3,6 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots
 {
-    public interface IScheduledTaskRepository: IRepositoryBase<ScheduledTask, Guid>
+    public interface IScheduledTaskRepository: IRepositoryBase<ScheduledTask, ulong>
     { }
 }

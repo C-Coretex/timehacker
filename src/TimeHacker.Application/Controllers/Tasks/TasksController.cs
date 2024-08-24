@@ -75,7 +75,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpGet("GetScheduledTaskById/{id}")]
-        public async Task<IActionResult> GetScheduledTaskById(Guid id)
+        public async Task<IActionResult> GetScheduledTaskById(ulong id)
         {
             try
             {

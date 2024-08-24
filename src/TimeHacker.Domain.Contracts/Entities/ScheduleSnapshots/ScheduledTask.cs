@@ -2,11 +2,11 @@
 
 namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 {
-    public class ScheduledTask : IDbModel<Guid>
+    public class ScheduledTask : IDbModel<ulong>
     {
-        public Guid Id { get; init; }
+        public ulong Id { get; init; }
         public uint ParentTaskId { get; init; }
-        public Guid? ScheduledCategoryId { get; init; }
+        public ulong? ScheduledCategoryId { get; init; }
         public uint? ParentScheduleEntity { get; init; }
 
         public string UserId { get; set; }

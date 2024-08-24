@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TimeHacker.Application.Models.Input.Categories;
-using TimeHacker.Application.Models.Input.Tasks;
 using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 
 namespace TimeHacker.Application.Controllers.Categories
@@ -42,7 +40,7 @@ namespace TimeHacker.Application.Controllers.Categories
         }
 
         [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(uint id)
         {
             try
             {
@@ -75,7 +73,7 @@ namespace TimeHacker.Application.Controllers.Categories
         }
 
         [HttpPost("Update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] InputCategoryModel inputCategoryModel)
+        public async Task<IActionResult> Update(uint id, [FromBody] InputCategoryModel inputCategoryModel)
         {
             try
             {
@@ -99,7 +97,7 @@ namespace TimeHacker.Application.Controllers.Categories
         }
 
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(uint id)
         {
             try
             {

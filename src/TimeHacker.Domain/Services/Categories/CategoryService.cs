@@ -25,7 +25,7 @@ namespace TimeHacker.Domain.Services.Categories
             await _categoryRepository.AddAsync(category);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(uint id)
         {
             var userId = _userAccessor.UserId;
             var category = await _categoryRepository.GetByIdAsync(id);
@@ -44,7 +44,7 @@ namespace TimeHacker.Domain.Services.Categories
             return _categoryRepository.GetAll().Where(x => x.UserId == userId);
         }
 
-        public Task<Category?> GetByIdAsync(int id)
+        public Task<Category?> GetByIdAsync(uint id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
