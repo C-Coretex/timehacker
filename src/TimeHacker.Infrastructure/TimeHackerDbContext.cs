@@ -1,8 +1,8 @@
-﻿using Helpers.DB.Abstractions.Classes;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
+using TimeHacker.Helpers.DB.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure
 {

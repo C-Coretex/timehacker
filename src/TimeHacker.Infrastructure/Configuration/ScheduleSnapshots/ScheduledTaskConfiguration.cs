@@ -4,7 +4,7 @@ using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduleTaskConfiguration : IEntityTypeConfiguration<ScheduledTask>
+    public class ScheduledTaskConfiguration : IEntityTypeConfiguration<ScheduledTask>
     {
         public void Configure(EntityTypeBuilder<ScheduledTask> builder)
         {

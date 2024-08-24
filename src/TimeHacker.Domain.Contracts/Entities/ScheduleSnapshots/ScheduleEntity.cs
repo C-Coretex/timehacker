@@ -13,7 +13,7 @@ namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
         public DateTime LastTaskCreated { get; set; }
         public DateTime? EndsOn { get; set; }
 
-        public ICollection<ScheduledTask> ScheduledTasks { get; set; } = [];
-        public ICollection<ScheduledCategory> ScheduledCategories { get; set; } = [];
+        public virtual ICollection<ScheduledTask> ScheduledTasks { get; set; }
+        public virtual ICollection<ScheduledCategory> ScheduledCategories { get; set; }
     }
 }

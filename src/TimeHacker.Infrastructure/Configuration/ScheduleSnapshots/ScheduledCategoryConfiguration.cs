@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduleCategoryConfiguration : IEntityTypeConfiguration<ScheduledCategory>
+    public class ScheduledCategoryConfiguration : IEntityTypeConfiguration<ScheduledCategory>
     {
         public void Configure(EntityTypeBuilder<ScheduledCategory> builder)
         {

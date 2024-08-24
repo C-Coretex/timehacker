@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace TimeHacker.Persistence.IdentityData
+namespace TimeHacker.Infrastructure.IdentityData
 {
     public class IdentityDbContext : Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext
     {

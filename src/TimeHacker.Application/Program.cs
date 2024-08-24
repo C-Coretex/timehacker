@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using TimeHacker.Application.Helpers;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Infrastructure;
-using TimeHacker.Persistence.Extensions;
-using TimeHacker.Persistence.IdentityData;
 using TimeHacker.Domain.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
+using TimeHacker.Infrastructure.Extensions;
+using TimeHacker.Infrastructure.IdentityData;
 
 var builder = WebApplication.CreateBuilder(args);
 

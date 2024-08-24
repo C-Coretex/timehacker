@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
-namespace Helpers.DB.Abstractions.Classes
+namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
 {
     public class DbContextBase<TContext> : DbContext where TContext : DbContext
     {
@@ -16,9 +16,7 @@ namespace Helpers.DB.Abstractions.Classes
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!string.IsNullOrWhiteSpace(_connectionString))
-            {
                 optionsBuilder.UseSqlServer(_connectionString);
-            }
         }
 
         internal T AddEntity<T>(DbSet<T> entityCollection, T entity, bool saveChanges = true) where T : class, IDbModel

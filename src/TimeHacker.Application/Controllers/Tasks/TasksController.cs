@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
-using TimeHacker.Domain.Services.Tasks;
 
 namespace TimeHacker.Application.Controllers.Tasks
 {
@@ -13,13 +12,12 @@ namespace TimeHacker.Application.Controllers.Tasks
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        private readonly IScheduleSnapshotService _scheduleSnapshotService;
         private readonly IScheduledTaskService _scheduledTaskService;
         private readonly ILogger<TasksController> _logger;
-        public TasksController(ITaskService taskService, IScheduleSnapshotService scheduleSnapshotService, IScheduledTaskService scheduledTaskService, ILogger<TasksController> logger)
+
+        public TasksController(ITaskService taskService, IScheduledTaskService scheduledTaskService, ILogger<TasksController> logger)
         {
             _taskService = taskService;
-            _scheduleSnapshotService = scheduleSnapshotService;
             _scheduledTaskService = scheduledTaskService;
 
             _logger = logger;

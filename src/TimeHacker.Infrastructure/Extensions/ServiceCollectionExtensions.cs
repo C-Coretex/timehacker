@@ -8,7 +8,7 @@ using TimeHacker.Infrastructure.Repositories.Categories;
 using TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
 using TimeHacker.Infrastructure.Repositories.Tasks;
 
-namespace TimeHacker.Persistence.Extensions
+namespace TimeHacker.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -22,6 +22,7 @@ namespace TimeHacker.Persistence.Extensions
             services.AddScoped<IScheduleSnapshotRepository, ScheduleSnapshotRepository>();
             services.AddScoped<IScheduledTaskRepository, ScheduledTaskRepository>();
             services.AddScoped<IScheduledCategoryRepository, ScheduledCategoryRepository>();
+            services.AddScoped<IScheduleEntityRepository, ScheduleEntityRepository>();
 
             services.AddScoped<IFixedTaskRepository, FixedTaskRepository>();
             services.AddScoped<IDynamicTaskRepository, DynamicTaskRepository>();
