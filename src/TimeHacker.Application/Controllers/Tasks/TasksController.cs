@@ -36,7 +36,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         {
             try
             {
-                var dateParsed = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                var dateParsed = DateOnly.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
                 var data = await _taskService.GetTasksForDay(dateParsed);
 
                 return Ok(data);
@@ -49,7 +49,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpPost("GetTasksForDays")]
-        public IActionResult GetTasksForDays([FromBody] IEnumerable<DateTime> dates)
+        public IActionResult GetTasksForDays([FromBody] IEnumerable<DateOnly> dates)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpPost("RefreshTasksForDays")]
-        public IActionResult RefreshTasksForDays([FromBody] IEnumerable<DateTime> dates)
+        public IActionResult RefreshTasksForDays([FromBody] IEnumerable<DateOnly> dates)
         {
             try
             {

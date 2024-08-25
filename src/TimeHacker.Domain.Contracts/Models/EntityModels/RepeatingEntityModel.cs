@@ -7,10 +7,10 @@ namespace TimeHacker.Domain.Contracts.Models.EntityModels
     {
         public RepeatingEntityTypeEnum EntityType { get; set; }
 
-        private object _repeatingData;
+        //private object _repeatingData;
 
-        public object RepeatingData
-        {
+        public IRepeatingEntityType RepeatingData { get; set; }
+        /*{
             get => _repeatingData;
             set
             {
@@ -19,6 +19,6 @@ namespace TimeHacker.Domain.Contracts.Models.EntityModels
                 else
                     throw new Exception("Value must implement RepeatingEntityTypeBase.");
             }
-        }
+        }*/
     }
 }

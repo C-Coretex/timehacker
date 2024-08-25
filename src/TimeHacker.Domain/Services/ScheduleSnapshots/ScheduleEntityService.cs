@@ -1,10 +1,13 @@
-﻿using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+﻿using AutoMapper;
+using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.Models.ReturnModels;
+using TimeHacker.Domain.IncludeExpansionDelegates;
 
 namespace TimeHacker.Domain.Services.ScheduleSnapshots
 {
@@ -15,22 +18,25 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         private readonly ICategoryService _categoryService;
 
         private readonly IUserAccessor _userAccessor;
+        private readonly IMapper _mapper;
 
-        public ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepository, IFixedTaskService fixedTaskService, ICategoryService categoryService, IUserAccessor userAccessor)
+        public ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepository, IFixedTaskService fixedTaskService, ICategoryService categoryService, IUserAccessor userAccessor, IMapper mapper)
         {
             _scheduleEntityRepository = scheduleEntityRepository;
             _fixedTaskService = fixedTaskService;
             _categoryService = categoryService;
 
             _userAccessor = userAccessor;
+            _mapper = mapper;
         }
 
 
-        public IQueryable<ScheduleEntity> GetAll(bool onlyActive)
+        public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
         {
-            var query = _scheduleEntityRepository.GetAll().Where(x => x.UserId == _userAccessor.UserId);
-            if(onlyActive)
-                query = query.Where(x => x.EndsOn >= DateOnly.FromDateTime(DateTime.UtcNow));
+            var query = _mapper.ProjectTo<ScheduleEntityReturn>(
+                _scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
+                                               .Where(x => x.UserId == _userAccessor.UserId && x.EndsOn >= from)
+            );
 
             return query;
         }

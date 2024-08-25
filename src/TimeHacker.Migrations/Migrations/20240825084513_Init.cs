@@ -12,22 +12,6 @@ namespace TimeHacker.Migrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Category",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
-                    Color = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Category", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DynamicTask",
                 columns: table => new
                 {
@@ -48,25 +32,6 @@ namespace TimeHacker.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FixedTask",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
-                    Priority = table.Column<long>(type: "bigint", nullable: false),
-                    StartTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FixedTask", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ScheduleEntity",
                 columns: table => new
                 {
@@ -76,7 +41,7 @@ namespace TimeHacker.Migrations.Migrations
                     RepeatingEntity = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     ScheduleCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastTaskCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndsOn = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    EndsOn = table.Column<DateOnly>(type: "date", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -94,6 +59,85 @@ namespace TimeHacker.Migrations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ScheduleSnapshot", x => new { x.UserId, x.Date });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Category",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    ScheduleEntityId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
+                    Color = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Category_ScheduleEntity_ScheduleEntityId",
+                        column: x => x.ScheduleEntityId,
+                        principalTable: "ScheduleEntity",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FixedTask",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    ScheduleEntityId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
+                    Priority = table.Column<long>(type: "bigint", nullable: false),
+                    StartTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FixedTask", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FixedTask_ScheduleEntity_ScheduleEntityId",
+                        column: x => x.ScheduleEntityId,
+                        principalTable: "ScheduleEntity",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScheduledCategory",
+                columns: table => new
+                {
+                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParentCategoryId = table.Column<long>(type: "bigint", nullable: false),
+                    ParentScheduleEntity = table.Column<long>(type: "bigint", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Color = table.Column<int>(type: "int", nullable: false),
+                    Start = table.Column<TimeSpan>(type: "time", nullable: false),
+                    End = table.Column<TimeSpan>(type: "time", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScheduledCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScheduledCategory_ScheduleEntity_ParentScheduleEntity",
+                        column: x => x.ParentScheduleEntity,
+                        principalTable: "ScheduleEntity",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ScheduledCategory_ScheduleSnapshot_UserId_Date",
+                        columns: x => new { x.UserId, x.Date },
+                        principalTable: "ScheduleSnapshot",
+                        principalColumns: new[] { "UserId", "Date" });
                 });
 
             migrationBuilder.CreateTable(
@@ -141,38 +185,6 @@ namespace TimeHacker.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ScheduledCategory",
-                columns: table => new
-                {
-                    Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ParentCategoryId = table.Column<long>(type: "bigint", nullable: false),
-                    ParentScheduleEntity = table.Column<long>(type: "bigint", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Color = table.Column<int>(type: "int", nullable: false),
-                    Start = table.Column<TimeSpan>(type: "time", nullable: false),
-                    End = table.Column<TimeSpan>(type: "time", nullable: false),
-                    UpdatedTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ScheduledCategory", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ScheduledCategory_ScheduleEntity_ParentScheduleEntity",
-                        column: x => x.ParentScheduleEntity,
-                        principalTable: "ScheduleEntity",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ScheduledCategory_ScheduleSnapshot_UserId_Date",
-                        columns: x => new { x.UserId, x.Date },
-                        principalTable: "ScheduleSnapshot",
-                        principalColumns: new[] { "UserId", "Date" });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ScheduledTask",
                 columns: table => new
                 {
@@ -213,6 +225,13 @@ namespace TimeHacker.Migrations.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Category_ScheduleEntityId",
+                table: "Category",
+                column: "ScheduleEntityId",
+                unique: true,
+                filter: "[ScheduleEntityId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Category_UserId",
                 table: "Category",
                 column: "UserId");
@@ -241,6 +260,13 @@ namespace TimeHacker.Migrations.Migrations
                 name: "IX_FixedTask_CreatedTimestamp",
                 table: "FixedTask",
                 column: "CreatedTimestamp");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FixedTask_ScheduleEntityId",
+                table: "FixedTask",
+                column: "ScheduleEntityId",
+                unique: true,
+                filter: "[ScheduleEntityId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FixedTask_StartTimestamp",

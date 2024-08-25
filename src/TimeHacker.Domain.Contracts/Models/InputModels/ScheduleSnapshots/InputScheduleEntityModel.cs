@@ -25,10 +25,9 @@ namespace TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots
                 scheduleEntity.EndsOn = EndsOnModel.MaxDate;
                 if (EndsOnModel.MaxOccurrences != null)
                 {
-                    var repeatingEntity = (IRepeatingEntityType) RepeatingEntityModel.RepeatingData;
                     var date = DateOnly.FromDateTime(DateTime.UtcNow);
                     for (var i = 0; i < EndsOnModel.MaxOccurrences; i++)
-                        date = repeatingEntity.GetNextTaskDate(date);
+                        date = RepeatingEntityModel.RepeatingData.GetNextTaskDate(date);
 
                     scheduleEntity.EndsOn = date;
                 }

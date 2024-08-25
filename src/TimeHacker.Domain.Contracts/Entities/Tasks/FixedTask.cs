@@ -19,5 +19,7 @@ namespace TimeHacker.Domain.Contracts.Entities.Tasks
 
         public virtual ScheduleEntity? ScheduleEntity { get; set; }
         public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
+
+        public FixedTask ShallowCopy() => (FixedTask)MemberwiseClone();
     }
 }

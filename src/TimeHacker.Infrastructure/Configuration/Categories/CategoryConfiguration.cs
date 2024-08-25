@@ -23,7 +23,7 @@ namespace TimeHacker.Infrastructure.Configuration.Categories
             );
 
             builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.Category)
-                .HasForeignKey<FixedTask>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
+                .HasForeignKey<Category>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
                 .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
