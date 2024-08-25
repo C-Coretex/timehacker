@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using AutoMapper;
+using TimeHacker.Application.Models.Return.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
@@ -15,15 +17,18 @@ namespace TimeHacker.Application.Controllers.Tasks
         private readonly ITaskService _taskService;
         private readonly IScheduledTaskService _scheduledTaskService;
         private readonly IScheduleEntityService _scheduleEntityService;
-        private readonly ILogger<TasksController> _logger;
 
-        public TasksController(ITaskService taskService, IScheduledTaskService scheduledTaskService, IScheduleEntityService scheduleEntityService, ILogger<TasksController> logger)
+        private readonly ILogger<TasksController> _logger;
+        private readonly IMapper _mapper;
+
+        public TasksController(ITaskService taskService, IScheduledTaskService scheduledTaskService, IScheduleEntityService scheduleEntityService, ILogger<TasksController> logger, IMapper mapper)
         {
             _taskService = taskService;
             _scheduledTaskService = scheduledTaskService;
             _scheduleEntityService = scheduleEntityService;
 
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet("GetTasksForDay")]
@@ -80,7 +85,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         {
             try
             {
-                var data = await _scheduledTaskService.GetBy(id);
+                var data = _mapper.Map<ScheduledTaskReturnModel>(await _scheduledTaskService.GetBy(id));
 
                 return Ok(data);
             }
@@ -91,12 +96,12 @@ namespace TimeHacker.Application.Controllers.Tasks
             }
         }
 
-        [HttpPost("PostNewScheduleForTask/{id}")]
-        public async Task<IActionResult> PostNewScheduleForTask(uint id, [FromBody] InputScheduleEntityModel inputScheduleEntityModel)
+        [HttpPost("PostNewScheduleForTask")]
+        public async Task<IActionResult> PostNewScheduleForTask([FromBody] InputScheduleEntityModel inputScheduleEntityModel)
         {
             try
             {
-                var data = await _scheduleEntityService.Save(inputScheduleEntityModel);
+                var data = _mapper.Map<ScheduleEntityReturnModel>(await _scheduleEntityService.Save(inputScheduleEntityModel));
 
                 return Ok(data);
             }

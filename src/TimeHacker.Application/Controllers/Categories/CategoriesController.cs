@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TimeHacker.Application.Models.Input.Categories;
+using TimeHacker.Application.Models.Return.Categories;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 
@@ -28,7 +29,7 @@ namespace TimeHacker.Application.Controllers.Categories
         {
             try
             {
-                var data = _categoryService.GetAll();
+                var data = _mapper.ProjectTo<CategoryReturnModel>(_categoryService.GetAll());
 
                 return Ok(data);
             }
@@ -44,7 +45,7 @@ namespace TimeHacker.Application.Controllers.Categories
         {
             try
             {
-                var data = await _categoryService.GetByIdAsync(id);
+                var data = _mapper.Map<CategoryReturnModel>(await _categoryService.GetByIdAsync(id));
 
                 return Ok(data);
             }
