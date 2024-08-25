@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
-using TimeHacker.Persistence.IdentityData;
+using TimeHacker.Infrastructure.IdentityData;
 
 namespace TimeHacker.Data.Migrations
 {

@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduleCategoryConfiguration : IEntityTypeConfiguration<ScheduledCategory>
+    public class ScheduledCategoryConfiguration : IEntityTypeConfiguration<ScheduledCategory>
     {
         public void Configure(EntityTypeBuilder<ScheduledCategory> builder)
         {
@@ -19,6 +19,10 @@ namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
                 v => v.ToArgb(),
                 v => Color.FromArgb(v)
             );
+
+            builder.HasOne(x => x.ScheduleEntity).WithMany(x => x.ScheduledCategories)
+                    .HasForeignKey(x => x.ParentScheduleEntity).HasPrincipalKey(x => x.Id)
+                    .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

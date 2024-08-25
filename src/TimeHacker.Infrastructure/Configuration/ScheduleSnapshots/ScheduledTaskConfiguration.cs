@@ -4,7 +4,7 @@ using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduleTaskConfiguration : IEntityTypeConfiguration<ScheduledTask>
+    public class ScheduledTaskConfiguration : IEntityTypeConfiguration<ScheduledTask>
     {
         public void Configure(EntityTypeBuilder<ScheduledTask> builder)
         {
@@ -20,6 +20,10 @@ namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
             builder.HasOne(x => x.ScheduledCategory).WithMany(x => x.ScheduledTasks)
                    .HasForeignKey(x => x.ScheduledCategoryId).HasPrincipalKey(x => x.Id)
                    .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.HasOne(x => x.ScheduleEntity).WithMany(x => x.ScheduledTasks)
+                    .HasForeignKey(x => x.ParentScheduleEntity).HasPrincipalKey(x => x.Id)
+                    .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

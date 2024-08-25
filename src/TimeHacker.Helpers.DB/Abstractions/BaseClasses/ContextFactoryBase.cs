@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
-namespace Helpers.DB.Abstractions.Classes
+namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
 {
-    public abstract class ContextFactoryBase<TContext>: IContextFactory<TContext> where TContext : DbContext
+    public abstract class ContextFactoryBase<TContext> : IContextFactory<TContext> where TContext : DbContext
     {
         protected string dbConnectionString { get; set; }
         public ContextFactoryBase(string dbConnectionString)

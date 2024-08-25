@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Tasks;
@@ -25,7 +26,21 @@ namespace TimeHacker.Domain.Services.Tasks
             await _fixedTaskRepository.AddAsync(task);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint taskId)
+        {
+            var userId = _userAccessor.UserId!;
+            if (scheduleEntity == null || taskId == 0)
+                throw new ArgumentException("Values are incorrect.");
+
+            var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == taskId);
+            if (task == null)
+                throw new Exception("Task by this Id is not found for current user.");
+
+            task.ScheduleEntity = scheduleEntity;
+            return (await _fixedTaskRepository.UpdateAsync(task)).ScheduleEntity!;
+        }
+
+        public async Task DeleteAsync(uint id)
         {
             var userId = _userAccessor.UserId;
             var task = await _fixedTaskRepository.GetByIdAsync(id);
@@ -38,13 +53,9 @@ namespace TimeHacker.Domain.Services.Tasks
             await _fixedTaskRepository.DeleteAsync(task);
         }
 
-        public IQueryable<FixedTask> GetAll()
-        {
-            var userId = _userAccessor.UserId;
-            return _fixedTaskRepository.GetAll().Where(x => x.UserId == userId);
-        }
+        public IQueryable<FixedTask> GetAll() => GetAll(true);
 
-        public Task<FixedTask?> GetByIdAsync(int id)
+        public Task<FixedTask?> GetByIdAsync(uint id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
@@ -69,6 +80,12 @@ namespace TimeHacker.Domain.Services.Tasks
 
             task.UserId = userId;
             await _fixedTaskRepository.UpdateAsync(task);
+        }
+
+        private IQueryable<FixedTask> GetAll(bool asNoTracking)
+        {
+            var userId = _userAccessor.UserId;
+            return _fixedTaskRepository.GetAll(asNoTracking).Where(x => x.UserId == userId);
         }
     }
 }

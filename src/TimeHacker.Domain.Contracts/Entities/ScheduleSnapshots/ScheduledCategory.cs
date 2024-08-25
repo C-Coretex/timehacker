@@ -3,12 +3,13 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 {
-    public class ScheduledCategory : IDbModel<Guid>
+    public class ScheduledCategory : IDbModel<ulong>
     {
-        public Guid Id { get; init; }
-        public int ParentCategoryId { get; init; }
+        public ulong Id { get; init; }
+        public uint ParentCategoryId { get; init; }
+        public uint? ParentScheduleEntity { get; init; }
 
-        public string? UserId { get; set; }
+        public string UserId { get; set; }
         public DateOnly Date { get; set; }
 
         public string Name { get; set; }
@@ -20,5 +21,6 @@ namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 
         public virtual ScheduleSnapshot ScheduleSnapshot { get; set; }
         public virtual ICollection<ScheduledTask> ScheduledTasks { get; set; }
+        public virtual ScheduleEntity? ScheduleEntity { get; set; }
     }
 }

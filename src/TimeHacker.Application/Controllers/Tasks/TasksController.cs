@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using AutoMapper;
+using TimeHacker.Application.Models.Return.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
-using TimeHacker.Domain.Services.Tasks;
+using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
 
 namespace TimeHacker.Application.Controllers.Tasks
 {
@@ -13,16 +15,20 @@ namespace TimeHacker.Application.Controllers.Tasks
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
-        private readonly IScheduleSnapshotService _scheduleSnapshotService;
         private readonly IScheduledTaskService _scheduledTaskService;
+        private readonly IScheduleEntityService _scheduleEntityService;
+
         private readonly ILogger<TasksController> _logger;
-        public TasksController(ITaskService taskService, IScheduleSnapshotService scheduleSnapshotService, IScheduledTaskService scheduledTaskService, ILogger<TasksController> logger)
+        private readonly IMapper _mapper;
+
+        public TasksController(ITaskService taskService, IScheduledTaskService scheduledTaskService, IScheduleEntityService scheduleEntityService, ILogger<TasksController> logger, IMapper mapper)
         {
             _taskService = taskService;
-            _scheduleSnapshotService = scheduleSnapshotService;
             _scheduledTaskService = scheduledTaskService;
+            _scheduleEntityService = scheduleEntityService;
 
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet("GetTasksForDay")]
@@ -30,7 +36,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         {
             try
             {
-                var dateParsed = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                var dateParsed = DateOnly.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
                 var data = await _taskService.GetTasksForDay(dateParsed);
 
                 return Ok(data);
@@ -43,7 +49,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpPost("GetTasksForDays")]
-        public IActionResult GetTasksForDays([FromBody] IEnumerable<DateTime> dates)
+        public IActionResult GetTasksForDays([FromBody] IEnumerable<DateOnly> dates)
         {
             try
             {
@@ -59,7 +65,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpPost("RefreshTasksForDays")]
-        public IActionResult RefreshTasksForDays([FromBody] IEnumerable<DateTime> dates)
+        public IActionResult RefreshTasksForDays([FromBody] IEnumerable<DateOnly> dates)
         {
             try
             {
@@ -75,17 +81,33 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpGet("GetScheduledTaskById/{id}")]
-        public async Task<IActionResult> GetScheduledTaskById(Guid id)
+        public async Task<IActionResult> GetScheduledTaskById(ulong id)
         {
             try
             {
-                var data = await _scheduledTaskService.GetBy(id);
+                var data = _mapper.Map<ScheduledTaskReturnModel>(await _scheduledTaskService.GetBy(id));
 
                 return Ok(data);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting fixed task by id");
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("PostNewScheduleForTask")]
+        public async Task<IActionResult> PostNewScheduleForTask([FromBody] InputScheduleEntityModel inputScheduleEntityModel)
+        {
+            try
+            {
+                var data = _mapper.Map<ScheduleEntityReturnModel>(await _scheduleEntityService.Save(inputScheduleEntityModel));
+
+                return Ok(data);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error while posting new Schedule for a task");
                 return BadRequest(e.Message);
             }
         }

@@ -39,7 +39,7 @@ namespace TimeHacker.Application.Pages
             FixedTasks = _fixedTasksService.GetAll();
         }
 
-        public async Task<IActionResult> OnPostDynamicTaskFormHandler(int id, InputDynamicTaskModel inputDynamicTaskModel)
+        public async Task<IActionResult> OnPostDynamicTaskFormHandler(uint id, InputDynamicTaskModel inputDynamicTaskModel)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace TimeHacker.Application.Pages
         }
 
 
-        public async Task<IActionResult> OnPostFixedTaskFormHandler(int id, InputFixedTaskModel inputFixedTaskModel)
+        public async Task<IActionResult> OnPostFixedTaskFormHandler(uint id, InputFixedTaskModel inputFixedTaskModel)
         {
             try
             {

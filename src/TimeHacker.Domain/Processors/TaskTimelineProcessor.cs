@@ -8,13 +8,11 @@ namespace TimeHacker.Domain.Processors
 {
     public class TaskTimelineProcessor
     {
-        public TaskTimelineProcessor() { }
-
-        public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateTime date)
+        public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
         {
             var returnData = new TasksForDayReturn()
             {
-                Date = DateOnly.FromDateTime(date),
+                Date = date,
             };
 
             var fixedTasksTimeline = GetFixedTasksTimeline(fixedTasks);
@@ -28,9 +26,9 @@ namespace TimeHacker.Domain.Processors
             return returnData;
         }
 
-        #region Protected
+        #region Private
 
-        protected IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
+        private IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
         {
             return fixedTasks.Select(fixedTask => new TaskContainerReturn()
             {
@@ -40,7 +38,7 @@ namespace TimeHacker.Domain.Processors
             });
         }
 
-        protected IEnumerable<TaskContainerReturn> GetDynamicTasksTimeline(IList<DynamicTask> dynamicTasks, IEnumerable<TimeRange> timeRanges)
+        private IEnumerable<TaskContainerReturn> GetDynamicTasksTimeline(IList<DynamicTask> dynamicTasks, IEnumerable<TimeRange> timeRanges)
         {
             var startTimeSpan = DefaultConstants.StartOfDay;
             TimeRange timeRange;
@@ -68,7 +66,7 @@ namespace TimeHacker.Domain.Processors
             return dynamicTasksTimeline;
         }
 
-        protected static IEnumerable<TaskContainerReturn> GetDynamicTasksForTimeRange(IEnumerable<DynamicTask> dynamicTasks, TimeRange timeRange)
+        private static IEnumerable<TaskContainerReturn> GetDynamicTasksForTimeRange(IEnumerable<DynamicTask> dynamicTasks, TimeRange timeRange)
         {
             var dynamicTaskContainers = dynamicTasks
                 .Where(dt => dt.MaxTimeToFinish.TotalMinutes > 0)
@@ -86,7 +84,7 @@ namespace TimeHacker.Domain.Processors
             return dynamicTaskTimeline;
         }
 
-        protected static IEnumerable<DynamicTaskContainer> GetDynamicTasksForTimeRangeRecursive(IEnumerable<DynamicTaskContainer> dynamicTasks, TimeRange timeRange)
+        private static IEnumerable<DynamicTaskContainer> GetDynamicTasksForTimeRangeRecursive(IEnumerable<DynamicTaskContainer> dynamicTasks, TimeRange timeRange)
         {
             var timeToFinish = timeRange.End - timeRange.Start;
             dynamicTasks = dynamicTasks.Where(dt => dt.Task.MinTimeToFinish <= timeToFinish).ToList(); // ensure that the task can be finished in the given time range
@@ -98,10 +96,10 @@ namespace TimeHacker.Domain.Processors
             //limit count of iterations (for performance)
             var takeCount = timeToFinish switch
             {
-                var t when t.TotalHours < 2 => 6,
-                var t when t.TotalHours < 4 => 5,
-                var t when t.TotalHours < 6 => 3,
-                var t when t.TotalHours < 8 => 2,
+                { TotalHours: < 2 } => 6,
+                { TotalHours: < 4 } => 5,
+                { TotalHours: < 6 } => 3,
+                { TotalHours: < 8 } => 2,
                 _ => 1
             };
 

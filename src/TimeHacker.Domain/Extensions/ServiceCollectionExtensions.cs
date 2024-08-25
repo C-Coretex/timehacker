@@ -18,6 +18,7 @@ namespace TimeHacker.Domain.Extensions
             serviceCollection.AddScoped<IScheduleSnapshotService, ScheduleSnapshotService>();
             serviceCollection.AddScoped<IScheduledTaskService, ScheduledTaskService>();
             serviceCollection.AddScoped<IScheduledCategoryService, ScheduledCategoryService>();
+            serviceCollection.AddScoped<IScheduleEntityService, ScheduleEntityService>();
 
             serviceCollection.AddScoped<IDynamicTaskService, DynamicTaskService>();
             serviceCollection.AddScoped<IFixedTaskService, FixedTaskService>();

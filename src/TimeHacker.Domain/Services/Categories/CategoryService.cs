@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using TimeHacker.Domain.Contracts.Entities.Categories;
+using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
+using TimeHacker.Domain.Contracts.IRepositories.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 
 namespace TimeHacker.Domain.Services.Categories
@@ -25,7 +28,21 @@ namespace TimeHacker.Domain.Services.Categories
             await _categoryRepository.AddAsync(category);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint categoryId)
+        {
+            var userId = _userAccessor.UserId!;
+            if (scheduleEntity == null || categoryId == 0)
+                throw new ArgumentException("Values are incorrect.");
+
+            var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == categoryId);
+            if (task == null)
+                throw new Exception("Category by this Id is not found for current user.");
+
+            task.ScheduleEntity = scheduleEntity;
+            return (await _categoryRepository.UpdateAsync(task)).ScheduleEntity!;
+        }
+
+        public async Task DeleteAsync(uint id)
         {
             var userId = _userAccessor.UserId;
             var category = await _categoryRepository.GetByIdAsync(id);
@@ -38,13 +55,9 @@ namespace TimeHacker.Domain.Services.Categories
             await _categoryRepository.DeleteAsync(category);
         }
 
-        public IQueryable<Category> GetAll()
-        {
-            var userId = _userAccessor.UserId;
-            return _categoryRepository.GetAll().Where(x => x.UserId == userId);
-        }
+        public IQueryable<Category> GetAll() => GetAll(true);
 
-        public Task<Category?> GetByIdAsync(int id)
+        public Task<Category?> GetByIdAsync(uint id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
@@ -69,6 +82,12 @@ namespace TimeHacker.Domain.Services.Categories
 
             category.UserId = userId;
             await _categoryRepository.UpdateAsync(category);
+        }
+
+        private IQueryable<Category> GetAll(bool asNoTracking)
+        {
+            var userId = _userAccessor.UserId;
+            return _categoryRepository.GetAll(asNoTracking).Where(x => x.UserId == userId);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             _userAccessor = userAccessor;
         }
 
-        public async Task<ScheduledTask?> GetBy(Guid id)
+        public async Task<ScheduledTask?> GetBy(ulong id)
         {
             var scheduledTask = await _scheduledTaskRepository.GetByIdAsync(id);
             if (scheduledTask == null)

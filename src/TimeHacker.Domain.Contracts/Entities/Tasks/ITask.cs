@@ -2,7 +2,7 @@
 
 namespace TimeHacker.Domain.Contracts.Entities.Tasks
 {
-    public interface ITask : IDbModel<int>
+    public interface ITask : IDbModel<uint>
     {
         public string UserId { get; set; }
         public string Name { get; set; }

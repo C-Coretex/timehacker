@@ -4,6 +4,6 @@ namespace TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots
 {
     public interface IScheduledTaskService
     {
-        Task<ScheduledTask?> GetBy(Guid id);
+        Task<ScheduledTask?> GetBy(ulong id);
     }
 }

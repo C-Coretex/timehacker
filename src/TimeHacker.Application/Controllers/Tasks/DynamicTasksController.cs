@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TimeHacker.Application.Models.Input.Tasks;
+using TimeHacker.Application.Models.Return.Tasks;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 
@@ -28,7 +29,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         {
             try
             {
-                var data = _dynamicTaskService.GetAll();
+                var data = _mapper.ProjectTo<DynamicTaskReturnModel>(_dynamicTaskService.GetAll());
 
                 return Ok(data);
             }
@@ -40,11 +41,11 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(uint id)
         {
             try
             {
-                var data = await _dynamicTaskService.GetByIdAsync(id);
+                var data = _mapper.Map<DynamicTaskReturnModel>( _dynamicTaskService.GetByIdAsync(id));
 
                 return Ok(data);
             }
@@ -73,7 +74,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpPost("Update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] InputDynamicTaskModel inputDynamicTaskModel)
+        public async Task<IActionResult> Update(uint id, [FromBody] InputDynamicTaskModel inputDynamicTaskModel)
         {
             try
             {
@@ -97,7 +98,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(uint id)
         {
             try
             {

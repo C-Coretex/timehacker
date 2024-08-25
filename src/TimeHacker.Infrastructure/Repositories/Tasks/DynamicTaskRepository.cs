@@ -4,7 +4,7 @@ using TimeHacker.Domain.Contracts.IRepositories.Tasks;
 
 namespace TimeHacker.Infrastructure.Repositories.Tasks
 {
-    internal class DynamicTaskRepository : TaskRepository<DynamicTask, int>, IDynamicTaskRepository
+    internal class DynamicTaskRepository : TaskRepository<DynamicTask, uint>, IDynamicTaskRepository
     {
         public DynamicTaskRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.DynamicTask)
         {
