@@ -22,7 +22,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         private readonly TaskTimelineProcessor _taskTimelineProcessor;
 
-        public TaskService(IFixedTaskService fixedTaskService, IDynamicTaskService dynamicTaskService, IScheduleSnapshotService scheduleSnapshotService, IMapper mapper, IScheduleEntityService scheduleEntityService)
+        public TaskService(IFixedTaskService fixedTaskService, IDynamicTaskService dynamicTaskService, IScheduleSnapshotService scheduleSnapshotService, IScheduleEntityService scheduleEntityService, IMapper mapper)
         {
             _fixedTaskService = fixedTaskService;
             _dynamicTaskService = dynamicTaskService;
@@ -47,11 +47,9 @@ namespace TimeHacker.Domain.Services.Tasks
 
             var dynamicTasks = _dynamicTaskService.GetAll().AsEnumerable();
 
+            var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date).ToListAsync();
 
-            fixedTasks.AddRange(await ExtendFixedTasksWithScheduledTasks(date).ToListAsync());
-            fixedTasks = fixedTasks.OrderBy(ft => ft.StartTimestamp).ToList();
-
-            var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasks, dynamicTasks, date);
+            var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
 
             snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
             snapshot = await _scheduleSnapshotService.Add(snapshot);
@@ -69,8 +67,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
             var dynamicTasks = await _dynamicTaskService.GetAll().ToListAsync();
 
-            fixedTasks.AddRange(await ExtendFixedTasksWithScheduledTasks(dates.Min(), dates.Max()).ToListAsync());
-            fixedTasks = fixedTasks.OrderBy(ft => ft.StartTimestamp).ToList();
+            var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max()).ToListAsync();
 
             foreach (var date in dates)
             {
@@ -82,7 +79,8 @@ namespace TimeHacker.Domain.Services.Tasks
                 else
                 {
                     var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
-                    var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, dynamicTasks, date);
+                    var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
+                    var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
                     snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
                     snapshot = await _scheduleSnapshotService.Add(snapshot);
@@ -94,6 +92,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public async IAsyncEnumerable<TasksForDayReturn> RefreshTasksForDays(IEnumerable<DateOnly> dates)
         {
+            dates = dates.ToList();
             var fixedTasks = await _fixedTaskService.GetAll()
                                                     .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
                                                     .OrderBy(ft => ft.StartTimestamp)
@@ -101,15 +100,15 @@ namespace TimeHacker.Domain.Services.Tasks
 
             var dynamicTasks = await _dynamicTaskService.GetAll().ToListAsync();
 
-            fixedTasks.AddRange(await ExtendFixedTasksWithScheduledTasks(dates.Min(), dates.Max()).ToListAsync());
-            fixedTasks = fixedTasks.OrderBy(ft => ft.StartTimestamp).ToList();
+            var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max()).ToListAsync();
 
             foreach (var date in dates)
             {
                 var snapshot = await _scheduleSnapshotService.GetBy(date) ?? new ScheduleSnapshot();
 
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
-                var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, dynamicTasks, date);
+                var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
+                var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
                 _mapper.Map(tasksForDay, snapshot);
 
@@ -118,17 +117,23 @@ namespace TimeHacker.Domain.Services.Tasks
                 else
                     snapshot = await _scheduleSnapshotService.Update(snapshot);
 
+                foreach(var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
+                {
+                    await _scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value,
+                        date);
+                }
+
                 yield return _mapper.Map<TasksForDayReturn>(snapshot);
             }
         }
 
-        private async IAsyncEnumerable<FixedTask> ExtendFixedTasksWithScheduledTasks(DateOnly from, DateOnly? to = null)
+        private async IAsyncEnumerable<FixedTask> GetFixedTasksForScheduledTasks(DateOnly from, DateOnly? to = null)
         {
             var scheduleEntities = _scheduleEntityService.GetAllFrom(from).AsAsyncEnumerable();
 
             await foreach (var scheduleEntity in scheduleEntities)
             {
-                var taskDates = scheduleEntity.GetNextTaskDatesIn(from, to ?? from);
+                var taskDates = scheduleEntity.GetNextEntityDatesIn(from, to ?? from);
 
                 foreach (var taskDate in taskDates)
                 {

@@ -33,12 +33,29 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
 
         public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
         {
-            var query = _mapper.ProjectTo<ScheduleEntityReturn>(
-                _scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
-                                               .Where(x => x.UserId == _userAccessor.UserId && x.EndsOn >= from)
-            );
+            var query = _scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
+                .Where(x => x.UserId == _userAccessor.UserId && (x.EndsOn == null || x.EndsOn >= from));
 
-            return query;
+            return _mapper.ProjectTo<ScheduleEntityReturn>(query);
+        }
+
+        public async Task UpdateLastEntityCreated(uint id, DateOnly entityCreated)
+        {
+            var scheduleEntity = await _scheduleEntityRepository.GetByIdAsync(id);
+            if (scheduleEntity == null)
+                throw new Exception("ScheduleEntity is not found.");
+
+            if (scheduleEntity.UserId != _userAccessor.UserId)
+                throw new Exception("User can edit only his own ScheduleEntity.");
+
+            var scheduleEntityReturn = _mapper.Map<ScheduleEntityReturn>(scheduleEntity);
+            if (!scheduleEntityReturn.IsEntityDateCorrect(entityCreated))
+                throw new ArgumentException("Created entity timestamp is not correct for this ScheduleEntityReturn.", nameof(entityCreated));
+
+            if (scheduleEntity.LastEntityCreated == null || scheduleEntity.LastEntityCreated < entityCreated)
+                scheduleEntity.LastEntityCreated = entityCreated;
+
+            await _scheduleEntityRepository.UpdateAsync(scheduleEntity);
         }
 
         public Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity)

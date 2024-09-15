@@ -281,7 +281,7 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledCategory_ParentScheduleEntity",
                 table: "ScheduledCategory",
-                column: "ParentScheduleEntity");
+                column: "ParentScheduleEntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledCategory_UserId_Date",
@@ -296,7 +296,7 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledTask_ParentScheduleEntity",
                 table: "ScheduledTask",
-                column: "ParentScheduleEntity");
+                column: "ParentScheduleEntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledTask_ScheduledCategoryId",

@@ -7,7 +7,7 @@ namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
         public ulong Id { get; init; }
         public uint ParentTaskId { get; init; }
         public ulong? ScheduledCategoryId { get; init; }
-        public uint? ParentScheduleEntity { get; init; }
+        public uint? ParentScheduleEntityId { get; init; }
 
         public string UserId { get; set; }
         public DateOnly Date { get; set; }

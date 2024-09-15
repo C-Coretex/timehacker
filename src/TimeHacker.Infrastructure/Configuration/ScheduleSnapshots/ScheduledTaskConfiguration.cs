@@ -22,7 +22,7 @@ namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
                    .OnDelete(DeleteBehavior.ClientCascade);
 
             builder.HasOne(x => x.ScheduleEntity).WithMany(x => x.ScheduledTasks)
-                    .HasForeignKey(x => x.ParentScheduleEntity).HasPrincipalKey(x => x.Id)
+                    .HasForeignKey(x => x.ParentScheduleEntityId).HasPrincipalKey(x => x.Id)
                     .OnDelete(DeleteBehavior.ClientCascade);
         }
     }

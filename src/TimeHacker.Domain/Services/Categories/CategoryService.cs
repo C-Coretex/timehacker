@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Domain.Contracts.IRepositories.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 
 namespace TimeHacker.Domain.Services.Categories
@@ -14,7 +12,7 @@ namespace TimeHacker.Domain.Services.Categories
         private readonly IUserAccessor _userAccessor;
         private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryService(IUserAccessor userAccessor, ICategoryRepository categoryRepository)
+        public CategoryService(ICategoryRepository categoryRepository, IUserAccessor userAccessor)
         {
             _userAccessor = userAccessor;
             _categoryRepository = categoryRepository;

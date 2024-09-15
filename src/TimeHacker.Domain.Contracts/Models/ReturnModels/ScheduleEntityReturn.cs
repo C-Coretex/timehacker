@@ -4,10 +4,10 @@ namespace TimeHacker.Domain.Contracts.Models.ReturnModels
 {
     public class ScheduleEntityReturn: ScheduleEntity
     {
-        public IEnumerable<DateOnly> GetNextTaskDatesIn(DateOnly from, DateOnly to)
+        public IEnumerable<DateOnly> GetNextEntityDatesIn(DateOnly from, DateOnly to)
         {
             var maxIterations = 10_000;
-            var nextTaskDate = DateOnly.FromDateTime(LastTaskCreated);
+            var nextTaskDate = LastEntityCreated ?? DateOnly.FromDateTime(CreatedTimestamp);
 
             while (nextTaskDate < to)
             {
@@ -18,6 +18,24 @@ namespace TimeHacker.Domain.Contracts.Models.ReturnModels
                 if (nextTaskDate >= from && nextTaskDate <= to)
                     yield return nextTaskDate;
             }
+        }
+
+        public bool IsEntityDateCorrect(DateOnly date)
+        {
+            var maxIterations = 10_000;
+            var nextTaskDate = DateOnly.FromDateTime(CreatedTimestamp);
+
+            while (nextTaskDate <= date)
+            {
+                nextTaskDate = RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate);
+                if (nextTaskDate > EndsOn || maxIterations-- == 0)
+                    return false;
+
+                if (nextTaskDate == date)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

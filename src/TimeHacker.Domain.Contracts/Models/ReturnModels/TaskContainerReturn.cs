@@ -5,8 +5,8 @@ namespace TimeHacker.Domain.Contracts.Models.ReturnModels;
 
 public class TaskContainerReturn
 {
-    public Guid Id { get; set; }
     public bool IsFixed { get; set; }
+    public uint? ScheduleEntityId { get; set; }
     public ITask Task { get; set; }
     public TimeRange TimeRange { get; set; }
 }

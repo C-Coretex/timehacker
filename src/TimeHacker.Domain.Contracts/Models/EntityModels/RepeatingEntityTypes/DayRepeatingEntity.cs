@@ -2,9 +2,9 @@
 {
     public class DayRepeatingEntity: IRepeatingEntityType
     {
-        private byte DaysCountToRepeat { get; set; }
+        private int DaysCountToRepeat { get; set; }
 
-        public DayRepeatingEntity(byte daysCountToRepeat)
+        public DayRepeatingEntity(int daysCountToRepeat)
         {
             DaysCountToRepeat = daysCountToRepeat;
         }

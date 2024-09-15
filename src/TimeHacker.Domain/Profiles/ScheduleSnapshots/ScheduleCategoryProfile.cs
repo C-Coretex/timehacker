@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Models.BusinessLogicModels;
 using TimeHacker.Domain.Contracts.Models.ReturnModels;

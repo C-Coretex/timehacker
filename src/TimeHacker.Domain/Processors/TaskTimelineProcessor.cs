@@ -8,7 +8,7 @@ namespace TimeHacker.Domain.Processors
 {
     public class TaskTimelineProcessor
     {
-        public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
+        public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
         {
             var returnData = new TasksForDayReturn()
             {
@@ -16,6 +16,9 @@ namespace TimeHacker.Domain.Processors
             };
 
             var fixedTasksTimeline = GetFixedTasksTimeline(fixedTasks);
+            returnData.TasksTimeline.AddRange(fixedTasksTimeline);
+
+            fixedTasksTimeline = GetFixedTasksTimeline(scheduledFixedTasks);
             returnData.TasksTimeline.AddRange(fixedTasksTimeline);
 
             var timeRanges = returnData.TasksTimeline.Select(tt => tt.TimeRange);
@@ -34,6 +37,7 @@ namespace TimeHacker.Domain.Processors
             {
                 Task = fixedTask,
                 IsFixed = true,
+                ScheduleEntityId = fixedTask.ScheduleEntityId,
                 TimeRange = new TimeRange(fixedTask.StartTimestamp.TimeOfDay, fixedTask.EndTimestamp.TimeOfDay)
             });
         }

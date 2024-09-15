@@ -102,14 +102,14 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateOnly?>("EndsOn")
                         .HasColumnType("date");
 
-                    b.Property<DateTime>("LastTaskCreated")
+                    b.Property<DateTime>("LastEntityCreated")
                         .HasColumnType("datetime2");
 
                     b.Property<byte[]>("RepeatingEntity")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<DateTime>("ScheduleCreated")
+                    b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -174,7 +174,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<long>("ParentCategoryId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ParentScheduleEntity")
+                    b.Property<long?>("ParentScheduleEntityId")
                         .HasColumnType("bigint");
 
                     b.Property<TimeSpan>("Start")
@@ -189,7 +189,7 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentScheduleEntity");
+                    b.HasIndex("ParentScheduleEntityId");
 
                     b.HasIndex("UserId", "Date");
 
@@ -223,7 +223,7 @@ namespace TimeHacker.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("ParentScheduleEntity")
+                    b.Property<long?>("ParentScheduleEntityId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("ParentTaskId")
@@ -249,7 +249,7 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.HasIndex("IsCompleted");
 
-                    b.HasIndex("ParentScheduleEntity");
+                    b.HasIndex("ParentScheduleEntityId");
 
                     b.HasIndex("ScheduledCategoryId");
 
@@ -408,7 +408,7 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithMany("ScheduledCategories")
-                        .HasForeignKey("ParentScheduleEntity")
+                        .HasForeignKey("ParentScheduleEntityId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
@@ -426,7 +426,7 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithMany("ScheduledTasks")
-                        .HasForeignKey("ParentScheduleEntity")
+                        .HasForeignKey("ParentScheduleEntityId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", "ScheduledCategory")
