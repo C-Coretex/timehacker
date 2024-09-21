@@ -61,6 +61,7 @@ public class TaskServiceTests
     }
 
     [Fact]
+    [Trait("GetTasksForDay", "Should return tasks for day")]
     public async Task GetTasksForDay_ShouldReturnTasksForDay()
     {
         // Arrange
@@ -80,6 +81,7 @@ public class TaskServiceTests
     }
 
     [Fact]
+    [Trait("GetTasksForDays", "Should return tasks for days")]
     public async Task GetTasksForDays_ShouldReturnTasksForDays()
     {
         // Arrange
@@ -100,6 +102,7 @@ public class TaskServiceTests
     }
 
     [Fact]
+    [Trait("GetTasksForDays", "Should return, save and return snapshot after first call")]
     public async Task GetTasksForDays_ShouldReturnSaveAndReturnSnapshotAfterFirstCall()
     {
         // Arrange
@@ -116,6 +119,7 @@ public class TaskServiceTests
     }
 
     [Fact]
+    [Trait("GetTasksForDays", "Should refresh snapshot")]
     public async Task GetTasksForDays_ShouldRefreshSnapshot()
     {
         // Arrange
@@ -136,6 +140,7 @@ public class TaskServiceTests
     }
 
     [Fact]
+    [Trait("GetTasksForDays", "Should be empty for user without tasks")]
     public async Task GetTasksForDays_ShouldBeEmptyForUserWithoutTasks()
     {
         // Arrange
@@ -153,6 +158,7 @@ public class TaskServiceTests
     }
 
     [Fact]
+    [Trait("GetTasksForDays", "Should add scheduled tasks")]
     public async Task GetTasksForDays_ShouldAddScheduledTasks()
     {
         // Arrange

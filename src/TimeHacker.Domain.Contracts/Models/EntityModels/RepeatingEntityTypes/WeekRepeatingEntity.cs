@@ -19,6 +19,13 @@ namespace TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes
             }
         }
 
+        public WeekRepeatingEntity() 
+        {}
+        public WeekRepeatingEntity(IEnumerable<DayOfWeekEnum> repeatsOn)
+        {
+            RepeatsOn = repeatsOn;
+        }
+
         public DateOnly GetNextTaskDate(DateOnly startingFrom)
         {
             var currentDayOfWeek = (int)startingFrom.DayOfWeek;
