@@ -16,6 +16,8 @@
             }
         }
 
+        public DayRepeatingEntity()
+        {}
         public DayRepeatingEntity(int daysCountToRepeat)
         {
             DaysCountToRepeat = daysCountToRepeat;
