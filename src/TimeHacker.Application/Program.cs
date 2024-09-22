@@ -2,10 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Application.Helpers;
 using TimeHacker.Domain.Contracts.IModels;
-using TimeHacker.Infrastructure;
 using TimeHacker.Domain.Extensions;
-using Microsoft.Extensions.DependencyInjection;
-using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using TimeHacker.Infrastructure.Extensions;
 using TimeHacker.Infrastructure.IdentityData;
 
@@ -35,6 +34,18 @@ builder.Services.AddDefaultIdentity<IdentityUser>(o =>
 
 AddApplicationServices(builder.Services);
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "TimeHacker API", Version = "v1" });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.WebHost.UseStaticWebAssets();
@@ -45,6 +56,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeHacker API v1");
+    });
 }
 else
 {

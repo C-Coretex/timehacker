@@ -4,7 +4,6 @@ using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IRepositories.Tasks;
@@ -25,16 +24,16 @@ public class TaskServiceTests
 {
     #region Mocks
 
-    private readonly Mock<IDynamicTaskRepository> _dynamicUserTasksRepository = new();
-    private readonly Mock<IFixedTaskRepository> _fixedUserTasksRepository = new();
+    private readonly Mock<IDynamicTaskRepository> _dynamicTasksRepository = new();
+    private readonly Mock<IFixedTaskRepository> _fixedTasksRepository = new();
     private readonly Mock<ICategoryRepository> _categoryRepository = new();
     private readonly Mock<IScheduleSnapshotRepository> _scheduleSnapshotRepository = new();
 
     private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
 
-    private readonly IUserAccessor _userAccessor;
-
     #endregion
+
+    #region Properties & constructor
 
     private List<FixedTask> _fixedTasks;
     private List<DynamicTask> _dynamicTasks;
@@ -45,20 +44,24 @@ public class TaskServiceTests
 
     public TaskServiceTests()
     {
-        _userAccessor = new UserAccessorMock("TestIdentifier", true);
+        var userAccessor = new UserAccessorMock("TestIdentifier", true);
         var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
         var mapper = new Mapper(mapperConfiguration);
 
-        var dynamicTasksService = new DynamicTaskService(_dynamicUserTasksRepository.Object, _userAccessor);
-        var fixedTasksService = new FixedTaskService(_fixedUserTasksRepository.Object, _userAccessor);
-        var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, _userAccessor);
-        var categoryService = new CategoryService(_categoryRepository.Object, _userAccessor);
+        var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
+        var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
+        var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
+        var categoryService = new CategoryService(_categoryRepository.Object, userAccessor);
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTasksService,
-            categoryService, _userAccessor, mapper);
+            categoryService, userAccessor, mapper);
 
         _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService,
             scheduleEntityService, mapper);
     }
+
+    #endregion
+
+
 
     [Fact]
     [Trait("GetTasksForDay", "Should return tasks for day")]
@@ -256,7 +259,7 @@ public class TaskServiceTests
                 OptimalTimeToFinish = new TimeSpan(0, 45, 0)
             }
         ];
-        _dynamicUserTasksRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<DynamicTask>[]>()))
+        _dynamicTasksRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<DynamicTask>[]>()))
             .Returns(_dynamicTasks.AsQueryable().BuildMock());
 
         _fixedTasks =
@@ -296,7 +299,7 @@ public class TaskServiceTests
 
             new()
             {
-                Id = 3,
+                Id = 4,
                 UserId = "IncorrectUserId",
                 Name = "TestFixedTask4",
                 Priority = 1,
@@ -305,7 +308,7 @@ public class TaskServiceTests
                 EndTimestamp = date.AddHours(3).AddMinutes(30)
             }
         ];
-        _fixedUserTasksRepository.Setup(x => x.GetAll(It.IsAny<bool>()))
+        _fixedTasksRepository.Setup(x => x.GetAll(It.IsAny<bool>()))
             .Returns(_fixedTasks.AsQueryable().BuildMock());
 
         _scheduleSnapshots = new List<ScheduleSnapshot>();

@@ -26,47 +26,12 @@ namespace TimeHacker.Domain.Services.Tasks
             await _fixedTaskRepository.AddAsync(task);
         }
 
-        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint taskId)
-        {
-            var userId = _userAccessor.UserId!;
-            if (scheduleEntity == null || taskId == 0)
-                throw new ArgumentException("Values are incorrect.");
-
-            var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == taskId);
-            if (task == null)
-                throw new Exception("Task by this Id is not found for current user.");
-
-            task.ScheduleEntity = scheduleEntity;
-            return (await _fixedTaskRepository.UpdateAsync(task)).ScheduleEntity!;
-        }
-
-        public async Task DeleteAsync(uint id)
-        {
-            var userId = _userAccessor.UserId;
-            var task = await _fixedTaskRepository.GetByIdAsync(id);
-            if (task == null)
-                return;
-
-            if (task.UserId != userId)
-                throw new ArgumentException("User can only delete its own tasks.");
-
-            await _fixedTaskRepository.DeleteAsync(task);
-        }
-
-        public IQueryable<FixedTask> GetAll() => GetAll(true);
-
-        public Task<FixedTask?> GetByIdAsync(uint id)
-        {
-            return GetAll().FirstOrDefaultAsync(x => x.Id == id);
-        }
-
         public async Task UpdateAsync(FixedTask task)
         {
-            var userId = _userAccessor.UserId;
-
             if (task == null || task.Id == 0)
                 throw new ArgumentException("Task must be valid");
 
+            var userId = _userAccessor.UserId;
 
             var oldTask = await _fixedTaskRepository.GetByIdAsync(task.Id);
             if (oldTask == null)
@@ -80,6 +45,35 @@ namespace TimeHacker.Domain.Services.Tasks
 
             task.UserId = userId;
             await _fixedTaskRepository.UpdateAsync(task);
+        }
+
+        public async Task DeleteAsync(uint id)
+        {
+            var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == id);
+            if (task == null)
+                throw new ArgumentException("Task by this Id is not found for current user.");
+
+            await _fixedTaskRepository.DeleteAsync(task);
+        }
+
+        public IQueryable<FixedTask> GetAll() => GetAll(true);
+
+        public Task<FixedTask?> GetByIdAsync(uint id)
+        {
+            return GetAll().FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint taskId)
+        {
+            if (scheduleEntity == null || taskId == 0)
+                throw new ArgumentException("Values are incorrect.");
+
+            var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == taskId);
+            if (task == null)
+                throw new ArgumentException("Task by this Id is not found for current user.");
+
+            task.ScheduleEntity = scheduleEntity;
+            return (await _fixedTaskRepository.UpdateAsync(task)).ScheduleEntity!;
         }
 
         private IQueryable<FixedTask> GetAll(bool asNoTracking)

@@ -31,8 +31,4 @@
     <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ServiceTests\Schedule\" />
-  </ItemGroup>
-
 </Project>
