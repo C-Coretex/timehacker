@@ -20,7 +20,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         }
 
 
-        public Task<ScheduleSnapshot> Add(ScheduleSnapshot scheduleSnapshot)
+        public Task<ScheduleSnapshot> AddAsync(ScheduleSnapshot scheduleSnapshot)
         {
             var updatedTimestamp = DateTime.UtcNow;
 
@@ -43,14 +43,14 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             return _scheduleSnapshotRepository.AddAsync(scheduleSnapshot);
         }
 
-        public Task<ScheduleSnapshot?> GetBy(DateOnly date)
+        public Task<ScheduleSnapshot?> GetByAsync(DateOnly date)
         {
             var query = _scheduleSnapshotRepository.GetAll(false, IncludeExpansionScheduleSnapshots.IncludeScheduledTasks, IncludeExpansionScheduleSnapshots.IncludeScheduledCategories);
 
             return query.FirstOrDefaultAsync(x => x.UserId == _userAccessor.UserId! && x.Date == date);
         }
 
-        public Task<ScheduleSnapshot> Update(ScheduleSnapshot scheduleSnapshot)
+        public Task<ScheduleSnapshot> UpdateAsync(ScheduleSnapshot scheduleSnapshot)
         {
             var updatedTimestamp = DateTime.UtcNow;
 

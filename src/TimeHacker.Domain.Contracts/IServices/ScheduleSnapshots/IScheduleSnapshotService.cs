@@ -4,8 +4,8 @@ namespace TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots
 {
     public interface IScheduleSnapshotService
     {
-        Task<ScheduleSnapshot?> GetBy(DateOnly date);
-        Task<ScheduleSnapshot> Add(ScheduleSnapshot scheduleSnapshot);
-        Task<ScheduleSnapshot> Update(ScheduleSnapshot scheduleSnapshot);
+        Task<ScheduleSnapshot?> GetByAsync(DateOnly date);
+        Task<ScheduleSnapshot> AddAsync(ScheduleSnapshot scheduleSnapshot);
+        Task<ScheduleSnapshot> UpdateAsync(ScheduleSnapshot scheduleSnapshot);
     }
 }

@@ -36,7 +36,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public async Task<TasksForDayReturn> GetTasksForDay(DateOnly date)
         {
-            var snapshot = await _scheduleSnapshotService.GetBy(date);
+            var snapshot = await _scheduleSnapshotService.GetByAsync(date);
             if (snapshot != null)
                 return _mapper.Map<TasksForDayReturn>(snapshot);
 
@@ -52,7 +52,7 @@ namespace TimeHacker.Domain.Services.Tasks
             var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
 
             snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
-            snapshot = await _scheduleSnapshotService.Add(snapshot);
+            snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
 
             return _mapper.Map<TasksForDayReturn>(snapshot);
         }
@@ -71,7 +71,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
             foreach (var date in dates)
             {
-                var snapshot = await _scheduleSnapshotService.GetBy(date);
+                var snapshot = await _scheduleSnapshotService.GetByAsync(date);
                 if (snapshot != null)
                 {
                     yield return _mapper.Map<TasksForDayReturn>(snapshot);
@@ -83,7 +83,7 @@ namespace TimeHacker.Domain.Services.Tasks
                     var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
                     snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
-                    snapshot = await _scheduleSnapshotService.Add(snapshot);
+                    snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
 
                     yield return _mapper.Map<TasksForDayReturn>(snapshot);
                 }
@@ -104,7 +104,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
             foreach (var date in dates)
             {
-                var snapshot = await _scheduleSnapshotService.GetBy(date) ?? new ScheduleSnapshot();
+                var snapshot = await _scheduleSnapshotService.GetByAsync(date) ?? new ScheduleSnapshot();
 
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
@@ -113,9 +113,9 @@ namespace TimeHacker.Domain.Services.Tasks
                 _mapper.Map(tasksForDay, snapshot);
 
                 if (snapshot.UserId == null)
-                    snapshot = await _scheduleSnapshotService.Add(snapshot);
+                    snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
                 else
-                    snapshot = await _scheduleSnapshotService.Update(snapshot);
+                    snapshot = await _scheduleSnapshotService.UpdateAsync(snapshot);
 
                 foreach(var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
                 {
