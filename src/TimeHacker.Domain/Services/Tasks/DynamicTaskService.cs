@@ -25,30 +25,6 @@ namespace TimeHacker.Domain.Services.Tasks
             await _dynamicTaskRepository.AddAsync(task);
         }
 
-        public async Task DeleteAsync(uint id)
-        {
-            var userId = _userAccessor.UserId;
-            var task = await _dynamicTaskRepository.GetByIdAsync(id);
-            if (task == null)
-                return;
-
-            if (task.UserId != userId)
-                throw new ArgumentException("User can only delete its own tasks.");
-
-            await _dynamicTaskRepository.DeleteAsync(task);
-        }
-
-        public IQueryable<DynamicTask> GetAll()
-        {
-            var userId = _userAccessor.UserId;
-            return _dynamicTaskRepository.GetAll().Where(x => x.UserId == userId);
-        }
-
-        public Task<DynamicTask?> GetByIdAsync(uint id)
-        {
-            return GetAll().FirstOrDefaultAsync(x => x.Id == id);
-        }
-
         public async Task UpdateAsync(DynamicTask task)
         {
             var userId = _userAccessor.UserId;
@@ -69,6 +45,26 @@ namespace TimeHacker.Domain.Services.Tasks
 
             task.UserId = userId;
             await _dynamicTaskRepository.UpdateAsync(task);
+        }
+
+        public async Task DeleteAsync(uint id)
+        {
+            var task = await GetAll().FirstOrDefaultAsync(x => x.Id == id);
+            if (task == null)
+                throw new ArgumentException("Task by this Id is not found for current user.");
+
+            await _dynamicTaskRepository.DeleteAsync(task);
+        }
+
+        public IQueryable<DynamicTask> GetAll()
+        {
+            var userId = _userAccessor.UserId;
+            return _dynamicTaskRepository.GetAll().Where(x => x.UserId == userId);
+        }
+
+        public Task<DynamicTask?> GetByIdAsync(uint id)
+        {
+            return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }

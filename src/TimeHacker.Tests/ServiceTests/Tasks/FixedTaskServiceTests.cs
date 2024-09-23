@@ -93,7 +93,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("DeleteAsync", "Should update entry")]
+        [Trait("DeleteAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
@@ -131,7 +131,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("GetByIdAsync", "Should update entry")]
+        [Trait("GetByIdAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
@@ -154,7 +154,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("UpdateScheduleEntityAsync", "Should update entry")]
+        [Trait("UpdateScheduleEntityAsync", "Should update schedule entry")]
         public async Task UpdateScheduleEntityAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
@@ -263,6 +263,5 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         }
 
         #endregion
-
     }
 }
