@@ -2,13 +2,14 @@
 using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Tests.Mocks;
+using TimeHacker.Tests.Mocks.Extensions;
 
 namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 {
@@ -18,13 +19,11 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 
         private readonly Mock<IScheduledTaskRepository> _scheduledTaskRepository = new();
 
-        private readonly IUserAccessor userAccessor;
-
         #endregion
 
         #region Properties & constructor
 
-        private List<ScheduledTask> _scheduledCategories;
+        private List<ScheduledTask> _scheduledTasks;
 
         private readonly IScheduledTaskService _scheduledTaskService;
 
@@ -39,7 +38,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 
         [Fact]
         [Trait("GetBy", "Should return correct data")]
-        public async Task DeleteAsync_ShouldUpdateEntry()
+        public async Task GetBy_ShouldReturnCorrectData()
         {
             var userId = "TestIdentifier";
             SetupFixedTaskMocks(userId);
@@ -51,7 +50,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 
         [Fact]
         [Trait("GetBy", "Should throw exception on incorrect userId")]
-        public async Task DeleteAsync_ShouldThrow()
+        public async Task GetBy_ShouldThrow()
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
@@ -66,7 +65,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 
         private void SetupFixedTaskMocks(string userId)
         {
-            _scheduledCategories =
+            _scheduledTasks =
             [
                 new()
                 {
@@ -107,25 +106,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
                 }
             ];
 
-            _scheduledTaskRepository.Setup(x => x.AddAsync(It.IsAny<ScheduledTask>(), It.IsAny<bool>()))
-                .Callback<ScheduledTask, bool>((entry, _) => _scheduledCategories.Add(entry));
-
-            _scheduledTaskRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduledTask>(), It.IsAny<bool>()))
-                .Callback<ScheduledTask, bool>((entry, _) =>
-                {
-                    _scheduledCategories.RemoveAll(x => x.Id == entry.Id);
-                    _scheduledCategories.Add(entry);
-                })
-                .Returns<ScheduledTask, bool>((entry, _) => Task.FromResult(entry));
-
-            _scheduledTaskRepository.Setup(x => x.GetByIdAsync(It.IsAny<uint>(), It.IsAny<bool>(), It.IsAny<IncludeExpansionDelegate<ScheduledTask>[]>()))
-                .Returns<uint, bool, IncludeExpansionDelegate<ScheduledTask>[]>((id, _, _) => Task.FromResult(_scheduledCategories.FirstOrDefault(x => x.Id == id)));
-
-            _scheduledTaskRepository.Setup(x => x.DeleteAsync(It.IsAny<ScheduledTask>(), It.IsAny<bool>()))
-                .Callback<ScheduledTask, bool>((entry, _) => _scheduledCategories.RemoveAll(x => x.Id == entry.Id));
-
-            _scheduledTaskRepository.Setup(x => x.GetAll(It.IsAny<bool>()))
-                .Returns(_scheduledCategories.AsQueryable().BuildMock());
+            _scheduledTaskRepository.As<IRepositoryBase<ScheduledTask, ulong>>().SetupRepositoryMock(_scheduledTasks);
         }
 
         #endregion

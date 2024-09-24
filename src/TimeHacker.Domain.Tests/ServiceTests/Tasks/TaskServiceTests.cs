@@ -15,8 +15,10 @@ using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Tests.Helpers;
 using TimeHacker.Tests.Mocks;
+using TimeHacker.Tests.Mocks.Extensions;
 
 namespace TimeHacker.Tests.ServiceTests.Tasks;
 
@@ -259,8 +261,7 @@ public class TaskServiceTests
                 OptimalTimeToFinish = new TimeSpan(0, 45, 0)
             }
         ];
-        _dynamicTasksRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<DynamicTask>[]>()))
-            .Returns(_dynamicTasks.AsQueryable().BuildMock());
+        _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, uint>>().SetupRepositoryMock(_dynamicTasks);
 
         _fixedTasks =
         [
@@ -308,8 +309,7 @@ public class TaskServiceTests
                 EndTimestamp = date.AddHours(3).AddMinutes(30)
             }
         ];
-        _fixedTasksRepository.Setup(x => x.GetAll(It.IsAny<bool>()))
-            .Returns(_fixedTasks.AsQueryable().BuildMock());
+        _fixedTasksRepository.As<IRepositoryBase<FixedTask, uint>>().SetupRepositoryMock(_fixedTasks);
 
         _scheduleSnapshots = new List<ScheduleSnapshot>();
         _scheduleSnapshotRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>()))
@@ -332,21 +332,7 @@ public class TaskServiceTests
 
         _scheduleEntities = [];
 
-        _scheduleEntityRepository
-            .Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<ScheduleEntity>[]>()))
-            .Returns(_scheduleEntities.AsQueryable().BuildMock());
-        _scheduleEntityRepository.Setup(x => x.AddAsync(It.IsAny<ScheduleEntity>(), It.IsAny<bool>()))
-            .Callback<ScheduleEntity, bool>((model, saveChanges) => { _scheduleEntities.Add(model); })
-            .Returns<ScheduleEntity, bool>((model, saveChanges) => Task.FromResult(model));
-
-        _scheduleEntityRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduleEntity>(), It.IsAny<bool>()))
-            .Callback<ScheduleEntity, bool>((model, saveChanges) =>
-            {
-                var existingObj =
-                    _scheduleEntities.First(x => x.Id == model.Id);
-                _scheduleEntities.Remove(existingObj);
-                _scheduleEntities.Add(model);
-            }).Returns<ScheduleEntity, bool>((model, saveChanges) => Task.FromResult(model));
+        _scheduleEntityRepository.As<IRepositoryBase<ScheduleEntity, uint>>().SetupRepositoryMock(_scheduleEntities);
     }
 
     #endregion

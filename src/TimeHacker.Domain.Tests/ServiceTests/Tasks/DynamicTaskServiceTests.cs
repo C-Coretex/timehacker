@@ -2,12 +2,13 @@
 using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Services.Tasks;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Tests.Mocks;
+using TimeHacker.Tests.Mocks.Extensions;
 
 namespace TimeHacker.Tests.ServiceTests.Tasks
 {
@@ -16,8 +17,6 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         #region Mocks
 
         private readonly Mock<IDynamicTaskRepository> _dynamicTasksRepository = new();
-
-        private readonly IUserAccessor userAccessor;
 
         #endregion
 
@@ -195,25 +194,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
                 }
             ];
 
-            _dynamicTasksRepository.Setup(x => x.AddAsync(It.IsAny<DynamicTask>(), It.IsAny<bool>()))
-                .Callback<DynamicTask, bool>((entry, _) => _dynamicTasks.Add(entry));
-
-            _dynamicTasksRepository.Setup(x => x.UpdateAsync(It.IsAny<DynamicTask>(), It.IsAny<bool>()))
-                .Callback<DynamicTask, bool>((entry, _) =>
-                {
-                    _dynamicTasks.RemoveAll(x => x.Id == entry.Id);
-                    _dynamicTasks.Add(entry);
-                })
-                .Returns<DynamicTask, bool>((entry, _) => Task.FromResult(entry));
-
-            _dynamicTasksRepository.Setup(x => x.GetByIdAsync(It.IsAny<uint>(), It.IsAny<bool>(), It.IsAny<IncludeExpansionDelegate<DynamicTask>[]>()))
-                .Returns<uint, bool, IncludeExpansionDelegate<DynamicTask>[]>((id, _, _) => Task.FromResult(_dynamicTasks.FirstOrDefault(x => x.Id == id)));
-
-            _dynamicTasksRepository.Setup(x => x.DeleteAsync(It.IsAny<DynamicTask>(), It.IsAny<bool>()))
-                .Callback<DynamicTask, bool>((entry, _) => _dynamicTasks.RemoveAll(x => x.Id == entry.Id));
-
-            _dynamicTasksRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<DynamicTask>[]>()))
-                .Returns(_dynamicTasks.AsQueryable().BuildMock());
+            _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, uint>>().SetupRepositoryMock(_dynamicTasks);
         }
 
         #endregion
