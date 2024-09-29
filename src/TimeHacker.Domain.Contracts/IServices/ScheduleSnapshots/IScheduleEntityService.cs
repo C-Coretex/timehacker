@@ -11,6 +11,5 @@ namespace TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots
         Task UpdateLastEntityCreated(uint id, DateOnly entityCreated);
 
         Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity);
-        Task Delete(uint id);
     }
 }

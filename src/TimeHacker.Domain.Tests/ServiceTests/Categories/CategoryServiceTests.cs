@@ -1,20 +1,16 @@
 ﻿using System.Drawing;
 using FluentAssertions;
-using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 using TimeHacker.Domain.Services.Categories;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Domain.Tests.Mocks;
+using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Tests.Mocks;
-using TimeHacker.Tests.Mocks.Extensions;
 
-namespace TimeHacker.Tests.ServiceTests.Categories
+namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 {
     public class CategoryServiceTests
     {
@@ -44,17 +40,19 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public async Task AddAsync_ShouldAddEntry()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             var newEntry = new Category()
             {
                 Id = 1000,
-                Name = "TestCategory1000"
+                Name = "TestCategory1000",
+                UserId = "IncorrectUserId"
             };
             await _categoryService.AddAsync(newEntry);
             var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
+            result!.UserId.Should().Be(userId);
         }
 
         [Fact]
@@ -62,7 +60,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             var newEntry = new Category()
             {
@@ -82,7 +80,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
                 var userId = "TestIdentifier";
-                SetupCategoryMocks(userId);
+                SetupMocks(userId);
 
                 var newEntry = new Category()
                 {
@@ -99,7 +97,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             await _categoryService.DeleteAsync(1);
             var result = _categories.FirstOrDefault(x => x.Id == 1);
@@ -113,7 +111,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
                 var userId = "TestIdentifier";
-                SetupCategoryMocks(userId);
+                SetupMocks(userId);
 
                 await _categoryService.DeleteAsync(3);
             });
@@ -124,7 +122,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public void GetAll_ShouldReturnCorrectData()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             var result = _categoryService.GetAll().ToList();
 
@@ -137,7 +135,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public async Task GetByIdAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             var result = await _categoryService.GetByIdAsync(1);
             result.Should().NotBeNull();
@@ -149,7 +147,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public async Task GetByIdAsync_ShouldThrow()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             var result = await _categoryService.GetByIdAsync(3);
             result.Should().BeNull();
@@ -160,7 +158,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
         public async Task UpdateScheduleEntityAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
-            SetupCategoryMocks(userId);
+            SetupMocks(userId);
 
             var newEntry = new ScheduleEntity()
             {
@@ -180,7 +178,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
                 var userId = "TestIdentifier";
-                SetupCategoryMocks(userId);
+                SetupMocks(userId);
 
                 var newEntry = new ScheduleEntity()
                 {
@@ -192,7 +190,7 @@ namespace TimeHacker.Tests.ServiceTests.Categories
 
         #region Mock helpers
 
-        private void SetupCategoryMocks(string userId)
+        private void SetupMocks(string userId)
         {
             _categories =
             [

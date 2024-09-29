@@ -52,9 +52,10 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             if (!scheduleEntityReturn.IsEntityDateCorrect(entityCreated))
                 throw new ArgumentException("Created entity timestamp is not correct for this ScheduleEntityReturn.", nameof(entityCreated));
 
-            if (scheduleEntity.LastEntityCreated == null || scheduleEntity.LastEntityCreated < entityCreated)
-                scheduleEntity.LastEntityCreated = entityCreated;
+            if (scheduleEntity.LastEntityCreated != null && scheduleEntity.LastEntityCreated >= entityCreated)
+                return;
 
+            scheduleEntity.LastEntityCreated = entityCreated;
             await _scheduleEntityRepository.UpdateAsync(scheduleEntity);
         }
 
@@ -69,11 +70,6 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 ScheduleEntityParentEnum.Category => _categoryService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
                 _ => throw new ArgumentException("ScheduleEntityParent must be chosen", nameof(ScheduleEntityParentEnum)),
             };
-        }
-
-        public Task Delete(uint id)
-        {
-            return _scheduleEntityRepository.DeleteAsync(id);
         }
     }
 }

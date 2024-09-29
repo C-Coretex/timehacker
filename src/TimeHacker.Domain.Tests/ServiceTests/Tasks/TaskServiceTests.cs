@@ -14,13 +14,13 @@ using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
 using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
+using TimeHacker.Domain.Tests.Helpers;
+using TimeHacker.Domain.Tests.Mocks;
+using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Tests.Helpers;
-using TimeHacker.Tests.Mocks;
-using TimeHacker.Tests.Mocks.Extensions;
 
-namespace TimeHacker.Tests.ServiceTests.Tasks;
+namespace TimeHacker.Domain.Tests.ServiceTests.Tasks;
 
 public class TaskServiceTests
 {
@@ -72,7 +72,7 @@ public class TaskServiceTests
         // Arrange
         var date = DateTime.Now;
         var userId = "TestIdentifier";
-        SetupTaskMocks(date, userId);
+        SetupMocks(date, userId);
 
         // Act
         var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(date));
@@ -92,7 +92,7 @@ public class TaskServiceTests
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
         var userId = "TestIdentifier";
-        SetupTaskMocks(dates[1], userId);
+        SetupMocks(dates[1], userId);
 
         // Act
         var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
@@ -113,7 +113,7 @@ public class TaskServiceTests
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
         var userId = "TestIdentifier";
-        SetupTaskMocks(dates[1], userId);
+        SetupMocks(dates[1], userId);
 
         // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
@@ -130,7 +130,7 @@ public class TaskServiceTests
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
         var userId = "TestIdentifier";
-        SetupTaskMocks(dates[1], userId);
+        SetupMocks(dates[1], userId);
 
         // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
@@ -151,7 +151,7 @@ public class TaskServiceTests
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
         var userId = "IncorrectIdentifier";
-        SetupTaskMocks(dates[1], userId);
+        SetupMocks(dates[1], userId);
 
         // Act
         var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
@@ -169,7 +169,7 @@ public class TaskServiceTests
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
         var userId = "TestIdentifier";
-        SetupTaskMocks(dates[1], userId);
+        SetupMocks(dates[1], userId);
         var fixedTask = new FixedTask()
         {
             Id = 100,
@@ -221,7 +221,7 @@ public class TaskServiceTests
 
     #region Mock helpers
 
-    private void SetupTaskMocks(DateTime date, string userId)
+    private void SetupMocks(DateTime date, string userId)
     {
         _dynamicTasks =
         [

@@ -1,6 +1,5 @@
 ﻿using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Models.EntityModels;
-using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots
 {

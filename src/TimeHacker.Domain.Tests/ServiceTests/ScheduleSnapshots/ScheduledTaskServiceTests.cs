@@ -1,17 +1,14 @@
 ﻿using FluentAssertions;
-using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Domain.Tests.Mocks;
+using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Tests.Mocks;
-using TimeHacker.Tests.Mocks.Extensions;
 
-namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
+namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 {
     public class ScheduledTaskServiceTests
     {
@@ -41,7 +38,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
         public async Task GetBy_ShouldReturnCorrectData()
         {
             var userId = "TestIdentifier";
-            SetupFixedTaskMocks(userId);
+            SetupMocks(userId);
 
             var result = await _scheduledTaskService.GetBy(1);
             result.Should().NotBeNull();
@@ -55,7 +52,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
                 var userId = "TestIdentifier";
-                SetupFixedTaskMocks(userId);
+                SetupMocks(userId);
 
                 var result = await _scheduledTaskService.GetBy(3);
             });
@@ -63,7 +60,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 
         #region Mock helpers
 
-        private void SetupFixedTaskMocks(string userId)
+        private void SetupMocks(string userId)
         {
             _scheduledTasks =
             [

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace TimeHacker.Tests.Helpers
+namespace TimeHacker.Domain.Tests.Helpers
 {
     public static class AutomapperHelpers
     {

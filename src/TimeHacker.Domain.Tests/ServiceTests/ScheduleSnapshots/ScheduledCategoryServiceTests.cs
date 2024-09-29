@@ -1,17 +1,13 @@
-﻿using MockQueryable.Moq;
-using Moq;
+﻿using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Domain.Tests.Mocks;
+using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Tests.Mocks;
-using TimeHacker.Tests.Mocks.Extensions;
 
-namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
+namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 {
     public class ScheduledCategoryServiceTests
     {
@@ -40,7 +36,7 @@ namespace TimeHacker.Tests.ServiceTests.ScheduleSnapshots
 
         #region Mock helpers
 
-        private void SetupFixedTaskMocks(string userId)
+        private void SetupMocks(string userId)
         {
             _scheduledCategories =
             [

@@ -1,6 +1,6 @@
 ﻿using TimeHacker.Domain.Contracts.IModels;
 
-namespace TimeHacker.Tests.Mocks
+namespace TimeHacker.Domain.Tests.Mocks
 {
     internal class UserAccessorMock: IUserAccessor
     {

@@ -1,16 +1,14 @@
 ﻿using FluentAssertions;
-using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IRepositories.Tasks;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Services.Tasks;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Domain.Tests.Mocks;
+using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Tests.Mocks;
-using TimeHacker.Tests.Mocks.Extensions;
 
-namespace TimeHacker.Tests.ServiceTests.Tasks
+namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 {
     public class DynamicTaskServiceTests
     {
@@ -40,17 +38,19 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         public async Task AddAsync_ShouldAddEntry()
         {
             var userId = "TestIdentifier";
-            SetupDynamicTaskMocks(userId);
+            SetupMocks(userId);
 
             var newEntry = new DynamicTask()
             {
                 Id = 1000,
-                Name = "TestDynamicTask1000"
+                Name = "TestDynamicTask1000",
+                UserId = "IncorrectUserId"
             };
             await _dynamicTaskService.AddAsync(newEntry);
             var result = _dynamicTasks.FirstOrDefault(x => x.Id == newEntry.Id);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
+            result!.UserId.Should().Be(userId);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
-            SetupDynamicTaskMocks(userId);
+            SetupMocks(userId);
 
             var newEntry = new DynamicTask()
             {
@@ -78,7 +78,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
                 var userId = "TestIdentifier";
-                SetupDynamicTaskMocks(userId);
+                SetupMocks(userId);
 
                 var newEntry = new DynamicTask()
                 {
@@ -95,7 +95,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         public async Task DeleteAsync_ShouldDeleteEntry()
         {
             var userId = "TestIdentifier";
-            SetupDynamicTaskMocks(userId);
+            SetupMocks(userId);
 
             await _dynamicTaskService.DeleteAsync(1);
             var result = _dynamicTasks.FirstOrDefault(x => x.Id == 1);
@@ -109,7 +109,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
                 var userId = "TestIdentifier";
-                SetupDynamicTaskMocks(userId);
+                SetupMocks(userId);
 
                 await _dynamicTaskService.DeleteAsync(3);
             });
@@ -120,7 +120,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         public void GetAll_ShouldReturnCorrectData()
         {
             var userId = "TestIdentifier";
-            SetupDynamicTaskMocks(userId);
+            SetupMocks(userId);
 
             var result = _dynamicTaskService.GetAll().ToList();
 
@@ -133,7 +133,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         public async Task GetByIdAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
-            SetupDynamicTaskMocks(userId);
+            SetupMocks(userId);
 
             var result = await _dynamicTaskService.GetByIdAsync(1);
             result.Should().NotBeNull();
@@ -145,7 +145,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
         public async Task GetByIdAsync_ShouldThrow()
         {
             var userId = "TestIdentifier";
-            SetupDynamicTaskMocks(userId);
+            SetupMocks(userId);
 
             var result = await _dynamicTaskService.GetByIdAsync(3);
             result.Should().BeNull();
@@ -153,7 +153,7 @@ namespace TimeHacker.Tests.ServiceTests.Tasks
 
         #region Mock helpers
 
-        private void SetupDynamicTaskMocks(string userId)
+        private void SetupMocks(string userId)
         {
             _dynamicTasks =
             [
