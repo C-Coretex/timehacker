@@ -21,7 +21,6 @@ namespace TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots
 
             if (EndsOnModel != null)
             {
-                scheduleEntity.EndsOn = EndsOnModel.MaxDate;
                 if (EndsOnModel.MaxOccurrences != null)
                 {
                     var date = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -30,6 +29,9 @@ namespace TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots
 
                     scheduleEntity.EndsOn = date;
                 }
+
+                if(scheduleEntity.EndsOn == null || scheduleEntity.EndsOn > EndsOnModel.MaxDate)
+                    scheduleEntity.EndsOn = EndsOnModel.MaxDate;
             }
 
             return scheduleEntity;

@@ -79,9 +79,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             actual.ScheduledTasks.Count.Should().Be(3);
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
+        [Theory, CombinatorialData]
         [Trait("GetByAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry(bool correctUser)
         {

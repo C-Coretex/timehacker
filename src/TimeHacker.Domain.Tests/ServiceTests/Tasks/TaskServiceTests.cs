@@ -70,7 +70,7 @@ public class TaskServiceTests
     public async Task GetTasksForDay_ShouldReturnTasksForDay()
     {
         // Arrange
-        var date = DateTime.Now;
+        var date = DateTime.Now.Date;
         var userId = "TestIdentifier";
         SetupMocks(date, userId);
 
@@ -111,7 +111,7 @@ public class TaskServiceTests
     public async Task GetTasksForDays_ShouldReturnSaveAndReturnSnapshotAfterFirstCall()
     {
         // Arrange
-        var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
         var userId = "TestIdentifier";
         SetupMocks(dates[1], userId);
 
@@ -128,7 +128,7 @@ public class TaskServiceTests
     public async Task GetTasksForDays_ShouldRefreshSnapshot()
     {
         // Arrange
-        var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
         var userId = "TestIdentifier";
         SetupMocks(dates[1], userId);
 
@@ -149,7 +149,7 @@ public class TaskServiceTests
     public async Task GetTasksForDays_ShouldBeEmptyForUserWithoutTasks()
     {
         // Arrange
-        var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
         var userId = "IncorrectIdentifier";
         SetupMocks(dates[1], userId);
 
@@ -167,7 +167,7 @@ public class TaskServiceTests
     public async Task GetTasksForDays_ShouldAddScheduledTasks()
     {
         // Arrange
-        var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
         var userId = "TestIdentifier";
         SetupMocks(dates[1], userId);
         var fixedTask = new FixedTask()

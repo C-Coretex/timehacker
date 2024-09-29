@@ -149,9 +149,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             actual.LastEntityCreated.Should().Be(lastEntryCreated);
         }
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
+        [Theory, CombinatorialData]
         [Trait("UpdateLastEntityCreated", "Should throw exception on incorrect data")]
         public async Task UpdateLastEntityCreated_ShouldThrow(bool existingEntry)
         {
@@ -178,9 +176,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             });
         }
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
+        [Theory, CombinatorialData]
         [Trait("Save", "Should save data")]
         public async Task Save_ShouldSaveData(bool isCategory)
         {
@@ -209,8 +205,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         }
 
 
-        [Theory]
-        [MemberData(nameof(TheoryDataHelpers.TwoBoolPermutationData), MemberType = typeof(TheoryDataHelpers))]
+        [Theory, CombinatorialData]
         [Trait("Save", "Should throw exception on incorrect data")]
         public async Task Save_ShouldThrow(bool existingEntry, bool isCategory)
         {

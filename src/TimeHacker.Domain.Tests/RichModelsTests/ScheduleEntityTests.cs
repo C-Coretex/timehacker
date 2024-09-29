@@ -3,7 +3,6 @@ using TimeHacker.Domain.Contracts.Models.EntityModels;
 using TimeHacker.Domain.Contracts.Models.EntityModels.Enums;
 using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
 using TimeHacker.Domain.Contracts.Models.ReturnModels;
-using TimeHacker.Domain.Tests.Helpers;
 
 namespace TimeHacker.Domain.Tests.RichModelsTests
 {
@@ -11,8 +10,7 @@ namespace TimeHacker.Domain.Tests.RichModelsTests
     {
         #region DayRepeatingEntity
 
-        [Theory]
-        [MemberData(nameof(TheoryDataHelpers.TwoBoolPermutationData), MemberType = typeof(TheoryDataHelpers))]
+        [Theory, CombinatorialData]
         [Trait("DayRepeatingEntity", "Should return correct data")]
         public void DayRepeatingEntity_ShouldReturnCorrectData(bool endsOn, bool lastEntityCreated)
         {
@@ -72,8 +70,7 @@ namespace TimeHacker.Domain.Tests.RichModelsTests
 
         #region WeekRepeatingEntity
 
-        [Theory]
-        [MemberData(nameof(TheoryDataHelpers.TwoBoolPermutationData), MemberType = typeof(TheoryDataHelpers))]
+        [Theory, CombinatorialData]
         [Trait("WeekRepeatingEntity", "Should return correct data")]
         public void WeekRepeatingEntity_ShouldReturnCorrectData(bool endsOn, bool lastEntityCreated)
         {
@@ -84,7 +81,7 @@ namespace TimeHacker.Domain.Tests.RichModelsTests
                 RepeatingEntity = new RepeatingEntityModel()
                 {
                     EntityType = RepeatingEntityTypeEnum.WeekRepeatingEntity,
-                    RepeatingData = new WeekRepeatingEntity([DayOfWeekEnum.Monday, DayOfWeekEnum.Tuesday, DayOfWeekEnum.Friday])
+                    RepeatingData = new WeekRepeatingEntity([DayOfWeekEnum.Tuesday, DayOfWeekEnum.Monday, DayOfWeekEnum.Friday])
                 },
                 CreatedTimestamp = monday,
                 LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(monday.AddDays(1)) : null,
@@ -139,8 +136,7 @@ namespace TimeHacker.Domain.Tests.RichModelsTests
 
         #region MonthRepeatingEntity
 
-        [Theory]
-        [MemberData(nameof(TheoryDataHelpers.TwoBoolPermutationData), MemberType = typeof(TheoryDataHelpers))]
+        [Theory, CombinatorialData]
         [Trait("MonthRepeatingEntity", "Should return correct data")]
         public void MonthRepeatingEntity_ShouldReturnCorrectData(bool endsOn, bool lastEntityCreated)
         {
@@ -174,8 +170,7 @@ namespace TimeHacker.Domain.Tests.RichModelsTests
                 result[i].Should().Be(DateOnly.FromDateTime(january.AddDays(11).AddMonths(i + (lastEntityCreated ? 1 : 0))));
         }
 
-        [Theory]
-        [MemberData(nameof(TheoryDataHelpers.ThreeBoolPermutationData), MemberType = typeof(TheoryDataHelpers))]
+        [Theory, CombinatorialData]
         [Trait("MonthRepeatingEntity", "Should return correct data on 31-st day")]
         public void MonthRepeatingEntity_ShouldReturnCorrectDataOn31Day(bool endsOn, bool lastEntityCreated, bool isLapYear)
         {
@@ -238,8 +233,7 @@ namespace TimeHacker.Domain.Tests.RichModelsTests
 
         #region YearRepeatingEntity
 
-        [Theory]
-        [MemberData(nameof(TheoryDataHelpers.ThreeBoolPermutationData), MemberType = typeof(TheoryDataHelpers))]
+        [Theory, CombinatorialData]
         [Trait("YearRepeatingEntity", "Should return correct data")]
         public void YearRepeatingEntity_ShouldReturnCorrectData(bool endsOn, bool lastEntityCreated, bool isLapYear)
         {
