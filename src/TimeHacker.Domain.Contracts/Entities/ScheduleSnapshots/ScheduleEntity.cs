@@ -5,9 +5,9 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots
 {
-    public class ScheduleEntity : IDbModel<uint>
+    public class ScheduleEntity : IDbModel<Guid>
     {
-        public uint Id { get; init; }
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         public string UserId { get; set; }
         public RepeatingEntityModel RepeatingEntity { get; set; }

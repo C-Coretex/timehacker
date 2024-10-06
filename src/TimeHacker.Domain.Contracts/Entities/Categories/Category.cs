@@ -4,11 +4,11 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.Entities.Categories
 {
-    public class Category : IDbModel<uint>
+    public class Category : IDbModel<Guid>
     {
-        public uint Id { get; init; }
+        public Guid Id { get; init; } = Guid.NewGuid();
         public string UserId { get; set; }
-        public uint? ScheduleEntityId { get; init; }
+        public Guid? ScheduleEntityId { get; init; }
 
         public string Name { get; set; }
         public string? Description { get; set; }

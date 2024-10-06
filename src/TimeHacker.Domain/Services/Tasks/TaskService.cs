@@ -7,7 +7,6 @@ using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Contracts.Models.ReturnModels;
 using TimeHacker.Domain.Processors;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TimeHacker.Domain.Services.Tasks
 {

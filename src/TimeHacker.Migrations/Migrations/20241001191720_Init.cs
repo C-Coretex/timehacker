@@ -15,12 +15,11 @@ namespace TimeHacker.Migrations.Migrations
                 name: "DynamicTask",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
-                    Priority = table.Column<long>(type: "bigint", nullable: false),
+                    Priority = table.Column<byte>(type: "tinyint", nullable: false),
                     MinTimeToFinish = table.Column<TimeSpan>(type: "time", nullable: false),
                     MaxTimeToFinish = table.Column<TimeSpan>(type: "time", nullable: false),
                     OptimalTimeToFinish = table.Column<TimeSpan>(type: "time", nullable: true),
@@ -35,12 +34,11 @@ namespace TimeHacker.Migrations.Migrations
                 name: "ScheduleEntity",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RepeatingEntity = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    ScheduleCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastTaskCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastEntityCreated = table.Column<DateOnly>(type: "date", nullable: true),
                     EndsOn = table.Column<DateOnly>(type: "date", nullable: true)
                 },
                 constraints: table =>
@@ -62,13 +60,27 @@ namespace TimeHacker.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tag",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
+                    Color = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tag", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Category",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    ScheduleEntityId = table.Column<long>(type: "bigint", nullable: true),
+                    ScheduleEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
                     Color = table.Column<int>(type: "int", nullable: false)
@@ -87,13 +99,12 @@ namespace TimeHacker.Migrations.Migrations
                 name: "FixedTask",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    ScheduleEntityId = table.Column<long>(type: "bigint", nullable: true),
+                    ScheduleEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(516)", maxLength: 516, nullable: true),
-                    Priority = table.Column<long>(type: "bigint", nullable: false),
+                    Priority = table.Column<byte>(type: "tinyint", nullable: false),
                     StartTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -114,8 +125,8 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ParentCategoryId = table.Column<long>(type: "bigint", nullable: false),
-                    ParentScheduleEntity = table.Column<long>(type: "bigint", nullable: true),
+                    ParentCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentScheduleEntity = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -141,11 +152,33 @@ namespace TimeHacker.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TagDynamicTask",
+                columns: table => new
+                {
+                    TagId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TagDynamicTask", x => new { x.TagId, x.TaskId });
+                    table.ForeignKey(
+                        name: "FK_TagDynamicTask_DynamicTask_TaskId",
+                        column: x => x.TaskId,
+                        principalTable: "DynamicTask",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TagDynamicTask_Tag_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tag",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CategoryDynamicTask",
                 columns: table => new
                 {
-                    CategoryId = table.Column<long>(type: "bigint", nullable: false),
-                    DynamicTaskId = table.Column<long>(type: "bigint", nullable: false)
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DynamicTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -166,8 +199,8 @@ namespace TimeHacker.Migrations.Migrations
                 name: "CategoryFixedTask",
                 columns: table => new
                 {
-                    CategoryId = table.Column<long>(type: "bigint", nullable: false),
-                    FixedTaskId = table.Column<long>(type: "bigint", nullable: false)
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FixedTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -185,14 +218,36 @@ namespace TimeHacker.Migrations.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TagFixedTask",
+                columns: table => new
+                {
+                    TagId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TagFixedTask", x => new { x.TagId, x.TaskId });
+                    table.ForeignKey(
+                        name: "FK_TagFixedTask_FixedTask_TaskId",
+                        column: x => x.TaskId,
+                        principalTable: "FixedTask",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TagFixedTask_Tag_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tag",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ScheduledTask",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ParentTaskId = table.Column<long>(type: "bigint", nullable: false),
+                    ParentTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ScheduledCategoryId = table.Column<decimal>(type: "decimal(20,0)", nullable: true),
-                    ParentScheduleEntity = table.Column<long>(type: "bigint", nullable: true),
+                    ParentScheduleEntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     IsFixed = table.Column<bool>(type: "bit", nullable: false),
@@ -208,8 +263,8 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     table.PrimaryKey("PK_ScheduledTask", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ScheduledTask_ScheduleEntity_ParentScheduleEntity",
-                        column: x => x.ParentScheduleEntity,
+                        name: "FK_ScheduledTask_ScheduleEntity_ParentScheduleEntityId",
+                        column: x => x.ParentScheduleEntityId,
                         principalTable: "ScheduleEntity",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -281,7 +336,7 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledCategory_ParentScheduleEntity",
                 table: "ScheduledCategory",
-                column: "ParentScheduleEntityId");
+                column: "ParentScheduleEntity");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledCategory_UserId_Date",
@@ -294,7 +349,7 @@ namespace TimeHacker.Migrations.Migrations
                 column: "IsCompleted");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ScheduledTask_ParentScheduleEntity",
+                name: "IX_ScheduledTask_ParentScheduleEntityId",
                 table: "ScheduledTask",
                 column: "ParentScheduleEntityId");
 
@@ -327,6 +382,26 @@ namespace TimeHacker.Migrations.Migrations
                 name: "IX_ScheduleSnapshot_UserId",
                 table: "ScheduleSnapshot",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tag_Category",
+                table: "Tag",
+                column: "Category");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tag_UserId",
+                table: "Tag",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TagDynamicTask_TaskId",
+                table: "TagDynamicTask",
+                column: "TaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TagFixedTask_TaskId",
+                table: "TagFixedTask",
+                column: "TaskId");
         }
 
         /// <inheritdoc />
@@ -342,22 +417,31 @@ namespace TimeHacker.Migrations.Migrations
                 name: "ScheduledTask");
 
             migrationBuilder.DropTable(
-                name: "DynamicTask");
+                name: "TagDynamicTask");
+
+            migrationBuilder.DropTable(
+                name: "TagFixedTask");
 
             migrationBuilder.DropTable(
                 name: "Category");
 
             migrationBuilder.DropTable(
-                name: "FixedTask");
-
-            migrationBuilder.DropTable(
                 name: "ScheduledCategory");
 
             migrationBuilder.DropTable(
-                name: "ScheduleEntity");
+                name: "DynamicTask");
+
+            migrationBuilder.DropTable(
+                name: "FixedTask");
+
+            migrationBuilder.DropTable(
+                name: "Tag");
 
             migrationBuilder.DropTable(
                 name: "ScheduleSnapshot");
+
+            migrationBuilder.DropTable(
+                name: "ScheduleEntity");
         }
     }
 }

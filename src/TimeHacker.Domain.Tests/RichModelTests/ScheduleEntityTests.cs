@@ -4,7 +4,7 @@ using TimeHacker.Domain.Contracts.Models.EntityModels.Enums;
 using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
 using TimeHacker.Domain.Contracts.Models.ReturnModels;
 
-namespace TimeHacker.Domain.Tests.RichModelsTests
+namespace TimeHacker.Domain.Tests.RichModelTests
 {
     public class ScheduleEntityTests
     {

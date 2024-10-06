@@ -28,7 +28,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public async Task UpdateAsync(FixedTask task)
         {
-            if (task == null || task.Id == 0)
+            if (task == null)
                 throw new ArgumentException("Task must be valid");
 
             var userId = _userAccessor.UserId;
@@ -47,7 +47,7 @@ namespace TimeHacker.Domain.Services.Tasks
             await _fixedTaskRepository.UpdateAsync(task);
         }
 
-        public async Task DeleteAsync(uint id)
+        public async Task DeleteAsync(Guid id)
         {
             var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == id);
             if (task == null)
@@ -58,14 +58,14 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public IQueryable<FixedTask> GetAll() => GetAll(true);
 
-        public Task<FixedTask?> GetByIdAsync(uint id)
+        public Task<FixedTask?> GetByIdAsync(Guid id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint taskId)
+        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, Guid taskId)
         {
-            if (scheduleEntity == null || taskId == 0)
+            if (scheduleEntity == null)
                 throw new ArgumentException("Values are incorrect.");
 
             var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == taskId);

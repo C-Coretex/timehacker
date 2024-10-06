@@ -2,10 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.IRepositories.Tags;
 using TimeHacker.Domain.Contracts.IRepositories.Tasks;
-using TimeHacker.Infrastructure;
 using TimeHacker.Infrastructure.Repositories.Categories;
 using TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
+using TimeHacker.Infrastructure.Repositories.Tags;
 using TimeHacker.Infrastructure.Repositories.Tasks;
 
 namespace TimeHacker.Infrastructure.Extensions
@@ -26,6 +27,8 @@ namespace TimeHacker.Infrastructure.Extensions
 
             services.AddScoped<IFixedTaskRepository, FixedTaskRepository>();
             services.AddScoped<IDynamicTaskRepository, DynamicTaskRepository>();
+
+            services.AddScoped<ITagRepository, TagRepository>();
 
             return services;
         }

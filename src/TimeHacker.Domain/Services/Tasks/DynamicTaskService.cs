@@ -29,7 +29,7 @@ namespace TimeHacker.Domain.Services.Tasks
         {
             var userId = _userAccessor.UserId;
 
-            if (task == null || task.Id == 0)
+            if (task == null)
                 throw new ArgumentException("Task must be valid");
 
 
@@ -47,7 +47,7 @@ namespace TimeHacker.Domain.Services.Tasks
             await _dynamicTaskRepository.UpdateAsync(task);
         }
 
-        public async Task DeleteAsync(uint id)
+        public async Task DeleteAsync(Guid id)
         {
             var task = await GetAll().FirstOrDefaultAsync(x => x.Id == id);
             if (task == null)
@@ -62,7 +62,7 @@ namespace TimeHacker.Domain.Services.Tasks
             return _dynamicTaskRepository.GetAll().Where(x => x.UserId == userId);
         }
 
-        public Task<DynamicTask?> GetByIdAsync(uint id)
+        public Task<DynamicTask?> GetByIdAsync(Guid id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }

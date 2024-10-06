@@ -24,13 +24,15 @@ namespace TimeHacker.Domain.Extensions
             serviceCollection.AddScoped<IFixedTaskService, FixedTaskService>();
             serviceCollection.AddScoped<ITaskService, TaskService>();
 
+            serviceCollection.AddScoped<ITaskService, TaskService>();
+
             var mapper = GetMapperConfiguration().CreateMapper();
             serviceCollection.AddSingleton(mapper);
 
             return serviceCollection;
         }
 
-        static MapperConfiguration GetMapperConfiguration()
+        private static MapperConfiguration GetMapperConfiguration()
         {
             var types = AppDomain.CurrentDomain
                                 .GetAssemblies()

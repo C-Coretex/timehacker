@@ -39,7 +39,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             return _mapper.ProjectTo<ScheduleEntityReturn>(query);
         }
 
-        public async Task UpdateLastEntityCreated(uint id, DateOnly entityCreated)
+        public async Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated)
         {
             var scheduleEntity = await _scheduleEntityRepository.GetByIdAsync(id);
             if (scheduleEntity == null)

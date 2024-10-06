@@ -43,7 +43,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
             var newEntry = new FixedTask()
             {
-                Id = 1000,
                 Name = "TestFixedTask1000",
                 UserId = "IncorrectUserId"
             };
@@ -63,7 +62,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
             var newEntry = new FixedTask()
             {
-                Id = 1,
+                Id = _fixedTasks.First(x => x.UserId == userId).Id,
                 Name = "TestFixedTask1000"
             };
             await _fixedTaskService.UpdateAsync(newEntry);
@@ -83,7 +82,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 var newEntry = new FixedTask()
                 {
-                    Id = 3,
+                    Id = _fixedTasks.First(x => x.UserId != userId).Id,
                     Name = "TestFixedTask1000"
                 };
                 await _fixedTaskService.UpdateAsync(newEntry);
@@ -98,8 +97,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            await _fixedTaskService.DeleteAsync(1);
-            var result = _fixedTasks.FirstOrDefault(x => x.Id == 1);
+            var idToDelete = _fixedTasks.First(x => x.UserId == userId).Id;
+            await _fixedTaskService.DeleteAsync(idToDelete);
+            var result = _fixedTasks.FirstOrDefault(x => x.Id == idToDelete);
             result.Should().BeNull();
         }
 
@@ -112,7 +112,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
                 var userId = "TestIdentifier";
                 SetupMocks(userId);
 
-                await _fixedTaskService.DeleteAsync(3);
+                await _fixedTaskService.DeleteAsync(_fixedTasks.First(x => x.UserId != userId).Id);
             });
         }
 
@@ -126,7 +126,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var result = _fixedTaskService.GetAll().ToList();
 
             result.Count.Should().Be(2);
-            result.Select(x => x.Id).Should().BeEquivalentTo([1, 2]);
+            result.Should().BeEquivalentTo(_fixedTasks.Where(x => x.UserId == userId).ToList());
         }
 
         [Fact]
@@ -136,9 +136,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var result = await _fixedTaskService.GetByIdAsync(1);
+            var id = _fixedTasks.First(x => x.UserId == userId).Id;
+            var result = await _fixedTaskService.GetByIdAsync(id);
             result.Should().NotBeNull();
-            result!.Id.Should().Be(1);
+            result!.Id.Should().Be(id);
         }
 
         [Fact]
@@ -148,7 +149,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var result = await _fixedTaskService.GetByIdAsync(3);
+            var result = await _fixedTaskService.GetByIdAsync(_fixedTasks.First(x => x.UserId != userId).Id);
             result.Should().BeNull();
         }
 
@@ -159,12 +160,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var newEntry = new ScheduleEntity()
-            {
-                Id = 100
-            };
-            await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, 1);
-            var result = _fixedTasks.FirstOrDefault(x => x.Id == 1);
+            var newEntry = new ScheduleEntity();
+
+            var id = _fixedTasks.First(x => x.UserId == userId).Id;
+            await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, id);
+            var result = _fixedTasks.FirstOrDefault(x => x.Id == id);
             result.Should().NotBeNull();
             result!.ScheduleEntity.Should().NotBeNull();
             result!.ScheduleEntity!.Id.Should().Be(newEntry.Id);
@@ -179,11 +179,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
                 var userId = "TestIdentifier";
                 SetupMocks(userId);
 
-                var newEntry = new ScheduleEntity()
-                {
-                    Id = 1
-                };
-                await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, 3);
+                var newEntry = new ScheduleEntity();
+                await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, _fixedTasks.First(x => x.UserId != userId).Id);
             });
         }
 
@@ -195,7 +192,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             [
                 new()
                 {
-                    Id = 1,
                     UserId = userId,
                     Name = "TestFixedTask1",
                     Priority = 1,
@@ -207,7 +203,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    Id = 2,
                     UserId = userId,
                     Name = "TestFixedTask2",
                     Priority = 1,
@@ -218,7 +213,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    Id = 3,
                     UserId = "IncorrectUserId",
                     Name = "TestFixedTask3",
                     Priority = 1,
@@ -230,7 +224,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    Id = 4,
                     UserId = "IncorrectUserId",
                     Name = "TestFixedTask4",
                     Priority = 1,
@@ -240,7 +233,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
                 }
             ];
 
-            _fixedTasksRepository.As<IRepositoryBase<FixedTask, uint>>().SetupRepositoryMock(_fixedTasks);
+            _fixedTasksRepository.As<IRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
         }
 
         #endregion

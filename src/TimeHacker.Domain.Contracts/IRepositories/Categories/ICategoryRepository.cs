@@ -3,6 +3,6 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Contracts.IRepositories.Categories
 {
-    public interface ICategoryRepository: IRepositoryBase<Category, uint>
+    public interface ICategoryRepository: IRepositoryBase<Category, Guid>
     {}
 }

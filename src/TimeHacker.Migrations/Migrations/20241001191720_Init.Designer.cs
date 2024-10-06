@@ -12,7 +12,7 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(MigrationsDbContext))]
-    [Migration("20240825084513_Init")]
+    [Migration("20241001191720_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -27,11 +27,9 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.Category", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Color")
                         .HasColumnType("int");
@@ -45,8 +43,8 @@ namespace TimeHacker.Migrations.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<long?>("ScheduleEntityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("ScheduleEntityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -66,11 +64,11 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.CategoryDynamicTask", b =>
                 {
-                    b.Property<long>("CategoryId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("DynamicTaskId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("DynamicTaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CategoryId", "DynamicTaskId");
 
@@ -81,11 +79,11 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.CategoryFixedTask", b =>
                 {
-                    b.Property<long>("CategoryId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("FixedTaskId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FixedTaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CategoryId", "FixedTaskId");
 
@@ -96,24 +94,22 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateOnly?>("EndsOn")
                         .HasColumnType("date");
 
-                    b.Property<DateTime>("LastTaskCreated")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("LastEntityCreated")
+                        .HasColumnType("date");
 
                     b.Property<byte[]>("RepeatingEntity")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<DateTime>("ScheduleCreated")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -174,11 +170,11 @@ namespace TimeHacker.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("ParentCategoryId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ParentCategoryId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long?>("ParentScheduleEntity")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("ParentScheduleEntity")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("time");
@@ -226,11 +222,11 @@ namespace TimeHacker.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("ParentScheduleEntity")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("ParentScheduleEntityId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("ParentTaskId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ParentTaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("Priority")
                         .HasColumnType("bigint");
@@ -252,7 +248,7 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.HasIndex("IsCompleted");
 
-                    b.HasIndex("ParentScheduleEntity");
+                    b.HasIndex("ParentScheduleEntityId");
 
                     b.HasIndex("ScheduledCategoryId");
 
@@ -261,13 +257,73 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("ScheduledTask");
                 });
 
+            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int>("Color")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tag");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagDynamicTask", b =>
+                {
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TagId", "TaskId");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("TagDynamicTask");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagFixedTask", b =>
+                {
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TagId", "TaskId");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("TagFixedTask");
+                });
+
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("datetime2");
@@ -290,8 +346,8 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan?>("OptimalTimeToFinish")
                         .HasColumnType("time");
 
-                    b.Property<long>("Priority")
-                        .HasColumnType("bigint");
+                    b.Property<byte>("Priority")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -309,11 +365,9 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("datetime2");
@@ -330,11 +384,11 @@ namespace TimeHacker.Migrations.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<long>("Priority")
-                        .HasColumnType("bigint");
+                    b.Property<byte>("Priority")
+                        .HasColumnType("tinyint");
 
-                    b.Property<long?>("ScheduleEntityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("ScheduleEntityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartTimestamp")
                         .HasColumnType("datetime2");
@@ -429,7 +483,7 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithMany("ScheduledTasks")
-                        .HasForeignKey("ParentScheduleEntity")
+                        .HasForeignKey("ParentScheduleEntityId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", "ScheduledCategory")
@@ -448,6 +502,44 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("ScheduleSnapshot");
 
                     b.Navigation("ScheduledCategory");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagDynamicTask", b =>
+                {
+                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tags.Tag", "Tag")
+                        .WithMany("TagDynamicTasks")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", "Task")
+                        .WithMany("TagDynamicTasks")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagFixedTask", b =>
+                {
+                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tags.Tag", "Tag")
+                        .WithMany("TagFixedTasks")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", "Task")
+                        .WithMany("TagFixedTasks")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", b =>
@@ -490,14 +582,25 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("ScheduledTasks");
                 });
 
+            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.Tag", b =>
+                {
+                    b.Navigation("TagDynamicTasks");
+
+                    b.Navigation("TagFixedTasks");
+                });
+
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", b =>
                 {
                     b.Navigation("CategoryDynamicTasks");
+
+                    b.Navigation("TagDynamicTasks");
                 });
 
             modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", b =>
                 {
                     b.Navigation("CategoryFixedTasks");
+
+                    b.Navigation("TagFixedTasks");
                 });
 #pragma warning restore 612, 618
         }

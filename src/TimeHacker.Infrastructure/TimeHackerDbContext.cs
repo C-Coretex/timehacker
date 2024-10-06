@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Helpers.DB.Abstractions.BaseClasses;
 
@@ -27,6 +28,11 @@ namespace TimeHacker.Infrastructure
         //Tasks
         internal DbSet<FixedTask> FixedTask { get; set; }
         internal DbSet<DynamicTask> DynamicTask { get; set; }
+
+        //Tags
+        internal DbSet<Tag> Tag { get; set; }
+        internal DbSet<TagFixedTask> TagFixedTask { get; set; }
+        internal DbSet<TagDynamicTask> TagDynamicTask { get; set; }
 
         #endregion
 

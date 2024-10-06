@@ -8,7 +8,7 @@ namespace TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots
     {
         IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from);
 
-        Task UpdateLastEntityCreated(uint id, DateOnly entityCreated);
+        Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated);
 
         Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity);
     }

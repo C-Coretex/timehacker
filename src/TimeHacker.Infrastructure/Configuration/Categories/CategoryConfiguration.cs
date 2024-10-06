@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Drawing;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
 
 namespace TimeHacker.Infrastructure.Configuration.Categories
 {
@@ -17,10 +16,7 @@ namespace TimeHacker.Infrastructure.Configuration.Categories
             builder.Property(x => x.UserId).HasMaxLength(450);
             builder.Property(x => x.Name).IsRequired().HasMaxLength(128);
             builder.Property(x => x.Description).HasMaxLength(516);
-            builder.Property(x => x.Color).IsRequired().HasConversion(
-                v => v.ToArgb(),
-                v => Color.FromArgb(v)
-            );
+            builder.Property(x => x.Color).IsRequired().HasConversion<Converters.ColorConverter>();
 
             builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.Category)
                 .HasForeignKey<Category>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)

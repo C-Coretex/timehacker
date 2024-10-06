@@ -6,7 +6,7 @@ namespace TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots
     public class InputScheduleEntityModel
     {
         public ScheduleEntityParentEnum ScheduleEntityParentEnum { get; set; }
-        public uint ParentEntityId { get; set; }
+        public Guid ParentEntityId { get; set; }
 
         public RepeatingEntityModel RepeatingEntityModel { get; set; }
         public EndsOnModel? EndsOnModel { get; set; }

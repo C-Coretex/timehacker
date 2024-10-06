@@ -20,7 +20,7 @@ namespace TimeHacker.Domain.Services.Categories
 
         public async Task AddAsync(Category category)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessor.UserId!;
             category.UserId = userId;
 
             await _categoryRepository.AddAsync(category);
@@ -29,7 +29,7 @@ namespace TimeHacker.Domain.Services.Categories
         {
             var userId = _userAccessor.UserId;
 
-            if (category == null || category.Id == 0)
+            if (category == null)
                 throw new ArgumentException("Category must be valid");
 
 
@@ -46,7 +46,7 @@ namespace TimeHacker.Domain.Services.Categories
             category.UserId = userId;
             await _categoryRepository.UpdateAsync(category);
         }
-        public async Task DeleteAsync(uint id)
+        public async Task DeleteAsync(Guid id)
         {
             var userId = _userAccessor.UserId;
             var category = await _categoryRepository.GetByIdAsync(id);
@@ -61,15 +61,15 @@ namespace TimeHacker.Domain.Services.Categories
 
         public IQueryable<Category> GetAll() => GetAll(true);
 
-        public Task<Category?> GetByIdAsync(uint id)
+        public Task<Category?> GetByIdAsync(Guid id)
         {
             return GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, uint categoryId)
+        public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, Guid categoryId)
         {
             var userId = _userAccessor.UserId!;
-            if (scheduleEntity == null || categoryId == 0)
+            if (scheduleEntity == null)
                 throw new ArgumentException("Values are incorrect.");
 
             var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == categoryId);

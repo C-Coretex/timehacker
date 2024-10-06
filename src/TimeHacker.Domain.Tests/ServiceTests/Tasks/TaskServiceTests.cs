@@ -172,14 +172,13 @@ public class TaskServiceTests
         SetupMocks(dates[1], userId);
         var fixedTask = new FixedTask()
         {
-            Id = 100,
             UserId = userId,
             Name = "TestFixedTask1",
             Priority = 1,
             Description = "Test description",
             StartTimestamp = dates[0].AddHours(1),
             EndTimestamp = dates[0].AddHours(1).AddMinutes(30),
-            ScheduleEntityId = 1
+            ScheduleEntityId = Guid.NewGuid()
         };
         _fixedTasks.Add(fixedTask);
 
@@ -187,7 +186,6 @@ public class TaskServiceTests
         {
             new()
             {
-                Id = 1,
                 UserId = userId,
                 LastEntityCreated = null,
                 EndsOn = null,
@@ -227,7 +225,6 @@ public class TaskServiceTests
         [
             new()
             {
-                Id = 1,
                 UserId = userId,
                 Name = "TestDynamicTask1",
                 Priority = 1,
@@ -239,7 +236,6 @@ public class TaskServiceTests
 
             new()
             {
-                Id = 2,
                 UserId = userId,
                 Name = "TestDynamicTask2",
                 Priority = 1,
@@ -251,7 +247,6 @@ public class TaskServiceTests
 
             new()
             {
-                Id = 3,
                 UserId = "IncorrectUserId",
                 Name = "TestDynamicTask3",
                 Priority = 1,
@@ -261,13 +256,12 @@ public class TaskServiceTests
                 OptimalTimeToFinish = new TimeSpan(0, 45, 0)
             }
         ];
-        _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, uint>>().SetupRepositoryMock(_dynamicTasks);
+        _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
 
         _fixedTasks =
         [
             new()
             {
-                Id = 1,
                 UserId = userId,
                 Name = "TestFixedTask1",
                 Priority = 1,
@@ -278,7 +272,6 @@ public class TaskServiceTests
 
             new()
             {
-                Id = 2,
                 UserId = userId,
                 Name = "TestFixedTask2",
                 Priority = 1,
@@ -289,7 +282,6 @@ public class TaskServiceTests
 
             new()
             {
-                Id = 3,
                 UserId = "IncorrectUserId",
                 Name = "TestFixedTask3",
                 Priority = 1,
@@ -300,7 +292,6 @@ public class TaskServiceTests
 
             new()
             {
-                Id = 4,
                 UserId = "IncorrectUserId",
                 Name = "TestFixedTask4",
                 Priority = 1,
@@ -309,7 +300,7 @@ public class TaskServiceTests
                 EndTimestamp = date.AddHours(3).AddMinutes(30)
             }
         ];
-        _fixedTasksRepository.As<IRepositoryBase<FixedTask, uint>>().SetupRepositoryMock(_fixedTasks);
+        _fixedTasksRepository.As<IRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
 
         _scheduleSnapshots = new List<ScheduleSnapshot>();
         _scheduleSnapshotRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>()))
@@ -332,7 +323,7 @@ public class TaskServiceTests
 
         _scheduleEntities = [];
 
-        _scheduleEntityRepository.As<IRepositoryBase<ScheduleEntity, uint>>().SetupRepositoryMock(_scheduleEntities);
+        _scheduleEntityRepository.As<IRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduleEntities);
     }
 
     #endregion

@@ -42,7 +42,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
             var newEntry = new DynamicTask()
             {
-                Id = 1000,
                 Name = "TestDynamicTask1000",
                 UserId = "IncorrectUserId"
             };
@@ -62,7 +61,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
             var newEntry = new DynamicTask()
             {
-                Id = 1,
+                Id = _dynamicTasks.First(x => x.UserId == userId).Id,
                 Name = "TestDynamicTask1000"
             };
             await _dynamicTaskService.UpdateAsync(newEntry);
@@ -82,11 +81,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 var newEntry = new DynamicTask()
                 {
-                    Id = 3,
+                    Id = _dynamicTasks.First(x => x.UserId != userId).Id,
                     Name = "TestDynamicTask1000"
                 };
                 await _dynamicTaskService.UpdateAsync(newEntry);
-                var result = _dynamicTasks.FirstOrDefault(x => x.Id == newEntry.Id);
             });
         }
 
@@ -97,8 +95,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            await _dynamicTaskService.DeleteAsync(1);
-            var result = _dynamicTasks.FirstOrDefault(x => x.Id == 1);
+            var id = _dynamicTasks.First(x => x.UserId == userId).Id;
+            await _dynamicTaskService.DeleteAsync(id);
+            var result = _dynamicTasks.FirstOrDefault(x => x.Id == id);
             result.Should().BeNull();
         }
 
@@ -111,7 +110,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
                 var userId = "TestIdentifier";
                 SetupMocks(userId);
 
-                await _dynamicTaskService.DeleteAsync(3);
+                var id = _dynamicTasks.First(x => x.UserId != userId).Id;
+                await _dynamicTaskService.DeleteAsync(id);
             });
         }
 
@@ -125,7 +125,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var result = _dynamicTaskService.GetAll().ToList();
 
             result.Count.Should().Be(2);
-            result.Select(x => x.Id).Should().BeEquivalentTo([1, 2]);
+            result.Should().BeEquivalentTo(_dynamicTasks.Where(x => x.UserId == userId).ToList());
         }
 
         [Fact]
@@ -135,9 +135,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var result = await _dynamicTaskService.GetByIdAsync(1);
+            var id = _dynamicTasks.First(x => x.UserId == userId).Id;
+            var result = await _dynamicTaskService.GetByIdAsync(id);
             result.Should().NotBeNull();
-            result!.Id.Should().Be(1);
+            result!.Id.Should().Be(id);
         }
 
         [Fact]
@@ -147,7 +148,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var result = await _dynamicTaskService.GetByIdAsync(3);
+            var result = await _dynamicTaskService.GetByIdAsync(_dynamicTasks.First(x => x.UserId != userId).Id);
             result.Should().BeNull();
         }
 
@@ -159,7 +160,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             [
                 new()
                 {
-                    Id = 1,
                     UserId = userId,
                     Name = "TestDynamicTask1",
                     Priority = 1,
@@ -171,7 +171,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    Id = 2,
                     UserId = userId,
                     Name = "TestDynamicTask2",
                     Priority = 1,
@@ -183,7 +182,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    Id = 3,
                     UserId = "IncorrectUserId",
                     Name = "TestDynamicTask3",
                     Priority = 1,
@@ -194,7 +192,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
                 }
             ];
 
-            _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, uint>>().SetupRepositoryMock(_dynamicTasks);
+            _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
         }
 
         #endregion

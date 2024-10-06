@@ -2,6 +2,6 @@
 
 namespace TimeHacker.Domain.Contracts.IRepositories.Tasks
 {
-    public interface IDynamicTaskRepository : ITaskRepository<DynamicTask, uint>
+    public interface IDynamicTaskRepository : ITaskRepository<DynamicTask, Guid>
     {}
 }

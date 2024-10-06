@@ -3,6 +3,7 @@ using FluentAssertions;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 using TimeHacker.Domain.Services.Categories;
@@ -44,7 +45,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
             var newEntry = new Category()
             {
-                Id = 1000,
                 Name = "TestCategory1000",
                 UserId = "IncorrectUserId"
             };
@@ -64,7 +64,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
             var newEntry = new Category()
             {
-                Id = 1,
+                Id = _categories.First(x => x.UserId == userId).Id,
                 Name = "TestCategory1000"
             };
             await _categoryService.UpdateAsync(newEntry);
@@ -84,7 +84,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
                 var newEntry = new Category()
                 {
-                    Id = 3,
+                    Id = _categories.First(x => x.UserId != userId).Id,
                     Name = "TestCategory1000"
                 };
                 await _categoryService.UpdateAsync(newEntry);
@@ -99,8 +99,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            await _categoryService.DeleteAsync(1);
-            var result = _categories.FirstOrDefault(x => x.Id == 1);
+            var idToDelete = _categories.First(x => x.UserId == userId).Id;
+            await _categoryService.DeleteAsync(idToDelete);
+            var result = _categories.FirstOrDefault(x => x.Id == idToDelete);
             result.Should().BeNull();
         }
 
@@ -113,7 +114,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
                 var userId = "TestIdentifier";
                 SetupMocks(userId);
 
-                await _categoryService.DeleteAsync(3);
+                await _categoryService.DeleteAsync(_categories.First(x => x.UserId != userId).Id);
             });
         }
 
@@ -127,7 +128,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var result = _categoryService.GetAll().ToList();
 
             result.Count.Should().Be(2);
-            result.Select(x => x.Id).Should().BeEquivalentTo([1, 2]);
+            result.Should().BeEquivalentTo(_categories.Where(x => x.UserId == userId).ToList());
         }
 
         [Fact]
@@ -137,9 +138,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var result = await _categoryService.GetByIdAsync(1);
+            var id = _categories.First(x => x.UserId == userId).Id;
+            var result = await _categoryService.GetByIdAsync(id);
             result.Should().NotBeNull();
-            result!.Id.Should().Be(1);
+            result!.Id.Should().Be(id);
         }
 
         [Fact]
@@ -149,7 +151,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var result = await _categoryService.GetByIdAsync(3);
+            var result = await _categoryService.GetByIdAsync(_categories.First(x => x.UserId != userId).Id);
             result.Should().BeNull();
         }
 
@@ -160,12 +162,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var userId = "TestIdentifier";
             SetupMocks(userId);
 
-            var newEntry = new ScheduleEntity()
-            {
-                Id = 100
-            };
-            await _categoryService.UpdateScheduleEntityAsync(newEntry, 1);
-            var result = _categories.FirstOrDefault(x => x.Id == 1);
+            var newEntry = new ScheduleEntity();
+            var categoryId = _categories.First(x => x.UserId == userId).Id;
+            await _categoryService.UpdateScheduleEntityAsync(newEntry, categoryId);
+            var result = _categories.FirstOrDefault(x => x.Id == categoryId);
             result.Should().NotBeNull();
             result!.ScheduleEntity.Should().NotBeNull();
             result!.ScheduleEntity!.Id.Should().Be(newEntry.Id);
@@ -180,11 +180,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
                 var userId = "TestIdentifier";
                 SetupMocks(userId);
 
-                var newEntry = new ScheduleEntity()
-                {
-                    Id = 1
-                };
-                await _categoryService.UpdateScheduleEntityAsync(newEntry, 3);
+                var newEntry = new ScheduleEntity();
+                await _categoryService.UpdateScheduleEntityAsync(newEntry, _categories.First(x => x.UserId != userId).Id);
             });
         }
 
@@ -196,9 +193,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             [
                 new()
                 {
-                    Id = 1,
                     UserId = userId,
-                    Name = "TestFixedTask1",
+                    Name = "TestCategory1",
                     Color = Color.AliceBlue,
                     Description = "Test description",
                     ScheduleEntity = new ScheduleEntity()
@@ -206,31 +202,28 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
                 new()
                 {
-                    Id = 2,
                     UserId = userId,
-                    Name = "TestFixedTask2",
+                    Name = "TestCategory2",
                     Description = "Test description",
                 },
 
                 new()
                 {
-                    Id = 3,
                     UserId = "IncorrectUserId",
-                    Name = "TestFixedTask3",
+                    Name = "TestCategory3",
                     Description = "Test description",
                     ScheduleEntity = new ScheduleEntity()
                 },
 
                 new()
                 {
-                    Id = 4,
                     UserId = "IncorrectUserId",
-                    Name = "TestFixedTask4",
+                    Name = "TestCategory4",
                     Description = "Test description",
                 }
             ];
 
-            _categoriesRepository.As<IRepositoryBase<Category, uint>>().SetupRepositoryMock(_categories);
+            _categoriesRepository.As<IRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories);
         }
 
         #endregion

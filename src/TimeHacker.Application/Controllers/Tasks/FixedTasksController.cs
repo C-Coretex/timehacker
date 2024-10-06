@@ -41,7 +41,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(uint id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpPost("Update/{id}")]
-        public async Task<IActionResult> Update(uint id, [FromBody] InputFixedTaskModel inputFixedTaskModel)
+        public async Task<IActionResult> Update(Guid id, [FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace TimeHacker.Application.Controllers.Tasks
         }
 
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(uint id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
