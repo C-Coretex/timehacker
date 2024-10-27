@@ -22,7 +22,7 @@ function Week() {
     })
 
 
-    getTasksForDays(days.map(d => d.day)).then((result) => {
+    getTasksForDays(days.map(d => d.day.format('YYYY-MM-DD'))).then((result) => {
       let tasks = result
       setdaysOfWeek(days.map((day, i) => {
         return { day: day.day, dayName: day.dayName, isSelected: day.isSelected, tasks: tasks[i] }

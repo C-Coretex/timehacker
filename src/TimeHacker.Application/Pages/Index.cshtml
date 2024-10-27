@@ -1,12 +1,21 @@
 ﻿@page
 @using TimeHacker.Application.Pages
+@using TimeHacker.Application.Helpers
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+    var assets = AssetHelper.GetAssets();
+    var mainJs = assets.ContainsKey("main.js") ? assets["main.js"] : null;
+    var mainCss = assets.ContainsKey("main.css") ? assets["main.css"] : null;
 }
 
 <link rel="stylesheet" href="~/lib/flatpickr/flatpickr.min.css">
 <script src="~/lib/flatpickr/flatpickr.min.js"></script>
+
+@if (mainCss != null)
+{
+    <link rel="stylesheet" href="~/js/build/@mainCss">
+}
 
 @section Toolbar {
     <button class="btn btn-primary m-2 js-open-add-task-modal" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Add task">
@@ -153,7 +162,12 @@
     }
 }
 
-<script src="~/js/index/index.js"></script>
-<link rel="stylesheet" href="~/js/calendar/build/main.css" asp-append-version="true" />
+<!-- <script src="~/js/index/index.js"></script>
+<link rel="stylesheet" href="~/js/build/main.css" asp-append-version="true" />
 <script src="~/js/calendar/build/main.js"></script>
-<script src="~/js/tasks/tasks.js"></script>
+<script src="~/js/tasks/tasks.js"></script> -->
+
+@if (mainJs != null)
+{
+    <script src="~/js/build/@mainJs"></script>
+}
