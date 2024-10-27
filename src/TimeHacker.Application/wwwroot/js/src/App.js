@@ -1,21 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
-import Week from './components/week'
-import { API_URL, setApiUrl } from './tools/variables'
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
+// !!!TODO
+// import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
+import { Layout } from './components/Layout';
 
 function App() {
-  let api = window.location.href
-  api = api.replace(window.location.pathname, "/")
-  api += 'api'
-  api = 'https://localhost:44390/api'
-  setApiUrl(api)
-
   return (
-    <div className='tw-h-full'>
-      <div className='tw-flex tw-flex-row tw-items-center tw-justify-center tw-h-full'>
-        <Week />
-      </div>
-    </div>
+    <Layout>
+      <Routes>
+        {AppRoutes.map((route, index) => {
+          const { element, requireAuth, ...rest } = route;
+          // return <Route key={index} {...rest} element={requireAuth ? <AuthorizeRoute {...rest} element={element} /> : element} />;
+          return <Route key={index} {...rest} element={element} />;
+        })}
+      </Routes>
+    </Layout>
   );
 }
 

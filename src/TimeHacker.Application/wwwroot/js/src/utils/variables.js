@@ -1,8 +1,3 @@
-export let API_URL = ""
-export function setApiUrl(newUrl) {
-    API_URL = newUrl
-}
-
 export const POSSIBLE_COLORS_FOR_TASK = [
     '#FFCCE5',
     '#FC766AFF',
@@ -451,4 +446,4 @@ export const TEST_RESULT_FOR_DAY = {
             }
         }
     ]
-  }
+}

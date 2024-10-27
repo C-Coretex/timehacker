@@ -2,7 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { POSSIBLE_COLORS_FOR_TASK } from '../tools/variables'
+import { POSSIBLE_COLORS_FOR_TASK } from '../utils/variables'
 
 function DayOfWeek({ day, isSelected, tasks }) {
   tasks = tasks.tasksTimeline

@@ -1,13 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { UserDataProvider } from './contexts/UserDataContext'
 
-const root = ReactDOM.createRoot(document.getElementById('calculator_react'));//calculator_react
+const rootElement = document.getElementById('calculator_react');
+const root = ReactDOM.createRoot(rootElement);
+
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      {/* !!!TODO */}
+      {/* <UserDataProvider> */}
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      {/* </UserDataProvider> */}
+    </BrowserRouter>
   </React.StrictMode>
 );
 

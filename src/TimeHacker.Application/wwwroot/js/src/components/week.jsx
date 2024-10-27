@@ -2,9 +2,11 @@ import moment from 'moment'
 import DayOfWeek from './dayOfWeek';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { API_URL, TEST_RESULT_FOR_DAY } from '../tools/variables'
+import { TEST_RESULT_FOR_DAY } from '../utils/variables'
 
 function Week() {
+  const API_URL = 'https://localhost:44390/api'
+
   const hoursOfDay = Array.from({ length: 23 }, (_, i) => i + 1);
 
   const [mondayOfSelectedWeek, setMondayOfSelectedWeek] = useState(moment().startOf('isoWeek'))
