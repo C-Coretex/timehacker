@@ -446,5 +446,5 @@ FodyWeavers.xsd
 *.sln.iml
 
 #Custom gitignore
-wwwroot/.parcel-cache/
-wwwroot/js/build/
+**/wwwroot/.parcel-cache
+**/wwwroot/js/build
