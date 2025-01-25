@@ -16,7 +16,7 @@ namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!string.IsNullOrWhiteSpace(_connectionString))
-                optionsBuilder.UseSqlServer(_connectionString);
+                optionsBuilder.UseNpgsql(_connectionString);
         }
 
         internal T AddEntity<T>(DbSet<T> entityCollection, T entity, bool saveChanges = true) where T : class, IDbModel

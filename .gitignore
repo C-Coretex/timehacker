@@ -447,3 +447,5 @@ FodyWeavers.xsd
 
 #Custom gitignore
 wwwroot/.parcel-cache/
+
+.containers/

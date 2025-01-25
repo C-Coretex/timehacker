@@ -1,4 +1,5 @@
-﻿using MockQueryable.Moq;
+﻿using MockQueryable;
+using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;

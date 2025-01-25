@@ -1,70 +1,80 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using TimeHacker.Application.Helpers;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
 using TimeHacker.Infrastructure.Extensions;
-using TimeHacker.Infrastructure.IdentityData;
+using TimeHacker.Infrastructure.Identity;
+using TimeHacker.Infrastructure.Identity.Extensions;
+using TimeHacker.Migrations.Factory;
+using TimeHacker.Migrations.Identity.Factory;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region Services
+
 #region DB
-var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
-builder.Services.AddDbContext<IdentityDbContext>(options =>
-    options.UseSqlServer(identityConnectionString));
 
 var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
-
-builder.Services.RegisterRepositories(timeHackerConnectionString);
-builder.Services.RegisterServices();
-#endregion
+var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(o =>
-{
-    o.Password.RequireDigit = true;
-    o.Password.RequiredLength = 6;
-    o.Password.RequireLowercase = true;
-    o.Password.RequireUppercase = true;
-    o.Password.RequireNonAlphanumeric = false;
-}).AddEntityFrameworkStores<IdentityDbContext>();
+builder.Services.RegisterRepositories(timeHackerConnectionString);
+builder.Services.RegisterIdentity(identityConnectionString);
+
+builder.Services.RegisterServices();
+
+#endregion
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
+
+builder.Services.AddIdentityCore<IdentityUser>(o =>
+    {
+        o.Password.RequireDigit = true;
+        o.Password.RequiredLength = 6;
+        o.Password.RequireLowercase = true;
+        o.Password.RequireUppercase = true;
+        o.Password.RequireNonAlphanumeric = false;
+    })
+    .AddEntityFrameworkStores<TimeHackerIdentityDbContext>()
+    .AddApiEndpoints();
 
 AddApplicationServices(builder.Services);
 
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true;
-});
+builder.Services.AddControllersWithViews();
 
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "TimeHacker API", Version = "v1" });
-});
+builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddControllers();
-builder.Services.AddRazorPages();
-builder.WebHost.UseStaticWebAssets();
+#endregion
 
 var app = builder.Build();
+
+#region Middleware
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
+    app.UseSwaggerUI();
+
+    app.MapScalarApiReference(o =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeHacker API v1");
+        o.WithTitle("TimeHacker API");
     });
+
+    app.UseMigrationsEndPoint();
+
+    //Apply database migrations
+    TimeHackerMigrationsDbContext.ApplyMigrations(timeHackerConnectionString);
+    IdentityMigrationsDbContext.ApplyMigrations(identityConnectionString);
 }
 else
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -76,17 +86,17 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapIdentityApi<IdentityUser>();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages();
+#endregion
 
 app.Run();
 
-static IServiceCollection AddApplicationServices(IServiceCollection services)
+static void AddApplicationServices(IServiceCollection services)
 {
     services.AddScoped<IUserAccessor, UserAccessor>();
-
-    return services;
 }
