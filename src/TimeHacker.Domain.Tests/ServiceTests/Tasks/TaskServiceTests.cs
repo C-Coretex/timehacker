@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using MockQueryable;
 using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;

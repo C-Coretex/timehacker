@@ -14,11 +14,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TimeHacker.Infrastructure\TimeHacker.Infrastructure.csproj" />
+    <ProjectReference Include="..\TimeHacker.Infrastructure.Identity\TimeHacker.Infrastructure.Identity.csproj" />
   </ItemGroup>
 
 </Project>

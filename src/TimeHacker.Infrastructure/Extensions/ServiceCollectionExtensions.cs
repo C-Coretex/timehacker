@@ -16,7 +16,7 @@ namespace TimeHacker.Infrastructure.Extensions
         public static IServiceCollection RegisterRepositories(this IServiceCollection services, string timeHackerConnectionString)
         {
             services.AddDbContext<TimeHackerDbContext>(options =>
-                options.UseSqlServer(timeHackerConnectionString));
+                options.UseNpgsql(timeHackerConnectionString));
 
             services.AddScoped<ICategoryRepository, CategoryRepository>();
 

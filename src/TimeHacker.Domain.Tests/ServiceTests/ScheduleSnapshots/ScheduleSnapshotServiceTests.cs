@@ -1,7 +1,6 @@
 ﻿using AutoBogus;
 using FluentAssertions;
 using Moq;
-using NuGet.Protocol.Core.Types;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;

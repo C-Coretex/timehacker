@@ -1,0 +1,48 @@
+services:
+  timehacker.application:
+    image: ${DOCKER_REGISTRY-}timehackerapplication
+    build:
+      context: .
+      dockerfile: TimeHacker.Application/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - timehacker.infrastructure
+      - timehacker.infrastructure.identity
+
+  timehacker.infrastructure:
+    image: postgres:latest
+    container_name: timehacker.infrastructure
+    environment:
+      - POSTGRES_DB=TimeHacker
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/timehacker-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  timehacker.infrastructure.identity:
+    image: postgres:latest
+    container_name: timehacker.infrastructure.identity
+    environment:
+      - POSTGRES_DB=TimeHackerIdentity
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/timehacker-identity-db:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Exposing a different host port to avoid conflicts
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./.containers/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - timehacker.infrastructure
