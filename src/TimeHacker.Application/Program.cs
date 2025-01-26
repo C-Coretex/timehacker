@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Scalar.AspNetCore;
 using TimeHacker.Application.Helpers;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Extensions;
@@ -76,11 +75,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    app.MapScalarApiReference(o =>
-    {
-        o.WithTitle("TimeHacker API");
-    });
 
     app.UseMigrationsEndPoint();
 
