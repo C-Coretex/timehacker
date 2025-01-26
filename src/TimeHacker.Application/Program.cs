@@ -41,6 +41,22 @@ builder.Services.AddIdentityCore<IdentityUser>(o =>
     .AddEntityFrameworkStores<TimeHackerIdentityDbContext>()
     .AddApiEndpoints();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Prevent automatic redirects
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
+});
+
 AddApplicationServices(builder.Services);
 
 builder.Services.AddControllersWithViews();

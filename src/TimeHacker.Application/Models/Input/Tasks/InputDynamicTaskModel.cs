@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-        public IEnumerable<int> CategoryIds { get; set; }
+        public IEnumerable<Guid> CategoryIds { get; set; }
         public byte Priority { get; set; }
         public TimeSpan MinTimeToFinish { get; set; }
         public TimeSpan MaxTimeToFinish { get; set; }

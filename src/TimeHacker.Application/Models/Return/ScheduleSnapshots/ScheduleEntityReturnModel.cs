@@ -4,7 +4,7 @@ namespace TimeHacker.Application.Models.Return.ScheduleSnapshots
 {
     public class ScheduleEntityReturnModel
     {
-        public uint Id { get; init; }
+        public Guid Id { get; init; }
 
         public RepeatingEntityModel RepeatingEntity { get; set; }
         public DateTime ScheduleCreated { get; set; } = DateTime.UtcNow;

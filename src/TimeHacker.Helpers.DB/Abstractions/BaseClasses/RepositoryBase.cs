@@ -97,11 +97,11 @@ namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
         }
     }
 
-        public class RepositoryBase<TDbContext, TModel, TId> : RepositoryBase<TDbContext, TModel>, IRepositoryBase<TModel, TId>
-        where TModel : class, IDbModel<TId>, new()
-        where TDbContext : DbContextBase<TDbContext>
+    public class RepositoryBase<TDbContext, TModel, TId> : RepositoryBase<TDbContext, TModel>, IRepositoryBase<TModel, TId>
+    where TModel : class, IDbModel<TId>, new()
+    where TDbContext : DbContextBase<TDbContext>
     {
-        public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet): base(dbContext, dbSet)
+        public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet) : base(dbContext, dbSet)
         { }
 
         public virtual TModel? GetById(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
