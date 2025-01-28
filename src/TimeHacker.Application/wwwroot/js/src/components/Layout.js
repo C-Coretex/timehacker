@@ -1,41 +1,72 @@
 import React, { useState } from 'react';
+import { useLocation } from "react-router-dom";
 import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
+  CalendarOutlined,
+  ProductOutlined,
+  QuestionCircleOutlined,
+  SettingOutlined,
+  SnippetsOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Breadcrumb, Layout as AntdLayout, Menu, theme } from 'antd';
 
+import {
+  Link
+} from '../ui';
+
+import {
+  capitalize
+} from '../utils/helpers'
+
 const { Header, Content, Footer, Sider } = AntdLayout;
 
-function getItem(label, key, icon, children) {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  };
+const findActiveLink = (url, menuItems) => {
+  for (const menuItem of menuItems) {
+    if (url.includes('profile')) {
+      return 'profile'
+    } else if (url === menuItem?.label?.props?.href) {
+      return String(menuItem.key)
+    }
+  }
+
+  return null;
 }
 
-const items = [
-  getItem('Option 1', '1', <PieChartOutlined />),
-  getItem('Option 2', '2', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [
-    getItem('Tom', '3'),
-    getItem('Bill', '4'),
-    getItem('Alex', '5'),
+const getItem = (key, icon, children) => ({
+  key,
+  icon,
+  children,
+  label: children ? capitalize(key) : <Link href={`/${key === 'calendar' ? '' : key}`}>{capitalize(key)}</Link>
+})
+
+const getMainMenuItems = (isAuthenticated) => ([
+  getItem('calendar', <CalendarOutlined />),
+  getItem('tasks', <SnippetsOutlined />),
+  getItem('categories', <ProductOutlined />),
+  ...(!isAuthenticated ? [
+    getItem('user', <UserOutlined />, [
+      getItem('profile'),
+      getItem('logout'),
+    ]),
+  ] : [
+    getItem('login', <ProductOutlined />),
   ]),
-  getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-  getItem('Files', '9', <FileOutlined />),
-];
+  getItem('help', <QuestionCircleOutlined />),
+  getItem('settings', <SettingOutlined />),
+]);
 
 export const Layout = ({children}) => {
+  const location = useLocation();
+
   const [collapsed, setCollapsed] = useState(false);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const mainMenuItems = getMainMenuItems(false);
+  const activeLink = findActiveLink(location.pathname, mainMenuItems);
+
   return (
     <AntdLayout
       style={{
@@ -43,16 +74,25 @@ export const Layout = ({children}) => {
       }}
     >
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <div 
+          className="demo-logo-vertical" 
+          style={{
+            height: '32px',
+            margin: '16px',
+            background: 'rgba(255, 255, 255, .2)',
+            borderRadius: '6px',
+          }}
+        />
+        <Menu theme="dark" selectedKeys={[activeLink]} mode="inline" items={mainMenuItems} />
       </Sider>
       <AntdLayout>
         <Header
           style={{
-            padding: 0,
             background: colorBgContainer,
           }}
-        />
+        >
+          <i>~TimeHacker~</i>
+        </Header>
         <Content
           style={{
             margin: '0 16px',
