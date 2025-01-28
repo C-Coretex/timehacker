@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Infrastructure",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Infrastructure.Identity", "TimeHacker.Infrastructure.Identity\TimeHacker.Infrastructure.Identity.csproj", "{DC38DB08-D7F8-454C-AE17-68AD52E8B24C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Helpers.Db", "TimeHacker.Helpers.Db\TimeHacker.Helpers.Db.csproj", "{6A1B47D7-0B7E-4CB7-9C9C-1C7CC7E514B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Helpers.DB", "TimeHacker.Helpers.DB\TimeHacker.Helpers.DB.csproj", "{6A1B47D7-0B7E-4CB7-9C9C-1C7CC7E514B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeHacker.Helpers.Domain", "TimeHacker.Helpers.Domain\TimeHacker.Helpers.Domain.csproj", "{B09DFE01-A061-4B79-9496-924B2306127D}"
 EndProject
