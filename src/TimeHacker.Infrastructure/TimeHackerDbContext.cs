@@ -4,6 +4,7 @@ using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
+using TimeHacker.Infrastructure.Converters;
 
 namespace TimeHacker.Infrastructure
 {
@@ -40,9 +41,18 @@ namespace TimeHacker.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            
             // Applies all configurations defined in this assembly
             modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            base.ConfigureConventions(configurationBuilder);
+
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion<DateTimeUtcConverter>();
         }
     }
 }
