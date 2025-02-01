@@ -1,7 +1,7 @@
 version: '1.1'
   
 services:
-#Front-end
+#Frontend
   vite-app:
     build:
       context: ./TimeHacker.Application.UI/
@@ -17,7 +17,7 @@ services:
     stdin_open: true
     tty: true
 
-#Application
+#Backend
   timehacker.application:
     image: ${DOCKER_REGISTRY-}timehackerapplication
     build:
@@ -67,7 +67,7 @@ services:
       timeout: 5s
       retries: 10
 
-# pgAdmin
+#pgAdmin
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
