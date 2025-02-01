@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
-namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
+namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
     public class DbContextBase<TContext> : DbContext where TContext : DbContext
     {

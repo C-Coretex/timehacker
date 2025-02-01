@@ -2,7 +2,7 @@
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
-namespace TimeHacker.Helpers.DB.Abstractions.BaseClasses
+namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
     public class RepositoryBase<TDbContext, TModel> : IRepositoryBase<TModel>
         where TModel : class, IDbModel, new()

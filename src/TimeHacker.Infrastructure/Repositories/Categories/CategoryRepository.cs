@@ -1,6 +1,6 @@
 ﻿using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Helpers.DB.Abstractions.BaseClasses;
+using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure.Repositories.Categories
 {

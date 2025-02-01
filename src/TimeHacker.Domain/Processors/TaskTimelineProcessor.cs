@@ -8,6 +8,8 @@ namespace TimeHacker.Domain.Processors
 {
     public class TaskTimelineProcessor
     {
+        #region Public
+
         public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
         {
             var returnData = new TasksForDayReturn()
@@ -29,6 +31,8 @@ namespace TimeHacker.Domain.Processors
             return returnData;
         }
 
+        #endregion
+
         #region Private
 
         private IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
@@ -44,12 +48,12 @@ namespace TimeHacker.Domain.Processors
 
         private IEnumerable<TaskContainerReturn> GetDynamicTasksTimeline(IList<DynamicTask> dynamicTasks, IEnumerable<TimeRange> timeRanges)
         {
-            var startTimeSpan = DefaultConstants.StartOfDay;
+            var startTimeSpan = DaytimeConstants.StartOfDay;
             TimeRange timeRange;
             var dynamicTasksTimeline = new List<TaskContainerReturn>();
             foreach (var takenTimeRange in timeRanges)
             {
-                timeRange = new TimeRange(startTimeSpan, takenTimeRange.Start - DefaultConstants.TimeBacklashBetweenTasks);
+                timeRange = new TimeRange(startTimeSpan, takenTimeRange.Start - DaytimeConstants.TimeBacklashBetweenTasks);
 
                 if (timeRange.Start < timeRange.End)
                 {
@@ -57,10 +61,10 @@ namespace TimeHacker.Domain.Processors
                     dynamicTasksTimeline.AddRange(tasks);
                 }
 
-                startTimeSpan = takenTimeRange.End + DefaultConstants.TimeBacklashBetweenTasks;
+                startTimeSpan = takenTimeRange.End + DaytimeConstants.TimeBacklashBetweenTasks;
             }
 
-            timeRange = new TimeRange(startTimeSpan, DefaultConstants.EndOfDay);
+            timeRange = new TimeRange(startTimeSpan, DaytimeConstants.EndOfDay);
             if (timeRange.Start < timeRange.End)
             {
                 var tasks = GetDynamicTasksForTimeRange(dynamicTasks, timeRange);
@@ -132,7 +136,7 @@ namespace TimeHacker.Domain.Processors
                     TimeRange = new TimeRange(timeRange.Start, timeRange.Start + taskTime)
                 };
 
-                var newTimeRange = new TimeRange(timeRange.Start + taskTime + DefaultConstants.TimeBacklashBetweenTasks, timeRange.End);
+                var newTimeRange = new TimeRange(timeRange.Start + taskTime + DaytimeConstants.TimeBacklashBetweenTasks, timeRange.End);
                 var newTimeToFinish = newTimeRange.End - newTimeRange.Start;
 
                 var dynamicTasksCopy = dynamicTasks
@@ -151,7 +155,7 @@ namespace TimeHacker.Domain.Processors
                 var distinctTasks = possibleTaskTimeline.DistinctBy(dt => dt.Task.Id).ToList();
                 var tasksCountOfUses = possibleTaskTimeline.Sum(dt => dt.CountOfUses);
                 var prioritySum = distinctTasks.Sum(dt => dt.Task.Priority);
-                var score = (float)((tasksCountOfUses + prioritySum) / distinctTasks.Count);
+                var score = (float)(tasksCountOfUses + prioritySum) / distinctTasks.Count;
 
                 var maxTimeRangeEnd = possibleTaskTimeline.Max(tt => tt.TimeRange.End);
                 score += (timeRange.End - maxTimeRangeEnd).Minutes; // penalty for not using the whole time range

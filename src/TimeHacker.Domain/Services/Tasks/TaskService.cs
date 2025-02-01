@@ -102,7 +102,13 @@ namespace TimeHacker.Domain.Services.Tasks
 
             foreach (var date in dates)
             {
-                var snapshot = await _scheduleSnapshotService.GetByAsync(date) ?? new ScheduleSnapshot();
+                var insert = false;
+                var snapshot = await _scheduleSnapshotService.GetByAsync(date);
+                if (snapshot == null)
+                {
+                    snapshot = new ScheduleSnapshot();
+                    insert = true;
+                }
 
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
@@ -110,7 +116,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
                 _mapper.Map(tasksForDay, snapshot);
 
-                if (snapshot.UserId == null)
+                if (insert)
                     snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
                 else
                     snapshot = await _scheduleSnapshotService.UpdateAsync(snapshot);

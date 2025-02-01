@@ -3,7 +3,7 @@ using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Helpers.DB.Abstractions.BaseClasses;
+using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure
 {

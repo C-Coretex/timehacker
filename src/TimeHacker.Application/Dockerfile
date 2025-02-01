@@ -16,7 +16,7 @@ COPY ["TimeHacker.Application/TimeHacker.Application.csproj", "TimeHacker.Applic
 COPY ["TimeHacker.Domain/TimeHacker.Domain.csproj", "TimeHacker.Domain/"]
 COPY ["TimeHacker.Domain.Contracts/TimeHacker.Domain.Contracts.csproj", "TimeHacker.Domain.Contracts/"]
 COPY ["TimeHacker.Helpers.Domain/TimeHacker.Helpers.Domain.csproj", "TimeHacker.Helpers.Domain/"]
-COPY ["TimeHacker.Helpers.DB/TimeHacker.Helpers.DB.csproj", "TimeHacker.Helpers.DB/"]
+COPY ["TimeHacker.Helpers.Db/TimeHacker.Helpers.Db.csproj", "TimeHacker.Helpers.DB/"]
 COPY ["TimeHacker.Infrastructure.Identity/TimeHacker.Infrastructure.Identity.csproj", "TimeHacker.Infrastructure.Identity/"]
 COPY ["TimeHacker.Infrastructure/TimeHacker.Infrastructure.csproj", "TimeHacker.Infrastructure/"]
 COPY ["TimeHacker.Migrations.Identity/TimeHacker.Migrations.Identity.csproj", "TimeHacker.Migrations.Identity/"]

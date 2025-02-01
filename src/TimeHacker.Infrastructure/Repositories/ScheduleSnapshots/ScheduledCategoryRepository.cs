@@ -1,6 +1,6 @@
 ﻿using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Helpers.DB.Abstractions.BaseClasses;
+using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure.Repositories.ScheduleSnapshots
 {
