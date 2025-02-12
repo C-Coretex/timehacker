@@ -26,7 +26,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         public ScheduledTaskServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object, userAccessor);
         }

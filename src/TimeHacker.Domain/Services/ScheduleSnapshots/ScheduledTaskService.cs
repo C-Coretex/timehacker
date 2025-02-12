@@ -9,12 +9,12 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
     {
         private readonly IScheduledTaskRepository _scheduledTaskRepository;
 
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
 
-        public ScheduledTaskService(IScheduledTaskRepository scheduledTaskRepository, IUserAccessor userAccessor)
+        public ScheduledTaskService(IScheduledTaskRepository scheduledTaskRepository, UserAccessorBase userAccessorBase)
         {
             _scheduledTaskRepository = scheduledTaskRepository;
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
         }
 
         public async Task<ScheduledTask?> GetBy(ulong id)
@@ -23,7 +23,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             if (scheduledTask == null)
                 return null;
 
-            if (scheduledTask.UserId != _userAccessor.UserId)
+            if (scheduledTask.UserId != _userAccessorBase.UserId)
                 throw new ArgumentException("User can only get its own tasks.");
 
             return scheduledTask;

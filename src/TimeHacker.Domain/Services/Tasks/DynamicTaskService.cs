@@ -8,18 +8,18 @@ namespace TimeHacker.Domain.Services.Tasks
 {
     public class DynamicTaskService : IDynamicTaskService
     {
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
         private readonly IDynamicTaskRepository _dynamicTaskRepository;
 
-        public DynamicTaskService(IDynamicTaskRepository dynamicTaskRepository, IUserAccessor userAccessor)
+        public DynamicTaskService(IDynamicTaskRepository dynamicTaskRepository, UserAccessorBase userAccessorBase)
         {
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
             _dynamicTaskRepository = dynamicTaskRepository;
         }
 
         public async Task AddAsync(DynamicTask task)
         {
-            var userId = _userAccessor.UserId!;
+            var userId = _userAccessorBase.UserId!;
             task.UserId = userId;
 
             await _dynamicTaskRepository.AddAsync(task);
@@ -27,7 +27,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public async Task UpdateAsync(DynamicTask task)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
 
             if (task == null)
                 throw new ArgumentException("Task must be valid");
@@ -58,7 +58,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         public IQueryable<DynamicTask> GetAll()
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
             return _dynamicTaskRepository.GetAll().Where(x => x.UserId == userId);
         }
 

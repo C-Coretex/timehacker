@@ -9,25 +9,25 @@ namespace TimeHacker.Domain.Services.Categories
 {
     public class CategoryService: ICategoryService
     {
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
         private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryService(ICategoryRepository categoryRepository, IUserAccessor userAccessor)
+        public CategoryService(ICategoryRepository categoryRepository, UserAccessorBase userAccessorBase)
         {
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
             _categoryRepository = categoryRepository;
         }
 
         public async Task AddAsync(Category category)
         {
-            var userId = _userAccessor.UserId!;
+            var userId = _userAccessorBase.UserId!;
             category.UserId = userId;
 
             await _categoryRepository.AddAsync(category);
         }
         public async Task UpdateAsync(Category category)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
 
             if (category == null)
                 throw new ArgumentException("Category must be valid");
@@ -48,7 +48,7 @@ namespace TimeHacker.Domain.Services.Categories
         }
         public async Task DeleteAsync(Guid id)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
                 return;
@@ -68,7 +68,7 @@ namespace TimeHacker.Domain.Services.Categories
 
         public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, Guid categoryId)
         {
-            var userId = _userAccessor.UserId!;
+            var userId = _userAccessorBase.UserId!;
             if (scheduleEntity == null)
                 throw new ArgumentException("Values are incorrect.");
 
@@ -82,7 +82,7 @@ namespace TimeHacker.Domain.Services.Categories
 
         private IQueryable<Category> GetAll(bool asNoTracking)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
             return _categoryRepository.GetAll(asNoTracking).Where(x => x.UserId == userId);
         }
     }

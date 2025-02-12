@@ -8,29 +8,29 @@ namespace TimeHacker.Domain.Services.Tags
     public class TagService : ITagService
     {
         private readonly ITagRepository _tagRepository;
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
 
-        public TagService(ITagRepository tagRepository, IUserAccessor userAccessor)
+        public TagService(ITagRepository tagRepository, UserAccessorBase userAccessorBase)
         {
             _tagRepository = tagRepository;
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
         }
 
         public IQueryable<Tag> GetAll()
         {
-            var userId = _userAccessor.UserId!;
+            var userId = _userAccessorBase.UserId!;
             return _tagRepository.GetAll().Where(x => x.UserId == userId);
         }
 
         public Task<Tag> AddAsync(Tag tag)
         {
-            tag.UserId = _userAccessor.UserId!;
+            tag.UserId = _userAccessorBase.UserId!;
             return _tagRepository.AddAsync(tag);
         }
 
         public async Task<Tag> UpdateAsync(Tag tag)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
 
             if (tag == null)
                 throw new ArgumentException("Category must be valid");
@@ -49,7 +49,7 @@ namespace TimeHacker.Domain.Services.Tags
 
         public async Task DeleteAsync(Guid id)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
             var tag = await _tagRepository.GetByIdAsync(id);
             if (tag == null)
                 return;

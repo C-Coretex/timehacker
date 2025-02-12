@@ -26,7 +26,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
         public DynamicTaskServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _dynamicTaskService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
         }

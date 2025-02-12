@@ -3,6 +3,7 @@ using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
+using TimeHacker.Domain.Contracts.Entities.Users;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 using TimeHacker.Infrastructure.Converters;
 
@@ -34,6 +35,9 @@ namespace TimeHacker.Infrastructure
         internal DbSet<Tag> Tag { get; set; }
         internal DbSet<TagFixedTask> TagFixedTask { get; set; }
         internal DbSet<TagDynamicTask> TagDynamicTask { get; set; }
+
+        //Users
+        internal DbSet<User> User { get; set; }
 
         #endregion
 

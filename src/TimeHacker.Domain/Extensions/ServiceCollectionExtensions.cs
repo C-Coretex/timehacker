@@ -3,9 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
+using TimeHacker.Domain.Contracts.IServices.Users;
 using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
+using TimeHacker.Domain.Services.Users;
 
 namespace TimeHacker.Domain.Extensions
 {
@@ -25,6 +27,8 @@ namespace TimeHacker.Domain.Extensions
             serviceCollection.AddScoped<ITaskService, TaskService>();
 
             serviceCollection.AddScoped<ITaskService, TaskService>();
+
+            serviceCollection.AddScoped<IUserService, UserService>();
 
             var mapper = GetMapperConfiguration().CreateMapper();
             serviceCollection.AddSingleton(mapper);

@@ -1,10 +1,10 @@
 ﻿using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.IRepositories.Tags;
-using TimeHacker.Infrastructure.Repositories.Tasks;
+using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure.Repositories.Tags
 {
-    public class TagRepository: TaskRepository<Tag, Guid>, ITagRepository
+    public class TagRepository: RepositoryBase<TimeHackerDbContext, Tag, Guid>, ITagRepository
     {
         public TagRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.Tag)
         { }

@@ -10,13 +10,13 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
     public class ScheduleSnapshotService: IScheduleSnapshotService
     {
         private readonly IScheduleSnapshotRepository _scheduleSnapshotRepository;
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
 
-        public ScheduleSnapshotService(IScheduleSnapshotRepository scheduleSnapshotRepository, IUserAccessor userAccessor)
+        public ScheduleSnapshotService(IScheduleSnapshotRepository scheduleSnapshotRepository, UserAccessorBase userAccessorBase)
         {
             _scheduleSnapshotRepository = scheduleSnapshotRepository;
 
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
         }
 
 
@@ -24,19 +24,19 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         {
             var updatedTimestamp = DateTime.UtcNow;
 
-            scheduleSnapshot.UserId = _userAccessor.UserId!;
+            scheduleSnapshot.UserId = _userAccessorBase.UserId!;
             scheduleSnapshot.LastUpdateTimestamp = updatedTimestamp;
 
             foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
             {
                 scheduledTask.Date = scheduleSnapshot.Date;
-                scheduledTask.UserId = _userAccessor.UserId!;
+                scheduledTask.UserId = _userAccessorBase.UserId!;
                 scheduledTask.UpdatedTimestamp = updatedTimestamp;
             }
             foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
             {
                 scheduledCategory.Date = scheduleSnapshot.Date;
-                scheduledCategory.UserId = _userAccessor.UserId!;
+                scheduledCategory.UserId = _userAccessorBase.UserId!;
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
@@ -47,7 +47,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         {
             var query = _scheduleSnapshotRepository.GetAll(false, IncludeExpansionScheduleSnapshots.IncludeScheduledTasks, IncludeExpansionScheduleSnapshots.IncludeScheduledCategories);
 
-            return query.FirstOrDefaultAsync(x => x.UserId == _userAccessor.UserId! && x.Date == date);
+            return query.FirstOrDefaultAsync(x => x.UserId == _userAccessorBase.UserId! && x.Date == date);
         }
 
         public Task<ScheduleSnapshot> UpdateAsync(ScheduleSnapshot scheduleSnapshot)
@@ -59,13 +59,13 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
             {
                 scheduledTask.Date = scheduleSnapshot.Date;
-                scheduledTask.UserId = _userAccessor.UserId!;
+                scheduledTask.UserId = _userAccessorBase.UserId!;
                 scheduledTask.UpdatedTimestamp = updatedTimestamp;
             }
             foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
             {
                 scheduledCategory.Date = scheduleSnapshot.Date;
-                scheduledCategory.UserId = _userAccessor.UserId!;
+                scheduledCategory.UserId = _userAccessorBase.UserId!;
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 

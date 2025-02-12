@@ -3,7 +3,7 @@ using TimeHacker.Domain.Contracts.IModels;
 
 namespace TimeHacker.Application.Helpers
 {
-    public class UserAccessor: IUserAccessor
+    public class UserAccessor: UserAccessorBase
     {
         public new bool IsUserValid => ValidateUser();
         public UserAccessor(IHttpContextAccessor httpContextAccessor)

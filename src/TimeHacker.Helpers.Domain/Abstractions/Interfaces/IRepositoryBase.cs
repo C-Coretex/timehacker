@@ -25,6 +25,8 @@ namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
     public interface IRepositoryBase<TModel, TId>: IRepositoryBase<TModel> where TModel : class, IDbModel<TId>, new()
     {
         TModel? GetById(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
+        bool Exists(TId id);
+        Task<bool> ExistsAsync(TId id);
         Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
         void Delete(TId id, bool saveChanges = true);
         Task DeleteAsync(TId id, bool saveChanges = true);

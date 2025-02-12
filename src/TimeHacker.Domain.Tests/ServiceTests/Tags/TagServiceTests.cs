@@ -27,7 +27,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
 
         public TagServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _tagService = new TagService(_tagRepository.Object, userAccessor);
         }

@@ -3,7 +3,6 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Composition;
 using TimeHacker.Application.Helpers;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Extensions;
@@ -133,7 +132,7 @@ static void AddDbServices(IServiceCollection services, string dbConnectionString
 
 static void AddApplicationServices(IServiceCollection services)
 {
-    services.AddScoped<IUserAccessor, UserAccessor>();
+    services.AddScoped<UserAccessorBase, UserAccessor>();
 }
 
 static void AddIdentityServices(IServiceCollection services)

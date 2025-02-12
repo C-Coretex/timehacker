@@ -29,7 +29,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         public ScheduleSnapshotServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
         }

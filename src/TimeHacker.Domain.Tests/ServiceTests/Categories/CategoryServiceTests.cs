@@ -29,7 +29,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
         public CategoryServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _categoryService = new CategoryService(_categoriesRepository.Object, userAccessor);
         }

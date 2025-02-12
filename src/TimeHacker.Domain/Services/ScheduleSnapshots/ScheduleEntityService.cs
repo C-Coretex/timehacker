@@ -17,16 +17,16 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         private readonly IFixedTaskService _fixedTaskService;
         private readonly ICategoryService _categoryService;
 
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
         private readonly IMapper _mapper;
 
-        public ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepository, IFixedTaskService fixedTaskService, ICategoryService categoryService, IUserAccessor userAccessor, IMapper mapper)
+        public ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepository, IFixedTaskService fixedTaskService, ICategoryService categoryService, UserAccessorBase userAccessorBase, IMapper mapper)
         {
             _scheduleEntityRepository = scheduleEntityRepository;
             _fixedTaskService = fixedTaskService;
             _categoryService = categoryService;
 
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
             _mapper = mapper;
         }
 
@@ -34,7 +34,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
         {
             var query = _scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
-                .Where(x => x.UserId == _userAccessor.UserId && (x.EndsOn == null || x.EndsOn >= from));
+                .Where(x => x.UserId == _userAccessorBase.UserId && (x.EndsOn == null || x.EndsOn >= from));
 
             return _mapper.ProjectTo<ScheduleEntityReturn>(query);
         }
@@ -45,7 +45,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             if (scheduleEntity == null)
                 throw new Exception("ScheduleEntity is not found.");
 
-            if (scheduleEntity.UserId != _userAccessor.UserId)
+            if (scheduleEntity.UserId != _userAccessorBase.UserId)
                 throw new Exception("User can edit only his own ScheduleEntity.");
 
             var scheduleEntityReturn = _mapper.Map<ScheduleEntityReturn>(scheduleEntity);
@@ -62,7 +62,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         public Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity)
         {
             var scheduleEntity = inputScheduleEntity.GetScheduleEntity();
-            scheduleEntity.UserId = _userAccessor.UserId!;
+            scheduleEntity.UserId = _userAccessorBase.UserId!;
 
             return inputScheduleEntity.ScheduleEntityParentEnum switch
             {

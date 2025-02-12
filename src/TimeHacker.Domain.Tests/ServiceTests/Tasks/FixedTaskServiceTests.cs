@@ -27,7 +27,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
         public FixedTaskServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _fixedTaskService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
         }

@@ -2,9 +2,9 @@
 
 namespace TimeHacker.Domain.Tests.Mocks
 {
-    internal class UserAccessorMock: IUserAccessor
+    internal class UserAccessorBaseMock: UserAccessorBase
     {
-        public UserAccessorMock(string userId, bool isUserValid)
+        public UserAccessorBaseMock(string userId, bool isUserValid)
         {
             UserId = userId;
             IsUserValid = isUserValid;

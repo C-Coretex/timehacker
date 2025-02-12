@@ -25,7 +25,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         public ScheduledCategoryServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
 
             _scheduledCategoryService = new ScheduledCategoryService(_scheduledCategoryRepository.Object, userAccessor);
         }

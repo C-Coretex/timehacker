@@ -109,6 +109,16 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefault(x => x.Id!.Equals(id));
         }
 
+        public virtual bool Exists(TId id)
+        {
+            return GetAll().Any(x => x.Id!.Equals(id));
+        }
+
+        public virtual Task<bool> ExistsAsync(TId id)
+        {
+            return GetAll().AnyAsync(x => x.Id!.Equals(id));
+        }
+
         public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
         {
             return await GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefaultAsync(x => x.Id!.Equals(id));

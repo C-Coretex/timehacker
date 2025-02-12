@@ -9,18 +9,18 @@ namespace TimeHacker.Domain.Services.Tasks
 {
     public class FixedTaskService : IFixedTaskService
     {
-        private readonly IUserAccessor _userAccessor;
+        private readonly UserAccessorBase _userAccessorBase;
         private readonly IFixedTaskRepository _fixedTaskRepository;
 
-        public FixedTaskService(IFixedTaskRepository FixedTaskRepository, IUserAccessor userAccessor)
+        public FixedTaskService(IFixedTaskRepository FixedTaskRepository, UserAccessorBase userAccessorBase)
         {
-            _userAccessor = userAccessor;
+            _userAccessorBase = userAccessorBase;
             _fixedTaskRepository = FixedTaskRepository;
         }
 
         public async Task AddAsync(FixedTask task)
         {
-            var userId = _userAccessor.UserId!;
+            var userId = _userAccessorBase.UserId!;
             task.UserId = userId;
 
             await _fixedTaskRepository.AddAsync(task);
@@ -31,7 +31,7 @@ namespace TimeHacker.Domain.Services.Tasks
             if (task == null)
                 throw new ArgumentException("Task must be valid");
 
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
 
             var oldTask = await _fixedTaskRepository.GetByIdAsync(task.Id);
             if (oldTask == null)
@@ -78,7 +78,7 @@ namespace TimeHacker.Domain.Services.Tasks
 
         private IQueryable<FixedTask> GetAll(bool asNoTracking)
         {
-            var userId = _userAccessor.UserId;
+            var userId = _userAccessorBase.UserId;
             return _fixedTaskRepository.GetAll(asNoTracking).Where(x => x.UserId == userId);
         }
     }

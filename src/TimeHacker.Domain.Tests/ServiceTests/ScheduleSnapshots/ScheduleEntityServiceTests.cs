@@ -43,7 +43,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         public ScheduleEntityServiceTests()
         {
-            var userAccessor = new UserAccessorMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
             var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
             var mapper = new Mapper(mapperConfiguration);
 
