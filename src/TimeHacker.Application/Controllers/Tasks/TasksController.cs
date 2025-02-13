@@ -44,11 +44,11 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting tasks for day");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
-        [HttpPost("GetTasksForDays")]
+        [HttpGet("GetTasksForDays")]
         public IActionResult GetTasksForDays([FromBody] IEnumerable<DateOnly> dates)
         {
             try
@@ -60,7 +60,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting tasks for days");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -76,7 +76,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while refreshing tasks for days");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -92,7 +92,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting fixed task by id");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -108,7 +108,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while posting new Schedule for a task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
     }

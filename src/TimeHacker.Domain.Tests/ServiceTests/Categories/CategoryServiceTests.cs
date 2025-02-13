@@ -3,7 +3,6 @@ using FluentAssertions;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IRepositories.Categories;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 using TimeHacker.Domain.Services.Categories;

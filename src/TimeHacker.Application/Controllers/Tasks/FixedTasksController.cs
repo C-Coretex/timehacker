@@ -36,7 +36,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting all fixed tasks");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -52,7 +52,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting fixed task by id");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -69,11 +69,11 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while adding fixed task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
             try
@@ -93,7 +93,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while adding fixed task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -109,7 +109,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while adding fixed task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
     }

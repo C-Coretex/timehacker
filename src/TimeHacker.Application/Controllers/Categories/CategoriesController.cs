@@ -11,7 +11,7 @@ namespace TimeHacker.Application.Controllers.Categories
     [Authorize]
     [ApiController]
     [Route("/api/Categories")]
-    public class CategoriesController: ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
         private readonly ILogger<CategoriesController> _logger;
@@ -36,7 +36,7 @@ namespace TimeHacker.Application.Controllers.Categories
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting all categories");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -52,7 +52,7 @@ namespace TimeHacker.Application.Controllers.Categories
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting category by id");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -69,7 +69,7 @@ namespace TimeHacker.Application.Controllers.Categories
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while adding category");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -92,8 +92,8 @@ namespace TimeHacker.Application.Controllers.Categories
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error while adding category");
-                return BadRequest(e.Message);
+                _logger.LogError(e, "Error while updating category");
+                throw;
             }
         }
 
@@ -108,8 +108,8 @@ namespace TimeHacker.Application.Controllers.Categories
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error while adding category");
-                return BadRequest(e.Message);
+                _logger.LogError(e, "Error while deleting category");
+                throw;
             }
         }
     }

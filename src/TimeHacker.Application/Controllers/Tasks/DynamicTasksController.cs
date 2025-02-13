@@ -36,7 +36,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting all dynamic tasks");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -52,7 +52,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while getting dynamic task by id");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -69,11 +69,11 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while adding dynamic task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] InputDynamicTaskModel inputDynamicTaskModel)
         {
             try
@@ -93,7 +93,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while adding dynamic task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
 
@@ -109,7 +109,7 @@ namespace TimeHacker.Application.Controllers.Tasks
             catch (Exception e)
             {
                 _logger.LogError(e, "Error while deleting dynamic task");
-                return BadRequest(e.Message);
+                throw;
             }
         }
     }
