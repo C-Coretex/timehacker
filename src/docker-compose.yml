@@ -32,7 +32,7 @@ services:
       timehacker.infrastructure.identity:
         condition: service_healthy
 
-#Database
+#Databases
   timehacker.infrastructure:
     image: postgres:latest
     container_name: timehacker.infrastructure
