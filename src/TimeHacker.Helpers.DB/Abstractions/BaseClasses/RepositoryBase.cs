@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
@@ -31,69 +33,75 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return query;
         }
 
-        public virtual TModel Add(TModel model, bool saveChanges = true)
+        public virtual TModel Add(TModel model)
         {
-            return _dbContext.AddEntity<TModel>(_dbSet, model, saveChanges);
+            return _dbContext.AddEntity(_dbSet, model);
         }
-        public virtual Task<TModel> AddAsync(TModel model, bool saveChanges = true)
+        public virtual Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.AddEntityAsync<TModel>(_dbSet, model, saveChanges);
-        }
-
-        public virtual IEnumerable<TModel> AddRange(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.AddEntities<TModel>(_dbSet, models, saveChanges);
-        }
-        public virtual Task<IEnumerable<TModel>> AddRangeAsync(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.AddEntitiesAsync<TModel>(_dbSet, models, saveChanges);
+            return _dbContext.AddEntityAndSaveAsync(_dbSet, model, cancellationToken);
         }
 
-        public virtual void Delete(TModel model, bool saveChanges = true)
+        public virtual void AddRange(IEnumerable<TModel> models)
         {
-            _dbContext.RemoveEntity<TModel>(_dbSet, model, saveChanges);
+            _dbContext.AddEntities(_dbSet, models);
         }
-        public virtual Task DeleteAsync(TModel model, bool saveChanges = true)
+        public virtual Task AddRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
-            return _dbContext.RemoveEntityAsync<TModel>(_dbSet, model, saveChanges);
-        }
-
-        public virtual void DeleteRange(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            _dbContext.RemoveEntities<TModel>(_dbSet, models, saveChanges);
-        }
-        public virtual Task DeleteRangeAsync(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.RemoveEntitiesAsync<TModel>(_dbSet, models, saveChanges);
+            return _dbContext.AddEntitiesAndSaveAsync(_dbSet, models, cancellationToken);
         }
 
-        public virtual TModel Update(TModel model, bool saveChanges = true)
+        public virtual void Delete(TModel model)
         {
-            return _dbContext.UpdateEntity<TModel>(_dbSet, model, saveChanges);
+            _dbContext.RemoveEntity(_dbSet, model);
         }
-        public virtual Task<TModel> UpdateAsync(TModel model, bool saveChanges = true)
+        public virtual Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.UpdateEntityAsync<TModel>(_dbSet, model, saveChanges);
-        }
-
-        public virtual IEnumerable<TModel> UpdateRange(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.UpdateEntities<TModel>(_dbSet, models, saveChanges);
-        }
-        public virtual Task<IEnumerable<TModel>> UpdateRangeAsync(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.UpdateEntitiesAsync<TModel>(_dbSet, models, saveChanges);
+            return _dbContext.RemoveEntityAndSaveAsync(_dbSet, model, cancellationToken);
         }
 
-        public virtual void SaveChanges()
+        public virtual void DeleteRange(IEnumerable<TModel> models)
         {
-            _dbContext.SaveDBChanges();
+            _dbContext.RemoveEntities(_dbSet, models);
+        }
+        public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
+        {
+            return _dbContext.RemoveEntitiesAndSaveAsync(_dbSet, models, cancellationToken);
         }
 
-        public virtual Task SaveChangesAsync(CancellationToken? cancellationToken = null)
+        public virtual TModel Update(TModel model)
         {
-            cancellationToken ??= CancellationToken.None;
-            return _dbContext.SaveDBChangesAsync(cancellationToken.Value);
+            return _dbContext.UpdateEntity<TModel>(_dbSet, model);
+        }
+        public virtual Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
+        {
+            return _dbContext.UpdateEntityAndSaveAsync(_dbSet, model, cancellationToken);
+        }
+
+        public virtual void UpdateRange(IEnumerable<TModel> models)
+        {
+            _dbContext.UpdateEntities(_dbSet, models);
+        }
+        public virtual Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
+        {
+            return _dbContext.UpdateEntitiesAndSaveAsync(_dbSet, models, cancellationToken);
+        }
+
+        public virtual Task<int> ExecuteUpdateAsync(Expression<Func<TModel, bool>> predicate, Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, CancellationToken cancellationToken = default)
+        {
+            var query = GetAll(asNoTracking: false).Where(predicate);
+            return query.ExecuteUpdateAsync(setPropertyCalls, cancellationToken);
+        }
+
+        public virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken)
+        {
+            var query = GetAll(asNoTracking: false).Where(predicate);
+            return query.ExecuteDeleteAsync(cancellationToken);
+        }
+
+        public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 
@@ -104,42 +112,32 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet) : base(dbContext, dbSet)
         { }
 
-        public virtual TModel? GetById(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefault(x => x.Id!.Equals(id));
+            return GetAll().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
         }
 
-        public virtual bool Exists(TId id)
+        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
         {
-            return GetAll().Any(x => x.Id!.Equals(id));
+            return await GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
         }
 
-        public virtual Task<bool> ExistsAsync(TId id)
+        public virtual void Delete(TId id)
         {
-            return GetAll().AnyAsync(x => x.Id!.Equals(id));
+            _dbContext.RemoveEntity(_dbSet, id);
+        }
+        public virtual Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default)
+        {
+            return _dbContext.RemoveEntityAndSaveAsync(_dbSet, id, cancellationToken);
         }
 
-        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual void DeleteRange(IEnumerable<TId> ids)
         {
-            return await GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefaultAsync(x => x.Id!.Equals(id));
+            _dbContext.RemoveEntities(_dbSet, ids);
         }
-
-        public virtual void Delete(TId id, bool saveChanges = true)
+        public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
         {
-            _dbContext.RemoveEntity(_dbSet, id, saveChanges);
-        }
-        public virtual Task DeleteAsync(TId id, bool saveChanges = true)
-        {
-            return _dbContext.RemoveEntityAsync(_dbSet, id, saveChanges);
-        }
-
-        public virtual void DeleteRange(IEnumerable<TId> ids, bool saveChanges = true)
-        {
-            _dbContext.RemoveEntities(_dbSet, ids, saveChanges);
-        }
-        public virtual Task DeleteRangeAsync(IEnumerable<TId> ids, bool saveChanges = true)
-        {
-            return _dbContext.RemoveEntitiesAsync(_dbSet, ids, saveChanges);
+            return _dbContext.RemoveEntitiesAndSaveAsync(_dbSet, ids, cancellationToken);
         }
     }
 }

@@ -12,26 +12,26 @@ namespace TimeHacker.Domain.Tests.Mocks.Extensions
         {
             repository.As<IRepositoryBase<TModel>>().SetupRepositoryMock(source);
 
-            repository.Setup(x => x.UpdateAsync(It.IsAny<TModel>(), It.IsAny<bool>()))
-                .Callback<TModel, bool>((entry, _) =>
+            repository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
+                .Callback<TModel, CancellationToken>((entry, _) =>
                 {
                     source.RemoveAll(x => x.Id!.Equals(entry.Id));
                     source.Add(entry);
                 })
-                .Returns<TModel, bool>((entry, _) => Task.FromResult(entry));
+                .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
 
-            repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<IncludeExpansionDelegate<TModel>[]>()))
-                .Returns<TId, bool, IncludeExpansionDelegate<TModel>[]>((id, _, _) => Task.FromResult(source.FirstOrDefault(x => x.Id!.Equals(id))));
+            repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<CancellationToken>(), It.IsAny<IncludeExpansionDelegate<TModel>[]>()))
+                .Returns<TId, bool, CancellationToken, IncludeExpansionDelegate<TModel>[]>((id, _, _, _) => Task.FromResult(source.FirstOrDefault(x => x.Id!.Equals(id))));
 
-            repository.Setup(x => x.DeleteAsync(It.IsAny<TModel>(), It.IsAny<bool>()))
-                .Callback<TModel, bool>((entry, _) => source.RemoveAll(x => x.Id!.Equals(entry.Id)));
+            repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
+                .Callback<TModel, CancellationToken>((entry, _) => source.RemoveAll(x => x.Id!.Equals(entry.Id)));
         }
 
         public static void SetupRepositoryMock<TModel>(this Mock<IRepositoryBase<TModel>> repository, List<TModel> source) where TModel : class, IDbModel, new()
         {
-            repository.Setup(x => x.AddAsync(It.IsAny<TModel>(), It.IsAny<bool>()))
-                .Callback<TModel, bool>((entry, _) => source.Add(entry))
-                .Returns<TModel, bool>((entry, _) => Task.FromResult(entry));
+            repository.Setup(x => x.AddAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
+                .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))
+                .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
 
             repository.Setup(x => x.GetAll(It.IsAny<bool>()))
             .Returns(source.AsQueryable().BuildMock());

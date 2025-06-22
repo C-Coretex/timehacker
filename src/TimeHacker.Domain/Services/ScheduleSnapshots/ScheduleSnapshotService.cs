@@ -40,7 +40,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
-            return _scheduleSnapshotRepository.AddAsync(scheduleSnapshot);
+            return _scheduleSnapshotRepository.AddAndSaveAsync(scheduleSnapshot);
         }
 
         public Task<ScheduleSnapshot?> GetByAsync(DateOnly date)
@@ -69,7 +69,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
-            return _scheduleSnapshotRepository.UpdateAsync(scheduleSnapshot);
+            return _scheduleSnapshotRepository.UpdateAndSaveAsync(scheduleSnapshot);
         }
     }
 }

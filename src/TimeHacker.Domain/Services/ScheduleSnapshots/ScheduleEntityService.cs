@@ -56,7 +56,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 return;
 
             scheduleEntity.LastEntityCreated = entityCreated;
-            await _scheduleEntityRepository.UpdateAsync(scheduleEntity);
+            await _scheduleEntityRepository.UpdateAndSaveAsync(scheduleEntity);
         }
 
         public Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity)

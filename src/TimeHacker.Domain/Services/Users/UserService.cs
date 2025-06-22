@@ -32,7 +32,7 @@ namespace TimeHacker.Domain.Services.Users
             };
             userEntity = _mapper.Map(user, userEntity);
 
-            await _userRepository.AddAsync(userEntity);
+            await _userRepository.AddAndSaveAsync(userEntity);
         }
 
         public Task<User?> GetCurrent()
@@ -48,13 +48,13 @@ namespace TimeHacker.Domain.Services.Users
 
             userEntity = _mapper.Map(user, userEntity);
 
-            await _userRepository.UpdateAsync(userEntity);
+            await _userRepository.UpdateAndSaveAsync(userEntity);
         }
 
         public async Task DeleteAsync()
         {
             var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-            await _userRepository.DeleteAsync(userId);
+            await _userRepository.DeleteAndSaveAsync(userId);
         }
     }
 }

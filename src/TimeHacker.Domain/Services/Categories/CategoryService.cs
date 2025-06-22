@@ -23,7 +23,7 @@ namespace TimeHacker.Domain.Services.Categories
             var userId = _userAccessorBase.UserId!;
             category.UserId = userId;
 
-            await _categoryRepository.AddAsync(category);
+            await _categoryRepository.AddAndSaveAsync(category);
         }
         public async Task UpdateAsync(Category category)
         {
@@ -36,7 +36,7 @@ namespace TimeHacker.Domain.Services.Categories
             var oldCategory = await _categoryRepository.GetByIdAsync(category.Id);
             if (oldCategory == null)
             {
-                await _categoryRepository.AddAsync(category);
+                await _categoryRepository.AddAndSaveAsync(category);
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace TimeHacker.Domain.Services.Categories
                 throw new ArgumentException("User can only edit its own categories.");
 
             category.UserId = userId;
-            await _categoryRepository.UpdateAsync(category);
+            await _categoryRepository.UpdateAndSaveAsync(category);
         }
         public async Task DeleteAsync(Guid id)
         {
@@ -56,7 +56,7 @@ namespace TimeHacker.Domain.Services.Categories
             if (category.UserId != userId)
                 throw new ArgumentException("User can only delete its own categories.");
 
-            await _categoryRepository.DeleteAsync(category);
+            await _categoryRepository.DeleteAndSaveAsync(category);
         }
 
         public IQueryable<Category> GetAll() => GetAll(true);
@@ -77,7 +77,7 @@ namespace TimeHacker.Domain.Services.Categories
                 throw new Exception("Category by this Id is not found for current user.");
 
             task.ScheduleEntity = scheduleEntity;
-            return (await _categoryRepository.UpdateAsync(task)).ScheduleEntity!;
+            return (await _categoryRepository.UpdateAndSaveAsync(task)).ScheduleEntity!;
         }
 
         private IQueryable<Category> GetAll(bool asNoTracking)

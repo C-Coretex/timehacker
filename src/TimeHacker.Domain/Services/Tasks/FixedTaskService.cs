@@ -23,7 +23,7 @@ namespace TimeHacker.Domain.Services.Tasks
             var userId = _userAccessorBase.UserId!;
             task.UserId = userId;
 
-            await _fixedTaskRepository.AddAsync(task);
+            await _fixedTaskRepository.AddAndSaveAsync(task);
         }
 
         public async Task UpdateAsync(FixedTask task)
@@ -36,7 +36,7 @@ namespace TimeHacker.Domain.Services.Tasks
             var oldTask = await _fixedTaskRepository.GetByIdAsync(task.Id);
             if (oldTask == null)
             {
-                await _fixedTaskRepository.AddAsync(task);
+                await _fixedTaskRepository.AddAndSaveAsync(task);
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 throw new ArgumentException("User can only edit its own tasks.");
 
             task.UserId = userId;
-            await _fixedTaskRepository.UpdateAsync(task);
+            await _fixedTaskRepository.UpdateAndSaveAsync(task);
         }
 
         public async Task DeleteAsync(Guid id)
@@ -53,7 +53,7 @@ namespace TimeHacker.Domain.Services.Tasks
             if (task == null)
                 throw new ArgumentException("Task by this Id is not found for current user.");
 
-            await _fixedTaskRepository.DeleteAsync(task);
+            await _fixedTaskRepository.DeleteAndSaveAsync(task);
         }
 
         public IQueryable<FixedTask> GetAll() => GetAll(true);
@@ -73,7 +73,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 throw new ArgumentException("Task by this Id is not found for current user.");
 
             task.ScheduleEntity = scheduleEntity;
-            return (await _fixedTaskRepository.UpdateAsync(task)).ScheduleEntity!;
+            return (await _fixedTaskRepository.UpdateAndSaveAsync(task)).ScheduleEntity!;
         }
 
         private IQueryable<FixedTask> GetAll(bool asNoTracking)

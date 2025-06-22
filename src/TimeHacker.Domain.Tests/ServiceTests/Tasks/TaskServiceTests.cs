@@ -309,18 +309,18 @@ public class TaskServiceTests
         _scheduleSnapshotRepository
             .Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>()))
             .Returns(_scheduleSnapshots.AsQueryable().BuildMock());
-        _scheduleSnapshotRepository.Setup(x => x.AddAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>()))
-            .Callback<ScheduleSnapshot, bool>((model, saveChanges) => { _scheduleSnapshots.Add(model); })
-            .Returns<ScheduleSnapshot, bool>((model, saveChanges) => Task.FromResult(model));
+        _scheduleSnapshotRepository.Setup(x => x.AddAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
+            .Callback<ScheduleSnapshot, CancellationToken>((model, _) => { _scheduleSnapshots.Add(model); })
+            .Returns<ScheduleSnapshot, CancellationToken>((model, _) => Task.FromResult(model));
 
-        _scheduleSnapshotRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>()))
-            .Callback<ScheduleSnapshot, bool>((model, saveChanges) =>
+        _scheduleSnapshotRepository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
+            .Callback<ScheduleSnapshot, CancellationToken>((model, _) =>
             {
                 var existingObj =
                     _scheduleSnapshots.First(x => x.UserId == model.UserId && x.Date == model.Date);
                 _scheduleSnapshots.Remove(existingObj);
                 _scheduleSnapshots.Add(model);
-            }).Returns<ScheduleSnapshot, bool>((model, saveChanges) => Task.FromResult(model));
+            }).Returns<ScheduleSnapshot, CancellationToken>((model, _) => Task.FromResult(model));
 
         _scheduleEntities = [];
 

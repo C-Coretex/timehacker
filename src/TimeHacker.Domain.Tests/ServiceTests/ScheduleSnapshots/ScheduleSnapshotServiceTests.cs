@@ -37,7 +37,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         #endregion
 
         [Fact]
-        [Trait("AddAsync", "Should add entry with correct data")]
+        [Trait("AddAndSaveAsync", "Should add entry with correct data")]
         public async Task AddAsync_ShouldAddEntry()
         {
             var userId = "TestIdentifier";
@@ -99,7 +99,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         }
 
         [Fact]
-        [Trait("UpdateAsync", "Should update entry")]
+        [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldAddEntry()
         {
             var userId = "TestIdentifier";
@@ -185,13 +185,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
             _scheduleSnapshotRepository.As<IRepositoryBase<ScheduleSnapshot>>().SetupRepositoryMock(_scheduleSnapshots);
 
-            _scheduleSnapshotRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>()))
-                .Callback<ScheduleSnapshot, bool>((entry, _) =>
+            _scheduleSnapshotRepository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
+                .Callback<ScheduleSnapshot, CancellationToken>((entry, _) =>
                 {
                     _scheduleSnapshots.RemoveAll(x => x.UserId!.Equals(entry.UserId) && x.Date!.Equals(entry.Date));
                     _scheduleSnapshots.Add(entry);
                 })
-                .Returns<ScheduleSnapshot, bool>((entry, _) => Task.FromResult(entry));
+                .Returns<ScheduleSnapshot, CancellationToken>((entry, _) => Task.FromResult(entry));
         }
 
         #endregion

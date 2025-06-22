@@ -5,11 +5,11 @@ namespace TimeHacker.Domain.Contracts.Models.EntityModels
 {
     public class RepeatingEntityModel
     {
-        public RepeatingEntityTypeEnum EntityType { get; set; }
+        public required RepeatingEntityTypeEnum EntityType { get; init; }
 
         //private object _repeatingData;
 
-        public IRepeatingEntityType RepeatingData { get; set; }
+        public required IRepeatingEntityType RepeatingData { get; init; }
         /*{
             get => _repeatingData;
             set

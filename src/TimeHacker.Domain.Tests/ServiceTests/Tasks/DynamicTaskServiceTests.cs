@@ -34,7 +34,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         #endregion
 
         [Fact]
-        [Trait("AddAsync", "Should add entry with correct userId")]
+        [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
             var userId = "TestIdentifier";
@@ -53,7 +53,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("UpdateAsync", "Should update entry")]
+        [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
             var userId = "TestIdentifier";
@@ -71,7 +71,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("UpdateAsync", "Should throw exception on incorrect userId")]
+        [Trait("UpdateAndSaveAsync", "Should throw exception on incorrect userId")]
         public async Task UpdateAsync_ShouldThrow()
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
@@ -89,7 +89,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("DeleteAsync", "Should delete entry")]
+        [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldDeleteEntry()
         {
             var userId = "TestIdentifier";
@@ -102,7 +102,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("DeleteAsync", "Should throw exception on incorrect userId")]
+        [Trait("DeleteAndSaveAsync", "Should throw exception on incorrect userId")]
         public async Task DeleteAsync_ShouldThrow()
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>

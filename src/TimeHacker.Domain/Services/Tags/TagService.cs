@@ -25,7 +25,7 @@ namespace TimeHacker.Domain.Services.Tags
         public Task<Tag> AddAsync(Tag tag)
         {
             tag.UserId = _userAccessorBase.UserId!;
-            return _tagRepository.AddAsync(tag);
+            return _tagRepository.AddAndSaveAsync(tag);
         }
 
         public async Task<Tag> UpdateAsync(Tag tag)
@@ -38,13 +38,13 @@ namespace TimeHacker.Domain.Services.Tags
 
             var oldTag = await _tagRepository.GetByIdAsync(tag.Id);
             if (oldTag == null)
-                return await _tagRepository.AddAsync(tag);
+                return await _tagRepository.AddAndSaveAsync(tag);
 
             if (oldTag.UserId != userId)
                 throw new ArgumentException("User can only edit its own categories.");
 
             tag.UserId = userId;
-            return await _tagRepository.UpdateAsync(tag);
+            return await _tagRepository.UpdateAndSaveAsync(tag);
         }
 
         public async Task DeleteAsync(Guid id)
@@ -57,7 +57,7 @@ namespace TimeHacker.Domain.Services.Tags
             if (tag.UserId != userId)
                 throw new ArgumentException("User can only delete its own categories.");
 
-            await _tagRepository.DeleteAsync(tag);
+            await _tagRepository.DeleteAndSaveAsync(tag);
         }
     }
 }

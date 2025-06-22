@@ -22,7 +22,7 @@ namespace TimeHacker.Domain.Services.Tasks
             var userId = _userAccessorBase.UserId!;
             task.UserId = userId;
 
-            await _dynamicTaskRepository.AddAsync(task);
+            await _dynamicTaskRepository.AddAndSaveAsync(task);
         }
 
         public async Task UpdateAsync(DynamicTask task)
@@ -36,7 +36,7 @@ namespace TimeHacker.Domain.Services.Tasks
             var oldTask = await _dynamicTaskRepository.GetByIdAsync(task.Id);
             if (oldTask == null)
             {
-                await _dynamicTaskRepository.AddAsync(task);
+                await _dynamicTaskRepository.AddAndSaveAsync(task);
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 throw new ArgumentException("User can only edit its own tasks.");
 
             task.UserId = userId;
-            await _dynamicTaskRepository.UpdateAsync(task);
+            await _dynamicTaskRepository.UpdateAndSaveAsync(task);
         }
 
         public async Task DeleteAsync(Guid id)
@@ -53,7 +53,7 @@ namespace TimeHacker.Domain.Services.Tasks
             if (task == null)
                 throw new ArgumentException("Task by this Id is not found for current user.");
 
-            await _dynamicTaskRepository.DeleteAsync(task);
+            await _dynamicTaskRepository.DeleteAndSaveAsync(task);
         }
 
         public IQueryable<DynamicTask> GetAll()

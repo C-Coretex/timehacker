@@ -42,7 +42,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
         #endregion
 
         [Fact]
-        [Trait("AddAsync", "Should add entry with correct Id")]
+        [Trait("AddAndSaveAsync", "Should add entry with correct Id")]
         public async Task AddAsync_ShouldAddEntry()
         {
             SetupMocks("UniqueId");
