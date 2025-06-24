@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using AutoMapper;
 using FluentAssertions;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Categories;
@@ -16,7 +15,6 @@ using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
-using TimeHacker.Domain.Tests.Helpers;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
@@ -44,12 +42,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         public ScheduleEntityServiceTests()
         {
             var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
-            var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
-            var mapper = new Mapper(mapperConfiguration);
 
             var fixedTaskService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
             var categoryService = new CategoryService(_categoriesRepository.Object, userAccessor);
-            _scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTaskService, categoryService, userAccessor, mapper);
+            _scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTaskService, categoryService, userAccessor);
         }
 
         #endregion
@@ -147,12 +143,18 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("UpdateLastEntityCreated", "Should throw exception on incorrect data")]
         public async Task UpdateLastEntityCreated_ShouldThrow(bool existingEntry)
         {
+            var userId = "TestIdentifier";
+            SetupMocks(userId);
+
+            if (!existingEntry)
+            {
+                await _scheduleEntityService.UpdateLastEntityCreated(Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Now));
+                return;
+            }
+
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
-
-                await _scheduleEntityService.UpdateLastEntityCreated(existingEntry ? _scheduledEntities.First(x => x.UserId != userId).Id : Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Now));
+                await _scheduleEntityService.UpdateLastEntityCreated(_scheduledEntities.First(x => x.UserId != userId).Id, DateOnly.FromDateTime(DateTime.Now));
             });
         }
 

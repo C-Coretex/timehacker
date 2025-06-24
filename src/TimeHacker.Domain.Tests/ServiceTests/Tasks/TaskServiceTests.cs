@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using FluentAssertions;
+﻿using FluentAssertions;
 using MockQueryable;
-using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
@@ -15,7 +13,6 @@ using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
 using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Tasks;
-using TimeHacker.Domain.Tests.Helpers;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
@@ -48,18 +45,15 @@ public class TaskServiceTests
     public TaskServiceTests()
     {
         var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
-        var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
-        var mapper = new Mapper(mapperConfiguration);
 
         var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
         var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
         var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
         var categoryService = new CategoryService(_categoryRepository.Object, userAccessor);
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTasksService,
-            categoryService, userAccessor, mapper);
+            categoryService, userAccessor);
 
-        _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService,
-            scheduleEntityService, mapper);
+        _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService, scheduleEntityService);
     }
 
     #endregion
@@ -96,7 +90,7 @@ public class TaskServiceTests
         SetupMocks(dates[1], userId);
 
         // Act
-        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -117,8 +111,8 @@ public class TaskServiceTests
         SetupMocks(dates[1], userId);
 
         // Act
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
@@ -134,10 +128,10 @@ public class TaskServiceTests
         SetupMocks(dates[1], userId);
 
         // Act
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
@@ -155,7 +149,7 @@ public class TaskServiceTests
         SetupMocks(dates[1], userId);
 
         // Act
-        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result.Should().NotBeNull();
@@ -206,8 +200,8 @@ public class TaskServiceTests
         
 
         // Act
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result1.Should().NotBeNull();

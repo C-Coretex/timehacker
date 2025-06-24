@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
@@ -16,7 +15,6 @@ namespace TimeHacker.Domain.Services.Tasks
         private readonly IScheduleSnapshotService _scheduleSnapshotService;
         private readonly IScheduleEntityService _scheduleEntityService;
 
-        private readonly IMapper _mapper;
 
         private readonly TaskTimelineProcessor _taskTimelineProcessor;
 
@@ -24,15 +22,12 @@ namespace TimeHacker.Domain.Services.Tasks
             IFixedTaskService fixedTaskService, 
             IDynamicTaskService dynamicTaskService, 
             IScheduleSnapshotService scheduleSnapshotService, 
-            IScheduleEntityService scheduleEntityService, 
-            IMapper mapper)
+            IScheduleEntityService scheduleEntityService)
         {
             _fixedTaskService = fixedTaskService;
             _dynamicTaskService = dynamicTaskService;
             _scheduleSnapshotService = scheduleSnapshotService;
             _scheduleEntityService = scheduleEntityService;
-
-            _mapper = mapper;
 
             _taskTimelineProcessor = new TaskTimelineProcessor();
         }
@@ -41,7 +36,7 @@ namespace TimeHacker.Domain.Services.Tasks
         {
             var snapshot = await _scheduleSnapshotService.GetByAsync(date);
             if (snapshot != null)
-                return _mapper.Map<TasksForDayReturn>(snapshot);
+                return TasksForDayReturn.Create(snapshot);
 
             var fixedTasks = await _fixedTaskService.GetAll()
                                               .Where(ft => DateOnly.FromDateTime(ft.StartTimestamp) == date)
@@ -54,10 +49,10 @@ namespace TimeHacker.Domain.Services.Tasks
 
             var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
 
-            snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
+            snapshot = tasksForDay.CreateScheduleSnapshot();
             snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
 
-            return _mapper.Map<TasksForDayReturn>(snapshot);
+            return TasksForDayReturn.Create(snapshot);
         }
 
         public async IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(ICollection<DateOnly> dates)
@@ -76,7 +71,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 var snapshot = await _scheduleSnapshotService.GetByAsync(date);
                 if (snapshot != null)
                 {
-                    yield return _mapper.Map<TasksForDayReturn>(snapshot);
+                    yield return TasksForDayReturn.Create(snapshot);
                 }
                 else
                 {
@@ -84,10 +79,10 @@ namespace TimeHacker.Domain.Services.Tasks
                     var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                     var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
-                    snapshot = _mapper.Map<ScheduleSnapshot>(tasksForDay);
+                    snapshot = tasksForDay.CreateScheduleSnapshot();
                     snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
 
-                    yield return _mapper.Map<TasksForDayReturn>(snapshot);
+                    yield return TasksForDayReturn.Create(snapshot);
                 }
             }
         }
@@ -117,7 +112,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
                 var tasksForDay = _taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
-                _mapper.Map(tasksForDay, snapshot);
+                snapshot = tasksForDay.CreateScheduleSnapshot(snapshot);
 
                 if (insert)
                     snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
@@ -130,7 +125,7 @@ namespace TimeHacker.Domain.Services.Tasks
                         date);
                 }
 
-                yield return _mapper.Map<TasksForDayReturn>(snapshot);
+                yield return TasksForDayReturn.Create(snapshot);
             }
         }
 

@@ -27,7 +27,10 @@ namespace TimeHacker.Domain.Processors
             var dynamicTasksTimeline = GetDynamicTasksTimeline(dynamicTasks.ToList(), timeRanges);
             returnData.TasksTimeline.AddRange(dynamicTasksTimeline);
 
-            returnData.TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList();
+            returnData = returnData with
+            {
+                TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList()
+            };
             return returnData;
         }
 

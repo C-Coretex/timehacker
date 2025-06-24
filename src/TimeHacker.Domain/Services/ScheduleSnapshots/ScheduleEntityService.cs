@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
@@ -12,45 +12,44 @@ using TimeHacker.Domain.IncludeExpansionDelegates;
 
 namespace TimeHacker.Domain.Services.ScheduleSnapshots
 {
-    public class ScheduleEntityService : IScheduleEntityService
+    public class ScheduleEntityService(
+        IScheduleEntityRepository scheduleEntityRepository,
+        IFixedTaskService fixedTaskService,
+        ICategoryService categoryService,
+        UserAccessorBase userAccessorBase)
+        : IScheduleEntityService
     {
-        private readonly IScheduleEntityRepository _scheduleEntityRepository;
-        private readonly IFixedTaskService _fixedTaskService;
-        private readonly ICategoryService _categoryService;
-
-        private readonly UserAccessorBase _userAccessorBase;
-        private readonly IMapper _mapper;
-
-        public ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepository, IFixedTaskService fixedTaskService, ICategoryService categoryService, UserAccessorBase userAccessorBase, IMapper mapper)
-        {
-            _scheduleEntityRepository = scheduleEntityRepository;
-            _fixedTaskService = fixedTaskService;
-            _categoryService = categoryService;
-
-            _userAccessorBase = userAccessorBase;
-            _mapper = mapper;
-        }
-
-
         public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
         {
-            var query = _scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
-                .Where(x => x.UserId == _userAccessorBase.UserId && (x.EndsOn == null || x.EndsOn >= from));
+            var query = scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
+                .Where(x => x.UserId == userAccessorBase.UserId && (x.EndsOn == null || x.EndsOn >= from));
 
-            return _mapper.ProjectTo<ScheduleEntityReturn>(query);
+            return query.Select(scheduleEntity => new ScheduleEntityReturn()
+            {
+                Id = scheduleEntity.Id,
+                UserId = scheduleEntity.UserId,
+                RepeatingEntity = scheduleEntity.RepeatingEntity,
+                CreatedTimestamp = scheduleEntity.CreatedTimestamp,
+                LastEntityCreated = scheduleEntity.LastEntityCreated,
+                EndsOn = scheduleEntity.EndsOn,
+                ScheduledTasks = scheduleEntity.ScheduledTasks,
+                ScheduledCategories = scheduleEntity.ScheduledCategories,
+                FixedTask = scheduleEntity.FixedTask,
+                Category = scheduleEntity.Category
+            });
         }
 
         public async Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated)
         {
-            var scheduleEntity = await _scheduleEntityRepository.GetByIdAsync(id);
+            var scheduleEntity = await scheduleEntityRepository.GetByIdAsync(id);
             if (scheduleEntity == null)
                 return;
 
             //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
-            if (scheduleEntity.UserId != _userAccessorBase.UserId)
+            if (scheduleEntity.UserId != userAccessorBase.UserId)
                 throw new Exception("User can edit only his own ScheduleEntity.");
 
-            var scheduleEntityReturn = _mapper.Map<ScheduleEntityReturn>(scheduleEntity);
+            var scheduleEntityReturn = ScheduleEntityReturn.Create(scheduleEntity);
             if (!scheduleEntityReturn.IsEntityDateCorrect(entityCreated))
                 throw new DataIsNotCorrectException("Created entity timestamp is not correct", nameof(entityCreated));
 
@@ -58,18 +57,18 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
                 return;
 
             scheduleEntity.LastEntityCreated = entityCreated;
-            await _scheduleEntityRepository.UpdateAndSaveAsync(scheduleEntity);
+            await scheduleEntityRepository.UpdateAndSaveAsync(scheduleEntity);
         }
 
         public Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity)
         {
             var scheduleEntity = inputScheduleEntity.GetScheduleEntity();
-            scheduleEntity.UserId = _userAccessorBase.UserId!;
+            scheduleEntity.UserId = userAccessorBase.UserId!;
 
             return inputScheduleEntity.ScheduleEntityParentEnum switch
             {
-                ScheduleEntityParentEnum.FixedTask => _fixedTaskService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
-                ScheduleEntityParentEnum.Category => _categoryService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
+                ScheduleEntityParentEnum.FixedTask => fixedTaskService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
+                ScheduleEntityParentEnum.Category => categoryService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
                 _ => throw new NotProvidedException(nameof(inputScheduleEntity.ScheduleEntityParentEnum)),
             };
         }

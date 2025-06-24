@@ -7,7 +7,7 @@
     <ProjectGuid>dcb670be-55cf-4672-bd5d-d6f4f12d2067</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>timehacker.application</DockerServiceName>
+    <DockerServiceName>timehacker.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

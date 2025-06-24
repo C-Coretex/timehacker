@@ -4,6 +4,28 @@ namespace TimeHacker.Domain.Contracts.Models.ReturnModels
 {
     public class ScheduleEntityReturn: ScheduleEntity
     {
+        public ScheduleEntityReturn()
+        {
+            
+        }
+
+        public static ScheduleEntityReturn Create(ScheduleEntity scheduleEntity)
+        {
+            return new ScheduleEntityReturn()
+            {
+                Id = scheduleEntity.Id,
+                UserId = scheduleEntity.UserId,
+                RepeatingEntity = scheduleEntity.RepeatingEntity,
+                CreatedTimestamp = scheduleEntity.CreatedTimestamp,
+                LastEntityCreated = scheduleEntity.LastEntityCreated,
+                EndsOn = scheduleEntity.EndsOn,
+                ScheduledTasks = scheduleEntity.ScheduledTasks,
+                ScheduledCategories = scheduleEntity.ScheduledCategories,
+                FixedTask = scheduleEntity.FixedTask,
+                Category = scheduleEntity.Category
+            };
+        }
+
         public IEnumerable<DateOnly> GetNextEntityDatesIn(DateOnly from, DateOnly to)
         {
             var maxIterations = 10_000;

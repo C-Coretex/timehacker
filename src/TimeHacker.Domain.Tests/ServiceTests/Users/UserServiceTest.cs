@@ -1,15 +1,10 @@
-﻿using System.Drawing;
-using AutoMapper;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Users;
 using TimeHacker.Domain.Contracts.IRepositories.Users;
 using TimeHacker.Domain.Contracts.IServices.Users;
 using TimeHacker.Domain.Contracts.Models.InputModels.Users;
 using TimeHacker.Domain.Services.Users;
-using TimeHacker.Domain.Tests.Helpers;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
@@ -33,10 +28,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
         public UserServiceTest()
         {
             var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
-            var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
-            var mapper = new Mapper(mapperConfiguration);
 
-            _userService = new UserService(_userRepositoryMock.Object, userAccessor, mapper);
+            _userService = new UserService(_userRepositoryMock.Object, userAccessor);
         }
 
         #endregion

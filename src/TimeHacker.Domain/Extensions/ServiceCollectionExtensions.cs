@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using TimeHacker.Domain.Contracts.IServices.Categories;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
@@ -30,25 +29,7 @@ namespace TimeHacker.Domain.Extensions
 
             serviceCollection.AddScoped<IUserService, UserService>();
 
-            var mapper = GetMapperConfiguration().CreateMapper();
-            serviceCollection.AddSingleton(mapper);
-
             return serviceCollection;
-        }
-
-        private static MapperConfiguration GetMapperConfiguration()
-        {
-            var types = AppDomain.CurrentDomain
-                                .GetAssemblies()
-                                .Where(x => x.FullName!.StartsWith("TimeHacker."))
-            .SelectMany(s => s.GetTypes())
-                                .Where(p => typeof(Profile).IsAssignableFrom(p));
-
-            return new MapperConfiguration(cfg =>
-            {
-                foreach (var type in types)
-                    cfg.AddProfile(type);
-            });
         }
     }
 }

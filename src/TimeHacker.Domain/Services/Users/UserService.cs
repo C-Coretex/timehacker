@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
+﻿using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.Users;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Users;
@@ -12,13 +11,11 @@ namespace TimeHacker.Domain.Services.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly UserAccessorBase _userAccessorBase;
-        private readonly IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, UserAccessorBase userAccessorBase, IMapper mapper)
+        public UserService(IUserRepository userRepository, UserAccessorBase userAccessorBase)
         {
             _userRepository = userRepository;
             _userAccessorBase = userAccessorBase;
-            _mapper = mapper;
         }
 
         public async Task AddAsync(UserUpdateModel user)
@@ -29,9 +26,11 @@ namespace TimeHacker.Domain.Services.Users
 
             var userEntity = new User()
             {
-                Id = userId
+                Id = userId,
+                Name = user.Name,
+                PhoneNumberForNotifications = user.PhoneNumberForNotifications,
+                EmailForNotifications = user.EmailForNotifications
             };
-            userEntity = _mapper.Map(user, userEntity);
 
             await _userRepository.AddAndSaveAsync(userEntity);
         }
@@ -47,7 +46,9 @@ namespace TimeHacker.Domain.Services.Users
             var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             var userEntity = await _userRepository.GetByIdAsync(userId) ?? throw new UserDoesNotExistException();
 
-            userEntity = _mapper.Map(user, userEntity);
+            userEntity.Name = user.Name;
+            userEntity.PhoneNumberForNotifications = user.PhoneNumberForNotifications;
+            userEntity.EmailForNotifications = user.EmailForNotifications;
 
             await _userRepository.UpdateAndSaveAsync(userEntity);
         }

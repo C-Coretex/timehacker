@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TimeHacker.Domain.Contracts.Models.InputModels.Users
 {
-    public class UserUpdateModel
+    public record UserUpdateModel
     {
-        public string Name { get; set; }
-        public string PhoneNumberForNotifications { get; set; }
-        public string EmailForNotifications { get; set; }
+        [Required]
+        public required string Name { get; init; }
+        public string? PhoneNumberForNotifications { get; init; }
+        public string? EmailForNotifications { get; init; }
     }
 }
