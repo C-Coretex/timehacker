@@ -20,7 +20,12 @@ namespace TimeHacker.Domain.Services.Tasks
 
         private readonly TaskTimelineProcessor _taskTimelineProcessor;
 
-        public TaskService(IFixedTaskService fixedTaskService, IDynamicTaskService dynamicTaskService, IScheduleSnapshotService scheduleSnapshotService, IScheduleEntityService scheduleEntityService, IMapper mapper)
+        public TaskService(
+            IFixedTaskService fixedTaskService, 
+            IDynamicTaskService dynamicTaskService, 
+            IScheduleSnapshotService scheduleSnapshotService, 
+            IScheduleEntityService scheduleEntityService, 
+            IMapper mapper)
         {
             _fixedTaskService = fixedTaskService;
             _dynamicTaskService = dynamicTaskService;
@@ -55,9 +60,8 @@ namespace TimeHacker.Domain.Services.Tasks
             return _mapper.Map<TasksForDayReturn>(snapshot);
         }
 
-        public async IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(IEnumerable<DateOnly> dates)
+        public async IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(ICollection<DateOnly> dates)
         {
-            dates = dates.ToList();
             var fixedTasks = await _fixedTaskService.GetAll()
                                                     .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
                                                     .OrderBy(ft => ft.StartTimestamp)
@@ -88,9 +92,8 @@ namespace TimeHacker.Domain.Services.Tasks
             }
         }
 
-        public async IAsyncEnumerable<TasksForDayReturn> RefreshTasksForDays(IEnumerable<DateOnly> dates)
+        public async IAsyncEnumerable<TasksForDayReturn> RefreshTasksForDays(ICollection<DateOnly> dates)
         {
-            dates = dates.ToList();
             var fixedTasks = await _fixedTaskService.GetAll()
                                                     .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
                                                     .OrderBy(ft => ft.StartTimestamp)

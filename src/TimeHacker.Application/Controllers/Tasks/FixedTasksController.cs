@@ -14,103 +14,62 @@ namespace TimeHacker.Application.Controllers.Tasks
     public class FixedTasksController: ControllerBase
     {
         private readonly IFixedTaskService _fixedTaskService;
-        private readonly ILogger<FixedTasksController> _logger;
         private readonly IMapper _mapper;
 
-        public FixedTasksController(IFixedTaskService fixedTaskService, ILogger<FixedTasksController> logger, IMapper mapper)
+        public FixedTasksController(IFixedTaskService fixedTaskService, IMapper mapper)
         {
             _fixedTaskService = fixedTaskService;
-            _logger = logger;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var data = _mapper.ProjectTo<FixedTaskReturnModel>(_fixedTaskService.GetAll());
+            //TODO: to AsEnumerableAsync
+            var data = _mapper.ProjectTo<FixedTaskReturnModel>(_fixedTaskService.GetAll());
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting all fixed tasks");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            try
-            {
-                var data = _mapper.Map<FixedTaskReturnModel>(await _fixedTaskService.GetByIdAsync(id));
+            var data = _mapper.Map<FixedTaskReturnModel>(await _fixedTaskService.GetByIdAsync(id));
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting fixed task by id");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpPost("Add")]
         public async Task<IActionResult> Add([FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
-            try
-            {
-                var fixedTask = _mapper.Map<FixedTask>(inputFixedTaskModel);
-                await _fixedTaskService.AddAsync(fixedTask);
+            var fixedTask = _mapper.Map<FixedTask>(inputFixedTaskModel);
+            await _fixedTaskService.AddAsync(fixedTask);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while adding fixed task");
-                throw;
-            }
+            return Ok();
         }
 
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
-            try
+            var fixedTask = new FixedTask()
             {
-                var fixedTask = new FixedTask()
-                {
-                    Id = id
-                };
+                Id = id
+            };
 
-                //could be done as _ = ..., but this is more readable
-                fixedTask = _mapper.Map(inputFixedTaskModel, fixedTask);
+            //could be done as _ = ..., but this is more readable
+            fixedTask = _mapper.Map(inputFixedTaskModel, fixedTask);
 
-                await _fixedTaskService.UpdateAsync(fixedTask);
+            await _fixedTaskService.UpdateAsync(fixedTask);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while adding fixed task");
-                throw;
-            }
+            return Ok();
         }
 
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                await _fixedTaskService.DeleteAsync(id);
+            await _fixedTaskService.DeleteAsync(id);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while adding fixed task");
-                throw;
-            }
+            return Ok();
         }
     }
 }

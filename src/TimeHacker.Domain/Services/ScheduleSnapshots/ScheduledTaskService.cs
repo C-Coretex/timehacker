@@ -23,6 +23,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             if (scheduledTask == null)
                 return null;
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (scheduledTask.UserId != _userAccessorBase.UserId)
                 throw new ArgumentException("User can only get its own tasks.");
 

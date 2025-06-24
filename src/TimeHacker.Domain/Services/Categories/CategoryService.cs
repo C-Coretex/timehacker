@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
@@ -30,7 +31,7 @@ namespace TimeHacker.Domain.Services.Categories
             var userId = _userAccessorBase.UserId;
 
             if (category == null)
-                throw new ArgumentException("Category must be valid");
+                throw new NotProvidedException(nameof(category));
 
 
             var oldCategory = await _categoryRepository.GetByIdAsync(category.Id);
@@ -40,6 +41,7 @@ namespace TimeHacker.Domain.Services.Categories
                 return;
             }
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (oldCategory.UserId != userId)
                 throw new ArgumentException("User can only edit its own categories.");
 
@@ -53,6 +55,7 @@ namespace TimeHacker.Domain.Services.Categories
             if (category == null)
                 return;
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (category.UserId != userId)
                 throw new ArgumentException("User can only delete its own categories.");
 
@@ -70,11 +73,11 @@ namespace TimeHacker.Domain.Services.Categories
         {
             var userId = _userAccessorBase.UserId!;
             if (scheduleEntity == null)
-                throw new ArgumentException("Values are incorrect.");
+                throw new NotProvidedException(nameof(scheduleEntity));
 
             var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == categoryId);
             if (task == null)
-                throw new Exception("Category by this Id is not found for current user.");
+                throw new NotFoundException(nameof(task), categoryId.ToString());
 
             task.ScheduleEntity = scheduleEntity;
             return (await _categoryRepository.UpdateAndSaveAsync(task)).ScheduleEntity!;

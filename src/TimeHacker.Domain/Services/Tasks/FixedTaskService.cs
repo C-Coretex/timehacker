@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IModels;
@@ -29,7 +30,7 @@ namespace TimeHacker.Domain.Services.Tasks
         public async Task UpdateAsync(FixedTask task)
         {
             if (task == null)
-                throw new ArgumentException("Task must be valid");
+                throw new NotProvidedException(nameof(task));
 
             var userId = _userAccessorBase.UserId;
 
@@ -40,6 +41,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 return;
             }
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (oldTask.UserId != userId)
                 throw new ArgumentException("User can only edit its own tasks.");
 
@@ -51,7 +53,7 @@ namespace TimeHacker.Domain.Services.Tasks
         {
             var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == id);
             if (task == null)
-                throw new ArgumentException("Task by this Id is not found for current user.");
+                throw new NotFoundException(nameof(task), id.ToString());
 
             await _fixedTaskRepository.DeleteAndSaveAsync(task);
         }
@@ -66,11 +68,11 @@ namespace TimeHacker.Domain.Services.Tasks
         public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, Guid taskId)
         {
             if (scheduleEntity == null)
-                throw new ArgumentException("Values are incorrect.");
+                throw new NotProvidedException(nameof(scheduleEntity));
 
             var task = await GetAll(false).FirstOrDefaultAsync(x => x.Id == taskId);
             if (task == null)
-                throw new ArgumentException("Task by this Id is not found for current user.");
+                throw new NotFoundException(nameof(task), taskId.ToString());
 
             task.ScheduleEntity = scheduleEntity;
             return (await _fixedTaskRepository.UpdateAndSaveAsync(task)).ScheduleEntity!;

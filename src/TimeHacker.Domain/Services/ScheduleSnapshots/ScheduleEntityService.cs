@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
@@ -43,14 +44,15 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
         {
             var scheduleEntity = await _scheduleEntityRepository.GetByIdAsync(id);
             if (scheduleEntity == null)
-                throw new Exception("ScheduleEntity is not found.");
+                return;
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (scheduleEntity.UserId != _userAccessorBase.UserId)
                 throw new Exception("User can edit only his own ScheduleEntity.");
 
             var scheduleEntityReturn = _mapper.Map<ScheduleEntityReturn>(scheduleEntity);
             if (!scheduleEntityReturn.IsEntityDateCorrect(entityCreated))
-                throw new ArgumentException("Created entity timestamp is not correct for this ScheduleEntityReturn.", nameof(entityCreated));
+                throw new DataIsNotCorrectException("Created entity timestamp is not correct", nameof(entityCreated));
 
             if (scheduleEntity.LastEntityCreated != null && scheduleEntity.LastEntityCreated >= entityCreated)
                 return;
@@ -68,7 +70,7 @@ namespace TimeHacker.Domain.Services.ScheduleSnapshots
             {
                 ScheduleEntityParentEnum.FixedTask => _fixedTaskService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
                 ScheduleEntityParentEnum.Category => _categoryService.UpdateScheduleEntityAsync(scheduleEntity, inputScheduleEntity.ParentEntityId),
-                _ => throw new ArgumentException("ScheduleEntityParent must be chosen", nameof(ScheduleEntityParentEnum)),
+                _ => throw new NotProvidedException(nameof(inputScheduleEntity.ScheduleEntityParentEnum)),
             };
         }
     }

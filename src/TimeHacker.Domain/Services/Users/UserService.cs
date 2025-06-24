@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.Users;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Users;
@@ -24,7 +25,7 @@ namespace TimeHacker.Domain.Services.Users
         {
             var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             if (await _userRepository.ExistsAsync(userId))
-                throw new Exception("Current user is already present.");
+                throw new UserAlreadyPresentException();
 
             var userEntity = new User()
             {
@@ -44,7 +45,7 @@ namespace TimeHacker.Domain.Services.Users
         public async Task UpdateAsync(UserUpdateModel user)
         {
             var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-            var userEntity = await _userRepository.GetByIdAsync(userId) ?? throw new Exception("Current user does not exist.");
+            var userEntity = await _userRepository.GetByIdAsync(userId) ?? throw new UserDoesNotExistException();
 
             userEntity = _mapper.Map(user, userEntity);
 

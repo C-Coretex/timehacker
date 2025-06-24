@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using TimeHacker.Application.Filters;
 using TimeHacker.Application.Helpers;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Extensions;
@@ -16,7 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region Services
 
-
 var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
 var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
 
@@ -26,7 +27,23 @@ AddIdentityServices(builder.Services);
 
 AddApplicationServices(builder.Services);
 
-builder.Services.AddControllers();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        var activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+        var pd = context.ProblemDetails;
+        pd.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+
+        pd.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+        pd.Extensions.TryAdd("traceId", activity?.Id);
+    };
+});
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<LogExceptionFilter>();
+});
 
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
@@ -72,6 +89,17 @@ app.UseRouting();
 app.UseAuthorization();
 app.MapIdentityApi<IdentityUser>();
 
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    StatusCodeSelector = ex => ex switch
+    {
+        ArgumentException => StatusCodes.Status400BadRequest,
+        _ => StatusCodes.Status500InternalServerError
+    }
+});
+
+app.UseStatusCodePages();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -87,31 +115,21 @@ static void AddOpenTelemetry(ILoggingBuilder logging, IServiceCollection service
 {
     logging.AddOpenTelemetry(options =>
     {
+        options.IncludeFormattedMessage = true;
+        options.IncludeScopes = true;
+
         options
             .SetResourceBuilder(
                 ResourceBuilder.CreateDefault()
                     .AddService("TimeHacker.Application"))
             .AddConsoleExporter();
     });
+
     services.AddOpenTelemetry()
         .ConfigureResource(resource => resource.AddService("TimeHacker.Application"))
-        .WithTracing(tracing => tracing
-            .AddAspNetCoreInstrumentation()
-            .AddConsoleExporter())
-        .WithMetrics(metrics => metrics
-            .AddAspNetCoreInstrumentation()
-            .AddConsoleExporter());
-    logging.AddOpenTelemetry(options =>
-    {
-        options
-            .SetResourceBuilder(
-                ResourceBuilder.CreateDefault()
-                    .AddService("TimeHacker.Application"))
-            .AddConsoleExporter();
-    });
-    services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService("TimeHacker.Application"))
-        .WithTracing(tracing => tracing
+        .WithTracing(tracing => 
+            tracing
+            .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation()
             .AddConsoleExporter())
         .WithMetrics(metrics => metrics

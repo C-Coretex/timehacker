@@ -14,103 +14,61 @@ namespace TimeHacker.Application.Controllers.Categories
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        private readonly ILogger<CategoriesController> _logger;
         private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryService categoryService, ILogger<CategoriesController> logger, IMapper mapper)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper)
         {
             _categoryService = categoryService;
-            _logger = logger;
             _mapper = mapper;
         }
 
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
-            try
-            {
-                var data = _mapper.ProjectTo<CategoryReturnModel>(_categoryService.GetAll());
+            var data = _mapper.ProjectTo<CategoryReturnModel>(_categoryService.GetAll());
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting all categories");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            try
-            {
-                var data = _mapper.Map<CategoryReturnModel>(await _categoryService.GetByIdAsync(id));
+            var data = _mapper.Map<CategoryReturnModel>(await _categoryService.GetByIdAsync(id));
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting category by id");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpPost("Add")]
         public async Task<IActionResult> Add([FromBody] InputCategoryModel inputCategoryModel)
         {
-            try
-            {
-                var category = _mapper.Map<Category>(inputCategoryModel);
-                await _categoryService.AddAsync(category);
+            var category = _mapper.Map<Category>(inputCategoryModel);
+            await _categoryService.AddAsync(category);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while adding category");
-                throw;
-            }
+            return Ok();
         }
 
         [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] InputCategoryModel inputCategoryModel)
         {
-            try
+            var category = new Category()
             {
-                var category = new Category()
-                {
-                    Id = id
-                };
+                Id = id
+            };
 
-                //could be done as _ = ..., but this is more readable
-                category = _mapper.Map(inputCategoryModel, category);
+            //could be done as _ = ..., but this is more readable
+            category = _mapper.Map(inputCategoryModel, category);
 
-                await _categoryService.UpdateAsync(category);
+            await _categoryService.UpdateAsync(category);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while updating category");
-                throw;
-            }
+            return Ok();
         }
 
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                await _categoryService.DeleteAsync(id);
+            await _categoryService.DeleteAsync(id);
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while deleting category");
-                throw;
-            }
+            return Ok();
         }
     }
 }

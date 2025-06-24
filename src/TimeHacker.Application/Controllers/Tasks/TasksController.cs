@@ -18,98 +18,56 @@ namespace TimeHacker.Application.Controllers.Tasks
         private readonly IScheduledTaskService _scheduledTaskService;
         private readonly IScheduleEntityService _scheduleEntityService;
 
-        private readonly ILogger<TasksController> _logger;
         private readonly IMapper _mapper;
 
-        public TasksController(ITaskService taskService, IScheduledTaskService scheduledTaskService, IScheduleEntityService scheduleEntityService, ILogger<TasksController> logger, IMapper mapper)
+        public TasksController(ITaskService taskService, IScheduledTaskService scheduledTaskService, IScheduleEntityService scheduleEntityService, IMapper mapper)
         {
             _taskService = taskService;
             _scheduledTaskService = scheduledTaskService;
             _scheduleEntityService = scheduleEntityService;
 
-            _logger = logger;
             _mapper = mapper;
         }
 
         [HttpGet("GetTasksForDay")]
         public async Task<IActionResult> GetTasksForDay(string date)
         {
-            try
-            {
-                var dateParsed = DateOnly.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
-                var data = await _taskService.GetTasksForDay(dateParsed);
+            var dateParsed = DateOnly.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+            var data = await _taskService.GetTasksForDay(dateParsed);
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting tasks for day");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpGet("GetTasksForDays")]
-        public IActionResult GetTasksForDays([FromBody] IEnumerable<DateOnly> dates)
+        public IActionResult GetTasksForDays([FromBody] ICollection<DateOnly> dates)
         {
-            try
-            {
-                var data = _taskService.GetTasksForDays(dates);
+            var data = _taskService.GetTasksForDays(dates);
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting tasks for days");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpPost("RefreshTasksForDays")]
-        public IActionResult RefreshTasksForDays([FromBody] IEnumerable<DateOnly> dates)
+        public IActionResult RefreshTasksForDays([FromBody] ICollection<DateOnly> dates)
         {
-            try
-            {
-                var data = _taskService.RefreshTasksForDays(dates);
+            var data = _taskService.RefreshTasksForDays(dates);
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while refreshing tasks for days");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpGet("GetScheduledTaskById/{id}")]
         public async Task<IActionResult> GetScheduledTaskById(ulong id)
         {
-            try
-            {
-                var data = _mapper.Map<ScheduledTaskReturnModel>(await _scheduledTaskService.GetBy(id));
+            var data = _mapper.Map<ScheduledTaskReturnModel>(await _scheduledTaskService.GetBy(id));
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while getting fixed task by id");
-                throw;
-            }
+            return Ok(data);
         }
 
         [HttpPost("PostNewScheduleForTask")]
         public async Task<IActionResult> PostNewScheduleForTask([FromBody] InputScheduleEntityModel inputScheduleEntityModel)
         {
-            try
-            {
-                var data = _mapper.Map<ScheduleEntityReturnModel>(await _scheduleEntityService.Save(inputScheduleEntityModel));
+            var data = _mapper.Map<ScheduleEntityReturnModel>(await _scheduleEntityService.Save(inputScheduleEntityModel));
 
-                return Ok(data);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error while posting new Schedule for a task");
-                throw;
-            }
+            return Ok(data);
         }
     }
 }

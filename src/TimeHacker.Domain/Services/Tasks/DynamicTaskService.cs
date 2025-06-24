@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
 using TimeHacker.Domain.Contracts.Entities.Tasks;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Tasks;
@@ -30,7 +31,7 @@ namespace TimeHacker.Domain.Services.Tasks
             var userId = _userAccessorBase.UserId;
 
             if (task == null)
-                throw new ArgumentException("Task must be valid");
+                throw new NotProvidedException(nameof(task));
 
 
             var oldTask = await _dynamicTaskRepository.GetByIdAsync(task.Id);
@@ -40,6 +41,7 @@ namespace TimeHacker.Domain.Services.Tasks
                 return;
             }
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (oldTask.UserId != userId)
                 throw new ArgumentException("User can only edit its own tasks.");
 
@@ -51,7 +53,7 @@ namespace TimeHacker.Domain.Services.Tasks
         {
             var task = await GetAll().FirstOrDefaultAsync(x => x.Id == id);
             if (task == null)
-                throw new ArgumentException("Task by this Id is not found for current user.");
+                throw new NotFoundException(nameof(task), id.ToString());
 
             await _dynamicTaskRepository.DeleteAndSaveAsync(task);
         }

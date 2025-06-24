@@ -1,4 +1,5 @@
-﻿using TimeHacker.Domain.Contracts.Entities.Tags;
+﻿using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
+using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.IModels;
 using TimeHacker.Domain.Contracts.IRepositories.Tags;
 using TimeHacker.Domain.Contracts.IServices.Tags;
@@ -33,13 +34,14 @@ namespace TimeHacker.Domain.Services.Tags
             var userId = _userAccessorBase.UserId;
 
             if (tag == null)
-                throw new ArgumentException("Category must be valid");
+                throw new NotProvidedException(nameof(tag));
 
 
             var oldTag = await _tagRepository.GetByIdAsync(tag.Id);
             if (oldTag == null)
                 return await _tagRepository.AddAndSaveAsync(tag);
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (oldTag.UserId != userId)
                 throw new ArgumentException("User can only edit its own categories.");
 
@@ -54,6 +56,7 @@ namespace TimeHacker.Domain.Services.Tags
             if (tag == null)
                 return;
 
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
             if (tag.UserId != userId)
                 throw new ArgumentException("User can only delete its own categories.");
 
