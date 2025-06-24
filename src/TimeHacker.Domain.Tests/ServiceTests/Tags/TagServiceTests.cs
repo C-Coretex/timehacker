@@ -1,6 +1,6 @@
 ﻿using Moq;
 using System.Drawing;
-using FluentAssertions;
+using AwesomeAssertions;
 using TimeHacker.Domain.Contracts.Entities.Tags;
 using TimeHacker.Domain.Contracts.IRepositories.Tags;
 using TimeHacker.Domain.Contracts.IServices.Tags;

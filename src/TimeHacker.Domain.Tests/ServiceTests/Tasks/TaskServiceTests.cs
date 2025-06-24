@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using MockQueryable;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;

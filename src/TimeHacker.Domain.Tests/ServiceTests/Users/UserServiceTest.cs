@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Users;
 using TimeHacker.Domain.Contracts.IRepositories.Users;

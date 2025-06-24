@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using TimeHacker.Domain.Contracts.Models.EntityModels;
 using TimeHacker.Domain.Contracts.Models.EntityModels.Enums;
 using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;

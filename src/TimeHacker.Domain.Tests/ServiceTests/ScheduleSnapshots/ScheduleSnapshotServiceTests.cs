@@ -1,5 +1,5 @@
 ﻿using AutoBogus;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using TimeHacker.Domain.Contracts.Entities.Categories;
 using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;

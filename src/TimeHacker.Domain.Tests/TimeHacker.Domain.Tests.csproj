@@ -11,11 +11,11 @@
 
   <ItemGroup>
     <PackageReference Include="AutoBogus" Version="2.13.1" />
+    <PackageReference Include="AwesomeAssertions" Version="9.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="FluentAssertions" Version="[7.1.0]" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
