@@ -73,7 +73,7 @@ namespace TimeHacker.Application.Controllers.Categories
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] InputCategoryModel inputCategoryModel)
         {
             try
