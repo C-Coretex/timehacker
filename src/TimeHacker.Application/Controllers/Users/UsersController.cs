@@ -22,6 +22,8 @@ namespace TimeHacker.Application.Controllers.Users
             _mapper = mapper;
         }
 
+        [ProducesResponseType(typeof(UserReturnModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("GetCurrent")]
         public async Task<Results<Ok<UserReturnModel>, NotFound>> GetCurrent()
         {
@@ -33,28 +35,31 @@ namespace TimeHacker.Application.Controllers.Users
             return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("Add")]
-        public async Task<IActionResult> Add([FromBody] UserUpdateModel inputUserModel)
+        public async Task<Ok> Add([FromBody] UserUpdateModel inputUserModel)
         {
             await _userService.AddAsync(inputUserModel);
 
-            return Ok();
+            return TypedResults.Ok();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] UserUpdateModel inputUserModel)
+        public async Task<Ok> Update([FromBody] UserUpdateModel inputUserModel)
         {
             await _userService.UpdateAsync(inputUserModel);
 
-            return Ok();
+            return TypedResults.Ok();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpDelete("Delete")]
-        public async Task<IActionResult> Delete()
+        public async Task<Ok> Delete()
         {
             await _userService.DeleteAsync();
 
-            return Ok();
+            return TypedResults.Ok();
         }
     }
 }

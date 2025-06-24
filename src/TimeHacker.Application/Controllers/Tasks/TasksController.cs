@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
-using AutoMapper;
+using TimeHacker.Application.Models.Return.Categories;
 using TimeHacker.Application.Models.Return.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Contracts.IServices.Tasks;
 using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.Contracts.Models.ReturnModels;
 
 namespace TimeHacker.Application.Controllers.Tasks
 {
@@ -29,45 +32,57 @@ namespace TimeHacker.Application.Controllers.Tasks
             _mapper = mapper;
         }
 
+        [ProducesResponseType(typeof(TasksForDayReturn), StatusCodes.Status200OK)]
         [HttpGet("GetTasksForDay")]
-        public async Task<IActionResult> GetTasksForDay(string date)
+        public async Task<Ok<TasksForDayReturn>> GetTasksForDay(string date)
         {
             var dateParsed = DateOnly.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
             var data = await _taskService.GetTasksForDay(dateParsed);
 
-            return Ok(data);
+            return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
         [HttpGet("GetTasksForDays")]
-        public IActionResult GetTasksForDays([FromBody] ICollection<DateOnly> dates)
+        public Ok<IAsyncEnumerable<TasksForDayReturn>> GetTasksForDays([FromBody] ICollection<DateOnly> dates)
         {
             var data = _taskService.GetTasksForDays(dates);
 
-            return Ok(data);
+            return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
         [HttpPost("RefreshTasksForDays")]
-        public IActionResult RefreshTasksForDays([FromBody] ICollection<DateOnly> dates)
+        public Ok<IAsyncEnumerable<TasksForDayReturn>> RefreshTasksForDays([FromBody] ICollection<DateOnly> dates)
         {
             var data = _taskService.RefreshTasksForDays(dates);
 
-            return Ok(data);
+            return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(typeof(ScheduledTaskReturnModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("GetScheduledTaskById/{id}")]
-        public async Task<IActionResult> GetScheduledTaskById(ulong id)
+        public async Task<Results<Ok<ScheduledTaskReturnModel>, NotFound>> GetScheduledTaskById(ulong id)
         {
-            var data = _mapper.Map<ScheduledTaskReturnModel>(await _scheduledTaskService.GetBy(id));
+            var entity = await _scheduledTaskService.GetBy(id);
+            if(entity == null)
+                return TypedResults.NotFound();
 
-            return Ok(data);
+            var data = _mapper.Map<ScheduledTaskReturnModel>(entity);
+
+            return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(typeof(ScheduleEntityReturnModel), StatusCodes.Status200OK)]
         [HttpPost("PostNewScheduleForTask")]
-        public async Task<IActionResult> PostNewScheduleForTask([FromBody] InputScheduleEntityModel inputScheduleEntityModel)
+        public async Task<Ok<ScheduleEntityReturnModel>> PostNewScheduleForTask([FromBody] InputScheduleEntityModel inputScheduleEntityModel)
         {
-            var data = _mapper.Map<ScheduleEntityReturnModel>(await _scheduleEntityService.Save(inputScheduleEntityModel));
+            var entity = await _scheduleEntityService.Save(inputScheduleEntityModel);
 
-            return Ok(data);
+            var data = _mapper.Map<ScheduleEntityReturnModel>(entity);
+
+            return TypedResults.Ok(data);
         }
     }
 }

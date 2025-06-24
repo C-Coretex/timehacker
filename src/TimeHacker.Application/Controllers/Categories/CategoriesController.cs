@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TimeHacker.Application.Models.Input.Categories;
 using TimeHacker.Application.Models.Return.Categories;
@@ -22,33 +23,43 @@ namespace TimeHacker.Application.Controllers.Categories
             _mapper = mapper;
         }
 
+        [ProducesResponseType(typeof(IQueryable<CategoryReturnModel>), StatusCodes.Status200OK)]
         [HttpGet("GetAll")]
-        public IActionResult GetAll()
+        public async Task<Ok<IQueryable<CategoryReturnModel>>> GetAll()
         {
+            //TODO: to AsAsyncEnumerable
             var data = _mapper.ProjectTo<CategoryReturnModel>(_categoryService.GetAll());
 
-            return Ok(data);
+            return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(typeof(CategoryReturnModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<Results<Ok<CategoryReturnModel>, NotFound>> GetById(Guid id)
         {
-            var data = _mapper.Map<CategoryReturnModel>(await _categoryService.GetByIdAsync(id));
+            var entity = await _categoryService.GetByIdAsync(id);
+            if (entity == null)
+                return TypedResults.NotFound();
 
-            return Ok(data);
+            var data = _mapper.Map<CategoryReturnModel>(entity);
+
+            return TypedResults.Ok(data);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("Add")]
-        public async Task<IActionResult> Add([FromBody] InputCategoryModel inputCategoryModel)
+        public async Task<Ok> Add([FromBody] InputCategoryModel inputCategoryModel)
         {
             var category = _mapper.Map<Category>(inputCategoryModel);
             await _categoryService.AddAsync(category);
 
-            return Ok();
+            return TypedResults.Ok();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] InputCategoryModel inputCategoryModel)
+        public async Task<Ok> Update(Guid id, [FromBody] InputCategoryModel inputCategoryModel)
         {
             var category = new Category()
             {
@@ -60,15 +71,16 @@ namespace TimeHacker.Application.Controllers.Categories
 
             await _categoryService.UpdateAsync(category);
 
-            return Ok();
+            return TypedResults.Ok();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<Ok> Delete(Guid id)
         {
             await _categoryService.DeleteAsync(id);
 
-            return Ok();
+            return TypedResults.Ok();
         }
     }
 }

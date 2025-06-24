@@ -45,7 +45,6 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<LogExceptionFilter>();
 });
 
-builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks()
@@ -63,7 +62,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 
