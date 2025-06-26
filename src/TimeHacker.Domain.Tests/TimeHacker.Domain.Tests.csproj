@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
     <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
   </ItemGroup>
 

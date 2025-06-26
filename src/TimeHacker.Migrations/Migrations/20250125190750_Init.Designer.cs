@@ -25,7 +25,7 @@ namespace TimeHacker.Migrations.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.Category", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.CategoryDynamicTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.CategoryDynamicTask", b =>
                 {
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
@@ -76,7 +76,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("CategoryDynamicTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.CategoryFixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.CategoryFixedTask", b =>
                 {
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
@@ -91,7 +91,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("CategoryFixedTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,7 +123,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("ScheduleEntity");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleSnapshot", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", b =>
                 {
                     b.Property<string>("UserId")
                         .HasMaxLength(450)
@@ -144,7 +144,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("ScheduleSnapshot");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduledCategory", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,7 +192,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("ScheduledCategory");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduledTask", b =>
                 {
                     b.Property<decimal>("Id")
                         .ValueGeneratedOnAdd()
@@ -252,7 +252,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("ScheduledTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.Tag", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tags.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -284,7 +284,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("Tag");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagDynamicTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tags.TagDynamicTask", b =>
                 {
                     b.Property<Guid>("TagId")
                         .HasColumnType("uuid");
@@ -299,7 +299,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("TagDynamicTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagFixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tags.TagFixedTask", b =>
                 {
                     b.Property<Guid>("TagId")
                         .HasColumnType("uuid");
@@ -314,7 +314,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("TagFixedTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tasks.DynamicTask", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -358,7 +358,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("DynamicTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tasks.FixedTask", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -407,25 +407,25 @@ namespace TimeHacker.Migrations.Migrations
                     b.ToTable("FixedTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.Category", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.Category", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithOne("Category")
-                        .HasForeignKey("TimeHacker.Domain.Contracts.Entities.Categories.Category", "ScheduleEntityId")
+                        .HasForeignKey("TimeHacker.Domain.Entities.Categories.Category", "ScheduleEntityId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.Navigation("ScheduleEntity");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.CategoryDynamicTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.CategoryDynamicTask", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Categories.Category", "Category")
+                    b.HasOne("TimeHacker.Domain.Entities.Categories.Category", "Category")
                         .WithMany("CategoryDynamicTasks")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", "DynamicTask")
+                    b.HasOne("TimeHacker.Domain.Entities.Tasks.DynamicTask", "DynamicTask")
                         .WithMany("CategoryDynamicTasks")
                         .HasForeignKey("DynamicTaskId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -436,15 +436,15 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("DynamicTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.CategoryFixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.CategoryFixedTask", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Categories.Category", "Category")
+                    b.HasOne("TimeHacker.Domain.Entities.Categories.Category", "Category")
                         .WithMany("CategoryFixedTasks")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", "FixedTask")
+                    b.HasOne("TimeHacker.Domain.Entities.Tasks.FixedTask", "FixedTask")
                         .WithMany("CategoryFixedTasks")
                         .HasForeignKey("FixedTaskId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -455,14 +455,14 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("FixedTask");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduledCategory", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithMany("ScheduledCategories")
                         .HasForeignKey("ParentScheduleEntity")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
                         .WithMany("ScheduledCategories")
                         .HasForeignKey("UserId", "Date")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -473,19 +473,19 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("ScheduleSnapshot");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduledTask", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithMany("ScheduledTasks")
                         .HasForeignKey("ParentScheduleEntityId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", "ScheduledCategory")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduledCategory", "ScheduledCategory")
                         .WithMany("ScheduledTasks")
                         .HasForeignKey("ScheduledCategoryId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
                         .WithMany("ScheduledTasks")
                         .HasForeignKey("UserId", "Date")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -498,15 +498,15 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("ScheduledCategory");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagDynamicTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tags.TagDynamicTask", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tags.Tag", "Tag")
+                    b.HasOne("TimeHacker.Domain.Entities.Tags.Tag", "Tag")
                         .WithMany("TagDynamicTasks")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", "Task")
+                    b.HasOne("TimeHacker.Domain.Entities.Tasks.DynamicTask", "Task")
                         .WithMany("TagDynamicTasks")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -517,15 +517,15 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.TagFixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tags.TagFixedTask", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tags.Tag", "Tag")
+                    b.HasOne("TimeHacker.Domain.Entities.Tags.Tag", "Tag")
                         .WithMany("TagFixedTasks")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", "Task")
+                    b.HasOne("TimeHacker.Domain.Entities.Tasks.FixedTask", "Task")
                         .WithMany("TagFixedTasks")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.ClientCascade)
@@ -536,24 +536,24 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tasks.FixedTask", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
                         .WithOne("FixedTask")
-                        .HasForeignKey("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", "ScheduleEntityId")
+                        .HasForeignKey("TimeHacker.Domain.Entities.Tasks.FixedTask", "ScheduleEntityId")
                         .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.Navigation("ScheduleEntity");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Categories.Category", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.Category", b =>
                 {
                     b.Navigation("CategoryDynamicTasks");
 
                     b.Navigation("CategoryFixedTasks");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleEntity", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", b =>
                 {
                     b.Navigation("Category");
 
@@ -564,33 +564,33 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("ScheduledTasks");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduleSnapshot", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", b =>
                 {
                     b.Navigation("ScheduledCategories");
 
                     b.Navigation("ScheduledTasks");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots.ScheduledCategory", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduledCategory", b =>
                 {
                     b.Navigation("ScheduledTasks");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tags.Tag", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tags.Tag", b =>
                 {
                     b.Navigation("TagDynamicTasks");
 
                     b.Navigation("TagFixedTasks");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.DynamicTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tasks.DynamicTask", b =>
                 {
                     b.Navigation("CategoryDynamicTasks");
 
                     b.Navigation("TagDynamicTasks");
                 });
 
-            modelBuilder.Entity("TimeHacker.Domain.Contracts.Entities.Tasks.FixedTask", b =>
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Tasks.FixedTask", b =>
                 {
                     b.Navigation("CategoryFixedTasks");
 

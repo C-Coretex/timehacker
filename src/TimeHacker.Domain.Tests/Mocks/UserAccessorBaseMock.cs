@@ -1,4 +1,4 @@
-﻿using TimeHacker.Domain.Contracts.IModels;
+﻿using TimeHacker.Domain.IModels;
 
 namespace TimeHacker.Domain.Tests.Mocks
 {

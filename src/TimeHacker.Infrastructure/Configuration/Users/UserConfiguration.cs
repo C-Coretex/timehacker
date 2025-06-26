@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeHacker.Domain.Contracts.Entities.Users;
+using TimeHacker.Domain.Entities.Users;
 
 namespace TimeHacker.Infrastructure.Configuration.Users
 {

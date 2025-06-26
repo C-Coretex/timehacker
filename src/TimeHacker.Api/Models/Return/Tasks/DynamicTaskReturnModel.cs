@@ -1,5 +1,5 @@
 ﻿using TimeHacker.Api.Models.Return.Tags;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
+using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Api.Models.Return.Tasks
 {

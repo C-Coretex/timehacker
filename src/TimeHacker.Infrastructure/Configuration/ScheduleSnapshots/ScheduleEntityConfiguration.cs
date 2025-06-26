@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Models.EntityModels;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Models.EntityModels;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {

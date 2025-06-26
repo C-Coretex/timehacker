@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TimeHacker.Api.Models.Return.Users;
-using TimeHacker.Domain.Contracts.IServices.Users;
-using TimeHacker.Domain.Contracts.Models.InputModels.Users;
+using TimeHacker.Domain.IServices.Users;
+using TimeHacker.Domain.Models.InputModels.Users;
 
 namespace TimeHacker.Api.Controllers.Users
 {

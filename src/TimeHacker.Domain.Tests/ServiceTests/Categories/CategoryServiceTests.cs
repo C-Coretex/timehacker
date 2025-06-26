@@ -1,10 +1,10 @@
 ﻿using System.Drawing;
 using AwesomeAssertions;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Domain.Contracts.IServices.Categories;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.IRepositories.Categories;
+using TimeHacker.Domain.IServices.Categories;
 using TimeHacker.Domain.Services.Categories;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;

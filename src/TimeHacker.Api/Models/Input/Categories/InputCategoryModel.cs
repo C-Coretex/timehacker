@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Contracts.Entities.Categories;
 using System.ComponentModel.DataAnnotations;
+using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Api.Models.Input.Categories
 {

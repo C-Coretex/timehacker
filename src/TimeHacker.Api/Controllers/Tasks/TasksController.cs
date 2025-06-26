@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using TimeHacker.Api.Models.Return.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IServices.Tasks;
-using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Models.ReturnModels;
+using TimeHacker.Domain.IServices.ScheduleSnapshots;
+using TimeHacker.Domain.IServices.Tasks;
+using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.Models.ReturnModels;
 
 namespace TimeHacker.Api.Controllers.Tasks
 {

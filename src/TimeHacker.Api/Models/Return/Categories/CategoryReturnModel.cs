@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Contracts.Entities.Categories;
+using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Api.Models.Return.Categories
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TimeHacker.Domain.Contracts.BusinessLogicExceptions;
+using TimeHacker.Domain.BusinessLogicExceptions;
 
 namespace TimeHacker.Api.Filters
 {

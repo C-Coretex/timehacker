@@ -4,12 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\TimeHacker.Domain.Contracts\TimeHacker.Domain.Contracts.csproj" />
+    <ProjectReference Include="..\TimeHacker.Helpers.Domain\TimeHacker.Helpers.Domain.csproj" />
   </ItemGroup>
 
 </Project>

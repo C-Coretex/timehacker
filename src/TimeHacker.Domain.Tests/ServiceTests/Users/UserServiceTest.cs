@@ -1,9 +1,9 @@
 ﻿using AwesomeAssertions;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.Users;
-using TimeHacker.Domain.Contracts.IRepositories.Users;
-using TimeHacker.Domain.Contracts.IServices.Users;
-using TimeHacker.Domain.Contracts.Models.InputModels.Users;
+using TimeHacker.Domain.Models.InputModels.Users;
+using TimeHacker.Domain.Entities.Users;
+using TimeHacker.Domain.IRepositories.Users;
+using TimeHacker.Domain.IServices.Users;
 using TimeHacker.Domain.Services.Users;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;

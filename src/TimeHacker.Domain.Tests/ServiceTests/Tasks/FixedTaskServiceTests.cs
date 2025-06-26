@@ -1,9 +1,9 @@
 ﻿using AwesomeAssertions;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IRepositories.Tasks;
-using TimeHacker.Domain.Contracts.IServices.Tasks;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IRepositories.Tasks;
+using TimeHacker.Domain.IServices.Tasks;
 using TimeHacker.Domain.Services.Tasks;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;

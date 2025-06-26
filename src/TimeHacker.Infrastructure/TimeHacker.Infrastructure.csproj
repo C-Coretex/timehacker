@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TimeHacker.Domain.Contracts\TimeHacker.Domain.Contracts.csproj" />
+    <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
     <ProjectReference Include="..\TimeHacker.Helpers.Db\TimeHacker.Helpers.Db.csproj" />
   </ItemGroup>
 

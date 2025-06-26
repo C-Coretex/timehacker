@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Drawing;
-using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.Categories
 {

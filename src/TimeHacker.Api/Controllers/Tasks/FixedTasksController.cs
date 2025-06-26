@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.Tasks;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IServices.Tasks;
+using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IServices.Tasks;
 
 namespace TimeHacker.Api.Controllers.Tasks
 {

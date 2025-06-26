@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using TimeHacker.Domain.Contracts.IModels;
+using TimeHacker.Domain.IModels;
 
 namespace TimeHacker.Api.Helpers
 {

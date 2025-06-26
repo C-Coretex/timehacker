@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Return.Categories;
-using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.IServices.Categories;
+using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.IServices.Categories;
 
 namespace TimeHacker.Api.Controllers.Categories
 {

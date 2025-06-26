@@ -1,13 +1,13 @@
 ﻿using Moq;
 using System.Drawing;
 using AwesomeAssertions;
-using TimeHacker.Domain.Contracts.Entities.Tags;
-using TimeHacker.Domain.Contracts.IRepositories.Tags;
-using TimeHacker.Domain.Contracts.IServices.Tags;
-using TimeHacker.Domain.Services.Tags;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Domain.Entities.Tags;
+using TimeHacker.Domain.IServices.Tags;
+using TimeHacker.Domain.IRepositories.Tags;
+using TimeHacker.Domain.Services.Tags;
 
 namespace TimeHacker.Domain.Tests.ServiceTests.Tags
 {

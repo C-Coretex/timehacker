@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Contracts.Entities.Tags;
+using TimeHacker.Domain.Entities.Tags;
 
 namespace TimeHacker.Api.Models.Return.Tags
 {

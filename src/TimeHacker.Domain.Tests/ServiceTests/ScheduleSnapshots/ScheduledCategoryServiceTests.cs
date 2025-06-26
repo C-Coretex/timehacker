@@ -1,7 +1,8 @@
 ﻿using Moq;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;

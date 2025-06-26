@@ -1,8 +1,8 @@
 ﻿using AwesomeAssertions;
-using TimeHacker.Domain.Contracts.Models.EntityModels;
-using TimeHacker.Domain.Contracts.Models.EntityModels.Enums;
-using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.Models.EntityModels;
+using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.Models.EntityModels.Enums;
 
 namespace TimeHacker.Domain.Tests.RichModelTests
 {

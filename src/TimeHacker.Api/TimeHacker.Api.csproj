@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
+    <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
     <ProjectReference Include="..\TimeHacker.Infrastructure.Identity\TimeHacker.Infrastructure.Identity.csproj" />
     <ProjectReference Include="..\TimeHacker.Infrastructure\TimeHacker.Infrastructure.csproj" />
     <ProjectReference Include="..\TimeHacker.Migrations.Identity\TimeHacker.Migrations.Identity.csproj" />

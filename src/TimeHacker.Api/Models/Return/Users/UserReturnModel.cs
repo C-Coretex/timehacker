@@ -1,4 +1,4 @@
-﻿using TimeHacker.Domain.Contracts.Entities.Users;
+﻿using TimeHacker.Domain.Entities.Users;
 
 namespace TimeHacker.Api.Models.Return.Users
 {

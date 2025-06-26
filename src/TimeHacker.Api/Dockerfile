@@ -14,7 +14,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["TimeHacker.Api/TimeHacker.Api.csproj", "TimeHacker.Api/"]
 COPY ["TimeHacker.Domain/TimeHacker.Domain.csproj", "TimeHacker.Domain/"]
-COPY ["TimeHacker.Domain.Contracts/TimeHacker.Domain.Contracts.csproj", "TimeHacker.Domain.Contracts/"]
+COPY ["TimeHacker.Domain.Services/TimeHacker.Domain.Services.csproj", "TimeHacker.Domain.Services/"]
 COPY ["TimeHacker.Helpers.Domain/TimeHacker.Helpers.Domain.csproj", "TimeHacker.Helpers.Domain/"]
 COPY ["TimeHacker.Helpers.Db/TimeHacker.Helpers.Db.csproj", "TimeHacker.Helpers.DB/"]
 COPY ["TimeHacker.Infrastructure.Identity/TimeHacker.Infrastructure.Identity.csproj", "TimeHacker.Infrastructure.Identity/"]
