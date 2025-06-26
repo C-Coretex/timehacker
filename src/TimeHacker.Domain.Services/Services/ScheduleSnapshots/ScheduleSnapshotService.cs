@@ -3,9 +3,9 @@ using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
-using TimeHacker.Domain.IncludeExpansionDelegates;
+using TimeHacker.Domain.Services.IncludeExpansionDelegates;
 
-namespace TimeHacker.Domain.Services.ScheduleSnapshots
+namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
 {
     public class ScheduleSnapshotService: IScheduleSnapshotService
     {

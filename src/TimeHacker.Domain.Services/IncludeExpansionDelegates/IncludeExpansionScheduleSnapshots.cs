@@ -2,7 +2,7 @@
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 
-namespace TimeHacker.Domain.IncludeExpansionDelegates
+namespace TimeHacker.Domain.Services.IncludeExpansionDelegates
 {
     public static class IncludeExpansionScheduleSnapshots
     {

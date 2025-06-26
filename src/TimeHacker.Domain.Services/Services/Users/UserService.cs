@@ -5,7 +5,7 @@ using TimeHacker.Domain.IRepositories.Users;
 using TimeHacker.Domain.IServices.Users;
 using TimeHacker.Domain.Models.InputModels.Users;
 
-namespace TimeHacker.Domain.Services.Users
+namespace TimeHacker.Domain.Services.Services.Users
 {
     public class UserService : IUserService
     {

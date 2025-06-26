@@ -3,7 +3,7 @@ using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
-using TimeHacker.Domain.Services.ScheduleSnapshots;
+using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;

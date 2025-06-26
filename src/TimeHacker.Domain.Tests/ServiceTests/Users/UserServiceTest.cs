@@ -4,7 +4,7 @@ using TimeHacker.Domain.Models.InputModels.Users;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.IRepositories.Users;
 using TimeHacker.Domain.IServices.Users;
-using TimeHacker.Domain.Services.Users;
+using TimeHacker.Domain.Services.Services.Users;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;

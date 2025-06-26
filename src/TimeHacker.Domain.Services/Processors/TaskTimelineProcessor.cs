@@ -4,7 +4,7 @@ using TimeHacker.Domain.Models.BusinessLogicModels;
 using TimeHacker.Domain.Models.ReturnModels;
 using TimeHacker.Helpers.Domain.Helpers;
 
-namespace TimeHacker.Domain.Processors
+namespace TimeHacker.Domain.Services.Processors
 {
     public class TaskTimelineProcessor
     {

@@ -4,9 +4,9 @@ using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.Tasks;
 using TimeHacker.Domain.Models.ReturnModels;
-using TimeHacker.Domain.Processors;
+using TimeHacker.Domain.Services.Processors;
 
-namespace TimeHacker.Domain.Services.Tasks
+namespace TimeHacker.Domain.Services.Services.Tasks
 {
     public class TaskService : ITaskService
     {

@@ -4,7 +4,7 @@ using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Tags;
 using TimeHacker.Domain.IServices.Tags;
 
-namespace TimeHacker.Domain.Services.Tags
+namespace TimeHacker.Domain.Services.Services.Tags
 {
     public class TagService : ITagService
     {

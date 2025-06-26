@@ -5,7 +5,7 @@ using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IServices.Categories;
-using TimeHacker.Domain.Services.Categories;
+using TimeHacker.Domain.Services.Services.Categories;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;

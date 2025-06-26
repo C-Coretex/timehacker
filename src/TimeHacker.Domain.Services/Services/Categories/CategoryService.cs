@@ -6,7 +6,7 @@ using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IServices.Categories;
 
-namespace TimeHacker.Domain.Services.Categories
+namespace TimeHacker.Domain.Services.Services.Categories
 {
     public class CategoryService: ICategoryService
     {

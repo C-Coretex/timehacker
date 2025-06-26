@@ -3,12 +3,12 @@ using TimeHacker.Domain.IServices.Categories;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.Tasks;
 using TimeHacker.Domain.IServices.Users;
-using TimeHacker.Domain.Services.Categories;
-using TimeHacker.Domain.Services.ScheduleSnapshots;
-using TimeHacker.Domain.Services.Tasks;
-using TimeHacker.Domain.Services.Users;
+using TimeHacker.Domain.Services.Services.Categories;
+using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
+using TimeHacker.Domain.Services.Services.Tasks;
+using TimeHacker.Domain.Services.Services.Users;
 
-namespace TimeHacker.Domain.Extensions
+namespace TimeHacker.Domain.Services.Extensions
 {
     public static class ServiceCollectionExtensions
     {

@@ -7,7 +7,7 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.IServices.Tags;
 using TimeHacker.Domain.IRepositories.Tags;
-using TimeHacker.Domain.Services.Tags;
+using TimeHacker.Domain.Services.Services.Tags;
 
 namespace TimeHacker.Domain.Tests.ServiceTests.Tags
 {

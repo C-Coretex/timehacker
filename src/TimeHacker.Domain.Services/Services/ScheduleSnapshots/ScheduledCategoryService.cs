@@ -2,7 +2,7 @@
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 
-namespace TimeHacker.Domain.Services.ScheduleSnapshots
+namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
 {
     public class ScheduledCategoryService: IScheduledCategoryService
     {

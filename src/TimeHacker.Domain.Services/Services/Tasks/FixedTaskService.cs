@@ -6,7 +6,7 @@ using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IServices.Tasks;
 
-namespace TimeHacker.Domain.Services.Tasks
+namespace TimeHacker.Domain.Services.Services.Tasks
 {
     public class FixedTaskService : IFixedTaskService
     {
