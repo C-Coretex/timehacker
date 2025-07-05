@@ -450,3 +450,6 @@ FodyWeavers.xsd
 **/wwwroot/js/build
 
 .containers/
+
+.vscode/*
+!.vscode/settings.json
