@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import type { FC } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router';
-import {
-  Breadcrumb,
-  Layout as AntdLayout,
-  Menu,
-  theme,
-} from 'antd';
+import { Breadcrumb, Layout as AntdLayout, Menu, theme } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CalendarOutlined,
@@ -31,38 +26,44 @@ type MenuItem = Required<MenuProps>['items'][number];
 //         return String(menuItem.key)
 //       }
 //     }
-  
+
 //     return null;
 // }
 
 const getItem = (
   key: React.Key,
   icon?: React.ReactNode,
-  children?: MenuItem[],
+  children?: MenuItem[]
 ): MenuItem => {
   return {
     key,
     icon,
     children,
-    label: children ? capitalize(key) : <NavLink to={`/${key === 'calendar' ? '' : key}`}>{capitalize(key)}</NavLink>
+    label: children ? (
+      capitalize(key)
+    ) : (
+      <NavLink to={`/${key === 'calendar' ? '' : key}`}>
+        {capitalize(key)}
+      </NavLink>
+    ),
   } as MenuItem;
-}
+};
 
-const getMainMenuItems = (isAuthenticated: boolean) => ([
-    getItem('calendar', <CalendarOutlined />),
-    getItem('tasks', <SnippetsOutlined />),
-    getItem('categories', <ProductOutlined />),
-    ...(!isAuthenticated ? [
+const getMainMenuItems = (isAuthenticated: boolean) => [
+  getItem('calendar', <CalendarOutlined />),
+  getItem('tasks', <SnippetsOutlined />),
+  getItem('categories', <ProductOutlined />),
+  ...(!isAuthenticated
+    ? [
         getItem('user', <UserOutlined />, [
-        getItem('profile'),
-        getItem('logout'),
+          getItem('profile'),
+          getItem('logout'),
         ]),
-    ] : [
-        getItem('login', <ProductOutlined />),
-    ]),
-    getItem('help', <QuestionCircleOutlined />),
-    getItem('settings', <SettingOutlined />),
-]);
+      ]
+    : [getItem('login', <ProductOutlined />)]),
+  getItem('help', <QuestionCircleOutlined />),
+  getItem('settings', <SettingOutlined />),
+];
 
 const Layout: FC = () => {
   const location = useLocation();
@@ -76,12 +77,15 @@ const Layout: FC = () => {
   const mainMenuItems = getMainMenuItems(false);
   // const activeLink = findActiveLink(location.pathname, mainMenuItems);
 
-
   return (
     <AntdLayout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div 
-          className="demo-logo-vertical" 
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+      >
+        <div
+          className="demo-logo-vertical"
           style={{
             height: '32px',
             margin: '16px',
@@ -89,7 +93,12 @@ const Layout: FC = () => {
             borderRadius: '6px',
           }}
         />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={mainMenuItems} />
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={['1']}
+          mode="inline"
+          items={mainMenuItems}
+        />
       </Sider>
       <AntdLayout>
         <Header
@@ -101,8 +110,8 @@ const Layout: FC = () => {
         </Header>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item>User</Breadcrumb.Item>
-          <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item>
           </Breadcrumb>
           <div
             style={{

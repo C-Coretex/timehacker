@@ -1,13 +1,5 @@
-import {
-  createContext,
-  useState,
-  useEffect
-} from 'react';
-import type {
-  ReactNode,
-  Dispatch,
-  SetStateAction
-} from 'react';
+import { createContext, useState, useEffect } from 'react';
+import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 const DARK_MODE = 'dark-mode';
 
@@ -18,7 +10,7 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType>({
   darkMode: false,
-  updateDarkMode: () => {}
+  updateDarkMode: () => {},
 });
 
 type ThemeProviderProps = {

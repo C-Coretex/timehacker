@@ -16,9 +16,9 @@ const AppRoutes: RouteObject[] = [
       {
         path: '*',
         element: <NotFoundPage />,
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];
 
 export default AppRoutes;
