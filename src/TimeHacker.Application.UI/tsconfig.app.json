@@ -27,10 +27,12 @@
     "baseUrl": "src",
     "paths": {
       "components/*": ["components/*"],
+      "config/*": ["config/*"],
+      "contexts/*": ["contexts/*"],
       "pages/*": ["pages/*"],
       "types/*": ["types/*"],
-      "utils/*": ["utils/*"],
-    },
+      "utils/*": ["utils/*"]
+    }
   },
   "include": ["src"]
 }
