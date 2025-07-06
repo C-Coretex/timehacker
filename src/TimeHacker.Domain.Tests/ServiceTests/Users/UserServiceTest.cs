@@ -24,10 +24,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
         private List<User> _users;
 
         private readonly IUserService _userService;
+        private readonly Guid _userId = Guid.NewGuid();
 
         public UserServiceTest()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             _userService = new UserService(_userRepositoryMock.Object, userAccessor);
         }
@@ -38,7 +39,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
         [Trait("AddAndSaveAsync", "Should add entry with correct Id")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            SetupMocks("UniqueId");
+            SetupMocks(Guid.NewGuid());
 
             var newEntry = new UserUpdateModel()
             {
@@ -47,7 +48,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
                 PhoneNumberForNotifications = "222",
             };
             await _userService.AddAsync(newEntry);
-            var result = _users.FirstOrDefault(x => x.Id == "TestIdentifier");
+            var result = _users.FirstOrDefault(x => x.Id == _userId);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
             result!.EmailForNotifications.Should().Be(newEntry.EmailForNotifications);
@@ -56,7 +57,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _users =
             [
@@ -70,19 +71,19 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
 
                 new()
                 {
-                    Id = "IncorrectUserId",
+                    Id  = Guid.NewGuid(),
                     Name = "TestName",
                     EmailForNotifications = "test@test.com",
                 },
 
                 new()
                 {
-                    Id = "IncorrectUserId",
+                    Id = Guid.NewGuid(),
                     Name = "TestName"
                 }
             ];
 
-            _userRepositoryMock.As<IRepositoryBase<User, string>>().SetupRepositoryMock(_users);
+            _userRepositoryMock.As<IRepositoryBase<User, Guid>>().SetupRepositoryMock(_users);
         }
 
         #endregion

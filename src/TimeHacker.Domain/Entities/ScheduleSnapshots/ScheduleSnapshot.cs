@@ -1,10 +1,13 @@
-﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+﻿using TimeHacker.Domain.Entities.Users;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
-    public class ScheduleSnapshot : IDbModel
+    public class ScheduleSnapshot : IDbEntity
     {
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
+        public virtual User? User { get; set; }
+
         public DateOnly Date { get; set; }
 
         public DateTime LastUpdateTimestamp { get; set; }

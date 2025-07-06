@@ -3,6 +3,6 @@
 namespace TimeHacker.Domain.IRepositories.Tasks
 {
     public interface ITaskRepository<TTask, TId> : IRepositoryBase<TTask, TId>
-        where TTask : class, IDbModel<TId>, new()
+        where TTask : class, IDbEntity<TId>, new()
     {}
 }

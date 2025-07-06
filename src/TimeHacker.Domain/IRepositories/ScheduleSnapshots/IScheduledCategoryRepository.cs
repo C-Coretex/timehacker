@@ -3,6 +3,6 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.IRepositories.ScheduleSnapshots
 {
-    public interface IScheduledCategoryRepository : IRepositoryBase<ScheduledCategory, ulong>
+    public interface IScheduledCategoryRepository : IRepositoryBase<ScheduledCategory, Guid>
     { }
 }

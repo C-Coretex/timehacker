@@ -1,10 +1,10 @@
-﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+﻿using TimeHacker.Helpers.Domain.Abstractions.Classes;
 
 namespace TimeHacker.Domain.Entities.Users
 {
-    public class User : IDbModel<string>
+    public class User : GuidDbEntity
     {
-        public string Id { get; init; }
+        public string IdentityId { get; init; }
 
         public string Name { get; set; }
         public string? PhoneNumberForNotifications { get; set; }

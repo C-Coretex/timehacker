@@ -3,7 +3,7 @@
     public interface IUserScopedEntity
     {
         //UserScopedRepository
-        //change UserId to something different
+        //change UserIdentityId to something different
 
        // public
     }

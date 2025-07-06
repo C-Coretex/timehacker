@@ -1,11 +1,11 @@
 ﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
 {
-    public interface IDbModel<T>: IDbModel
+    public interface IDbEntity<T>: IDbEntity
     {
         public T Id { get; init; }
     }
 
-    public interface IDbModel
+    public interface IDbEntity
     {
     }
 }

@@ -24,9 +24,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         private readonly IScheduledCategoryService _scheduledCategoryService;
 
+        private readonly Guid _userId = Guid.NewGuid();
+
         public ScheduledCategoryServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             _scheduledCategoryService = new ScheduledCategoryService(_scheduledCategoryRepository.Object, userAccessor);
         }
@@ -37,13 +39,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _scheduledCategories =
             [
                 new()
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     UserId = userId,
                     Name = "TestFixedTask1",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
@@ -53,7 +55,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    Id = 2,
+                    Id = Guid.NewGuid(),
                     UserId = userId,
                     Name = "TestFixedTask2",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
@@ -62,8 +64,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    Id = 3,
-                    UserId = "IncorrectUserId",
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask3",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
                     Description = "Test description",
@@ -72,15 +74,15 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    Id = 4,
-                    UserId = "IncorrectUserId",
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask4",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
                     Description = "Test description",
                 }
             ];
 
-            _scheduledCategoryRepository.As<IRepositoryBase<ScheduledCategory, ulong>>().SetupRepositoryMock(_scheduledCategories);
+            _scheduledCategoryRepository.As<IRepositoryBase<ScheduledCategory, Guid>>().SetupRepositoryMock(_scheduledCategories);
         }
 
         #endregion

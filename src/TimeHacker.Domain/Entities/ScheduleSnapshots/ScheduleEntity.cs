@@ -1,15 +1,16 @@
 ﻿using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.Models.EntityModels;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Classes;
 
 namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
-    public class ScheduleEntity : IDbModel<Guid>
+    public class ScheduleEntity : GuidDbEntity
     {
-        public Guid Id { get; init; } = Guid.NewGuid();
+        public Guid UserId { get; set; }
+        public virtual User? User { get; set; }
 
-        public string UserId { get; set; }
         public RepeatingEntityModel RepeatingEntity { get; set; }
         public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
         public DateOnly? LastEntityCreated { get; set; }

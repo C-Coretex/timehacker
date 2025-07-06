@@ -48,7 +48,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("GetScheduledTaskById/{id}")]
         public async Task<Results<Ok<ScheduledTaskReturnModel>, NotFound>> GetScheduledTaskById(
-            ulong id, 
+            Guid id, 
             [FromServices] IScheduledTaskService scheduledTaskService)
         {
             var entity = await scheduledTaskService.GetBy(id);

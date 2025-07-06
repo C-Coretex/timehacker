@@ -8,7 +8,7 @@ namespace TimeHacker.Domain.Tests.Mocks.Extensions
 {
     public static class RepositoryMockExtensions
     {
-        public static void SetupRepositoryMock<TModel, TId>(this Mock<IRepositoryBase<TModel, TId>> repository, List<TModel> source) where TModel : class, IDbModel<TId>, new()
+        public static void SetupRepositoryMock<TModel, TId>(this Mock<IRepositoryBase<TModel, TId>> repository, List<TModel> source) where TModel : class, IDbEntity<TId>, new()
         {
             repository.As<IRepositoryBase<TModel>>().SetupRepositoryMock(source);
 
@@ -27,7 +27,7 @@ namespace TimeHacker.Domain.Tests.Mocks.Extensions
                 .Callback<TModel, CancellationToken>((entry, _) => source.RemoveAll(x => x.Id!.Equals(entry.Id)));
         }
 
-        public static void SetupRepositoryMock<TModel>(this Mock<IRepositoryBase<TModel>> repository, List<TModel> source) where TModel : class, IDbModel, new()
+        public static void SetupRepositoryMock<TModel>(this Mock<IRepositoryBase<TModel>> repository, List<TModel> source) where TModel : class, IDbEntity, new()
         {
             repository.Setup(x => x.AddAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
                 .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))

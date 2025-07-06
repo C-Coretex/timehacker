@@ -3,6 +3,6 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.IRepositories.Users
 {
-    public interface IUserRepository : IRepositoryBase<User, string>
+    public interface IUserRepository : IRepositoryBase<User, Guid>
     { }
 }

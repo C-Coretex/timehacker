@@ -23,10 +23,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         private List<ScheduledTask> _scheduledTasks;
 
         private readonly IScheduledTaskService _scheduledTaskService;
+        private readonly Guid _userId = Guid.NewGuid();
 
         public ScheduledTaskServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object, userAccessor);
         }
@@ -37,12 +38,12 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetBy", "Should return correct data")]
         public async Task GetBy_ShouldReturnCorrectData()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
-            var result = await _scheduledTaskService.GetBy(1);
+            var id = _scheduledTasks.First().Id;
+            var result = await _scheduledTaskService.GetBy(id);
             result.Should().NotBeNull();
-            result!.Id.Should().Be(1);
+            result!.Id.Should().Be(id);
         }
 
         [Fact]
@@ -51,22 +52,22 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
-                var result = await _scheduledTaskService.GetBy(3);
+                var id = _scheduledTasks.First(x => x.UserId != _userId).Id;
+                var result = await _scheduledTaskService.GetBy(id);
             });
         }
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _scheduledTasks =
             [
                 new()
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     UserId = userId,
                     Name = "TestFixedTask1",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
@@ -76,7 +77,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    Id = 2,
+                    Id = Guid.NewGuid(),
                     UserId = userId,
                     Name = "TestFixedTask2",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
@@ -85,8 +86,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    Id = 3,
-                    UserId = "IncorrectUserId",
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask3",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
                     Description = "Test description",
@@ -95,15 +96,15 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    Id = 4,
-                    UserId = "IncorrectUserId",
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask4",
                     Date =  DateOnly.FromDateTime(DateTime.Now),
                     Description = "Test description",
                 }
             ];
 
-            _scheduledTaskRepository.As<IRepositoryBase<ScheduledTask, ulong>>().SetupRepositoryMock(_scheduledTasks);
+            _scheduledTaskRepository.As<IRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks);
         }
 
         #endregion

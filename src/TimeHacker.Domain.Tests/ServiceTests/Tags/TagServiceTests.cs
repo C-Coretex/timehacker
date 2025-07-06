@@ -24,10 +24,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         private List<Tag> _tags;
 
         private readonly ITagService _tagService;
+        private readonly Guid _userId = Guid.NewGuid();
 
         public TagServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             _tagService = new TagService(_tagRepository.Object, userAccessor);
         }
@@ -38,33 +39,31 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var newEntry = new Tag()
             {
                 Id = Guid.NewGuid(),
                 Name = "TestTag1000",
-                UserId = "IncorrectUserId"
+                UserId = Guid.NewGuid()
             };
             await _tagService.AddAsync(newEntry);
             var result = _tags.FirstOrDefault(x => x.Id == newEntry.Id);
 
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
-            result!.UserId.Should().Be(userId);
+            result!.UserId.Should().Be(_userId);
         }
 
         [Fact]
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var newEntry = new Tag()
             {
-                Id = _tags.First(x => x.UserId == userId).Id,
+                Id = _tags.First(x => x.UserId == _userId).Id,
                 Name = "TestTag1000"
             };
             await _tagService.UpdateAsync(newEntry);
@@ -80,12 +79,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
                 var newEntry = new Tag()
                 {
-                    Id = _tags.First(x => x.UserId != userId).Id,
+                    Id = _tags.First(x => x.UserId != _userId).Id,
                     Name = "TestTag1000"
                 };
                 await _tagService.UpdateAsync(newEntry);
@@ -97,10 +95,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
-            var idToDelete = _tags.First(x => x.UserId == userId).Id;
+            var idToDelete = _tags.First(x => x.UserId == _userId).Id;
             await _tagService.DeleteAsync(idToDelete);
             var result = _tags.FirstOrDefault(x => x.Id == idToDelete);
 
@@ -113,10 +110,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
-                await _tagService.DeleteAsync(_tags.First(x => x.UserId != userId).Id);
+                await _tagService.DeleteAsync(_tags.First(x => x.UserId != _userId).Id);
             });
         }
 
@@ -124,18 +120,17 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("GetAll", "Should return correct data")]
         public void GetAll_ShouldReturnCorrectData()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var result = _tagService.GetAll().ToList();
 
             result.Count.Should().Be(2);
-            result.Should().BeEquivalentTo(_tags.Where(x => x.UserId == userId));
+            result.Should().BeEquivalentTo(_tags.Where(x => x.UserId == _userId));
         }
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _tags =
             [
@@ -159,7 +154,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestTag3",
                     Color = Color.AliceBlue,
                     Category = "TestCategory"
@@ -168,7 +163,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestTag4",
                     Color = Color.AliceBlue,
                 }

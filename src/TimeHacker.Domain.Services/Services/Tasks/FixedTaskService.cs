@@ -21,7 +21,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
 
         public async Task AddAsync(FixedTask task)
         {
-            var userId = _userAccessorBase.UserId!;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             task.UserId = userId;
 
             await _fixedTaskRepository.AddAndSaveAsync(task);
@@ -32,7 +32,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
             if (task == null)
                 throw new NotProvidedException(nameof(task));
 
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
 
             var oldTask = await _fixedTaskRepository.GetByIdAsync(task.Id);
             if (oldTask == null)
@@ -80,7 +80,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
 
         private IQueryable<FixedTask> GetAll(bool asNoTracking)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             return _fixedTaskRepository.GetAll(asNoTracking).Where(x => x.UserId == userId);
         }
     }

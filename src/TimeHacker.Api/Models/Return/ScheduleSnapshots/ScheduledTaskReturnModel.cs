@@ -3,7 +3,7 @@
 namespace TimeHacker.Api.Models.Return.ScheduleSnapshots
 {
     public record ScheduledTaskReturnModel(
-        ulong Id,
+        Guid Id,
         Guid ParentTaskId,
         DateOnly Date,
         bool IsFixed,

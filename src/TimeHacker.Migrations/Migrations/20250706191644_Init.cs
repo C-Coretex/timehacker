@@ -12,11 +12,27 @@ namespace TimeHacker.Migrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
+                    IdentityId = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    PhoneNumberForNotifications = table.Column<string>(type: "text", nullable: true),
+                    EmailForNotifications = table.Column<string>(type: "text", nullable: true),
+                    Birthday = table.Column<DateOnly>(type: "date", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DynamicTask",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "character varying(516)", maxLength: 516, nullable: true),
                     Priority = table.Column<byte>(type: "smallint", nullable: false),
@@ -28,6 +44,12 @@ namespace TimeHacker.Migrations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DynamicTask", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DynamicTask_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -35,7 +57,7 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RepeatingEntity = table.Column<byte[]>(type: "bytea", nullable: false),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastEntityCreated = table.Column<DateOnly>(type: "date", nullable: true),
@@ -44,19 +66,31 @@ namespace TimeHacker.Migrations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ScheduleEntity", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScheduleEntity_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ScheduleSnapshot",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     LastUpdateTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ScheduleSnapshot", x => new { x.UserId, x.Date });
+                    table.ForeignKey(
+                        name: "FK_ScheduleSnapshot_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,7 +98,7 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Category = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Color = table.Column<int>(type: "integer", nullable: false)
@@ -72,6 +106,12 @@ namespace TimeHacker.Migrations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tag", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tag_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,7 +119,7 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     ScheduleEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Description = table.Column<string>(type: "character varying(516)", maxLength: 516, nullable: true),
@@ -93,6 +133,12 @@ namespace TimeHacker.Migrations.Migrations
                         column: x => x.ScheduleEntityId,
                         principalTable: "ScheduleEntity",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Category_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -100,7 +146,7 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     ScheduleEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "character varying(516)", maxLength: 516, nullable: true),
@@ -117,16 +163,22 @@ namespace TimeHacker.Migrations.Migrations
                         column: x => x.ScheduleEntityId,
                         principalTable: "ScheduleEntity",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FixedTask_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ScheduledCategory",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentCategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentScheduleEntity = table.Column<Guid>(type: "uuid", nullable: true),
-                    UserId = table.Column<string>(type: "character varying(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
@@ -148,6 +200,12 @@ namespace TimeHacker.Migrations.Migrations
                         columns: x => new { x.UserId, x.Date },
                         principalTable: "ScheduleSnapshot",
                         principalColumns: new[] { "UserId", "Date" });
+                    table.ForeignKey(
+                        name: "FK_ScheduledCategory_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,16 +300,16 @@ namespace TimeHacker.Migrations.Migrations
                 name: "ScheduledTask",
                 columns: table => new
                 {
-                    Id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentTaskId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ScheduledCategoryId = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
+                    ScheduledCategoryId = table.Column<Guid>(type: "uuid", nullable: true),
                     ParentScheduleEntityId = table.Column<Guid>(type: "uuid", nullable: true),
-                    UserId = table.Column<string>(type: "character varying(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     IsFixed = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Priority = table.Column<long>(type: "bigint", nullable: false),
+                    Priority = table.Column<byte>(type: "smallint", nullable: false),
                     IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     Start = table.Column<TimeSpan>(type: "interval", nullable: false),
                     End = table.Column<TimeSpan>(type: "interval", nullable: false),
@@ -275,6 +333,12 @@ namespace TimeHacker.Migrations.Migrations
                         column: x => x.ScheduledCategoryId,
                         principalTable: "ScheduledCategory",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ScheduledTask_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -398,6 +462,12 @@ namespace TimeHacker.Migrations.Migrations
                 name: "IX_TagFixedTask_TaskId",
                 table: "TagFixedTask",
                 column: "TaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_IdentityId",
+                table: "User",
+                column: "IdentityId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -438,6 +508,9 @@ namespace TimeHacker.Migrations.Migrations
 
             migrationBuilder.DropTable(
                 name: "ScheduleEntity");
+
+            migrationBuilder.DropTable(
+                name: "User");
         }
     }
 }

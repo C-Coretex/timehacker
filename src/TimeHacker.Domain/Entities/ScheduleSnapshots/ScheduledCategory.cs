@@ -1,15 +1,17 @@
 ﻿using System.Drawing;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Domain.Entities.Users;
+using TimeHacker.Helpers.Domain.Abstractions.Classes;
 
 namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
-    public class ScheduledCategory : IDbModel<ulong>
+    public class ScheduledCategory : GuidDbEntity
     {
-        public ulong Id { get; init; }
         public Guid ParentCategoryId { get; init; }
         public Guid? ParentScheduleEntity { get; init; }
 
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
+        public virtual User? User { get; set; }
+
         public DateOnly Date { get; set; }
 
         public string Name { get; set; }

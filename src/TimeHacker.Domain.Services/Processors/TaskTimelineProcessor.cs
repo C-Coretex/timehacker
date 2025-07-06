@@ -8,8 +8,6 @@ namespace TimeHacker.Domain.Services.Processors
 {
     public class TaskTimelineProcessor
     {
-        #region Public
-
         public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
         {
             var returnData = new TasksForDayReturn()
@@ -33,10 +31,6 @@ namespace TimeHacker.Domain.Services.Processors
             };
             return returnData;
         }
-
-        #endregion
-
-        #region Private
 
         private IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
         {
@@ -169,7 +163,5 @@ namespace TimeHacker.Domain.Services.Processors
             var randomDynamicTask = RandomValuesHelper.GetRandomEntries(possibleTimelines, 1).First();
             return randomDynamicTask;
         }
-
-        #endregion
     }
 }

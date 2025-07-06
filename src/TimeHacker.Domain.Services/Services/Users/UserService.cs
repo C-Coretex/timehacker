@@ -1,4 +1,5 @@
-﻿using TimeHacker.Domain.BusinessLogicExceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Users;

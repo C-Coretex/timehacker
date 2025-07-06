@@ -19,19 +19,19 @@ namespace TimeHacker.Domain.Services.Services.Tags
 
         public IQueryable<Tag> GetAll()
         {
-            var userId = _userAccessorBase.UserId!;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             return _tagRepository.GetAll().Where(x => x.UserId == userId);
         }
 
         public Task<Tag> AddAsync(Tag tag)
         {
-            tag.UserId = _userAccessorBase.UserId!;
+            tag.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             return _tagRepository.AddAndSaveAsync(tag);
         }
 
         public async Task<Tag> UpdateAsync(Tag tag)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
 
             if (tag == null)
                 throw new NotProvidedException(nameof(tag));
@@ -51,7 +51,7 @@ namespace TimeHacker.Domain.Services.Services.Tags
 
         public async Task DeleteAsync(Guid id)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             var tag = await _tagRepository.GetByIdAsync(id);
             if (tag == null)
                 return;

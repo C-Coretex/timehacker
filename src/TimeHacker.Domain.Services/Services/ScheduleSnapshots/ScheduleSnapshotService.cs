@@ -24,19 +24,19 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
         {
             var updatedTimestamp = DateTime.UtcNow;
 
-            scheduleSnapshot.UserId = _userAccessorBase.UserId!;
+            scheduleSnapshot.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             scheduleSnapshot.LastUpdateTimestamp = updatedTimestamp;
 
             foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
             {
                 scheduledTask.Date = scheduleSnapshot.Date;
-                scheduledTask.UserId = _userAccessorBase.UserId!;
+                scheduledTask.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
                 scheduledTask.UpdatedTimestamp = updatedTimestamp;
             }
             foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
             {
                 scheduledCategory.Date = scheduleSnapshot.Date;
-                scheduledCategory.UserId = _userAccessorBase.UserId!;
+                scheduledCategory.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
@@ -47,7 +47,8 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
         {
             var query = _scheduleSnapshotRepository.GetAll(false, IncludeExpansionScheduleSnapshots.IncludeScheduledTasks, IncludeExpansionScheduleSnapshots.IncludeScheduledCategories);
 
-            return query.FirstOrDefaultAsync(x => x.UserId == _userAccessorBase.UserId! && x.Date == date);
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
+            return query.FirstOrDefaultAsync(x => x.UserId == userId && x.Date == date);
         }
 
         public Task<ScheduleSnapshot> UpdateAsync(ScheduleSnapshot scheduleSnapshot)
@@ -59,13 +60,13 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
             foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
             {
                 scheduledTask.Date = scheduleSnapshot.Date;
-                scheduledTask.UserId = _userAccessorBase.UserId!;
+                scheduledTask.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
                 scheduledTask.UpdatedTimestamp = updatedTimestamp;
             }
             foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
             {
                 scheduledCategory.Date = scheduleSnapshot.Date;
-                scheduledCategory.UserId = _userAccessorBase.UserId!;
+                scheduledCategory.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
                 scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 

@@ -17,14 +17,14 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
             _userAccessorBase = userAccessorBase;
         }
 
-        public async Task<ScheduledTask?> GetBy(ulong id)
+        public async Task<ScheduledTask?> GetBy(Guid id)
         {
             var scheduledTask = await _scheduledTaskRepository.GetByIdAsync(id);
             if (scheduledTask == null)
                 return null;
 
             //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
-            if (scheduledTask.UserId != _userAccessorBase.UserId)
+            if (scheduledTask.UserId != _userAccessorBase.GetUserIdOrThrowUnauthorized())
                 throw new ArgumentException("User can only get its own tasks.");
 
             return scheduledTask;

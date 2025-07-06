@@ -7,7 +7,7 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
     public class RepositoryBase<TDbContext, TModel> : IRepositoryBase<TModel>
-        where TModel : class, IDbModel, new()
+        where TModel : class, IDbEntity, new()
         where TDbContext : DbContextBase<TDbContext>
     {
         protected TDbContext _dbContext;
@@ -106,7 +106,7 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
     }
 
     public class RepositoryBase<TDbContext, TModel, TId> : RepositoryBase<TDbContext, TModel>, IRepositoryBase<TModel, TId>
-    where TModel : class, IDbModel<TId>, new()
+    where TModel : class, IDbEntity<TId>, new()
     where TDbContext : DbContextBase<TDbContext>
     {
         public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet) : base(dbContext, dbSet)

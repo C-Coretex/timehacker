@@ -1,10 +1,10 @@
 ﻿namespace TimeHacker.Domain.IModels
 {
-    public class UserAccessorBase
+    public abstract class UserAccessorBase
     {
-        public string? UserId { get; init; }
+        public Guid? UserId { get; protected set; }
         public bool IsUserValid;
 
-        public string GetUserIdOrThrowUnauthorized() => UserId ?? throw new UnauthorizedAccessException();
+        public Guid GetUserIdOrThrowUnauthorized() => UserId ?? throw new UnauthorizedAccessException();
     }
 }

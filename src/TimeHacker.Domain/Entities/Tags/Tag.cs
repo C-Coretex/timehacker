@@ -1,12 +1,13 @@
 ﻿using System.Drawing;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Domain.Entities.Users;
+using TimeHacker.Helpers.Domain.Abstractions.Classes;
 
 namespace TimeHacker.Domain.Entities.Tags
 {
-    public class Tag: IDbModel<Guid>
+    public class Tag : GuidDbEntity
     {
-        public Guid Id { get; init; } = Guid.NewGuid();
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
+        public virtual User? User { get; set; }
 
         public string Name { get; set; }
         public string? Category { get; set; }

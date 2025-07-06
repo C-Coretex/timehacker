@@ -20,8 +20,9 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
     {
         public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
         {
+            var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
             var query = scheduleEntityRepository.GetAll(IncludeExpansionScheduleEntity.IncludeFixedTask)
-                .Where(x => x.UserId == userAccessorBase.UserId && (x.EndsOn == null || x.EndsOn >= from));
+                .Where(x => x.UserId == userId && (x.EndsOn == null || x.EndsOn >= from));
 
             return query.Select(scheduleEntity => new ScheduleEntityReturn()
             {
@@ -45,7 +46,7 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
                 return;
 
             //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
-            if (scheduleEntity.UserId != userAccessorBase.UserId)
+            if (scheduleEntity.UserId != userAccessorBase.GetUserIdOrThrowUnauthorized())
                 throw new Exception("User can edit only his own ScheduleEntity.");
 
             var scheduleEntityReturn = ScheduleEntityReturn.Create(scheduleEntity);
@@ -62,7 +63,7 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
         public Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity)
         {
             var scheduleEntity = inputScheduleEntity.GetScheduleEntity();
-            scheduleEntity.UserId = userAccessorBase.UserId!;
+            scheduleEntity.UserId = userAccessorBase.GetUserIdOrThrowUnauthorized()!;
 
             return inputScheduleEntity.ScheduleEntityParentEnum switch
             {

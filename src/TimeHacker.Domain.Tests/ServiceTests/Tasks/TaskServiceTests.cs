@@ -41,10 +41,11 @@ public class TaskServiceTests
     private List<ScheduleEntity> _scheduleEntities;
 
     private readonly ITaskService _tasksService;
+    private readonly Guid _userId = Guid.NewGuid();
 
     public TaskServiceTests()
     {
-        var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+        var userAccessor = new UserAccessorBaseMock(_userId, true);
 
         var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
         var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
@@ -66,8 +67,7 @@ public class TaskServiceTests
     {
         // Arrange
         var date = DateTime.Now.Date;
-        var userId = "TestIdentifier";
-        SetupMocks(date, userId);
+        SetupMocks(date, _userId);
 
         // Act
         var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(date));
@@ -86,8 +86,7 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
 
         // Act
         var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
@@ -107,8 +106,7 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
 
         // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
@@ -124,8 +122,7 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
 
         // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
@@ -145,8 +142,7 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "IncorrectIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], Guid.NewGuid());
 
         // Act
         var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
@@ -163,11 +159,10 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
         var fixedTask = new FixedTask()
         {
-            UserId = userId,
+            UserId = _userId,
             Name = "TestFixedTask1",
             Priority = 1,
             Description = "Test description",
@@ -181,7 +176,7 @@ public class TaskServiceTests
         {
             new()
             {
-                UserId = userId,
+                UserId = _userId,
                 LastEntityCreated = null,
                 EndsOn = null,
                 CreatedTimestamp = dates[0],
@@ -214,7 +209,7 @@ public class TaskServiceTests
 
     #region Mock helpers
 
-    private void SetupMocks(DateTime date, string userId)
+    private void SetupMocks(DateTime date, Guid userId)
     {
         _dynamicTasks =
         [
@@ -242,7 +237,7 @@ public class TaskServiceTests
 
             new()
             {
-                UserId = "IncorrectUserId",
+                UserId = Guid.NewGuid(),
                 Name = "TestDynamicTask3",
                 Priority = 1,
                 Description = "Test description",
@@ -277,7 +272,7 @@ public class TaskServiceTests
 
             new()
             {
-                UserId = "IncorrectUserId",
+                UserId = Guid.NewGuid(),
                 Name = "TestFixedTask3",
                 Priority = 1,
                 Description = "Test description",
@@ -287,7 +282,7 @@ public class TaskServiceTests
 
             new()
             {
-                UserId = "IncorrectUserId",
+                UserId = Guid.NewGuid(),
                 Name = "TestFixedTask4",
                 Priority = 1,
                 Description = "Test description",

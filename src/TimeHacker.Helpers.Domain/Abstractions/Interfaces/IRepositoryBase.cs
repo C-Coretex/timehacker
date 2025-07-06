@@ -4,7 +4,7 @@ using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 
 namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
 {
-    public interface IRepositoryBase<TModel> where TModel : class, IDbModel, new()
+    public interface IRepositoryBase<TModel> where TModel : class, IDbEntity, new()
     {
         IQueryable<TModel> GetAll(params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
         IQueryable<TModel> GetAll(bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);
@@ -24,7 +24,7 @@ namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 
-    public interface IRepositoryBase<TModel, TId>: IRepositoryBase<TModel> where TModel : class, IDbModel<TId>, new()
+    public interface IRepositoryBase<TModel, TId>: IRepositoryBase<TModel> where TModel : class, IDbEntity<TId>, new()
     {
         Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default);
         Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates);

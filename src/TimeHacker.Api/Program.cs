@@ -6,6 +6,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using TimeHacker.Api.Filters;
 using TimeHacker.Api.Helpers;
+using TimeHacker.Api.Middleware;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.Services.Extensions;
 using TimeHacker.Infrastructure.Extensions;
@@ -26,6 +27,13 @@ AddDbServices(builder.Services, timeHackerConnectionString, identityConnectionSt
 AddIdentityServices(builder.Services);
 
 AddApplicationServices(builder.Services);
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+});
 
 builder.Services.AddProblemDetails(options =>
 {
@@ -84,6 +92,10 @@ app.MapHealthChecks("/health");
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseSession();
+
+app.UseMiddleware<UserAccessorInitMiddleware>();
 
 app.UseAuthorization();
 app.MapIdentityApi<IdentityUser>();

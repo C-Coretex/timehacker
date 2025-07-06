@@ -6,7 +6,7 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 namespace TimeHacker.Infrastructure.Repositories.Tasks
 {
     public class TaskRepository<TTask, TId> : RepositoryBase<TimeHackerDbContext, TTask, TId>, ITaskRepository<TTask, TId>
-        where TTask : class, IDbModel<TId>, new()
+        where TTask : class, IDbEntity<TId>, new()
     {
         public TaskRepository(TimeHackerDbContext dbContext, DbSet<TTask> dbSet) : base(dbContext, dbSet)
         {

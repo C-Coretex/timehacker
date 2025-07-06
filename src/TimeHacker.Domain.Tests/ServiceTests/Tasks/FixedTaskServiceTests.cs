@@ -24,10 +24,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         private List<FixedTask> _fixedTasks;
 
         private readonly IFixedTaskService _fixedTaskService;
+        private readonly Guid _userId = Guid.NewGuid();
 
         public FixedTaskServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             _fixedTaskService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
         }
@@ -38,31 +39,29 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var newEntry = new FixedTask()
             {
                 Name = "TestFixedTask1000",
-                UserId = "IncorrectUserId"
+                UserId = Guid.NewGuid()
             };
             await _fixedTaskService.AddAsync(newEntry);
             var result = _fixedTasks.FirstOrDefault(x => x.Id == newEntry.Id);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
-            result!.UserId.Should().Be(userId);
+            result!.UserId.Should().Be(_userId);
         }
 
         [Fact]
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var newEntry = new FixedTask()
             {
-                Id = _fixedTasks.First(x => x.UserId == userId).Id,
+                Id = _fixedTasks.First(x => x.UserId == _userId).Id,
                 Name = "TestFixedTask1000"
             };
             await _fixedTaskService.UpdateAsync(newEntry);
@@ -77,12 +76,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
                 var newEntry = new FixedTask()
                 {
-                    Id = _fixedTasks.First(x => x.UserId != userId).Id,
+                    Id = _fixedTasks.First(x => x.UserId != _userId).Id,
                     Name = "TestFixedTask1000"
                 };
                 await _fixedTaskService.UpdateAsync(newEntry);
@@ -94,10 +92,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
-            var idToDelete = _fixedTasks.First(x => x.UserId == userId).Id;
+            var idToDelete = _fixedTasks.First(x => x.UserId == _userId).Id;
             await _fixedTaskService.DeleteAsync(idToDelete);
             var result = _fixedTasks.FirstOrDefault(x => x.Id == idToDelete);
             result.Should().BeNull();
@@ -109,10 +106,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
-                await _fixedTaskService.DeleteAsync(_fixedTasks.First(x => x.UserId != userId).Id);
+                await _fixedTaskService.DeleteAsync(_fixedTasks.First(x => x.UserId != _userId).Id);
             });
         }
 
@@ -120,23 +116,21 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         [Trait("GetAll", "Should return correct data")]
         public void GetAll_ShouldReturnCorrectData()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var result = _fixedTaskService.GetAll().ToList();
 
             result.Count.Should().Be(2);
-            result.Should().BeEquivalentTo(_fixedTasks.Where(x => x.UserId == userId).ToList());
+            result.Should().BeEquivalentTo(_fixedTasks.Where(x => x.UserId == _userId).ToList());
         }
 
         [Fact]
         [Trait("GetByIdAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
-            var id = _fixedTasks.First(x => x.UserId == userId).Id;
+            var id = _fixedTasks.First(x => x.UserId == _userId).Id;
             var result = await _fixedTaskService.GetByIdAsync(id);
             result.Should().NotBeNull();
             result!.Id.Should().Be(id);
@@ -146,10 +140,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         [Trait("GetByIdAsync", "Should return nothing on incorrect userId")]
         public async Task GetByIdAsync_ShouldThrow()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
-            var result = await _fixedTaskService.GetByIdAsync(_fixedTasks.First(x => x.UserId != userId).Id);
+            var result = await _fixedTaskService.GetByIdAsync(_fixedTasks.First(x => x.UserId != _userId).Id);
             result.Should().BeNull();
         }
 
@@ -157,12 +150,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         [Trait("UpdateScheduleEntityAsync", "Should update schedule entry")]
         public async Task UpdateScheduleEntityAsync_ShouldUpdateEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var newEntry = new ScheduleEntity();
 
-            var id = _fixedTasks.First(x => x.UserId == userId).Id;
+            var id = _fixedTasks.First(x => x.UserId == _userId).Id;
             await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, id);
             var result = _fixedTasks.FirstOrDefault(x => x.Id == id);
             result.Should().NotBeNull();
@@ -176,17 +168,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
                 var newEntry = new ScheduleEntity();
-                await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, _fixedTasks.First(x => x.UserId != userId).Id);
+                await _fixedTaskService.UpdateScheduleEntityAsync(newEntry, _fixedTasks.First(x => x.UserId != _userId).Id);
             });
         }
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _fixedTasks =
             [
@@ -213,7 +204,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask3",
                     Priority = 1,
                     Description = "Test description",
@@ -224,7 +215,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask4",
                     Priority = 1,
                     Description = "Test description",

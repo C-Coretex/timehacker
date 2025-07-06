@@ -20,7 +20,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
 
         public async Task AddAsync(DynamicTask task)
         {
-            var userId = _userAccessorBase.UserId!;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             task.UserId = userId;
 
             await _dynamicTaskRepository.AddAndSaveAsync(task);
@@ -28,7 +28,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
 
         public async Task UpdateAsync(DynamicTask task)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
 
             if (task == null)
                 throw new NotProvidedException(nameof(task));
@@ -60,7 +60,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
 
         public IQueryable<DynamicTask> GetAll()
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             return _dynamicTaskRepository.GetAll().Where(x => x.UserId == userId);
         }
 

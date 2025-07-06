@@ -21,14 +21,14 @@ namespace TimeHacker.Domain.Services.Services.Categories
 
         public async Task AddAsync(Category category)
         {
-            var userId = _userAccessorBase.UserId!;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             category.UserId = userId;
 
             await _categoryRepository.AddAndSaveAsync(category);
         }
         public async Task UpdateAsync(Category category)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
 
             if (category == null)
                 throw new NotProvidedException(nameof(category));
@@ -50,7 +50,7 @@ namespace TimeHacker.Domain.Services.Services.Categories
         }
         public async Task DeleteAsync(Guid id)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
                 return;
@@ -71,7 +71,7 @@ namespace TimeHacker.Domain.Services.Services.Categories
 
         public async Task<ScheduleEntity> UpdateScheduleEntityAsync(ScheduleEntity scheduleEntity, Guid categoryId)
         {
-            var userId = _userAccessorBase.UserId!;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized()!;
             if (scheduleEntity == null)
                 throw new NotProvidedException(nameof(scheduleEntity));
 
@@ -85,7 +85,7 @@ namespace TimeHacker.Domain.Services.Services.Categories
 
         private IQueryable<Category> GetAll(bool asNoTracking)
         {
-            var userId = _userAccessorBase.UserId;
+            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
             return _categoryRepository.GetAll(asNoTracking).Where(x => x.UserId == userId);
         }
     }
