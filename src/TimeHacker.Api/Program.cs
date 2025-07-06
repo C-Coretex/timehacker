@@ -31,7 +31,7 @@ AddApplicationServices(builder.Services);
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
 });
 
@@ -167,7 +167,7 @@ static void AddIdentityServices(IServiceCollection services)
 {
     services.AddAuthorization();
     services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
-
+    
     services.AddIdentityCore<IdentityUser>(o =>
         {
             o.Password.RequireDigit = true;
