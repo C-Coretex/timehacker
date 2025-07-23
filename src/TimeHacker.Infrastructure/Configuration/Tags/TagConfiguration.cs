@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeHacker.Domain.Contracts.Entities.Tags;
+using TimeHacker.Domain.Entities.Tags;
 
 namespace TimeHacker.Infrastructure.Configuration.Tags
 {

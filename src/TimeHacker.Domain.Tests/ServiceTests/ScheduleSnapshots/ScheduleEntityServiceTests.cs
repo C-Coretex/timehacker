@@ -1,22 +1,20 @@
 ﻿using System.Drawing;
-using AutoMapper;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.Tasks;
-using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Models.EntityModels;
-using TimeHacker.Domain.Contracts.Models.EntityModels.Enums;
-using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Contracts.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Domain.Services.Categories;
-using TimeHacker.Domain.Services.ScheduleSnapshots;
-using TimeHacker.Domain.Services.Tasks;
-using TimeHacker.Domain.Tests.Helpers;
+using TimeHacker.Domain.Models.EntityModels;
+using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IRepositories.Categories;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories.Tasks;
+using TimeHacker.Domain.IServices.ScheduleSnapshots;
+using TimeHacker.Domain.Models.EntityModels.Enums;
+using TimeHacker.Domain.Services.Services.Categories;
+using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
+using TimeHacker.Domain.Services.Services.Tasks;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
@@ -39,17 +37,17 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         private List<Category> _categories;
         private List<ScheduleEntity> _scheduledEntities;
 
+        private readonly Guid _userId = Guid.NewGuid();
+
         private readonly IScheduleEntityService _scheduleEntityService;
 
         public ScheduleEntityServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
-            var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
-            var mapper = new Mapper(mapperConfiguration);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             var fixedTaskService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
             var categoryService = new CategoryService(_categoriesRepository.Object, userAccessor);
-            _scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTaskService, categoryService, userAccessor, mapper);
+            _scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTaskService, categoryService, userAccessor);
         }
 
         #endregion
@@ -58,16 +56,15 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetAllFrom", "Should return correct data")]
         public void GetAllFrom_ShouldReturnCorrectData()
         {
-            var userId = "TestIdentifier";
             var date = DateTime.Now;
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             _scheduledEntities.Clear();
             _scheduledEntities.AddRange(
             [
                 new()
                 {
-                    UserId = userId,
+                    UserId = _userId,
                     CreatedTimestamp = date,
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()],
@@ -76,28 +73,28 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = userId,
+                    UserId = _userId,
                     CreatedTimestamp = date.AddDays(-1),
                     EndsOn = DateOnly.FromDateTime(date)
                 },
 
                 new()
                 {
-                    UserId = userId,
+                    UserId = _userId,
                     CreatedTimestamp = date.AddDays(-1).AddMinutes(10),
                     EndsOn = DateOnly.FromDateTime(date.AddDays(-1).AddMinutes(10))
                 },
 
                 new()
                 {
-                    UserId = userId,
+                    UserId = _userId,
                     CreatedTimestamp = date.AddDays(-2),
                     EndsOn = DateOnly.FromDateTime(date.AddDays(-2))
                 },
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     CreatedTimestamp = date,
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()],
@@ -106,14 +103,14 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     CreatedTimestamp = date.AddDays(-1),
                     EndsOn = DateOnly.FromDateTime(date)
                 },
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     CreatedTimestamp = date.AddDays(-2),
                     EndsOn = DateOnly.FromDateTime(date.AddDays(-2))
                 }
@@ -123,7 +120,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             var actual = _scheduleEntityService.GetAllFrom(from).ToList();
             actual.Should().NotBeNull();
 
-            var expected = _scheduledEntities.Where(x => x.UserId == userId && (x.EndsOn == null || x.EndsOn >= from))
+            var expected = _scheduledEntities.Where(x => x.UserId == _userId && (x.EndsOn == null || x.EndsOn >= from))
                 .ToList();
             actual.Count.Should().Be(expected.Count);
             actual.Should().BeEquivalentTo(expected);
@@ -133,11 +130,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("UpdateLastEntityCreated", "Should update data")]
         public async Task UpdateLastEntityCreated_ShouldUpdateData()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var lastEntryCreated = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
-            var scheduleEntityId = _scheduledEntities.First(x => x.UserId == userId).Id;
+            var scheduleEntityId = _scheduledEntities.First(x => x.UserId == _userId).Id;
             await _scheduleEntityService.UpdateLastEntityCreated(scheduleEntityId, lastEntryCreated);
             var actual = _scheduledEntities.First(x => x.Id == scheduleEntityId);
             actual.LastEntityCreated.Should().Be(lastEntryCreated);
@@ -147,12 +143,17 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("UpdateLastEntityCreated", "Should throw exception on incorrect data")]
         public async Task UpdateLastEntityCreated_ShouldThrow(bool existingEntry)
         {
+            SetupMocks(_userId);
+
+            if (!existingEntry)
+            {
+                await _scheduleEntityService.UpdateLastEntityCreated(Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Now));
+                return;
+            }
+
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
-
-                await _scheduleEntityService.UpdateLastEntityCreated(existingEntry ? _scheduledEntities.First(x => x.UserId != userId).Id : Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Now));
+                await _scheduleEntityService.UpdateLastEntityCreated(_scheduledEntities.First(x => x.UserId != _userId).Id, DateOnly.FromDateTime(DateTime.Now));
             });
         }
 
@@ -163,10 +164,11 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
-                await _scheduleEntityService.UpdateLastEntityCreated(_scheduledEntities.First(x => x.UserId == userId).Id, DateOnly.FromDateTime(DateTime.Now.AddDays(1)));
+                await _scheduleEntityService.UpdateLastEntityCreated(
+                    _scheduledEntities.First(x => x.UserId == _userId).Id, 
+                    DateOnly.FromDateTime(DateTime.Now.AddDays(1)));
             });
         }
 
@@ -174,8 +176,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("Save", "Should save data")]
         public async Task Save_ShouldSaveData(bool isCategory)
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var repeatingEntity = new RepeatingEntityModel()
             {
@@ -188,8 +189,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 ScheduleEntityParentEnum =
                     isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
                 ParentEntityId = isCategory
-                    ? _categories.First(x => x.UserId == userId).Id
-                    : _fixedTasks.First(x => x.UserId == userId).Id,
+                    ? _categories.First(x => x.UserId == _userId).Id
+                    : _fixedTasks.First(x => x.UserId == _userId).Id,
                 RepeatingEntityModel = repeatingEntity
             };
             var expected = await _scheduleEntityService.Save(inputData);
@@ -200,7 +201,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
             expected.Should().Be(actual2);
             actual2!.RepeatingEntity.Should().Be(repeatingEntity);
-            actual2!.UserId.Should().Be(userId);
+            actual2!.UserId.Should().Be(_userId);
         }
 
 
@@ -210,13 +211,12 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var userId = "TestIdentifier";
-                SetupMocks(userId);
+                SetupMocks(_userId);
 
                 var actual = await _scheduleEntityService.Save(new InputScheduleEntityModel()
                 {
                     ScheduleEntityParentEnum = isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
-                    ParentEntityId = existingEntry ? _scheduledEntities.First(x => x.UserId != userId).Id : Guid.NewGuid(),
+                    ParentEntityId = existingEntry ? _scheduledEntities.First(x => x.UserId != _userId).Id : Guid.NewGuid(),
                     RepeatingEntityModel = new RepeatingEntityModel()
                     {
                         EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
@@ -229,7 +229,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _scheduledEntities =
             [
@@ -254,7 +254,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     CreatedTimestamp = DateTime.Now,
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()]
@@ -262,7 +262,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     CreatedTimestamp = DateTime.Now,
                 }
             ];
@@ -295,7 +295,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask3",
                     Priority = 1,
                     Description = "Test description",
@@ -306,7 +306,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask4",
                     Priority = 1,
                     Description = "Test description",
@@ -338,7 +338,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask3",
                     Description = "Test description",
                     ScheduleEntity = new ScheduleEntity()
@@ -346,7 +346,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Name = "TestFixedTask4",
                     Description = "Test description",
                 }

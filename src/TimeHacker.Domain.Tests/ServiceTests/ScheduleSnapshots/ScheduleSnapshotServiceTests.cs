@@ -1,11 +1,9 @@
-﻿using AutoBogus;
-using FluentAssertions;
+﻿using AwesomeAssertions;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IServices.ScheduleSnapshots;
-using TimeHacker.Domain.Services.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.IServices.ScheduleSnapshots;
+using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
@@ -26,10 +24,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         private List<ScheduleSnapshot> _scheduleSnapshots;
 
         private readonly IScheduleSnapshotService _scheduleSnapshotService;
-
+        private readonly Guid _userId = Guid.NewGuid();
         public ScheduleSnapshotServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
+            var userAccessor = new UserAccessorBaseMock(_userId, true);
 
             _scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
         }
@@ -37,17 +35,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         #endregion
 
         [Fact]
-        [Trait("AddAsync", "Should add entry with correct data")]
+        [Trait("AddAndSaveAsync", "Should add entry with correct data")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var date = DateOnly.FromDateTime(DateTime.Now);
             var lastUpdateTimestamp = DateTime.Now;
             var newEntry = new ScheduleSnapshot()
             {
-                UserId = userId,
+                UserId = _userId,
                 Date = date,
                 LastUpdateTimestamp = lastUpdateTimestamp,
                 ScheduledCategories = [new(), new(), new()],
@@ -56,7 +53,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
             await Task.Delay(100);
             var actual = await _scheduleSnapshotService.AddAsync(newEntry);
-            var actual2 = _scheduleSnapshots.FirstOrDefault(x => x.UserId == userId && x.Date == date);
+            var actual2 = _scheduleSnapshots.FirstOrDefault(x => x.UserId == _userId && x.Date == date);
 
             actual2.Should().NotBeNull();
             actual.Should().Be(actual2);
@@ -82,8 +79,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetByAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry(bool correctUser)
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var date = DateOnly.FromDateTime(DateTime.Now.AddDays(correctUser ? -1 : 0));
             var actual = await _scheduleSnapshotService.GetByAsync(date);
@@ -91,7 +87,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             {
                 actual.Should().NotBeNull();
 
-                var expected = _scheduleSnapshots.First(x => x.UserId == userId && x.Date == date);
+                var expected = _scheduleSnapshots.First(x => x.UserId == _userId && x.Date == date);
                 actual.Should().Be(expected);
             }
             else
@@ -99,17 +95,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         }
 
         [Fact]
-        [Trait("UpdateAsync", "Should update entry")]
+        [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldAddEntry()
         {
-            var userId = "TestIdentifier";
-            SetupMocks(userId);
+            SetupMocks(_userId);
 
             var date = DateOnly.FromDateTime(DateTime.Now);
             var lastUpdateTimestamp = DateTime.Now;
             var newEntry = new ScheduleSnapshot()
             {
-                UserId = userId,
+                UserId = _userId,
                 Date = date,
                 LastUpdateTimestamp = lastUpdateTimestamp,
                 ScheduledCategories = [new(), new(), new()],
@@ -118,7 +113,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
             await Task.Delay(100);
             var actual = await _scheduleSnapshotService.UpdateAsync(newEntry);
-            var actual2 = _scheduleSnapshots.FirstOrDefault(x => x.UserId == userId && x.Date == date);
+            var actual2 = _scheduleSnapshots.FirstOrDefault(x => x.UserId == _userId && x.Date == date);
 
             actual2.Should().NotBeNull();
             actual.Should().Be(actual2);
@@ -142,7 +137,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         #region Mock helpers
 
-        private void SetupMocks(string userId)
+        private void SetupMocks(Guid userId)
         {
             _scheduleSnapshots =
             [
@@ -166,7 +161,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Date = DateOnly.FromDateTime(DateTime.Now),
                     LastUpdateTimestamp = DateTime.Now.AddHours(-4),
                     ScheduledTasks = [new ScheduledTask()],
@@ -175,7 +170,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
                 new()
                 {
-                    UserId = "IncorrectUserId",
+                    UserId = Guid.NewGuid(),
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
                     LastUpdateTimestamp = DateTime.Now.AddHours(-4),
                     ScheduledTasks = [new ScheduledTask()],
@@ -185,13 +180,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
             _scheduleSnapshotRepository.As<IRepositoryBase<ScheduleSnapshot>>().SetupRepositoryMock(_scheduleSnapshots);
 
-            _scheduleSnapshotRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>()))
-                .Callback<ScheduleSnapshot, bool>((entry, _) =>
+            _scheduleSnapshotRepository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
+                .Callback<ScheduleSnapshot, CancellationToken>((entry, _) =>
                 {
                     _scheduleSnapshots.RemoveAll(x => x.UserId!.Equals(entry.UserId) && x.Date!.Equals(entry.Date));
                     _scheduleSnapshots.Add(entry);
                 })
-                .Returns<ScheduleSnapshot, bool>((entry, _) => Task.FromResult(entry));
+                .Returns<ScheduleSnapshot, CancellationToken>((entry, _) => Task.FromResult(entry));
         }
 
         #endregion

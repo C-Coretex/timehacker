@@ -1,21 +1,18 @@
-﻿using AutoMapper;
-using FluentAssertions;
+﻿using AwesomeAssertions;
 using MockQueryable;
-using MockQueryable.Moq;
 using Moq;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
-using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.Tasks;
-using TimeHacker.Domain.Contracts.IServices.Tasks;
-using TimeHacker.Domain.Contracts.Models.EntityModels;
-using TimeHacker.Domain.Contracts.Models.EntityModels.Enums;
-using TimeHacker.Domain.Contracts.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Services.Categories;
-using TimeHacker.Domain.Services.ScheduleSnapshots;
-using TimeHacker.Domain.Services.Tasks;
-using TimeHacker.Domain.Tests.Helpers;
+using TimeHacker.Domain.Models.EntityModels;
+using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IRepositories.Categories;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories.Tasks;
+using TimeHacker.Domain.IServices.Tasks;
+using TimeHacker.Domain.Models.EntityModels.Enums;
+using TimeHacker.Domain.Services.Services.Categories;
+using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
+using TimeHacker.Domain.Services.Services.Tasks;
 using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
@@ -44,22 +41,20 @@ public class TaskServiceTests
     private List<ScheduleEntity> _scheduleEntities;
 
     private readonly ITaskService _tasksService;
+    private readonly Guid _userId = Guid.NewGuid();
 
     public TaskServiceTests()
     {
-        var userAccessor = new UserAccessorBaseMock("TestIdentifier", true);
-        var mapperConfiguration = AutomapperHelpers.GetMapperConfiguration();
-        var mapper = new Mapper(mapperConfiguration);
+        var userAccessor = new UserAccessorBaseMock(_userId, true);
 
         var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
         var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
         var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
         var categoryService = new CategoryService(_categoryRepository.Object, userAccessor);
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTasksService,
-            categoryService, userAccessor, mapper);
+            categoryService, userAccessor);
 
-        _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService,
-            scheduleEntityService, mapper);
+        _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService, scheduleEntityService);
     }
 
     #endregion
@@ -72,8 +67,7 @@ public class TaskServiceTests
     {
         // Arrange
         var date = DateTime.Now.Date;
-        var userId = "TestIdentifier";
-        SetupMocks(date, userId);
+        SetupMocks(date, _userId);
 
         // Act
         var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(date));
@@ -92,11 +86,10 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
 
         // Act
-        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -113,12 +106,11 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
 
         // Act
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
@@ -130,14 +122,13 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
 
         // Act
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
@@ -151,11 +142,10 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "IncorrectIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], Guid.NewGuid());
 
         // Act
-        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result.Should().NotBeNull();
@@ -169,11 +159,10 @@ public class TaskServiceTests
     {
         // Arrange
         var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        var userId = "TestIdentifier";
-        SetupMocks(dates[1], userId);
+        SetupMocks(dates[1], _userId);
         var fixedTask = new FixedTask()
         {
-            UserId = userId,
+            UserId = _userId,
             Name = "TestFixedTask1",
             Priority = 1,
             Description = "Test description",
@@ -187,7 +176,7 @@ public class TaskServiceTests
         {
             new()
             {
-                UserId = userId,
+                UserId = _userId,
                 LastEntityCreated = null,
                 EndsOn = null,
                 CreatedTimestamp = dates[0],
@@ -206,8 +195,8 @@ public class TaskServiceTests
         
 
         // Act
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime)).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
         // Assert
         result1.Should().NotBeNull();
@@ -220,7 +209,7 @@ public class TaskServiceTests
 
     #region Mock helpers
 
-    private void SetupMocks(DateTime date, string userId)
+    private void SetupMocks(DateTime date, Guid userId)
     {
         _dynamicTasks =
         [
@@ -248,7 +237,7 @@ public class TaskServiceTests
 
             new()
             {
-                UserId = "IncorrectUserId",
+                UserId = Guid.NewGuid(),
                 Name = "TestDynamicTask3",
                 Priority = 1,
                 Description = "Test description",
@@ -283,7 +272,7 @@ public class TaskServiceTests
 
             new()
             {
-                UserId = "IncorrectUserId",
+                UserId = Guid.NewGuid(),
                 Name = "TestFixedTask3",
                 Priority = 1,
                 Description = "Test description",
@@ -293,7 +282,7 @@ public class TaskServiceTests
 
             new()
             {
-                UserId = "IncorrectUserId",
+                UserId = Guid.NewGuid(),
                 Name = "TestFixedTask4",
                 Priority = 1,
                 Description = "Test description",
@@ -309,18 +298,18 @@ public class TaskServiceTests
         _scheduleSnapshotRepository
             .Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>()))
             .Returns(_scheduleSnapshots.AsQueryable().BuildMock());
-        _scheduleSnapshotRepository.Setup(x => x.AddAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>()))
-            .Callback<ScheduleSnapshot, bool>((model, saveChanges) => { _scheduleSnapshots.Add(model); })
-            .Returns<ScheduleSnapshot, bool>((model, saveChanges) => Task.FromResult(model));
+        _scheduleSnapshotRepository.Setup(x => x.AddAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
+            .Callback<ScheduleSnapshot, CancellationToken>((model, _) => { _scheduleSnapshots.Add(model); })
+            .Returns<ScheduleSnapshot, CancellationToken>((model, _) => Task.FromResult(model));
 
-        _scheduleSnapshotRepository.Setup(x => x.UpdateAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<bool>()))
-            .Callback<ScheduleSnapshot, bool>((model, saveChanges) =>
+        _scheduleSnapshotRepository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
+            .Callback<ScheduleSnapshot, CancellationToken>((model, _) =>
             {
                 var existingObj =
                     _scheduleSnapshots.First(x => x.UserId == model.UserId && x.Date == model.Date);
                 _scheduleSnapshots.Remove(existingObj);
                 _scheduleSnapshots.Add(model);
-            }).Returns<ScheduleSnapshot, bool>((model, saveChanges) => Task.FromResult(model));
+            }).Returns<ScheduleSnapshot, CancellationToken>((model, _) => Task.FromResult(model));
 
         _scheduleEntities = [];
 

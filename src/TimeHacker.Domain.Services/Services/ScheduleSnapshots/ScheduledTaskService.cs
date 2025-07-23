@@ -1,0 +1,33 @@
+﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IModels;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.IServices.ScheduleSnapshots;
+
+namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
+{
+    public class ScheduledTaskService: IScheduledTaskService
+    {
+        private readonly IScheduledTaskRepository _scheduledTaskRepository;
+
+        private readonly UserAccessorBase _userAccessorBase;
+
+        public ScheduledTaskService(IScheduledTaskRepository scheduledTaskRepository, UserAccessorBase userAccessorBase)
+        {
+            _scheduledTaskRepository = scheduledTaskRepository;
+            _userAccessorBase = userAccessorBase;
+        }
+
+        public async Task<ScheduledTask?> GetBy(Guid id)
+        {
+            var scheduledTask = await _scheduledTaskRepository.GetByIdAsync(id);
+            if (scheduledTask == null)
+                return null;
+
+            //TODO: will be removed after repository level filtrations, it will just be null and another exception will be thrown
+            if (scheduledTask.UserId != _userAccessorBase.GetUserIdOrThrowUnauthorized())
+                throw new ArgumentException("User can only get its own tasks.");
+
+            return scheduledTask;
+        }
+    }
+}
