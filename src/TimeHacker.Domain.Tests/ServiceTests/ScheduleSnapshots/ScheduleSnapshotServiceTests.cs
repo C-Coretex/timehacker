@@ -41,12 +41,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             SetupMocks(_userId);
 
             var date = DateOnly.FromDateTime(DateTime.Now);
-            var lastUpdateTimestamp = DateTime.Now;
             var newEntry = new ScheduleSnapshot()
             {
                 UserId = _userId,
                 Date = date,
-                LastUpdateTimestamp = lastUpdateTimestamp,
                 ScheduledCategories = [new(), new(), new()],
                 ScheduledTasks = [new(), new(), new()]
             };
@@ -58,19 +56,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             actual2.Should().NotBeNull();
             actual.Should().Be(actual2);
 
-            actual.LastUpdateTimestamp.Should().NotBe(lastUpdateTimestamp);
             actual.ScheduledCategories.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledCategories.Count.Should().Be(3);
             actual.ScheduledTasks.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledTasks.Count.Should().Be(3);
         }
@@ -101,12 +96,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             SetupMocks(_userId);
 
             var date = DateOnly.FromDateTime(DateTime.Now);
-            var lastUpdateTimestamp = DateTime.Now;
             var newEntry = new ScheduleSnapshot()
             {
                 UserId = _userId,
                 Date = date,
-                LastUpdateTimestamp = lastUpdateTimestamp,
                 ScheduledCategories = [new(), new(), new()],
                 ScheduledTasks = [new(), new(), new()]
             };
@@ -118,19 +111,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             actual2.Should().NotBeNull();
             actual.Should().Be(actual2);
 
-            actual.LastUpdateTimestamp.Should().NotBe(lastUpdateTimestamp);
             actual.ScheduledCategories.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledCategories.Count.Should().Be(3);
             actual.ScheduledTasks.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledTasks.Count.Should().Be(3);
         }
@@ -145,7 +135,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 {
                     UserId = userId,
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()]
                 },
@@ -154,7 +143,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 {
                     UserId = userId,
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-2)),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()]
                 },
@@ -163,7 +151,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 {
                     UserId = Guid.NewGuid(),
                     Date = DateOnly.FromDateTime(DateTime.Now),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()]
                 },
@@ -172,7 +159,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 {
                     UserId = Guid.NewGuid(),
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
                     ScheduledTasks = [new ScheduledTask()],
                     ScheduledCategories = [new ScheduledCategory()]
                 },

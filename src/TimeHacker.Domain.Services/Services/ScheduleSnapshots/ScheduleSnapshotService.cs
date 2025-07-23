@@ -22,22 +22,17 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
 
         public Task<ScheduleSnapshot> AddAsync(ScheduleSnapshot scheduleSnapshot)
         {
-            var updatedTimestamp = DateTime.UtcNow;
-
             scheduleSnapshot.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-            scheduleSnapshot.LastUpdateTimestamp = updatedTimestamp;
 
             foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
             {
                 scheduledTask.Date = scheduleSnapshot.Date;
                 scheduledTask.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-                scheduledTask.UpdatedTimestamp = updatedTimestamp;
             }
             foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
             {
                 scheduledCategory.Date = scheduleSnapshot.Date;
                 scheduledCategory.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-                scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
             return _scheduleSnapshotRepository.AddAndSaveAsync(scheduleSnapshot);
@@ -53,21 +48,15 @@ namespace TimeHacker.Domain.Services.Services.ScheduleSnapshots
 
         public Task<ScheduleSnapshot> UpdateAsync(ScheduleSnapshot scheduleSnapshot)
         {
-            var updatedTimestamp = DateTime.UtcNow;
-
-            scheduleSnapshot.LastUpdateTimestamp = updatedTimestamp;
-
             foreach (var scheduledTask in scheduleSnapshot.ScheduledTasks)
             {
                 scheduledTask.Date = scheduleSnapshot.Date;
                 scheduledTask.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-                scheduledTask.UpdatedTimestamp = updatedTimestamp;
             }
             foreach (var scheduledCategory in scheduleSnapshot.ScheduledCategories)
             {
                 scheduledCategory.Date = scheduleSnapshot.Date;
                 scheduledCategory.UserId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-                scheduledCategory.UpdatedTimestamp = updatedTimestamp;
             }
 
             return _scheduleSnapshotRepository.UpdateAndSaveAsync(scheduleSnapshot);

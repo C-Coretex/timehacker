@@ -3,6 +3,7 @@ using MockQueryable.Moq;
 using Moq;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Domain.Tests.Mocks.Extensions
 {

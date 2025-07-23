@@ -1,4 +1,4 @@
-﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
+﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity
 {
     public interface IDbEntity<T>: IDbEntity
     {

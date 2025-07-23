@@ -19,7 +19,6 @@ namespace TimeHacker.Domain.Entities.Tasks
 
         public DateTime StartTimestamp { get; set; }
         public DateTime EndTimestamp { get; set; }
-        public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
 
         public virtual ScheduleEntity? ScheduleEntity { get; set; }
         public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];

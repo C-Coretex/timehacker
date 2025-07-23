@@ -3,9 +3,14 @@ using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
+    /// <summary>
+    /// ExecuteUpdateAsync and ExecuteDeleteAsync should not be available for services. If you need them, extend specific repository with specific business logic method.
+    /// If you are using ExecuteUpdateAsync don't forget to manually set UpdatedTimestamp property, since SaveChangesAsync method is not being executed.
+    /// </summary>
     public class RepositoryBase<TDbContext, TModel> : IRepositoryBase<TModel>
         where TModel : class, IDbEntity, new()
         where TDbContext : DbContextBase<TDbContext>
@@ -37,9 +42,11 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         {
             return _dbContext.AddEntity(_dbSet, model);
         }
-        public virtual Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
+        public virtual async Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.AddEntityAndSaveAsync(_dbSet, model, cancellationToken);
+            var entity = Add(model);
+            await SaveChangesAsync(cancellationToken);
+            return entity;
         }
 
         public virtual void AddRange(IEnumerable<TModel> models)
@@ -48,7 +55,8 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         }
         public virtual Task AddRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
-            return _dbContext.AddEntitiesAndSaveAsync(_dbSet, models, cancellationToken);
+            AddRange(models);
+            return SaveChangesAsync(cancellationToken);
         }
 
         public virtual void Delete(TModel model)
@@ -57,7 +65,8 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         }
         public virtual Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.RemoveEntityAndSaveAsync(_dbSet, model, cancellationToken);
+            Delete(model);
+            return SaveChangesAsync(cancellationToken);
         }
 
         public virtual void DeleteRange(IEnumerable<TModel> models)
@@ -66,16 +75,19 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         }
         public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
-            return _dbContext.RemoveEntitiesAndSaveAsync(_dbSet, models, cancellationToken);
+            DeleteRange(models);
+            return SaveChangesAsync(cancellationToken);
         }
 
         public virtual TModel Update(TModel model)
         {
             return _dbContext.UpdateEntity<TModel>(_dbSet, model);
         }
-        public virtual Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
+        public virtual async Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.UpdateEntityAndSaveAsync(_dbSet, model, cancellationToken);
+            var entity = Update(model);
+            await SaveChangesAsync(cancellationToken);
+            return entity;
         }
 
         public virtual void UpdateRange(IEnumerable<TModel> models)
@@ -84,23 +96,34 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         }
         public virtual Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
-            return _dbContext.UpdateEntitiesAndSaveAsync(_dbSet, models, cancellationToken);
+            UpdateRange(models);
+            return SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task<int> ExecuteUpdateAsync(Expression<Func<TModel, bool>> predicate, Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, CancellationToken cancellationToken = default)
+        protected virtual Task<int> ExecuteUpdateAsync(Expression<Func<TModel, bool>> predicate, Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, CancellationToken cancellationToken = default)
         {
-            var query = GetAll(asNoTracking: false).Where(predicate);
+            var query = GetAll().Where(predicate);
             return query.ExecuteUpdateAsync(setPropertyCalls, cancellationToken);
         }
 
-        public virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken)
+        protected virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken)
         {
-            var query = GetAll(asNoTracking: false).Where(predicate);
+            var query = GetAll().Where(predicate);
             return query.ExecuteDeleteAsync(cancellationToken);
         }
 
         public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            var now = DateTime.UtcNow;
+
+            var createdEntries = _dbContext.ChangeTracker.Entries<ICreatable>().Where(entry => entry.State == EntityState.Added);
+            foreach (var entry in createdEntries)
+                entry.Entity.CreatedTimestamp = now;
+
+            var updatedEntries = _dbContext.ChangeTracker.Entries<IUpdatable>().Where(entry => entry.State == EntityState.Modified);
+            foreach (var entry in updatedEntries)
+                entry.Entity.UpdatedTimestamp = now;
+
             return _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
@@ -128,7 +151,8 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         }
         public virtual Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return _dbContext.RemoveEntityAndSaveAsync(_dbSet, id, cancellationToken);
+            Delete(id);
+            return SaveChangesAsync(cancellationToken);
         }
 
         public virtual void DeleteRange(IEnumerable<TId> ids)
@@ -137,7 +161,8 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         }
         public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
         {
-            return _dbContext.RemoveEntitiesAndSaveAsync(_dbSet, ids, cancellationToken);
+            DeleteRange(ids);
+            return SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -18,8 +18,6 @@ namespace TimeHacker.Domain.Entities.Tasks
         public TimeSpan MaxTimeToFinish { get; set; }
         public TimeSpan? OptimalTimeToFinish { get; set; }
 
-        public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
-
         public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
         public virtual ICollection<TagDynamicTask> TagDynamicTasks { get; set; } = [];
     }

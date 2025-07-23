@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Infrastructure.Repositories.Tasks
 {

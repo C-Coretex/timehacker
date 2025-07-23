@@ -1,4 +1,5 @@
 ﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Domain.IRepositories.Tasks
 {

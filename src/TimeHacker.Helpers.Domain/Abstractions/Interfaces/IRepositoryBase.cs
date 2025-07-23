@@ -1,6 +1,5 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Query;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+﻿using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
 {
@@ -20,7 +19,6 @@ namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
         Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
         void UpdateRange(IEnumerable<TModel> models);
         Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default);
-        Task<int> ExecuteUpdateAsync(Expression<Func<TModel, bool>> predicate, Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, CancellationToken cancellationToken = default);
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 

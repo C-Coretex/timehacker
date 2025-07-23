@@ -12,7 +12,6 @@ namespace TimeHacker.Domain.Entities.ScheduleSnapshots
         public virtual User? User { get; set; }
 
         public RepeatingEntityModel RepeatingEntity { get; set; }
-        public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
         public DateOnly? LastEntityCreated { get; set; }
         public DateOnly? EndsOn { get; set; }
 
