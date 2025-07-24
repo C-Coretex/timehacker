@@ -18,7 +18,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpGet("GetAll")]
         public Ok<IAsyncEnumerable<FixedTaskReturnModel>> GetAll()
         {
-            var data = fixedTaskService.GetAll().AsAsyncEnumerable().Select(FixedTaskReturnModel.Create);
+            var data = fixedTaskService.GetAll().Select(FixedTaskReturnModel.Create);
             return TypedResults.Ok(data);
         }
 

@@ -2,9 +2,6 @@
 {
     public interface IUserScopedEntity
     {
-        //UserScopedRepository
-        //change UserIdentityId to something different
-
         public Guid UserId { get; set; }
     }
 }

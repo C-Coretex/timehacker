@@ -28,9 +28,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         public ScheduledTaskServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock(_userId, true);
             SetupMocks(_userId);
-            _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object, userAccessor);
+            _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object);
         }
 
         #endregion
@@ -43,17 +42,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             var result = await _scheduledTaskService.GetBy(id);
             result.Should().NotBeNull();
             result!.Id.Should().Be(id);
-        }
-
-        [Fact]
-        [Trait("GetBy", "Should throw exception on incorrect userId")]
-        public async Task GetBy_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                var id = _scheduledTasks.First(x => x.UserId != _userId).Id;
-                var result = await _scheduledTaskService.GetBy(id);
-            });
         }
 
         #region Mock helpers

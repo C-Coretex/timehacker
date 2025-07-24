@@ -5,7 +5,7 @@ namespace TimeHacker.Domain.IServices.Tasks
     public interface IDynamicTaskService
     {
         /// <returns>Query with filtration by user id applied.</returns>
-        public IQueryable<DynamicTask> GetAll();
+        public IAsyncEnumerable<DynamicTask> GetAll();
         Task<DynamicTask?> GetByIdAsync(Guid id);
         public Task UpdateAsync(DynamicTask task);
         public Task DeleteAsync(Guid id);

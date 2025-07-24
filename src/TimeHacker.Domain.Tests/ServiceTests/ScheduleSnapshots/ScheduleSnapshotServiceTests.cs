@@ -73,7 +73,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetByAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry(bool correctUser)
         {
-            var date = DateOnly.FromDateTime(DateTime.Now.AddDays(correctUser ? -1 : 0));
+            var date = DateOnly.FromDateTime(DateTime.Now.AddDays(correctUser ? -1 : 1));
             var actual = await _scheduleSnapshotService.GetByAsync(date);
             if (correctUser)
             {

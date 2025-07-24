@@ -6,7 +6,7 @@ namespace TimeHacker.Domain.IServices.Tasks
     public interface IFixedTaskService
     {
         /// <returns>Query with filtration by user id applied.</returns>
-        IQueryable<FixedTask> GetAll();
+        IAsyncEnumerable<FixedTask> GetAll();
         Task<FixedTask?> GetByIdAsync(Guid id);
         Task UpdateAsync(FixedTask task);
         Task DeleteAsync(Guid id);

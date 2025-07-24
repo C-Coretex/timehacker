@@ -29,9 +29,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
 
         public TagServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock(_userId, true);
             SetupMocks(_userId);
-            _tagService = new TagService(_tagRepository.Object, userAccessor);
+            _tagService = new TagService(_tagRepository.Object);
         }
 
         #endregion
@@ -51,7 +50,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
 
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
-            result!.UserId.Should().Be(_userId);
         }
 
         [Fact]
@@ -71,22 +69,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         }
 
         [Fact]
-        [Trait("UpdateAndSaveAsync", "Should throw exception on incorrect userId")]
-        public async Task UpdateAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                var newEntry = new Tag()
-                {
-                    Id = _tags.First(x => x.UserId != _userId).Id,
-                    Name = "TestTag1000"
-                };
-                await _tagService.UpdateAsync(newEntry);
-                var result = _tags.FirstOrDefault(x => x.Id == newEntry.Id);
-            });
-        }
-
-        [Fact]
         [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
@@ -98,23 +80,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         }
 
         [Fact]
-        [Trait("DeleteAndSaveAsync", "Should throw exception on incorrect userId")]
-        public async Task DeleteAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                await _tagService.DeleteAsync(_tags.First(x => x.UserId != _userId).Id);
-            });
-        }
-
-        [Fact]
         [Trait("GetAll", "Should return correct data")]
-        public void GetAll_ShouldReturnCorrectData()
+        public async Task GetAll_ShouldReturnCorrectData()
         {
-            var result = _tagService.GetAll().ToList();
+            var result = await _tagService.GetAll().ToListAsync();
 
-            result.Count.Should().Be(2);
-            result.Should().BeEquivalentTo(_tags.Where(x => x.UserId == _userId));
+            result.Count.Should().Be(_tags.Count);
+            result.Should().BeEquivalentTo(_tags);
         }
 
         #region Mock helpers

@@ -46,8 +46,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         {
             var userAccessor = new UserAccessorBaseMock(_userId, true);
             SetupMocks(_userId);
-            var fixedTaskService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
-            var categoryService = new CategoryService(_categoriesRepository.Object, userAccessor);
+            var fixedTaskService = new FixedTaskService(_fixedTasksRepository.Object);
+            var categoryService = new CategoryService(_categoriesRepository.Object);
             _scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTaskService, categoryService, userAccessor);
         }
 
@@ -120,7 +120,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             var actual = _scheduleEntityService.GetAllFrom(from).ToList();
             actual.Should().NotBeNull();
 
-            var expected = _scheduledEntities.Where(x => x.UserId == _userId && (x.EndsOn == null || x.EndsOn >= from))
+            var expected = _scheduledEntities.Where(x => x.EndsOn == null || x.EndsOn >= from)
                 .ToList();
             actual.Count.Should().Be(expected.Count);
             actual.Should().BeEquivalentTo(expected);

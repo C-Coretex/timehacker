@@ -60,8 +60,8 @@ namespace TimeHacker.Domain.Tests.Mocks.Extensions
             repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<CancellationToken>(), It.IsAny<IncludeExpansionDelegate<TModel>[]>()))
                 .Returns<TId, bool, CancellationToken, IncludeExpansionDelegate<TModel>[]>((id, _, _, _) => Task.FromResult(source.FirstOrDefault(x => x.Id!.Equals(id))));
 
-            repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
-                .Callback<TModel, CancellationToken>((entry, _) => source.RemoveAll(x => x.Id!.Equals(entry.Id)));
+            repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TId>(), It.IsAny<CancellationToken>()))
+                .Callback<TId, CancellationToken>((id, _) => source.RemoveAll(x => x.Id!.Equals(id)));
 
             repository.Setup(x => x.AddAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
                 .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))

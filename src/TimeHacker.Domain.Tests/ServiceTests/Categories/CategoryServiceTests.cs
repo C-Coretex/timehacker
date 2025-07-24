@@ -29,9 +29,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
         private readonly Guid _userId = Guid.NewGuid();
         public CategoryServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock(_userId, true);
             SetupMocks(_userId);
-            _categoryService = new CategoryService(_categoriesRepository.Object, userAccessor);
+            _categoryService = new CategoryService(_categoriesRepository.Object);
         }
 
         #endregion
@@ -48,7 +47,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
-            result!.UserId.Should().Be(_userId);
         }
 
         [Fact]
@@ -67,22 +65,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
         }
 
         [Fact]
-        [Trait("UpdateAndSaveAsync", "Should throw exception on incorrect userId")]
-        public async Task UpdateAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                var newEntry = new Category()
-                {
-                    Id = _categories.First(x => x.UserId != _userId).Id,
-                    Name = "TestCategory1000"
-                };
-                await _categoryService.UpdateAsync(newEntry);
-                var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
-            });
-        }
-
-        [Fact]
         [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
@@ -93,23 +75,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
         }
 
         [Fact]
-        [Trait("DeleteAndSaveAsync", "Should throw exception on incorrect userId")]
-        public async Task DeleteAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                await _categoryService.DeleteAsync(_categories.First(x => x.UserId != _userId).Id);
-            });
-        }
-
-        [Fact]
         [Trait("GetAll", "Should return correct data")]
         public void GetAll_ShouldReturnCorrectData()
         {
             var result = _categoryService.GetAll().ToList();
 
-            result.Count.Should().Be(2);
-            result.Should().BeEquivalentTo(_categories.Where(x => x.UserId == _userId).ToList());
+            result.Count.Should().Be(_categories.Count);
+            result.Should().BeEquivalentTo(_categories.ToList());
         }
 
         [Fact]
@@ -120,14 +92,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             var result = await _categoryService.GetByIdAsync(id);
             result.Should().NotBeNull();
             result!.Id.Should().Be(id);
-        }
-
-        [Fact]
-        [Trait("GetByIdAsync", "Should return nothing on incorrect userId")]
-        public async Task GetByIdAsync_ShouldThrow()
-        {
-            var result = await _categoryService.GetByIdAsync(_categories.First(x => x.UserId != _userId).Id);
-            result.Should().BeNull();
         }
 
         [Fact]
@@ -143,17 +107,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             result!.ScheduleEntity!.Id.Should().Be(newEntry.Id);
         }
 
-        [Fact]
-        [Trait("UpdateScheduleEntityAsync", "Should throw exception on incorrect userId")]
-        public async Task UpdateScheduleEntityAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                var newEntry = new ScheduleEntity();
-                await _categoryService.UpdateScheduleEntityAsync(newEntry, _categories.First(x => x.UserId != _userId).Id);
-            });
-        }
-
         #region Mock helpers
 
         private void SetupMocks(Guid userId)
@@ -162,6 +115,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
             [
                 new()
                 {
+                    Id = Guid.NewGuid(),
                     UserId = userId,
                     Name = "TestCategory1",
                     Color = Color.AliceBlue,
@@ -171,6 +125,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
                 new()
                 {
+                    Id = Guid.NewGuid(),
                     UserId = userId,
                     Name = "TestCategory2",
                     Description = "Test description",
@@ -178,6 +133,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
                 new()
                 {
+                    Id = Guid.NewGuid(),
                     UserId = Guid.NewGuid(),
                     Name = "TestCategory3",
                     Description = "Test description",
@@ -186,6 +142,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 
                 new()
                 {
+                    Id = Guid.NewGuid(),
                     UserId = Guid.NewGuid(),
                     Name = "TestCategory4",
                     Description = "Test description",

@@ -50,10 +50,10 @@ public class TaskServiceTests
     {
         _userAccessor = new UserAccessorBaseMock(_userId, true);
         SetupMocks(_date, _userId);
-        var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, _userAccessor);
-        var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, _userAccessor);
+        var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object);
+        var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object);
         var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, _userAccessor);
-        var categoryService = new CategoryService(_categoryRepository.Object, _userAccessor);
+        var categoryService = new CategoryService(_categoryRepository.Object);
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTasksService,
             categoryService, _userAccessor);
 
@@ -73,8 +73,6 @@ public class TaskServiceTests
         Assert.NotNull(result);
         Assert.Contains(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask1");
         Assert.Contains(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask2");
-        Assert.DoesNotContain(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask3");
-        Assert.DoesNotContain(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask4");
     }
 
     [Fact]
@@ -89,8 +87,6 @@ public class TaskServiceTests
         result.Should().HaveCount(dates.Count);
         Assert.Contains(result, x => x.TasksTimeline.Any(tt => tt.Task.Name == "TestFixedTask1"));
         Assert.Contains(result, x => x.TasksTimeline.Any(tt => tt.Task.Name == "TestFixedTask2"));
-        Assert.DoesNotContain(result, x => x.TasksTimeline.Any(tt => tt.Task.Name == "TestFixedTask3"));
-        Assert.DoesNotContain(result, x => x.TasksTimeline.Any(tt => tt.Task.Name == "TestFixedTask4"));
     }
 
     [Fact]
@@ -119,21 +115,6 @@ public class TaskServiceTests
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         result2.Should().NotBeEquivalentTo(result3, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         result3.Should().BeEquivalentTo(result4, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
-    }
-
-    [Fact]
-    [Trait("GetTasksForDays", "Should be empty for user without tasks")]
-    public async Task GetTasksForDays_ShouldBeEmptyForUserWithoutTasks()
-    {
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
-
-        _userAccessor.SetUserId(Guid.NewGuid());
-
-        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
-
-        result.Should().NotBeNull();
-        result.Should().HaveCount(dates.Count);
-        result.Should().OnlyContain(x => x.TasksTimeline.Count == 0);
     }
 
     [Fact]

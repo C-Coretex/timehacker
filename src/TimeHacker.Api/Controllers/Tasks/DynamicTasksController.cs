@@ -18,7 +18,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpGet("GetAll")]
         public Ok<IAsyncEnumerable<DynamicTaskReturnModel>> GetAll()
         {
-            var data = dynamicTaskService.GetAll().AsAsyncEnumerable().Select(DynamicTaskReturnModel.Create);
+            var data = dynamicTaskService.GetAll().Select(DynamicTaskReturnModel.Create);
             return TypedResults.Ok(data);
         }
 
