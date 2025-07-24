@@ -18,8 +18,4 @@
     <ProjectReference Include="..\TimeHacker.Infrastructure\TimeHacker.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

@@ -29,7 +29,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
         public UserServiceTest()
         {
             var userAccessor = new UserAccessorBaseMock(_userId, true);
-
+            SetupMocks();
             _userService = new UserService(_userRepositoryMock.Object, userAccessor);
         }
 
@@ -39,16 +39,15 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
         [Trait("AddAndSaveAsync", "Should add entry with correct Id")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            SetupMocks(Guid.NewGuid());
-
             var newEntry = new UserUpdateModel()
             {
                 Name = "TestCategory1000",
                 EmailForNotifications = "aaa",
-                PhoneNumberForNotifications = "222",
+                PhoneNumberForNotifications = "222"
             };
             await _userService.AddAsync(newEntry);
             var result = _users.FirstOrDefault(x => x.Id == _userId);
+
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
             result!.EmailForNotifications.Should().Be(newEntry.EmailForNotifications);
@@ -57,13 +56,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Users
 
         #region Mock helpers
 
-        private void SetupMocks(Guid userId)
+        private void SetupMocks()
         {
             _users =
             [
                 new()
                 {
-                    Id = userId,
+                    Id = Guid.NewGuid(),
                     Name = "TestCategory1",
                     EmailForNotifications = "test@test.com",
                     PhoneNumberForNotifications = "+37125844165"

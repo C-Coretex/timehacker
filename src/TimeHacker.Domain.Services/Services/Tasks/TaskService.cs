@@ -43,7 +43,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
                                               .OrderBy(ft => ft.StartTimestamp)
                                               .ToListAsync();
 
-            var dynamicTasks = _dynamicTaskService.GetAll().AsEnumerable();
+            var dynamicTasks = await _dynamicTaskService.GetAll().ToListAsync();
 
             var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date).ToListAsync();
 
@@ -69,9 +69,7 @@ namespace TimeHacker.Domain.Services.Services.Tasks
             foreach (var date in dates)
             {
                 var snapshot = await _scheduleSnapshotService.GetByAsync(date);
-                if (snapshot != null)
-                    yield return TasksForDayReturn.Create(snapshot);
-                else
+                if (snapshot == null)
                 {
                     var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                     var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
@@ -79,9 +77,8 @@ namespace TimeHacker.Domain.Services.Services.Tasks
 
                     snapshot = tasksForDay.CreateScheduleSnapshot();
                     snapshot = await _scheduleSnapshotService.AddAsync(snapshot);
-
-                    yield return TasksForDayReturn.Create(snapshot);
                 }
+                yield return TasksForDayReturn.Create(snapshot);
             }
         }
 

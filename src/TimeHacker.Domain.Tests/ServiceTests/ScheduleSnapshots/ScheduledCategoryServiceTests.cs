@@ -1,6 +1,7 @@
 ﻿using Moq;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
@@ -82,7 +83,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 }
             ];
 
-            _scheduledCategoryRepository.As<IRepositoryBase<ScheduledCategory, Guid>>().SetupRepositoryMock(_scheduledCategories);
+            _scheduledCategoryRepository.As<IUserScopedRepositoryBase<ScheduledCategory, Guid>>().SetupRepositoryMock(_scheduledCategories);
         }
 
         #endregion

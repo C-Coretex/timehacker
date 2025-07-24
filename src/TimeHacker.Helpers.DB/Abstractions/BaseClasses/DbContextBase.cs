@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
@@ -61,7 +61,7 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             await SaveChangesAsync(cancellationToken);
         }
 
-        internal void RemoveEntity<T>(DbSet<T> entityCollection, T model) where T : class, IDbEntity, new()
+        internal void RemoveEntity<T>(DbSet<T> entityCollection, T model) where T : class, IDbEntity
         {
             entityCollection.Remove(model);
         }
@@ -70,7 +70,7 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             entityCollection.Remove(model);
             await SaveChangesAsync(cancellationToken);
         }
-        internal void RemoveEntities<T>(DbSet<T> entityCollection, IEnumerable<T> models) where T : class, IDbEntity, new()
+        internal void RemoveEntities<T>(DbSet<T> entityCollection, IEnumerable<T> models) where T : class, IDbEntity
         {
             entityCollection.RemoveRange(models);
         }

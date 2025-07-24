@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
@@ -27,9 +28,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 
         public ScheduledTaskServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock(_userId, true);
-
-            _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object, userAccessor);
+            SetupMocks(_userId);
+            _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object);
         }
 
         #endregion
@@ -38,25 +38,10 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetBy", "Should return correct data")]
         public async Task GetBy_ShouldReturnCorrectData()
         {
-            SetupMocks(_userId);
-
             var id = _scheduledTasks.First().Id;
             var result = await _scheduledTaskService.GetBy(id);
             result.Should().NotBeNull();
             result!.Id.Should().Be(id);
-        }
-
-        [Fact]
-        [Trait("GetBy", "Should throw exception on incorrect userId")]
-        public async Task GetBy_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                SetupMocks(_userId);
-
-                var id = _scheduledTasks.First(x => x.UserId != _userId).Id;
-                var result = await _scheduledTaskService.GetBy(id);
-            });
         }
 
         #region Mock helpers
@@ -104,7 +89,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 }
             ];
 
-            _scheduledTaskRepository.As<IRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks);
+            _scheduledTaskRepository.As<IUserScopedRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks);
         }
 
         #endregion

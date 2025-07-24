@@ -12,7 +12,7 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(TimeHackerMigrationsDbContext))]
-    [Migration("20250706191644_Init")]
+    [Migration("20250724053630_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -34,6 +34,9 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<int>("Color")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasMaxLength(516)
                         .HasColumnType("character varying(516)");
@@ -45,6 +48,9 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.Property<Guid?>("ScheduleEntityId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasMaxLength(450)
@@ -109,6 +115,9 @@ namespace TimeHacker.Migrations.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -130,7 +139,13 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
-                    b.Property<DateTime>("LastUpdateTimestamp")
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId", "Date");
@@ -151,11 +166,13 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<int>("Color")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<TimeSpan>("End")
@@ -174,7 +191,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("UpdatedTimestamp")
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -194,6 +211,9 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -229,7 +249,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("UpdatedTimestamp")
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -261,10 +281,16 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<int>("Color")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasMaxLength(450)
@@ -339,6 +365,9 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<byte>("Priority")
                         .HasColumnType("smallint");
 
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("UserId")
                         .HasMaxLength(450)
                         .HasColumnType("uuid");
@@ -382,6 +411,9 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateTime>("StartTimestamp")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("UserId")
                         .HasMaxLength(450)
                         .HasColumnType("uuid");
@@ -410,6 +442,9 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateOnly>("Birthday")
                         .HasColumnType("date");
 
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("EmailForNotifications")
                         .HasColumnType("text");
 
@@ -424,6 +459,9 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.Property<string>("PhoneNumberForNotifications")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

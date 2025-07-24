@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
@@ -28,7 +29,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         public ScheduleSnapshotServiceTests()
         {
             var userAccessor = new UserAccessorBaseMock(_userId, true);
-
+            SetupMocks(_userId);
             _scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
         }
 
@@ -38,17 +39,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("AddAndSaveAsync", "Should add entry with correct data")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            SetupMocks(_userId);
-
             var date = DateOnly.FromDateTime(DateTime.Now);
-            var lastUpdateTimestamp = DateTime.Now;
             var newEntry = new ScheduleSnapshot()
             {
                 UserId = _userId,
                 Date = date,
-                LastUpdateTimestamp = lastUpdateTimestamp,
-                ScheduledCategories = [new(), new(), new()],
-                ScheduledTasks = [new(), new(), new()]
+                ScheduledCategories = [new() { Name = "" }, new() { Name = "" }, new() { Name = "" }],
+                ScheduledTasks = [new() { Name = "" }, new() { Name = "" }, new() { Name = "" }]
             };
 
             await Task.Delay(100);
@@ -58,19 +55,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             actual2.Should().NotBeNull();
             actual.Should().Be(actual2);
 
-            actual.LastUpdateTimestamp.Should().NotBe(lastUpdateTimestamp);
             actual.ScheduledCategories.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledCategories.Count.Should().Be(3);
             actual.ScheduledTasks.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledTasks.Count.Should().Be(3);
         }
@@ -79,9 +73,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetByAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry(bool correctUser)
         {
-            SetupMocks(_userId);
-
-            var date = DateOnly.FromDateTime(DateTime.Now.AddDays(correctUser ? -1 : 0));
+            var date = DateOnly.FromDateTime(DateTime.Now.AddDays(correctUser ? -1 : 1));
             var actual = await _scheduleSnapshotService.GetByAsync(date);
             if (correctUser)
             {
@@ -98,17 +90,13 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldAddEntry()
         {
-            SetupMocks(_userId);
-
             var date = DateOnly.FromDateTime(DateTime.Now);
-            var lastUpdateTimestamp = DateTime.Now;
             var newEntry = new ScheduleSnapshot()
             {
                 UserId = _userId,
                 Date = date,
-                LastUpdateTimestamp = lastUpdateTimestamp,
-                ScheduledCategories = [new(), new(), new()],
-                ScheduledTasks = [new(), new(), new()]
+                ScheduledCategories = [new() { Name = "" }, new() { Name = "" }, new() { Name = "" }],
+                ScheduledTasks = [new() { Name = "" }, new() { Name = "" }, new() { Name = "" }]
             };
 
             await Task.Delay(100);
@@ -118,19 +106,16 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
             actual2.Should().NotBeNull();
             actual.Should().Be(actual2);
 
-            actual.LastUpdateTimestamp.Should().NotBe(lastUpdateTimestamp);
             actual.ScheduledCategories.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledCategories.Count.Should().Be(3);
             actual.ScheduledTasks.Should().AllSatisfy(x =>
             {
                 x.Date.Should().Be(newEntry.Date);
                 x.UserId.Should().Be(newEntry.UserId);
-                x.UpdatedTimestamp.Should().Be(actual.LastUpdateTimestamp);
             });
             actual.ScheduledTasks.Count.Should().Be(3);
         }
@@ -145,40 +130,36 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 {
                     UserId = userId,
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
-                    ScheduledTasks = [new ScheduledTask()],
-                    ScheduledCategories = [new ScheduledCategory()]
+                    ScheduledTasks = [new ScheduledTask() { Name = "" }],
+                    ScheduledCategories = [new ScheduledCategory() { Name = "" }]
                 },
 
                 new()
                 {
                     UserId = userId,
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-2)),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
-                    ScheduledTasks = [new ScheduledTask()],
-                    ScheduledCategories = [new ScheduledCategory()]
+                    ScheduledTasks = [new ScheduledTask() { Name = "" }],
+                    ScheduledCategories = [new ScheduledCategory() { Name = "" }]
                 },
 
                 new()
                 {
                     UserId = Guid.NewGuid(),
                     Date = DateOnly.FromDateTime(DateTime.Now),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
-                    ScheduledTasks = [new ScheduledTask()],
-                    ScheduledCategories = [new ScheduledCategory()]
+                    ScheduledTasks = [new ScheduledTask() { Name = "" }],
+                    ScheduledCategories = [new ScheduledCategory() { Name = "" }]
                 },
 
                 new()
                 {
                     UserId = Guid.NewGuid(),
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
-                    LastUpdateTimestamp = DateTime.Now.AddHours(-4),
-                    ScheduledTasks = [new ScheduledTask()],
-                    ScheduledCategories = [new ScheduledCategory()]
+                    ScheduledTasks = [new ScheduledTask() { Name = "" }],
+                    ScheduledCategories = [new ScheduledCategory() { Name = "" }]
                 },
             ];
 
-            _scheduleSnapshotRepository.As<IRepositoryBase<ScheduleSnapshot>>().SetupRepositoryMock(_scheduleSnapshots);
+            _scheduleSnapshotRepository.As<IUserScopedRepositoryBase<ScheduleSnapshot, Guid>>().SetupRepositoryMock(_scheduleSnapshots);
 
             _scheduleSnapshotRepository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<ScheduleSnapshot>(), It.IsAny<CancellationToken>()))
                 .Callback<ScheduleSnapshot, CancellationToken>((entry, _) =>

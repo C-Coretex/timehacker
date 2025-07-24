@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IServices.Tasks;
 using TimeHacker.Domain.Services.Services.Tasks;
@@ -27,9 +28,8 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 
         public DynamicTaskServiceTests()
         {
-            var userAccessor = new UserAccessorBaseMock(_userId, true);
-
-            _dynamicTaskService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
+            SetupMocks(_userId);
+            _dynamicTaskService = new DynamicTaskService(_dynamicTasksRepository.Object);
         }
 
         #endregion
@@ -38,8 +38,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            SetupMocks(_userId);
-
             var newEntry = new DynamicTask()
             {
                 Name = "TestDynamicTask1000",
@@ -49,15 +47,12 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
             var result = _dynamicTasks.FirstOrDefault(x => x.Id == newEntry.Id);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
-            result!.UserId.Should().Be(_userId);
         }
 
         [Fact]
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            SetupMocks(_userId);
-
             var newEntry = new DynamicTask()
             {
                 Id = _dynamicTasks.First(x => x.UserId == _userId).Id,
@@ -70,28 +65,9 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("UpdateAndSaveAsync", "Should throw exception on incorrect userId")]
-        public async Task UpdateAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                SetupMocks(_userId);
-
-                var newEntry = new DynamicTask()
-                {
-                    Id = _dynamicTasks.First(x => x.UserId != _userId).Id,
-                    Name = "TestDynamicTask1000"
-                };
-                await _dynamicTaskService.UpdateAsync(newEntry);
-            });
-        }
-
-        [Fact]
         [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldDeleteEntry()
         {
-            SetupMocks(_userId);
-
             var id = _dynamicTasks.First(x => x.UserId == _userId).Id;
             await _dynamicTaskService.DeleteAsync(id);
             var result = _dynamicTasks.FirstOrDefault(x => x.Id == id);
@@ -99,50 +75,23 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
         }
 
         [Fact]
-        [Trait("DeleteAndSaveAsync", "Should throw exception on incorrect userId")]
-        public async Task DeleteAsync_ShouldThrow()
-        {
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                SetupMocks(_userId);
-
-                var id = _dynamicTasks.First(x => x.UserId != _userId).Id;
-                await _dynamicTaskService.DeleteAsync(id);
-            });
-        }
-
-        [Fact]
         [Trait("GetAll", "Should return correct data")]
-        public void GetAll_ShouldReturnCorrectData()
+        public async Task GetAll_ShouldReturnCorrectData()
         {
-            SetupMocks(_userId);
+            var result = await _dynamicTaskService.GetAll().ToListAsync();
 
-            var result = _dynamicTaskService.GetAll().ToList();
-
-            result.Count.Should().Be(2);
-            result.Should().BeEquivalentTo(_dynamicTasks.Where(x => x.UserId == _userId).ToList());
+            result.Count.Should().Be(_dynamicTasks.Count);
+            result.Should().BeEquivalentTo(_dynamicTasks.ToList());
         }
 
         [Fact]
         [Trait("GetByIdAsync", "Should return correct data")]
         public async Task GetByIdAsync_ShouldUpdateEntry()
         {
-            SetupMocks(_userId);
-
             var id = _dynamicTasks.First(x => x.UserId == _userId).Id;
             var result = await _dynamicTaskService.GetByIdAsync(id);
             result.Should().NotBeNull();
             result!.Id.Should().Be(id);
-        }
-
-        [Fact]
-        [Trait("GetByIdAsync", "Should return nothing on incorrect userId")]
-        public async Task GetByIdAsync_ShouldThrow()
-        {
-            SetupMocks(_userId);
-
-            var result = await _dynamicTaskService.GetByIdAsync(_dynamicTasks.First(x => x.UserId != _userId).Id);
-            result.Should().BeNull();
         }
 
         #region Mock helpers
@@ -185,7 +134,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
                 }
             ];
 
-            _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
+            _dynamicTasksRepository.As<IUserScopedRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
         }
 
         #endregion

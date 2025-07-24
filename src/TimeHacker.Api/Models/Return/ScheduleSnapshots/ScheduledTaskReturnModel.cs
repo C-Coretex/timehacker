@@ -13,7 +13,7 @@ namespace TimeHacker.Api.Models.Return.ScheduleSnapshots
         bool IsCompleted,
         TimeSpan Start,
         TimeSpan End,
-        DateTime UpdatedTimestamp
+        DateTime? UpdatedTimestamp
     )
     {
         public static ScheduledTaskReturnModel Create(ScheduledTask scheduledTask)

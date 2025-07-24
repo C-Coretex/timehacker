@@ -1,18 +1,14 @@
 ﻿using System.Drawing;
+using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Helpers.Domain.Abstractions.Classes;
 
 namespace TimeHacker.Domain.Entities.Categories
 {
-    public class Category : GuidDbEntity
+    public class Category : UserScopedEntityBase
     {
-        public Guid UserId { get; set; }
-        public virtual User? User { get; set; }
-
         public Guid? ScheduleEntityId { get; init; }
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public string? Description { get; set; }
         public Color Color { get; set; }
 

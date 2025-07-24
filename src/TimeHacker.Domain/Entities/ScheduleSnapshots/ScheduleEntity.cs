@@ -1,18 +1,13 @@
 ﻿using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.Models.EntityModels;
-using TimeHacker.Helpers.Domain.Abstractions.Classes;
 
 namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
-    public class ScheduleEntity : GuidDbEntity
+    public class ScheduleEntity : UserScopedEntityBase
     {
-        public Guid UserId { get; set; }
-        public virtual User? User { get; set; }
-
         public RepeatingEntityModel RepeatingEntity { get; set; }
-        public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
         public DateOnly? LastEntityCreated { get; set; }
         public DateOnly? EndsOn { get; set; }
 
