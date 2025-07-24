@@ -22,7 +22,8 @@ namespace TimeHacker.Domain.Tests.RichModelTests
                     RepeatingData = new DayRepeatingEntity(2)
                 },
                 LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(DateTime.Now.AddDays(1)) : null,
-                EndsOn = endsOn ? DateOnly.FromDateTime(DateTime.Now.AddDays(6)) : null
+                EndsOn = endsOn ? DateOnly.FromDateTime(DateTime.Now.AddDays(6)) : null,
+                CreatedTimestamp = DateTime.Now
             };
             var dateFrom = DateOnly.FromDateTime(DateTime.Now);
             var dateTo = DateOnly.FromDateTime(DateTime.Now.AddDays(10));

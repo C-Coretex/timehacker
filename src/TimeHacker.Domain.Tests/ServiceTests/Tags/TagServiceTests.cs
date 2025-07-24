@@ -5,6 +5,7 @@ using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Domain.Entities.Tags;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IServices.Tags;
 using TimeHacker.Domain.IRepositories.Tags;
 using TimeHacker.Domain.Services.Services.Tags;
@@ -29,7 +30,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         public TagServiceTests()
         {
             var userAccessor = new UserAccessorBaseMock(_userId, true);
-
+            SetupMocks(_userId);
             _tagService = new TagService(_tagRepository.Object, userAccessor);
         }
 
@@ -39,8 +40,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            SetupMocks(_userId);
-
             var newEntry = new Tag()
             {
                 Id = Guid.NewGuid(),
@@ -59,8 +58,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            SetupMocks(_userId);
-
             var newEntry = new Tag()
             {
                 Id = _tags.First(x => x.UserId == _userId).Id,
@@ -79,8 +76,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                SetupMocks(_userId);
-
                 var newEntry = new Tag()
                 {
                     Id = _tags.First(x => x.UserId != _userId).Id,
@@ -95,8 +90,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("DeleteAndSaveAsync", "Should delete entry")]
         public async Task DeleteAsync_ShouldUpdateEntry()
         {
-            SetupMocks(_userId);
-
             var idToDelete = _tags.First(x => x.UserId == _userId).Id;
             await _tagService.DeleteAsync(idToDelete);
             var result = _tags.FirstOrDefault(x => x.Id == idToDelete);
@@ -110,8 +103,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                SetupMocks(_userId);
-
                 await _tagService.DeleteAsync(_tags.First(x => x.UserId != _userId).Id);
             });
         }
@@ -120,8 +111,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
         [Trait("GetAll", "Should return correct data")]
         public void GetAll_ShouldReturnCorrectData()
         {
-            SetupMocks(_userId);
-
             var result = _tagService.GetAll().ToList();
 
             result.Count.Should().Be(2);
@@ -169,7 +158,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.Tags
                 }
             ];
 
-            _tagRepository.As<IRepositoryBase<Tag, Guid>>().SetupRepositoryMock(_tags);
+            _tagRepository.As<IUserScopedRepositoryBase<Tag, Guid>>().SetupRepositoryMock(_tags);
         }
 
         #endregion

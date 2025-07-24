@@ -37,10 +37,12 @@ public record TaskContainerReturn
             Task = task.IsFixed ? 
                 new FixedTask()
                 {
+                    Name = "Fixed Task",
                     Id = task.ParentTaskId,
                 } : 
                 new DynamicTask()
                 {
+                    Name = "Dynamic Task",
                     Id = task.ParentTaskId,
                 }
         };

@@ -1,13 +1,9 @@
-﻿using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
+﻿using TimeHacker.Domain.Entities.EntityBase;
 
 namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
-    public class ScheduleSnapshot : IDbEntity
+    public class ScheduleSnapshot : UserScopedEntityBase
     {
-        public Guid UserId { get; set; }
-        public virtual User? User { get; set; }
-
         public DateOnly Date { get; set; }
 
         public virtual ICollection<ScheduledTask> ScheduledTasks { get; set; }

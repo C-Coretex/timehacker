@@ -1,8 +1,7 @@
 ﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.IRepositories.ScheduleSnapshots
 {
-    public interface IScheduleEntityRepository: IRepositoryBase<ScheduleEntity, Guid>
+    public interface IScheduleEntityRepository: IUserScopedRepositoryBase<ScheduleEntity, Guid>
     { }
 }

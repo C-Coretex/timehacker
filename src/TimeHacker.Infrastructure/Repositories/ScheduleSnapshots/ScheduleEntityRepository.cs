@@ -1,12 +1,12 @@
 ﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure.Repositories.ScheduleSnapshots
 {
-    public class ScheduleEntityRepository : RepositoryBase<TimeHackerDbContext, ScheduleEntity, Guid>, IScheduleEntityRepository
+    public class ScheduleEntityRepository : UserScopedRepositoryBase<ScheduleEntity, Guid>, IScheduleEntityRepository
     {
-        public ScheduleEntityRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.ScheduleEntity)
+        public ScheduleEntityRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) : base(dbContext, dbContext.ScheduleEntity, userAccessor)
         { }
     }
 }

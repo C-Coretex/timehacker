@@ -15,6 +15,7 @@ public record CategoryContainerReturn
         //fill category data and time range
         return new ScheduledCategory()
         {
+            Name = "Scheduled Category",
             Start = TimeRange.Start,
             End = TimeRange.End,
         };

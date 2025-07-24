@@ -136,6 +136,15 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("UserId", "Date");
 
                     b.HasIndex("Date");
@@ -161,7 +170,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<TimeSpan>("End")
@@ -180,7 +188,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("UpdatedTimestamp")
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -238,7 +246,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("UpdatedTimestamp")
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")

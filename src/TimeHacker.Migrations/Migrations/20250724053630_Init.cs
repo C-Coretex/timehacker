@@ -20,7 +20,9 @@ namespace TimeHacker.Migrations.Migrations
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     PhoneNumberForNotifications = table.Column<string>(type: "text", nullable: true),
                     EmailForNotifications = table.Column<string>(type: "text", nullable: true),
-                    Birthday = table.Column<DateOnly>(type: "date", nullable: false)
+                    Birthday = table.Column<DateOnly>(type: "date", nullable: false),
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -32,14 +34,15 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "character varying(516)", maxLength: 516, nullable: true),
                     Priority = table.Column<byte>(type: "smallint", nullable: false),
                     MinTimeToFinish = table.Column<TimeSpan>(type: "interval", nullable: false),
                     MaxTimeToFinish = table.Column<TimeSpan>(type: "interval", nullable: false),
                     OptimalTimeToFinish = table.Column<TimeSpan>(type: "interval", nullable: true),
-                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,11 +60,12 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     RepeatingEntity = table.Column<byte[]>(type: "bytea", nullable: false),
-                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastEntityCreated = table.Column<DateOnly>(type: "date", nullable: true),
-                    EndsOn = table.Column<DateOnly>(type: "date", nullable: true)
+                    EndsOn = table.Column<DateOnly>(type: "date", nullable: true),
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,7 +84,9 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    LastUpdateTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -98,10 +104,12 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Category = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
-                    Color = table.Column<int>(type: "integer", nullable: false)
+                    Color = table.Column<int>(type: "integer", nullable: false),
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,11 +127,13 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     ScheduleEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     Description = table.Column<string>(type: "character varying(516)", maxLength: 516, nullable: true),
-                    Color = table.Column<int>(type: "integer", nullable: false)
+                    Color = table.Column<int>(type: "integer", nullable: false),
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -146,14 +156,15 @@ namespace TimeHacker.Migrations.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
                     ScheduleEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     Description = table.Column<string>(type: "character varying(516)", maxLength: 516, nullable: true),
                     Priority = table.Column<byte>(type: "smallint", nullable: false),
                     StartTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -178,14 +189,15 @@ namespace TimeHacker.Migrations.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentCategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentScheduleEntity = table.Column<Guid>(type: "uuid", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     Color = table.Column<int>(type: "integer", nullable: false),
                     Start = table.Column<TimeSpan>(type: "interval", nullable: false),
                     End = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -304,7 +316,6 @@ namespace TimeHacker.Migrations.Migrations
                     ParentTaskId = table.Column<Guid>(type: "uuid", nullable: false),
                     ScheduledCategoryId = table.Column<Guid>(type: "uuid", nullable: true),
                     ParentScheduleEntityId = table.Column<Guid>(type: "uuid", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     IsFixed = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
@@ -313,7 +324,9 @@ namespace TimeHacker.Migrations.Migrations
                     IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     Start = table.Column<TimeSpan>(type: "interval", nullable: false),
                     End = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {

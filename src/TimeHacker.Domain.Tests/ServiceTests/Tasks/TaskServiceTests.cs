@@ -5,6 +5,7 @@ using TimeHacker.Domain.Models.EntityModels;
 using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tasks;
@@ -42,17 +43,19 @@ public class TaskServiceTests
 
     private readonly ITaskService _tasksService;
     private readonly Guid _userId = Guid.NewGuid();
+    private readonly DateTime _date = DateTime.Now.Date;
+    private readonly UserAccessorBaseMock _userAccessor;
 
     public TaskServiceTests()
     {
-        var userAccessor = new UserAccessorBaseMock(_userId, true);
-
-        var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, userAccessor);
-        var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, userAccessor);
-        var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, userAccessor);
-        var categoryService = new CategoryService(_categoryRepository.Object, userAccessor);
+        _userAccessor = new UserAccessorBaseMock(_userId, true);
+        SetupMocks(_date, _userId);
+        var dynamicTasksService = new DynamicTaskService(_dynamicTasksRepository.Object, _userAccessor);
+        var fixedTasksService = new FixedTaskService(_fixedTasksRepository.Object, _userAccessor);
+        var scheduleSnapshotService = new ScheduleSnapshotService(_scheduleSnapshotRepository.Object, _userAccessor);
+        var categoryService = new CategoryService(_categoryRepository.Object, _userAccessor);
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object, fixedTasksService,
-            categoryService, userAccessor);
+            categoryService, _userAccessor);
 
         _tasksService = new TaskService(fixedTasksService, dynamicTasksService, scheduleSnapshotService, scheduleEntityService);
     }
@@ -65,14 +68,8 @@ public class TaskServiceTests
     [Trait("GetTasksForDay", "Should return tasks for day")]
     public async Task GetTasksForDay_ShouldReturnTasksForDay()
     {
-        // Arrange
-        var date = DateTime.Now.Date;
-        SetupMocks(date, _userId);
+        var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(_date));
 
-        // Act
-        var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(date));
-
-        // Assert
         Assert.NotNull(result);
         Assert.Contains(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask1");
         Assert.Contains(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask2");
@@ -84,14 +81,10 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should return tasks for days")]
     public async Task GetTasksForDays_ShouldReturnTasksForDays()
     {
-        // Arrange
-        var dates = new List<DateTime> { DateTime.Now.AddDays(-1), DateTime.Now, DateTime.Now.AddDays(1) };
-        SetupMocks(dates[1], _userId);
+        var dates = new List<DateTime> { DateTime.Now.AddDays(-1), _date, DateTime.Now.AddDays(1) };
 
-        // Act
         var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
-        // Assert
         Assert.NotNull(result);
         result.Should().HaveCount(dates.Count);
         Assert.Contains(result, x => x.TasksTimeline.Any(tt => tt.Task.Name == "TestFixedTask1"));
@@ -104,15 +97,11 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should return, save and return snapshot after first call")]
     public async Task GetTasksForDays_ShouldReturnSaveAndReturnSnapshotAfterFirstCall()
     {
-        // Arrange
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        SetupMocks(dates[1], _userId);
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
 
-        // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
-        // Assert
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
     }
 
@@ -120,17 +109,13 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should refresh snapshot")]
     public async Task GetTasksForDays_ShouldRefreshSnapshot()
     {
-        // Arrange
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        SetupMocks(dates[1], _userId);
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
 
-        // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
-        // Assert
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         result2.Should().NotBeEquivalentTo(result3, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         result3.Should().BeEquivalentTo(result4, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
@@ -140,14 +125,12 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should be empty for user without tasks")]
     public async Task GetTasksForDays_ShouldBeEmptyForUserWithoutTasks()
     {
-        // Arrange
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        SetupMocks(dates[1], Guid.NewGuid());
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
 
-        // Act
+        _userAccessor.SetUserId(Guid.NewGuid());
+
         var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
-        // Assert
         result.Should().NotBeNull();
         result.Should().HaveCount(dates.Count);
         result.Should().OnlyContain(x => x.TasksTimeline.Count == 0);
@@ -157,9 +140,8 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should add scheduled tasks")]
     public async Task GetTasksForDays_ShouldAddScheduledTasks()
     {
-        // Arrange
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), DateTime.Now.Date, DateTime.Now.Date.AddDays(1) };
-        SetupMocks(dates[1], _userId);
+        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
+
         var fixedTask = new FixedTask()
         {
             UserId = _userId,
@@ -194,11 +176,9 @@ public class TaskServiceTests
             .Returns(scheduleEntities.AsQueryable().BuildMock());
         
 
-        // Act
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
 
-        // Assert
         result1.Should().NotBeNull();
         result1.Should().HaveCount(dates.Count);
         result1.Should().Contain(x => x.TasksTimeline.Any(y => y.Task.Id == fixedTask.Id));
@@ -246,7 +226,7 @@ public class TaskServiceTests
                 OptimalTimeToFinish = new TimeSpan(0, 45, 0)
             }
         ];
-        _dynamicTasksRepository.As<IRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
+        _dynamicTasksRepository.As<IUserScopedRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
 
         _fixedTasks =
         [
@@ -290,7 +270,7 @@ public class TaskServiceTests
                 EndTimestamp = date.AddHours(3).AddMinutes(30)
             }
         ];
-        _fixedTasksRepository.As<IRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
+        _fixedTasksRepository.As<IUserScopedRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
 
         _scheduleSnapshots = new List<ScheduleSnapshot>();
         _scheduleSnapshotRepository.Setup(x => x.GetAll(It.IsAny<IncludeExpansionDelegate<ScheduleSnapshot>[]>()))
@@ -313,7 +293,7 @@ public class TaskServiceTests
 
         _scheduleEntities = [];
 
-        _scheduleEntityRepository.As<IRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduleEntities);
+        _scheduleEntityRepository.As<IUserScopedRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduleEntities);
     }
 
     #endregion

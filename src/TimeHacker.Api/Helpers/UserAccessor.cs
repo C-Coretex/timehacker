@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Users;
-using TimeHacker.Domain.IServices.Users;
-using TimeHacker.Infrastructure.Repositories.Users;
 
 namespace TimeHacker.Api.Helpers
 {

@@ -9,5 +9,8 @@ namespace TimeHacker.Domain.Tests.Mocks
             UserId = userId;
             IsUserValid = isUserValid;
         }
+
+        public void SetUserId(Guid userId) => UserId = userId;
+        public void SetIsValid(bool isValid) => IsUserValid = IsUserValid;
     }
 }

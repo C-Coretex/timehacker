@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
@@ -28,7 +29,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         public ScheduledTaskServiceTests()
         {
             var userAccessor = new UserAccessorBaseMock(_userId, true);
-
+            SetupMocks(_userId);
             _scheduledTaskService = new ScheduledTaskService(_scheduledTaskRepository.Object, userAccessor);
         }
 
@@ -38,8 +39,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         [Trait("GetBy", "Should return correct data")]
         public async Task GetBy_ShouldReturnCorrectData()
         {
-            SetupMocks(_userId);
-
             var id = _scheduledTasks.First().Id;
             var result = await _scheduledTaskService.GetBy(id);
             result.Should().NotBeNull();
@@ -52,8 +51,6 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                SetupMocks(_userId);
-
                 var id = _scheduledTasks.First(x => x.UserId != _userId).Id;
                 var result = await _scheduledTaskService.GetBy(id);
             });
@@ -104,7 +101,7 @@ namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
                 }
             ];
 
-            _scheduledTaskRepository.As<IRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks);
+            _scheduledTaskRepository.As<IUserScopedRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks);
         }
 
         #endregion

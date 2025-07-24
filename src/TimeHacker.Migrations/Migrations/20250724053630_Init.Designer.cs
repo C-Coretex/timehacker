@@ -12,8 +12,8 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(TimeHackerMigrationsDbContext))]
-    [Migration("20250723061724_Update_AllTables_CreatedUpdatedPropertiesAdded")]
-    partial class Update_AllTables_CreatedUpdatedPropertiesAdded
+    [Migration("20250724053630_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,6 +139,15 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("UserId", "Date");
 
                     b.HasIndex("Date");
@@ -164,7 +173,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<TimeSpan>("End")
@@ -183,7 +191,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("UpdatedTimestamp")
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -241,7 +249,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
 
-                    b.Property<DateTime>("UpdatedTimestamp")
+                    b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
