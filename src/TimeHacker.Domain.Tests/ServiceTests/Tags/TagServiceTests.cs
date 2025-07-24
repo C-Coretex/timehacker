@@ -1,9 +1,7 @@
 ﻿using Moq;
 using System.Drawing;
 using AwesomeAssertions;
-using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IServices.Tags;

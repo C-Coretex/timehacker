@@ -5,9 +5,7 @@ using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IServices.ScheduleSnapshots;
 using TimeHacker.Domain.Services.Services.ScheduleSnapshots;
-using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Tests.ServiceTests.ScheduleSnapshots
 {

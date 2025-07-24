@@ -2,7 +2,6 @@
 using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IServices.Categories;
 

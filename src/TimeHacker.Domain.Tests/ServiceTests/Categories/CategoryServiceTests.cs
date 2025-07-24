@@ -7,9 +7,7 @@ using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IServices.Categories;
 using TimeHacker.Domain.Services.Services.Categories;
-using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Tests.ServiceTests.Categories
 {

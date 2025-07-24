@@ -5,9 +5,7 @@ using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IServices.Tasks;
 using TimeHacker.Domain.Services.Services.Tasks;
-using TimeHacker.Domain.Tests.Mocks;
 using TimeHacker.Domain.Tests.Mocks.Extensions;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 
 namespace TimeHacker.Domain.Tests.ServiceTests.Tasks
 {
