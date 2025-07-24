@@ -161,6 +161,7 @@ static void AddDbServices(IServiceCollection services, string dbConnectionString
 static void AddApplicationServices(IServiceCollection services)
 {
     services.AddScoped<UserAccessorBase, UserAccessor>();
+    services.AddScoped<UserAccessor, UserAccessor>();
 }
 
 static void AddIdentityServices(IServiceCollection services)
