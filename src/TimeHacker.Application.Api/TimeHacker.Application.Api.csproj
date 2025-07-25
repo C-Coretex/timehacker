@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TimeHacker.Application.Api.Contracts\TimeHacker.Application.Api.Contracts.csproj" />
+    <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -7,6 +7,7 @@ using OpenTelemetry.Trace;
 using TimeHacker.Api.Filters;
 using TimeHacker.Api.Helpers;
 using TimeHacker.Api.Middleware;
+using TimeHacker.Application.Api.Extensions;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.Services.Extensions;
 using TimeHacker.Infrastructure.Extensions;
@@ -22,7 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
 var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
 
-AddDbServices(builder.Services, timeHackerConnectionString, identityConnectionString);
+RegisterServices(builder.Services, timeHackerConnectionString, identityConnectionString);
 
 AddIdentityServices(builder.Services);
 
@@ -148,14 +149,14 @@ static void AddOpenTelemetry(ILoggingBuilder logging, IServiceCollection service
             .AddConsoleExporter());
 }
 
-static void AddDbServices(IServiceCollection services, string dbConnectionString, string identityDbConnectionString)
+static void RegisterServices(IServiceCollection services, string dbConnectionString, string identityDbConnectionString)
 {
     services.AddDatabaseDeveloperPageExceptionFilter();
 
     services.RegisterRepositories(dbConnectionString);
     services.RegisterIdentity(identityDbConnectionString);
 
-    services.RegisterServices();
+    services.RegisterAppServices();
 }
 
 static void AddApplicationServices(IServiceCollection services)
