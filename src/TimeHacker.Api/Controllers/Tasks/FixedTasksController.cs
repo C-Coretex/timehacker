@@ -4,21 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.Tasks;
+using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IServices.Tasks;
 
 namespace TimeHacker.Api.Controllers.Tasks
 {
     [Authorize]
     [ApiController]
     [Route("/api/FixedTasks")]
-    public class FixedTasksController(IFixedTaskService fixedTaskService) : ControllerBase
+    public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : ControllerBase
     {
         [ProducesResponseType(typeof(IAsyncEnumerable<FixedTaskReturnModel>), StatusCodes.Status200OK)]
         [HttpGet("GetAll")]
         public Ok<IAsyncEnumerable<FixedTaskReturnModel>> GetAll()
         {
-            var data = fixedTaskService.GetAll().Select(FixedTaskReturnModel.Create);
+            var data = fixedTaskAppService.GetAll().Select(FixedTaskReturnModel.Create);
             return TypedResults.Ok(data);
         }
 
@@ -27,7 +27,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpGet("GetById/{id:guid}")]
         public async Task<Results<Ok<FixedTaskReturnModel>, NotFound>> GetById(Guid id)
         {
-            var entity = await fixedTaskService.GetByIdAsync(id);
+            var entity = await fixedTaskAppService.GetByIdAsync(id);
             if (entity == null)
                 return TypedResults.NotFound();
 
@@ -40,7 +40,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         public async Task<Ok> Add([FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
             var fixedTask = inputFixedTaskModel.CreateFixedTask();
-            await fixedTaskService.AddAsync(fixedTask);
+            await fixedTaskAppService.AddAsync(fixedTask);
 
             return TypedResults.Ok();
         }
@@ -59,7 +59,7 @@ namespace TimeHacker.Api.Controllers.Tasks
                 StartTimestamp = DateTime.Parse(inputFixedTaskModel.StartTimestamp),
                 EndTimestamp = DateTime.Parse(inputFixedTaskModel.EndTimestamp)
             };
-            await fixedTaskService.UpdateAsync(fixedTask);
+            await fixedTaskAppService.UpdateAsync(fixedTask);
 
             return TypedResults.Ok();
         }
@@ -68,7 +68,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpDelete("Delete/{id:guid}")]
         public async Task<Ok> Delete(Guid id)
         {
-            await fixedTaskService.DeleteAsync(id);
+            await fixedTaskAppService.DeleteAsync(id);
 
             return TypedResults.Ok();
         }

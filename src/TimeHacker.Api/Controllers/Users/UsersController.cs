@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TimeHacker.Api.Models.Return.Users;
-using TimeHacker.Domain.IServices.Users;
+using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 using TimeHacker.Domain.Models.InputModels.Users;
 
 namespace TimeHacker.Api.Controllers.Users
@@ -12,9 +12,9 @@ namespace TimeHacker.Api.Controllers.Users
     [Route("/api/User")]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserAppService _userService;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserAppService userService)
         {
             _userService = userService;
         }

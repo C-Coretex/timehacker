@@ -1,4 +1,8 @@
 ﻿namespace TimeHacker.Helpers.Domain.Abstractions.Delegates
 {
-    public delegate IQueryable<T> IncludeExpansionDelegate<T>(IQueryable<T> query);
+    // ReSharper disable once GrammarMistakeInComment
+    /// <summary>
+    /// Encapsulates Includes and any filtering logic for queries.
+    /// </summary>
+    public delegate IQueryable<T> QueryPipelineStep<T>(IQueryable<T> query);
 }

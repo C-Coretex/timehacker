@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.Tasks;
+﻿using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Tasks;
 

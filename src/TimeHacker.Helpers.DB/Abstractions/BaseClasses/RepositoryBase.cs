@@ -15,6 +15,16 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         where TModel : class, IDbEntity
         where TDbContext : DbContextBase<TDbContext>
     {
+        private static readonly Lazy<Func<TModel, DateTime>?> UpdatedTimestampSelector = new(() =>
+        {
+            var isUpdatable = typeof(IUpdatable).IsAssignableFrom(typeof(TModel));
+            if (!isUpdatable) return null;
+
+            var param = Expression.Parameter(typeof(TModel), "x");
+            var updatedProp = Expression.Property(param, nameof(IUpdatable.UpdatedTimestamp));
+            return (Func<TModel, DateTime>)Expression.Lambda(updatedProp, param).Compile();
+        });
+
         protected TDbContext DbContext = dbContext;
         protected DbSet<TModel> DbSet = dbSet;
 
@@ -23,16 +33,16 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return DbSet;
         }
 
-        public virtual IQueryable<TModel> GetAll(params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates) => GetAll(true, includeExpansionDelegates);
+        public virtual IQueryable<TModel> GetAll(params QueryPipelineStep<TModel>[] queryPipelineSteps) => GetAll(true, queryPipelineSteps);
 
-        public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params QueryPipelineStep<TModel>[] queryPipelineSteps)
         {
             var query = GetAllBase();
             if (asNoTracking)
                 query = query.AsNoTracking();
 
-            foreach (var includeExpansionDelegate in includeExpansionDelegates)
-                query = includeExpansionDelegate(query);
+            foreach (var queryPipelineStep in queryPipelineSteps)
+                query = queryPipelineStep(query);
 
             return query;
         }
@@ -78,6 +88,11 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return SaveChangesAsync(cancellationToken);
         }
 
+        public virtual Task<int> DeleteBy<TKey>(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return ExecuteDeleteAsync(predicate, cancellationToken);
+        }
+
         public virtual TModel Update(TModel model)
         {
             return DbContext.UpdateEntity(DbSet, model);
@@ -99,13 +114,29 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return SaveChangesAsync(cancellationToken);
         }
 
-        protected virtual Task<int> ExecuteUpdateAsync(Expression<Func<TModel, bool>> predicate, Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, CancellationToken cancellationToken = default)
+        public virtual Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Func<TModel, TKey> propertySelector, TKey value, CancellationToken cancellationToken = default)
+        {
+            var updatedTimestampSelector = UpdatedTimestampSelector.Value;
+            if (updatedTimestampSelector == null)
+                return ExecuteUpdateAsync(predicate, setPropertyCalls => setPropertyCalls.SetProperty(propertySelector, value), cancellationToken);
+            
+            return ExecuteUpdateAsync(predicate,
+                setPropertyCalls => setPropertyCalls
+                    .SetProperty(propertySelector, value)
+                    .SetProperty(updatedTimestampSelector, DateTime.UtcNow), 
+                cancellationToken);
+        }
+
+        protected virtual Task<int> ExecuteUpdateAsync(
+            Expression<Func<TModel, bool>> predicate, 
+            Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, 
+            CancellationToken cancellationToken = default)
         {
             var query = GetAllBase().Where(predicate);
             return query.ExecuteUpdateAsync(setPropertyCalls, cancellationToken);
         }
 
-        protected virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken)
+        protected virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
         {
             var query = GetAllBase().Where(predicate);
             return query.ExecuteDeleteAsync(cancellationToken);
@@ -139,9 +170,9 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
         }
 
-        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params QueryPipelineStep<TModel>[] queryPipelineSteps)
         {
-            return await GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
+            return await GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
         }
 
 

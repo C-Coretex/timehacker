@@ -7,7 +7,7 @@ namespace TimeHacker.Domain.Entities.Tasks
 {
     public class FixedTask : UserScopedEntityBase, ITask
     {
-        public Guid? ScheduleEntityId { get; init; }
+        public Guid? ScheduleEntityId { get; set; }
 
         public required string Name { get; set; }
         public string? Description { get; set; }

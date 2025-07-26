@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Runtime.InteropServices.ComTypes;
 using TimeHacker.Api.Models.Return.ScheduleSnapshots;
-using TimeHacker.Domain.IServices.ScheduleSnapshots;
-using TimeHacker.Domain.IServices.Tasks;
+using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
+using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
+using TimeHacker.Domain.IServices;
 using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
 using TimeHacker.Domain.Models.ReturnModels;
 
@@ -13,7 +15,7 @@ namespace TimeHacker.Api.Controllers.Tasks
     [Authorize]
     [ApiController]
     [Route("/api/Tasks")]
-    public class TasksController(ITaskService taskService)
+    public class TasksController(ITaskAppService taskService)
         : ControllerBase
     {
         [ProducesResponseType(typeof(TasksForDayReturn), StatusCodes.Status200OK)]
@@ -49,9 +51,9 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpGet("GetScheduledTaskById/{id}")]
         public async Task<Results<Ok<ScheduledTaskReturnModel>, NotFound>> GetScheduledTaskById(
             Guid id, 
-            [FromServices] IScheduledTaskService scheduledTaskService)
+            [FromServices] IScheduledTaskAppService scheduledTaskAppService)
         {
-            var entity = await scheduledTaskService.GetBy(id);
+            var entity = await scheduledTaskAppService.GetBy(id);
             if(entity == null)
                 return TypedResults.NotFound();
 
@@ -64,9 +66,9 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpPost("PostNewScheduleForTask")]
         public async Task<Ok<ScheduleEntityReturnModel>> PostNewScheduleForTask(
             [FromBody] InputScheduleEntityModel inputScheduleEntityModel, 
-            [FromServices] IScheduleEntityService scheduleEntityService)
+            [FromServices] IScheduleEntityAppService scheduleEntityAppService)
         {
-            var entity = await scheduleEntityService.Save(inputScheduleEntityModel);
+            var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel);
             var data = ScheduleEntityReturnModel.Create(entity);
 
             return TypedResults.Ok(data);

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <UserSecretsId>aspnet-TimeHacker-c2681444-35c8-4b92-bea2-cc6821a0b32c</UserSecretsId>
@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TimeHacker.Application.Api\TimeHacker.Application.Api.csproj" />
     <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
     <ProjectReference Include="..\TimeHacker.Infrastructure.Identity\TimeHacker.Infrastructure.Identity.csproj" />
     <ProjectReference Include="..\TimeHacker.Infrastructure\TimeHacker.Infrastructure.csproj" />

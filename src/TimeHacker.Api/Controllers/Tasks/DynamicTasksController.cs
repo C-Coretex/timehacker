@@ -4,21 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.Tasks;
+using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IServices.Tasks;
 
 namespace TimeHacker.Api.Controllers.Tasks
 {
     [Authorize]
     [ApiController]
     [Route("/api/DynamicTasks")]
-    public class DynamicTasksController(IDynamicTaskService dynamicTaskService) : ControllerBase
+    public class DynamicTasksController(IDynamicTaskAppService dynamicTaskAppService) : ControllerBase
     {
         [ProducesResponseType(typeof(IAsyncEnumerable<DynamicTaskReturnModel>), StatusCodes.Status200OK)]
         [HttpGet("GetAll")]
         public Ok<IAsyncEnumerable<DynamicTaskReturnModel>> GetAll()
         {
-            var data = dynamicTaskService.GetAll().Select(DynamicTaskReturnModel.Create);
+            var data = dynamicTaskAppService.GetAll().Select(DynamicTaskReturnModel.Create);
             return TypedResults.Ok(data);
         }
 
@@ -27,7 +27,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpGet("GetById/{id:guid}")]
         public async Task<Results<Ok<DynamicTaskReturnModel>, NotFound>> GetById(Guid id)
         {
-            var entity = await dynamicTaskService.GetByIdAsync(id);
+            var entity = await dynamicTaskAppService.GetByIdAsync(id);
             if (entity == null)
                 return TypedResults.NotFound();
 
@@ -40,7 +40,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         public async Task<Ok> Add([FromBody] InputDynamicTaskModel inputDynamicTaskModel)
         {
             var dynamicTask = inputDynamicTaskModel.CreateDynamicTask();
-            await dynamicTaskService.AddAsync(dynamicTask);
+            await dynamicTaskAppService.AddAsync(dynamicTask);
 
             return TypedResults.Ok();
         }
@@ -62,7 +62,7 @@ namespace TimeHacker.Api.Controllers.Tasks
                 OptimalTimeToFinish = inputDynamicTaskModel.OptimalTimeToFinish
             };
 
-            await dynamicTaskService.UpdateAsync(dynamicTask);
+            await dynamicTaskAppService.UpdateAsync(dynamicTask);
 
             return TypedResults.Ok();
         }
@@ -71,7 +71,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpDelete("Delete/{id:guid}")]
         public async Task<Ok> Delete(Guid id)
         {
-            await dynamicTaskService.DeleteAsync(id);
+            await dynamicTaskAppService.DeleteAsync(id);
 
             return TypedResults.Ok();
         }
