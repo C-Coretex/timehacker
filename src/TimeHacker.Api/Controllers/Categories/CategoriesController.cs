@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Return.Categories;
-using TimeHacker.Application.Api.Contracts.IServices.Categories;
+using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
 using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Api.Controllers.Categories
@@ -12,7 +12,7 @@ namespace TimeHacker.Api.Controllers.Categories
     [Authorize]
     [ApiController]
     [Route("/api/Categories")]
-    public class CategoriesController(ICategoryService categoryService) : ControllerBase
+    public class CategoriesController(ICategoryAppService categoryService) : ControllerBase
     {
         [ProducesResponseType(typeof(IAsyncEnumerable<CategoryReturnModel>), StatusCodes.Status200OK)]
         [HttpGet("GetAll")]

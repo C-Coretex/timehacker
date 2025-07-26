@@ -156,6 +156,7 @@ static void RegisterServices(IServiceCollection services, string dbConnectionStr
     services.RegisterRepositories(dbConnectionString);
     services.RegisterIdentity(identityDbConnectionString);
 
+    services.RegisterDomainServices();
     services.RegisterAppServices();
 }
 

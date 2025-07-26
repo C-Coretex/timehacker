@@ -1,12 +1,13 @@
 ﻿using TimeHacker.Domain.Constants;
 using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.IProcessors;
 using TimeHacker.Domain.Models.BusinessLogicModels;
 using TimeHacker.Domain.Models.ReturnModels;
 using TimeHacker.Helpers.Domain.Helpers;
 
 namespace TimeHacker.Domain.Services.Processors
 {
-    public class TaskTimelineProcessor
+    public class TaskTimelineProcessor: ITaskTimelineProcessor
     {
         public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
         {

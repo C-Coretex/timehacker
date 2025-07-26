@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using TimeHacker.Application.Api.Contracts.IServices.Categories;
-using TimeHacker.Application.Api.Contracts.IServices.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.IServices.Tasks;
-using TimeHacker.Application.Api.Contracts.IServices.Users;
-using TimeHacker.Application.Api.Services.Categories;
-using TimeHacker.Application.Api.Services.ScheduleSnapshots;
-using TimeHacker.Application.Api.Services.Tasks;
-using TimeHacker.Application.Api.Services.Users;
-using TimeHacker.Domain.Services.Extensions;
+using TimeHacker.Application.Api.AppServices.Categories;
+using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
+using TimeHacker.Application.Api.AppServices.Tasks;
+using TimeHacker.Application.Api.AppServices.Users;
+using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
+using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
+using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
+using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 
 namespace TimeHacker.Application.Api.Extensions
 {
@@ -15,21 +14,20 @@ namespace TimeHacker.Application.Api.Extensions
     {
         public static IServiceCollection RegisterAppServices(this IServiceCollection serviceCollection)
         {
-            serviceCollection.RegisterServices();
-            serviceCollection.AddScoped<ICategoryService, CategoryService>();
+            serviceCollection.AddScoped<ICategoryAppService, CategoryService>();
 
-            serviceCollection.AddScoped<IScheduleSnapshotService, ScheduleSnapshotService>();
-            serviceCollection.AddScoped<IScheduledTaskService, ScheduledTaskService>();
-            serviceCollection.AddScoped<IScheduledCategoryService, ScheduledCategoryService>();
-            serviceCollection.AddScoped<IScheduleEntityService, ScheduleEntityService>();
+            serviceCollection.AddScoped<IScheduleSnapshotAppService, ScheduleSnapshotService>();
+            serviceCollection.AddScoped<IScheduledTaskAppService, ScheduledTaskAppService>();
+            serviceCollection.AddScoped<IScheduleEntityAppService, ScheduleEntityAppService>();
+            serviceCollection.AddScoped<IScheduledCategoryAppService, ScheduledCategoryService>();
 
-            serviceCollection.AddScoped<IDynamicTaskService, DynamicTaskService>();
-            serviceCollection.AddScoped<IFixedTaskService, FixedTaskService>();
-            serviceCollection.AddScoped<ITaskService, TaskService>();
+            serviceCollection.AddScoped<IDynamicTaskAppService, DynamicTaskAppService>();
+            serviceCollection.AddScoped<IFixedTaskAppService, FixedTaskAppService>();
+            serviceCollection.AddScoped<ITaskAppService, TaskService>();
 
-            serviceCollection.AddScoped<ITaskService, TaskService>();
+            serviceCollection.AddScoped<ITaskAppService, TaskService>();
 
-            serviceCollection.AddScoped<IUserService, UserService>();
+            serviceCollection.AddScoped<IUserAppService, UserService>();
 
             return serviceCollection;
         }

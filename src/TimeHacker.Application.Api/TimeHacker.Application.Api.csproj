@@ -4,8 +4,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Linq.Async" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TimeHacker.Application.Api.Contracts\TimeHacker.Application.Api.Contracts.csproj" />
-    <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
   </ItemGroup>
 
 </Project>
