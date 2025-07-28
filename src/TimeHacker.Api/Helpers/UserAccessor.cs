@@ -29,7 +29,7 @@ namespace TimeHacker.Api.Helpers
        
         public async Task Init()
         {
-            if (!IsUserValid)
+            if (IsUserValid)
                 return;
 
             var context = _httpContextAccessor.HttpContext;
