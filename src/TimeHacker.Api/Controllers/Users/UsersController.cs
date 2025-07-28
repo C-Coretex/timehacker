@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TimeHacker.Api.Models.Return.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 using TimeHacker.Domain.Models.InputModels.Users;
@@ -13,10 +14,12 @@ namespace TimeHacker.Api.Controllers.Users
     public class UsersController : ControllerBase
     {
         private readonly IUserAppService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UsersController(IUserAppService userService)
+        public UsersController(IUserAppService userService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [ProducesResponseType(typeof(UserReturnModel), StatusCodes.Status200OK)]
@@ -36,8 +39,10 @@ namespace TimeHacker.Api.Controllers.Users
         [HttpPost("Add")]
         public async Task<Ok> Add([FromBody] UserUpdateModel inputUserModel)
         {
+            var context = _httpContextAccessor.HttpContext;
+            var userIdentityId = context!.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             //TODO: service to DTO, InputModel remains
-            await _userService.AddAsync(inputUserModel);
+            await _userService.AddAsync(inputUserModel, userIdentityId);
 
             return TypedResults.Ok();
         }

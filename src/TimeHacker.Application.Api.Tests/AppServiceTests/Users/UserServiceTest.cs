@@ -45,8 +45,8 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Users
                 EmailForNotifications = "aaa",
                 PhoneNumberForNotifications = "222"
             };
-            await _userService.AddAsync(newEntry);
-            var result = _users.FirstOrDefault(x => x.Id == _userId);
+            await _userService.AddAsync(newEntry, "123");
+            var result = _users.FirstOrDefault(x => x.IdentityId == "123");
 
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);

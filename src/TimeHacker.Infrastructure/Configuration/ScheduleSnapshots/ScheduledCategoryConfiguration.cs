@@ -1,15 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Drawing;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduledCategoryConfiguration : IEntityTypeConfiguration<ScheduledCategory>
+    public class ScheduledCategoryConfiguration : UserScopedEntityConfigurationBase<ScheduledCategory>
     {
-        public void Configure(EntityTypeBuilder<ScheduledCategory> builder)
+        public override void Configure(EntityTypeBuilder<ScheduledCategory> builder)
         {
-            builder.HasKey(x => x.Id);
+            ConfigureUserScoped(builder);
 
             builder.HasOne(x => x.ScheduleSnapshot).WithMany(x => x.ScheduledCategories)
                    .HasForeignKey(x => new { x.UserId, x.Date }).HasPrincipalKey(x => new { x.UserId, x.Date })

@@ -5,7 +5,7 @@ namespace TimeHacker.Application.Api.Contracts.IAppServices.Users
 {
     public interface IUserAppService
     {
-        Task AddAsync(UserUpdateModel user);
+        Task AddAsync(UserUpdateModel user, string userIdentityId);
         Task<User?> GetCurrent();
         Task UpdateAsync(UserUpdateModel user);
         Task DeleteAsync();

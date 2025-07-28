@@ -18,15 +18,11 @@ namespace TimeHacker.Application.Api.AppServices.Users
             _userAccessorBase = userAccessorBase;
         }
 
-        public async Task AddAsync(UserUpdateModel user)
+        public async Task AddAsync(UserUpdateModel user, string userIdentityId)
         {
-            var userId = _userAccessorBase.GetUserIdOrThrowUnauthorized();
-            if (await _userRepository.ExistsAsync(userId))
-                throw new UserAlreadyPresentException();
-
             var userEntity = new User()
             {
-                Id = userId,
+                IdentityId = userIdentityId,
                 Name = user.Name,
                 PhoneNumberForNotifications = user.PhoneNumberForNotifications,
                 EmailForNotifications = user.EmailForNotifications

@@ -12,7 +12,7 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(TimeHackerMigrationsDbContext))]
-    [Migration("20250724053630_Init")]
+    [Migration("20250728211812_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -53,7 +53,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasMaxLength(450)
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -132,23 +131,23 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasMaxLength(450)
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
 
                     b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("UserId", "Date");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("Date");
 
@@ -200,6 +199,8 @@ namespace TimeHacker.Migrations.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ParentScheduleEntity");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("UserId", "Date");
 
@@ -263,6 +264,8 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.HasIndex("ScheduledCategoryId");
 
+                    b.HasIndex("UserId");
+
                     b.HasIndex("UserId", "Date");
 
                     b.ToTable("ScheduledTask");
@@ -293,7 +296,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasMaxLength(450)
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -369,7 +371,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasMaxLength(450)
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -415,7 +416,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
-                        .HasMaxLength(450)
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -565,6 +565,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
                         .WithMany("ScheduledCategories")
                         .HasForeignKey("UserId", "Date")
+                        .HasPrincipalKey("UserId", "Date")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
@@ -596,6 +597,7 @@ namespace TimeHacker.Migrations.Migrations
                     b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleSnapshot", "ScheduleSnapshot")
                         .WithMany("ScheduledTasks")
                         .HasForeignKey("UserId", "Date")
+                        .HasPrincipalKey("UserId", "Date")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
