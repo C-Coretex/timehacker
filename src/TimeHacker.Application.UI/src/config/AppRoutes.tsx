@@ -3,6 +3,7 @@ import type { RouteObject } from 'react-router-dom';
 import Layout from 'components/Layout';
 import PrivateRoute from 'components/PrivateRoute';
 import CalendarPage from 'pages/CalendarPage';
+import LoginPage from 'pages/LoginPage';
 import NotFoundPage from 'pages/NotFoundPage';
 
 const AppRoutes: RouteObject[] = [
@@ -32,6 +33,10 @@ const AppRoutes: RouteObject[] = [
         element: <NotFoundPage />,
       },
     ],
+  },
+  {
+    path: 'login',
+    element: <LoginPage />,
   },
 ];
 
