@@ -1,0 +1,62 @@
+// src/hooks/useFixedTasks.ts
+import { useState, useEffect, useCallback } from 'react';
+import { notification } from 'antd';
+import moment from 'moment';
+import {
+    fetchFixedTasks,
+    createFixedTask,
+    updateFixedTask,
+    deleteFixedTask,
+    type FixedTaskReturnModel,
+    type InputFixedTask,
+} from '../api/fixedTasks';
+import type { FixedTaskDisplayModel } from '../types';
+
+const useFixedTasks = () => {
+    const [tasks, setTasks] = useState<FixedTaskDisplayModel[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchTasks = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const fetchedTasks = await fetchFixedTasks();
+            const mappedTasks: FixedTaskDisplayModel[] = fetchedTasks.map((task) => ({
+                id: task.id,
+                name: task.name,
+                description: task.description,
+                priority: task.priority,
+                startTimestamp: moment(task.startTimestamp),
+                endTimestamp: moment(task.endTimestamp),
+            }));
+            setTasks(mappedTasks);
+        } catch (err) {
+            const message = 'Failed to load tasks. Please check your network or API server connection.';
+            setError(message);
+            notification.error({ message: 'Error', description: message });
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const createTask = useCallback(async (task: InputFixedTask) => {
+        await createFixedTask(task);
+    }, []);
+
+    const updateTask = useCallback(async (id: string, task: InputFixedTask) => {
+        await updateFixedTask(id, task);
+    }, []);
+
+    const deleteTask = useCallback(async (id: string) => {
+        await deleteFixedTask(id);
+    }, []);
+
+    useEffect(() => {
+        fetchTasks();
+    }, [fetchTasks]);
+
+    return { tasks, loading, error, fetchTasks, createTask, updateTask, deleteTask };
+};
+
+export default useFixedTasks;

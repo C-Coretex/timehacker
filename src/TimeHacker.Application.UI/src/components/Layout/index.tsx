@@ -23,18 +23,6 @@ const { Header, Content, Footer, Sider } = AntdLayout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-// const findActiveLink = (url: string, menuItems: MenuItem[]) => {
-//     for (const menuItem of menuItems) {
-//       if (url.includes('profile')) {
-//         return 'profile'
-//       } else if (url === menuItem?.label?.props?.href) {
-//         return String(menuItem.key)
-//       }
-//     }
-  
-//     return null;
-// }
-
 const getItem = (
   key: React.Key,
   icon?: React.ReactNode,
@@ -61,6 +49,7 @@ const getMainMenuItems = (isAuthenticated: boolean) => ([
         getItem('login', <ProductOutlined />),
     ]),
     getItem('help', <QuestionCircleOutlined />),
+    getItem('about', <QuestionCircleOutlined />),
     getItem('settings', <SettingOutlined />),
 ]);
 
@@ -75,7 +64,6 @@ const Layout: FC = () => {
 
   const mainMenuItems = getMainMenuItems(false);
   // const activeLink = findActiveLink(location.pathname, mainMenuItems);
-
 
   return (
     <AntdLayout style={{ minHeight: '100vh' }}>
@@ -116,7 +104,7 @@ const Layout: FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          TimeHacker ©{new Date().getFullYear()}
+                  TimeHacker &copy;2024 &mdash; {new Date().getFullYear()} All rights reserved.
         </Footer>
       </AntdLayout>
     </AntdLayout>
