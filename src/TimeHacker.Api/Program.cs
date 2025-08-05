@@ -54,6 +54,18 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<LogExceptionFilter>();
 });
 
+var port = builder.Configuration.GetValue<int>("AppSettings:uiPort");
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins($"http://localhost:{port}")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks()
@@ -95,6 +107,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseSession();
+
+app.UseCors("AllowFrontend");
 
 app.UseMiddleware<UserAccessorInitMiddleware>();
 

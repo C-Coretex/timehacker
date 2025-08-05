@@ -3,7 +3,7 @@ using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Api.Models.Return.Tasks
 {
-    public class FixedTaskReturnModel(
+    public record FixedTaskReturnModel(
         
         Guid Id,
         string Name,
