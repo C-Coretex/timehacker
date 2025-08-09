@@ -54,15 +54,16 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<LogExceptionFilter>();
 });
 
-var port = builder.Configuration.GetValue<int>("AppSettings:uiPort");
+var uiUrl = builder.Configuration.GetValue<string>("AppSettings:uiUrl")!;
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins($"http://localhost:{port}")
+            policy.WithOrigins(uiUrl)
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
 
