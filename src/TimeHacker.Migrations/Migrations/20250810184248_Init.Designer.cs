@@ -12,11 +12,7 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(TimeHackerMigrationsDbContext))]
-<<<<<<<< HEAD:src/TimeHacker.Migrations/Migrations/20250810153429_Init.Designer.cs
-    [Migration("20250810153429_Init")]
-========
-    [Migration("20250728211812_Init")]
->>>>>>>> main:src/TimeHacker.Migrations/Migrations/20250728211812_Init.Designer.cs
+    [Migration("20250810184248_Init")]
     partial class Init
     {
         /// <inheritdoc />
