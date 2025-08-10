@@ -4,11 +4,11 @@ using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduledTaskConfiguration : IEntityTypeConfiguration<ScheduledTask>
+    public class ScheduledTaskConfiguration : UserScopedEntityConfigurationBase<ScheduledTask>
     {
-        public void Configure(EntityTypeBuilder<ScheduledTask> builder)
+        public override void Configure(EntityTypeBuilder<ScheduledTask> builder)
         {
-            builder.HasKey(x => x.Id);
+            ConfigureUserScoped(builder);
 
             builder.HasIndex(x => x.IsCompleted);
             builder.Property(x => x.IsCompleted).IsRequired();

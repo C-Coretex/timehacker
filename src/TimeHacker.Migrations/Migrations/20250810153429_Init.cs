@@ -42,7 +42,7 @@ namespace TimeHacker.Migrations.Migrations
                     OptimalTimeToFinish = table.Column<TimeSpan>(type: "interval", nullable: true),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,15 +82,16 @@ namespace TimeHacker.Migrations.Migrations
                 name: "ScheduleSnapshot",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ScheduleSnapshot", x => new { x.UserId, x.Date });
+                    table.PrimaryKey("PK_ScheduleSnapshot", x => x.Id);
+                    table.UniqueConstraint("AK_ScheduleSnapshot_UserId_Date", x => new { x.UserId, x.Date });
                     table.ForeignKey(
                         name: "FK_ScheduleSnapshot_User_UserId",
                         column: x => x.UserId,
@@ -109,7 +110,7 @@ namespace TimeHacker.Migrations.Migrations
                     Color = table.Column<int>(type: "integer", nullable: false),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -133,7 +134,7 @@ namespace TimeHacker.Migrations.Migrations
                     Color = table.Column<int>(type: "integer", nullable: false),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -164,7 +165,7 @@ namespace TimeHacker.Migrations.Migrations
                     EndTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -412,6 +413,11 @@ namespace TimeHacker.Migrations.Migrations
                 column: "ParentScheduleEntity");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ScheduledCategory_UserId",
+                table: "ScheduledCategory",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ScheduledCategory_UserId_Date",
                 table: "ScheduledCategory",
                 columns: new[] { "UserId", "Date" });
@@ -430,6 +436,11 @@ namespace TimeHacker.Migrations.Migrations
                 name: "IX_ScheduledTask_ScheduledCategoryId",
                 table: "ScheduledTask",
                 column: "ScheduledCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduledTask_UserId",
+                table: "ScheduledTask",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledTask_UserId_Date",
