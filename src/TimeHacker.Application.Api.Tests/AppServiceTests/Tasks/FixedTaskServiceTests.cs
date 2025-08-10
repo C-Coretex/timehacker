@@ -1,6 +1,7 @@
 ﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Application.Api.AppServices.Tasks;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
@@ -37,13 +38,12 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            var newEntry = new FixedTask()
+            var newEntry = new FixedTaskDto()
             {
-                Name = "TestFixedTask1000",
-                UserId = Guid.NewGuid()
+                Name = "TestFixedTask1000"
             };
             await _fixedTaskAppService.AddAsync(newEntry);
-            var result = _fixedTasks.FirstOrDefault(x => x.Id == newEntry.Id);
+            var result = _fixedTasks.FirstOrDefault(x => x.Name == newEntry.Name);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
         }
@@ -52,7 +52,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            var newEntry = new FixedTask()
+            var newEntry = new FixedTaskDto()
             {
                 Id = _fixedTasks.First(x => x.UserId == _userId).Id,
                 Name = "TestFixedTask1000"
@@ -80,7 +80,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks
             var result = await _fixedTaskAppService.GetAll().ToListAsync();
 
             result.Count.Should().Be(_fixedTasks.Count);
-            result.Should().BeEquivalentTo(_fixedTasks.ToList());
+            result.Should().BeEquivalentTo(_fixedTasks.Select(FixedTaskDto.Create).ToList());
         }
 
         [Fact]

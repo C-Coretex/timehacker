@@ -2,6 +2,7 @@
 using AwesomeAssertions;
 using Moq;
 using TimeHacker.Application.Api.AppServices.Tags;
+using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tags;
 using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.IRepositories;
@@ -37,12 +38,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tags
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            var newEntry = new Tag()
-            {
-                Id = Guid.NewGuid(),
-                Name = "TestTag1000",
-                UserId = Guid.NewGuid()
-            };
+            var newEntry = new TagDto(Guid.NewGuid(), "TestTag1000", "", Color.AliceBlue);
             await _tagService.AddAsync(newEntry);
             var result = _tags.FirstOrDefault(x => x.Id == newEntry.Id);
 
@@ -54,11 +50,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tags
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            var newEntry = new Tag()
-            {
-                Id = _tags.First(x => x.UserId == _userId).Id,
-                Name = "TestTag1000"
-            };
+            var newEntry = new TagDto(_tags.First(x => x.UserId == _userId).Id, "TestTag1000", "", Color.AliceBlue);
             await _tagService.UpdateAsync(newEntry);
             var result = _tags.FirstOrDefault(x => x.Id == newEntry.Id);
 
@@ -84,7 +76,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tags
             var result = await _tagService.GetAll().ToListAsync();
 
             result.Count.Should().Be(_tags.Count);
-            result.Should().BeEquivalentTo(_tags);
+            result.Should().BeEquivalentTo(_tags.Select(TagDto.Create));
         }
 
         #region Mock helpers

@@ -5,6 +5,7 @@ using TimeHacker.Application.Api.AppServices.Categories;
 using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.AppServices.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
+using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.IProcessors;
@@ -140,11 +141,7 @@ public class TaskServiceTests
                 LastEntityCreated = null,
                 EndsOn = null,
                 CreatedTimestamp = dates[0],
-                RepeatingEntity = new RepeatingEntityModel()
-                {
-                    EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                    RepeatingData = new DayRepeatingEntity(1)
-                },
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1)),
                 FixedTask = fixedTask
             }
         };

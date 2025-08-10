@@ -1,4 +1,7 @@
 ﻿using AwesomeAssertions;
+using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+using TimeHacker.Domain.DTOs.RepeatingEntity;
+using TimeHacker.Domain.Helpers.ScheduleSnapshots;
 using TimeHacker.Domain.Models.EntityModels;
 using TimeHacker.Domain.Models.EntityModels.Enums;
 using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
@@ -12,19 +15,9 @@ namespace TimeHacker.Application.Api.Tests.RichModelTests
         [Trait("DayRepeatingEntity", "Should return correct data without EndsOnModel")]
         public void GetScheduleEntity_ShouldReturnCorrectDataWithoutEndsOnModel()
         {
-            var repeatingEntityModel = new RepeatingEntityModel()
-            {
-                EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                RepeatingData = new DayRepeatingEntity()
-            };
+            var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity());
 
-            var model = new InputScheduleEntityModel()
-            {
-                RepeatingEntityModel = repeatingEntityModel,
-                EndsOnModel = null
-            };
-
-            var scheduledEntity = model.GetScheduleEntity();
+            var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null);
             scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
             scheduledEntity.EndsOn.Should().BeNull();
         }
@@ -33,24 +26,16 @@ namespace TimeHacker.Application.Api.Tests.RichModelTests
         [Trait("DayRepeatingEntity", "Should return correct data with EndsOnModel without MaxOccurrences")]
         public void GetScheduleEntity_ShouldReturnCorrectDataWithEndsOnModelWithoutMaxOccurrences()
         {
-            var repeatingEntityModel = new RepeatingEntityModel()
-            {
-                EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                RepeatingData = new DayRepeatingEntity()
-            };
+            var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity());
 
             var maxDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10));
-            var model = new InputScheduleEntityModel()
+            var endsOnModel = new EndsOnModel()
             {
-                RepeatingEntityModel = repeatingEntityModel,
-                EndsOnModel = new EndsOnModel()
-                {
-                    MaxDate = maxDate,
-                    MaxOccurrences = null
-                }
+                MaxDate = maxDate,
+                MaxOccurrences = null
             };
 
-            var scheduledEntity = model.GetScheduleEntity();
+            var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel);
             scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
             scheduledEntity.EndsOn.Should().Be(maxDate);
         }
@@ -59,24 +44,16 @@ namespace TimeHacker.Application.Api.Tests.RichModelTests
         [Trait("DayRepeatingEntity", "Should return correct data with EndsOnModel with MaxOccurrences")]
         public void GetScheduleEntity_ShouldReturnCorrectDataWithEndsOnModelWithMaxOccurrences([CombinatorialValues(0, 1, 5, 10)] uint maxOccurrences, bool isMaxDate)
         {
-            var repeatingEntityModel = new RepeatingEntityModel()
-            {
-                EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                RepeatingData = new DayRepeatingEntity(2)
-            };
+            var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2));
 
             var maxDate = isMaxDate ? (DateOnly?)DateOnly.FromDateTime(DateTime.Now.AddDays(8)) : null;
-            var model = new InputScheduleEntityModel()
+            var endsOnModel = new EndsOnModel()
             {
-                RepeatingEntityModel = repeatingEntityModel,
-                EndsOnModel = new EndsOnModel()
-                {
-                    MaxDate = maxDate,
-                    MaxOccurrences = maxOccurrences
-                }
+                MaxDate = maxDate,
+                MaxOccurrences = maxOccurrences
             };
 
-            var scheduledEntity = model.GetScheduleEntity();
+            var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel);
             scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
 
             var endsOn = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(maxOccurrences * 2));

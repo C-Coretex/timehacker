@@ -21,10 +21,7 @@ namespace TimeHacker.Application.Api.Contracts.DTOs.Categories
 
         public Category GetEntity(Category? category = null)
         {
-            category ??= new Category()
-            {
-                Id = Id ?? Guid.CreateVersion7()
-            };
+            category ??= new Category();
 
             category.ScheduleEntityId = ScheduleEntityId;
             category.Name = Name;

@@ -1,10 +1,10 @@
 ﻿using AwesomeAssertions;
 using Moq;
 using TimeHacker.Application.Api.AppServices.Users;
+using TimeHacker.Application.Api.Contracts.DTOs.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.IRepositories.Users;
-using TimeHacker.Domain.Models.InputModels.Users;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Helpers.Tests.Mocks;
 using TimeHacker.Helpers.Tests.Mocks.Extensions;
@@ -35,24 +35,6 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Users
 
         #endregion
 
-        [Fact]
-        [Trait("AddAndSaveAsync", "Should add entry with correct Id")]
-        public async Task AddAsync_ShouldAddEntry()
-        {
-            var newEntry = new UserUpdateModel()
-            {
-                Name = "TestCategory1000",
-                EmailForNotifications = "aaa",
-                PhoneNumberForNotifications = "222"
-            };
-            await _userService.AddAsync(newEntry);
-            var result = _users.FirstOrDefault(x => x.Id == _userId);
-
-            result.Should().NotBeNull();
-            result!.Name.Should().Be(newEntry.Name);
-            result!.EmailForNotifications.Should().Be(newEntry.EmailForNotifications);
-            result!.PhoneNumberForNotifications.Should().Be(newEntry.PhoneNumberForNotifications);
-        }
 
         #region Mock helpers
 

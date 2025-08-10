@@ -14,7 +14,7 @@ namespace TimeHacker.Application.Api.AppServices.Categories
 
         public Task AddAsync(CategoryDto categoryDto)
         {
-            return categoryRepository.AddAndSaveAsync(categoryDto.GetEntity(new Category()));
+            return categoryRepository.AddAndSaveAsync(categoryDto.GetEntity());
         }
 
         public async Task UpdateAsync(CategoryDto categoryDto)

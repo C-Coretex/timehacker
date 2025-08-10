@@ -2,6 +2,7 @@
 using AwesomeAssertions;
 using Moq;
 using TimeHacker.Application.Api.AppServices.Categories;
+using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
 using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
@@ -37,12 +38,9 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Categories
         [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
         public async Task AddAsync_ShouldAddEntry()
         {
-            var newEntry = new Category()
-            {
-                Name = "TestCategory1000"
-            };
+            var newEntry = new CategoryDto(null, null, "TestCategory1000", "", Color.AliceBlue);
             await _categoryService.AddAsync(newEntry);
-            var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
+            var result = _categories.FirstOrDefault(x => x.Name == newEntry.Name);
             result.Should().NotBeNull();
             result!.Name.Should().Be(newEntry.Name);
         }
@@ -51,11 +49,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Categories
         [Trait("UpdateAndSaveAsync", "Should update entry")]
         public async Task UpdateAsync_ShouldUpdateEntry()
         {
-            var newEntry = new Category()
-            {
-                Id = _categories.First(x => x.UserId == _userId).Id,
-                Name = "TestCategory1000"
-            };
+            var newEntry = new CategoryDto(_categories.First(x => x.UserId == _userId).Id, null, "TestCategory1000", "", Color.AliceBlue);
             await _categoryService.UpdateAsync(newEntry);
             var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
             result.Should().NotBeNull();
@@ -76,10 +70,10 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.Categories
         [Trait("GetAll", "Should return correct data")]
         public void GetAll_ShouldReturnCorrectData()
         {
-            var result = _categoryService.GetAll().ToList();
+            var result = _categoryService.GetAll().ToBlockingEnumerable().ToList();
 
             result.Count.Should().Be(_categories.Count);
-            result.Should().BeEquivalentTo(_categories.ToList());
+            result.Should().BeEquivalentTo(_categories.Select(CategoryDto.Create).ToList());
         }
 
         [Fact]
