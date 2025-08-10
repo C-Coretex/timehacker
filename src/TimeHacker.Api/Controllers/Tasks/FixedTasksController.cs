@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
@@ -39,8 +38,8 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpPost("Add")]
         public async Task<Ok> Add([FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
-            var fixedTask = inputFixedTaskModel.CreateFixedTask();
-            await fixedTaskAppService.AddAsync(fixedTask);
+            var fixedTaskDto = inputFixedTaskModel.CreateFixedTaskDto();
+            await fixedTaskAppService.AddAsync(fixedTaskDto);
 
             return TypedResults.Ok();
         }
@@ -50,16 +49,8 @@ namespace TimeHacker.Api.Controllers.Tasks
         public async Task<Ok> Update(Guid id, [FromBody] InputFixedTaskModel inputFixedTaskModel)
         {
             //TODO: when it will be record DTO - will use inputCategoryModel.CreateCategory() with { Id = id };
-            var fixedTask = new FixedTask()
-            {
-                Id = id,
-                Name = inputFixedTaskModel.Name,
-                Description = inputFixedTaskModel.Description,
-                Priority = inputFixedTaskModel.Priority,
-                StartTimestamp = DateTime.Parse(inputFixedTaskModel.StartTimestamp),
-                EndTimestamp = DateTime.Parse(inputFixedTaskModel.EndTimestamp)
-            };
-            await fixedTaskAppService.UpdateAsync(fixedTask);
+            var fixedTaskDto = inputFixedTaskModel.CreateFixedTaskDto() with { Id = id };
+            await fixedTaskAppService.UpdateAsync(fixedTaskDto);
 
             return TypedResults.Ok();
         }

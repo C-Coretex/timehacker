@@ -5,7 +5,7 @@ namespace TimeHacker.Domain.Entities.Tags
 {
     public class Tag : UserScopedEntityBase
     {
-        public required string Name { get; set; }
+        public string Name { get; set; } = "";
         public string? Category { get; set; }
 
         public Color Color { get; set; }

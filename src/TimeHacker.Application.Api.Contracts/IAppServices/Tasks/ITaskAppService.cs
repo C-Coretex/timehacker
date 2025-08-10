@@ -1,11 +1,11 @@
-﻿using TimeHacker.Domain.Models.ReturnModels;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Application.Api.Contracts.IAppServices.Tasks
 {
     public interface ITaskAppService
     {
-        Task<TasksForDayReturn> GetTasksForDay(DateOnly date);
-        IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(ICollection<DateOnly> dates);
-        IAsyncEnumerable<TasksForDayReturn> RefreshTasksForDays(ICollection<DateOnly> dates);
+        Task<TasksForDayDto> GetTasksForDay(DateOnly date);
+        IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates);
+        IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Application.Api.QueryPipelineSteps;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
@@ -18,11 +19,11 @@ namespace TimeHacker.Application.Api.AppServices.Tasks
         IScheduleEntityService scheduleEntityService,
         ITaskTimelineProcessor taskTimelineProcessor) : ITaskAppService
     {
-        public async Task<TasksForDayReturn> GetTasksForDay(DateOnly date)
+        public async Task<TasksForDayDto> GetTasksForDay(DateOnly date)
         {
             var snapshot = await GetSnapshotForDate(date);
             if (snapshot != null)
-                return TasksForDayReturn.Create(snapshot);
+                return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
 
             var fixedTasks = await fixedTaskRepository.GetAll()
                                               .Where(ft => DateOnly.FromDateTime(ft.StartTimestamp) == date)
@@ -38,10 +39,10 @@ namespace TimeHacker.Application.Api.AppServices.Tasks
             snapshot = tasksForDay.CreateScheduleSnapshot();
             snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot);
 
-            return TasksForDayReturn.Create(snapshot);
+            return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
         }
 
-        public async IAsyncEnumerable<TasksForDayReturn> GetTasksForDays(ICollection<DateOnly> dates)
+        public async IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates)
         {
             var fixedTasks = await fixedTaskRepository.GetAll()
                                                     .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
@@ -64,13 +65,13 @@ namespace TimeHacker.Application.Api.AppServices.Tasks
                     snapshot = tasksForDay.CreateScheduleSnapshot();
                     snapshot = scheduleSnapshotRepository.Add(snapshot);
                 }
-                yield return TasksForDayReturn.Create(snapshot);
+                yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
             }
 
             await scheduleSnapshotRepository.SaveChangesAsync();
         }
 
-        public async IAsyncEnumerable<TasksForDayReturn> RefreshTasksForDays(ICollection<DateOnly> dates)
+        public async IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates)
         {
             var fixedTasks = await fixedTaskRepository.GetAll()
                                                     .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
@@ -102,7 +103,7 @@ namespace TimeHacker.Application.Api.AppServices.Tasks
                 foreach(var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
                     await scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value, date);
 
-                yield return TasksForDayReturn.Create(snapshot);
+                yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
             }
 
             await scheduleSnapshotRepository.SaveChangesAsync();

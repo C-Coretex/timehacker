@@ -1,4 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Users;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 
 namespace TimeHacker.Api.Models.Return.Users
 {
@@ -8,7 +8,7 @@ namespace TimeHacker.Api.Models.Return.Users
         string? EmailForNotifications
     )
     {
-        public static UserReturnModel Create(User user)
+        public static UserReturnModel Create(UserDto user)
         {
             return new UserReturnModel(
                 user.Name,

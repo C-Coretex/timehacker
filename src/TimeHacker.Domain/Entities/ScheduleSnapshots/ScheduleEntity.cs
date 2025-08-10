@@ -1,13 +1,13 @@
-﻿using TimeHacker.Domain.Entities.Categories;
+﻿using TimeHacker.Domain.DTOs.RepeatingEntity;
+using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.Models.EntityModels;
 
 namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
     public class ScheduleEntity : UserScopedEntityBase
     {
-        public RepeatingEntityModel RepeatingEntity { get; set; }
+        public RepeatingEntityDto RepeatingEntity { get; set; }
         public DateOnly? LastEntityCreated { get; set; }
         public DateOnly? EndsOn { get; set; }
 

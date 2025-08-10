@@ -9,8 +9,9 @@ namespace TimeHacker.Infrastructure.Configuration.Users
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(u => u.Id);
-            builder.Property(x => x.Id).HasMaxLength(450);
+            builder.Property(x => x.Id);
 
+            builder.Property(x => x.IdentityId).HasMaxLength(450).IsRequired();
             builder.HasIndex(x => x.IdentityId).IsUnique();
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(64);

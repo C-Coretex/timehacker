@@ -15,12 +15,12 @@ namespace TimeHacker.Migrations.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", maxLength: 450, nullable: false),
-                    IdentityId = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IdentityId = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     PhoneNumberForNotifications = table.Column<string>(type: "text", nullable: true),
                     EmailForNotifications = table.Column<string>(type: "text", nullable: true),
-                    Birthday = table.Column<DateOnly>(type: "date", nullable: false),
+                    Birthday = table.Column<DateOnly>(type: "date", nullable: true),
                     CreatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },

@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Api.Controllers.Tasks
 {
@@ -39,7 +37,7 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpPost("Add")]
         public async Task<Ok> Add([FromBody] InputDynamicTaskModel inputDynamicTaskModel)
         {
-            var dynamicTask = inputDynamicTaskModel.CreateDynamicTask();
+            var dynamicTask = inputDynamicTaskModel.CreateDynamicTaskDto();
             await dynamicTaskAppService.AddAsync(dynamicTask);
 
             return TypedResults.Ok();
@@ -49,20 +47,8 @@ namespace TimeHacker.Api.Controllers.Tasks
         [HttpPut("Update/{id:guid}")]
         public async Task<Ok> Update(Guid id, [FromBody] InputDynamicTaskModel inputDynamicTaskModel)
         {
-            //TODO: when it will be record DTO - will use inputCategoryModel.CreateCategory() with { Id = id };
-
-            var dynamicTask = new DynamicTask()
-            {
-                Id = id,
-                Name = inputDynamicTaskModel.Name,
-                Description = inputDynamicTaskModel.Description,
-                Priority = inputDynamicTaskModel.Priority,
-                MinTimeToFinish = inputDynamicTaskModel.MinTimeToFinish,
-                MaxTimeToFinish = inputDynamicTaskModel.MaxTimeToFinish,
-                OptimalTimeToFinish = inputDynamicTaskModel.OptimalTimeToFinish
-            };
-
-            await dynamicTaskAppService.UpdateAsync(dynamicTask);
+            var dynamicTaskDto = inputDynamicTaskModel.CreateDynamicTaskDto() with { Id = id };
+            await dynamicTaskAppService.UpdateAsync(dynamicTaskDto);
 
             return TypedResults.Ok();
         }
