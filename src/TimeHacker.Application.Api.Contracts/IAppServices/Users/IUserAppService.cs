@@ -1,13 +1,11 @@
-﻿using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Domain.Models.InputModels.Users;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 
 namespace TimeHacker.Application.Api.Contracts.IAppServices.Users
 {
     public interface IUserAppService
     {
-        Task AddAsync(UserUpdateModel user, string userIdentityId);
-        Task<User?> GetCurrent();
-        Task UpdateAsync(UserUpdateModel user);
+        Task<UserDto?> GetCurrent();
+        Task UpdateAsync(UserDto user);
         Task DeleteAsync();
     }
 }

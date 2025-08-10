@@ -16,7 +16,6 @@ namespace TimeHacker.Application.Api.Extensions
         {
             serviceCollection.AddScoped<ICategoryAppService, CategoryService>();
 
-            serviceCollection.AddScoped<IScheduleSnapshotAppService, ScheduleSnapshotService>();
             serviceCollection.AddScoped<IScheduledTaskAppService, ScheduledTaskAppService>();
             serviceCollection.AddScoped<IScheduleEntityAppService, ScheduleEntityAppService>();
             serviceCollection.AddScoped<IScheduledCategoryAppService, ScheduledCategoryService>();

@@ -10,26 +10,26 @@
 
             random ??= Random.Shared;
 
-            var entriesList = entries.OrderBy(e => e.Weight).ToList();
+            var entriesList = entries.Where(e => e.Weight > 0).OrderBy(e => e.Weight).ToList();
             if (count > entriesList.Count)
                 count = entriesList.Count;
 
             var totalWeight = entriesList.Sum(e => e.Weight);
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var randomValue = random.NextDouble() * totalWeight;
 
-                foreach (var entry in entriesList)
+                for (var j = 0; i < entriesList.Count; j++)
                 {
+                    var entry = entriesList[j];
                     randomValue -= entry.Weight;
-                    if (randomValue <= 0)
-                    {
-                        yield return entry.Entry;
+                    if (randomValue > 0) 
+                        continue;
 
-                        totalWeight -= entry.Weight;
-                        entriesList.Remove(entry);
-                        break;
-                    }
+                    yield return entry.Entry;
+                    totalWeight -= entry.Weight;
+                    entriesList.RemoveAt(j);
+                    break;
                 }
             }
         }

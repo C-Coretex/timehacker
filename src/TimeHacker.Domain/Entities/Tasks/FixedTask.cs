@@ -9,7 +9,7 @@ namespace TimeHacker.Domain.Entities.Tasks
     {
         public Guid? ScheduleEntityId { get; set; }
 
-        public required string Name { get; set; }
+        public string Name { get; set; } = "";
         public string? Description { get; set; }
         public byte Priority { get; set; }
 

@@ -1,10 +1,9 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 
 namespace TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots
 {
     public interface IScheduleEntityAppService
     {
-        Task<ScheduleEntity> Save(InputScheduleEntityModel inputScheduleEntity);
+        Task<ScheduleEntityDto> Save(ScheduleEntityCreateDto scheduleEntityCreateDto);
     }
 }

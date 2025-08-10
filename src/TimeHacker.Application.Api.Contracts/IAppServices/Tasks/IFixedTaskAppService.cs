@@ -1,15 +1,14 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Application.Api.Contracts.IAppServices.Tasks
 {
     public interface IFixedTaskAppService
     {
         /// <returns>Query with filtration by user id applied.</returns>
-        IAsyncEnumerable<FixedTask> GetAll();
-        Task<FixedTask?> GetByIdAsync(Guid id);
-        Task UpdateAsync(FixedTask task);
+        IAsyncEnumerable<FixedTaskDto> GetAll();
+        Task<FixedTaskDto?> GetByIdAsync(Guid id);
+        Task UpdateAsync(FixedTaskDto task);
         Task DeleteAsync(Guid id);
-        Task AddAsync(FixedTask task);
+        Task AddAsync(FixedTaskDto task);
     }
 }

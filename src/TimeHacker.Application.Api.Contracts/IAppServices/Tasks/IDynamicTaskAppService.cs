@@ -1,14 +1,14 @@
-﻿using TimeHacker.Domain.Entities.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Application.Api.Contracts.IAppServices.Tasks
 {
     public interface IDynamicTaskAppService
     {
         /// <returns>Query with filtration by user id applied.</returns>
-        public IAsyncEnumerable<DynamicTask> GetAll();
-        Task<DynamicTask?> GetByIdAsync(Guid id);
-        public Task UpdateAsync(DynamicTask task);
+        public IAsyncEnumerable<DynamicTaskDto> GetAll();
+        Task<DynamicTaskDto?> GetByIdAsync(Guid id);
+        public Task UpdateAsync(DynamicTaskDto task);
         public Task DeleteAsync(Guid id);
-        public Task AddAsync(DynamicTask task);
+        public Task AddAsync(DynamicTaskDto task);
     }
 }

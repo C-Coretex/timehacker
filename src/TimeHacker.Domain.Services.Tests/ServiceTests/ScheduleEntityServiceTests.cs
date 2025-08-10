@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using AwesomeAssertions;
 using Moq;
+using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
@@ -169,11 +170,7 @@ namespace TimeHacker.Domain.Services.Tests.ServiceTests
                 {
                     UserId = userId,
                     CreatedTimestamp = DateTime.Now,
-                    RepeatingEntity = new RepeatingEntityModel()
-                    {
-                        EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                        RepeatingData = new DayRepeatingEntity(2)
-                    }, 
+                    RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2)), 
                     ScheduledTasks = [new ScheduledTask() { Name = "" }],
                     ScheduledCategories = [new ScheduledCategory() { Name = "" }]
                 },

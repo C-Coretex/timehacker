@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
 using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.Entities.Categories;
@@ -9,17 +10,20 @@ namespace TimeHacker.Application.Api.AppServices.Categories
     public class CategoryService(ICategoryRepository categoryRepository)
         : ICategoryAppService
     {
-        public Task AddAsync(Category category)
+        public IAsyncEnumerable<CategoryDto> GetAll() => categoryRepository.GetAll(true).Select(CategoryDto.Selector).AsAsyncEnumerable();
+
+        public Task AddAsync(CategoryDto categoryDto)
         {
-            return categoryRepository.AddAndSaveAsync(category);
+            return categoryRepository.AddAndSaveAsync(categoryDto.GetEntity());
         }
 
-        public Task UpdateAsync(Category category)
+        public async Task UpdateAsync(CategoryDto categoryDto)
         {
-            if (category == null)
-                throw new NotProvidedException(nameof(category));
+            if (categoryDto == null)
+                throw new NotProvidedException(nameof(categoryDto));
 
-            return categoryRepository.UpdateAndSaveAsync(category);
+            var entity = await categoryRepository.GetByIdAsync(categoryDto.Id!.Value);
+            await categoryRepository.UpdateAndSaveAsync(categoryDto.GetEntity(entity));
         }
 
         public Task DeleteAsync(Guid id)
@@ -27,11 +31,10 @@ namespace TimeHacker.Application.Api.AppServices.Categories
             return categoryRepository.DeleteAndSaveAsync(id);
         }
 
-        public IQueryable<Category> GetAll() => categoryRepository.GetAll(true);
-
-        public Task<Category?> GetByIdAsync(Guid id)
+        public async Task<CategoryDto?> GetByIdAsync(Guid id)
         {
-            return categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await categoryRepository.GetAll(true).FirstAsync(x => x.Id == id);
+            return CategoryDto.Create(entity);
         }
     }
 }

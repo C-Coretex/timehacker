@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Entities.Tags;
+using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 
 namespace TimeHacker.Api.Models.Return.Tags
 {
@@ -10,9 +10,6 @@ namespace TimeHacker.Api.Models.Return.Tags
         Color Color
     )
     {
-        public static TagReturnModel Create(Tag tag)
-        {
-            return new TagReturnModel(tag.Id, tag.Name, tag.Category, tag.Color);
-        }
+        public static TagReturnModel Create(TagDto tag) =>  new TagReturnModel(tag.Id!.Value, tag.Name, tag.Category, tag.Color);
     }
 }

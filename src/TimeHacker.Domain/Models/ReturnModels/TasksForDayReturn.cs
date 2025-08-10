@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Domain.Models.ReturnModels
 {

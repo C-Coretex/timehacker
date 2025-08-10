@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Return.Categories
 {
@@ -10,9 +10,9 @@ namespace TimeHacker.Api.Models.Return.Categories
         Color Color
     )
     {
-        public static CategoryReturnModel Create(Category category)
+        public static CategoryReturnModel Create(CategoryDto category)
         {
-            return new CategoryReturnModel(category.Id, category.Name, category.Description, category.Color);
+            return new CategoryReturnModel(category.Id!.Value, category.Name, category.Description, category.Color);
         }
     }
 }

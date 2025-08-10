@@ -12,7 +12,7 @@ using TimeHacker.Migrations.Factory;
 namespace TimeHacker.Migrations.Migrations
 {
     [DbContext(typeof(TimeHackerMigrationsDbContext))]
-    [Migration("20250728211812_Init")]
+    [Migration("20250810184248_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -436,10 +436,9 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(450)
                         .HasColumnType("uuid");
 
-                    b.Property<DateOnly>("Birthday")
+                    b.Property<DateOnly?>("Birthday")
                         .HasColumnType("date");
 
                     b.Property<DateTime>("CreatedTimestamp")
@@ -450,7 +449,8 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.Property<string>("IdentityId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()

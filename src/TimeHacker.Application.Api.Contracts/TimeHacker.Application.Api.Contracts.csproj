@@ -7,8 +7,4 @@
     <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\" />
-  </ItemGroup>
-
 </Project>
