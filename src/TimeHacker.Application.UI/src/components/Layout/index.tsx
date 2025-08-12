@@ -65,6 +65,17 @@ const Layout: FC = () => {
   const mainMenuItems = getMainMenuItems(false);
   // const activeLink = findActiveLink(location.pathname, mainMenuItems);
 
+    const breadcrumbItems = [
+        {
+            title: 'User',
+        },
+        {
+            title: 'Bill',
+        },
+    ];
+
+    <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />
+
   return (
     <AntdLayout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -88,10 +99,8 @@ const Layout: FC = () => {
           <i>~TimeHacker~</i>
         </Header>
         <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item>User</Breadcrumb.Item>
-          <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
+                  <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} separator=">" />
+
           <div
             style={{
               padding: 24,

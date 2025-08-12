@@ -11,6 +11,7 @@ import {
     type InputFixedTask,
 } from '../api/fixedTasks';
 import type { FixedTaskDisplayModel } from '../types';
+import api from '../api/api';
 
 const useFixedTasks = () => {
     const [tasks, setTasks] = useState<FixedTaskDisplayModel[]>([]);
@@ -45,12 +46,22 @@ const useFixedTasks = () => {
     }, []);
 
     const updateTask = useCallback(async (id: string, task: InputFixedTask) => {
-        await updateFixedTask(id, task);
-    }, []);
+        try {
+            await updateFixedTask(id, task);
+            await fetchTasks();
+        } catch (err) {
+            notification.error({ message: 'Error', description: 'Failed to update task.' });
+        }
+    }, [fetchTasks]);
 
     const deleteTask = useCallback(async (id: string) => {
-        await deleteFixedTask(id);
-    }, []);
+        try {
+            await deleteFixedTask(id);
+            await fetchTasks();
+        } catch (err) {
+            notification.error({ message: 'Error', description: 'Failed to delete task.' });
+        }
+    }, [fetchTasks]);
 
     useEffect(() => {
         fetchTasks();

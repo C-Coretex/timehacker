@@ -21,8 +21,8 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                 name: initialData.name,
                 description: initialData.description,
                 priority: initialData.priority,
-                startTimestamp: initialData.startTimestamp,
-                endTimestamp: initialData.endTimestamp,
+                startTimestamp: initialData.startTimestamp ? moment(initialData.startTimestamp) : null,
+                endTimestamp: initialData.endTimestamp ? moment(initialData.endTimestamp) : null,
             });
         } else {
             form.resetFields();
