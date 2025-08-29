@@ -1,11 +1,13 @@
-﻿using System.Drawing;
-using System.ComponentModel.DataAnnotations;
-using TimeHacker.Domain.Entities.Categories;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Drawing;
+using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Input.Categories
 {
     public record InputCategoryModel
     {
+        public Guid? ScheduleEntityId { get; set; }
+
         [Required]
         public required string Name { get; init; }
         
@@ -15,13 +17,10 @@ namespace TimeHacker.Api.Models.Input.Categories
         public required Color Color { get; init; }
 
 
-        public Category CreateCategory()
+        public CategoryDto CreateCategory()
         {
-            return new Category()
+            return new CategoryDto(ScheduleEntityId, Name, Description, Color)
             {
-                Name = Name,
-                Description = Description,
-                Color = Color
             };
         }
     }

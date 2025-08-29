@@ -1,10 +1,10 @@
 ﻿using TimeHacker.Api.Models.Return.Tags;
-using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Api.Models.Return.Tasks
 {
     public record DynamicTaskReturnModel(
-        Guid Id,
+        Guid? Id,
         string Name,
         string? Description,
         byte Priority,
@@ -15,7 +15,7 @@ namespace TimeHacker.Api.Models.Return.Tasks
         IEnumerable<TagReturnModel> Tags
     )
     {
-        public static DynamicTaskReturnModel Create(DynamicTask task)
+        public static DynamicTaskReturnModel Create(DynamicTaskDto task)
         {
             return new DynamicTaskReturnModel(
                 task.Id,
@@ -26,7 +26,7 @@ namespace TimeHacker.Api.Models.Return.Tasks
                 task.MaxTimeToFinish,
                 task.OptimalTimeToFinish,
                 task.CreatedTimestamp,
-                task.TagDynamicTasks.Select(x => TagReturnModel.Create(x.Tag))
+                task.Tags.Select(x => TagReturnModel.Create(x))
             );
         }
     }

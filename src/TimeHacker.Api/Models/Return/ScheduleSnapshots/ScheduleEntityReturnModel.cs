@@ -1,20 +1,20 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Models.EntityModels;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+using TimeHacker.Domain.DTOs.RepeatingEntity;
 
 namespace TimeHacker.Api.Models.Return.ScheduleSnapshots
 {
     public record ScheduleEntityReturnModel(
         Guid Id,
-        RepeatingEntityModel RepeatingEntity,
+        RepeatingEntityDto RepeatingEntity,
         DateTime ScheduleCreated,
         DateOnly? LastTaskCreated,
         DateOnly? EndsOn
     )
     {
-        public static ScheduleEntityReturnModel Create(ScheduleEntity scheduleEntity)
+        public static ScheduleEntityReturnModel Create(ScheduleEntityDto scheduleEntity)
         {
             return new ScheduleEntityReturnModel(
-                scheduleEntity.Id,
+                scheduleEntity.Id!.Value,
                 scheduleEntity.RepeatingEntity,
                 scheduleEntity.CreatedTimestamp,
                 scheduleEntity.LastEntityCreated,

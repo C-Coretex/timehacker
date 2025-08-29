@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Api.Models.Input.Tasks
 {
@@ -18,9 +18,9 @@ namespace TimeHacker.Api.Models.Input.Tasks
 
         public TimeSpan? OptimalTimeToFinish { get; init; }
 
-        public DynamicTask CreateDynamicTask()
+        public DynamicTaskDto CreateDynamicTaskDto()
         {
-            return new DynamicTask()
+            return new DynamicTaskDto()
             {
                 Name = Name,
                 Description = Description,

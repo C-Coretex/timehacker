@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
-using System.Runtime.InteropServices.ComTypes;
+using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.ScheduleSnapshots;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.IServices;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
 using TimeHacker.Domain.Models.ReturnModels;
 
 namespace TimeHacker.Api.Controllers.Tasks
@@ -20,7 +19,7 @@ namespace TimeHacker.Api.Controllers.Tasks
     {
         [ProducesResponseType(typeof(TasksForDayReturn), StatusCodes.Status200OK)]
         [HttpGet("GetTasksForDay")]
-        public async Task<Ok<TasksForDayReturn>> GetTasksForDay(string date)
+        public async Task<Ok<TasksForDayDto>> GetTasksForDay(string date)
         {
             var dateParsed = DateOnly.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
             var data = await taskService.GetTasksForDay(dateParsed);
@@ -30,7 +29,7 @@ namespace TimeHacker.Api.Controllers.Tasks
 
         [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
         [HttpGet("GetTasksForDays")]
-        public Ok<IAsyncEnumerable<TasksForDayReturn>> GetTasksForDays([FromBody] ICollection<DateOnly> dates)
+        public Ok<IAsyncEnumerable<TasksForDayDto>> GetTasksForDays([FromBody] ICollection<DateOnly> dates)
         {
             var data = taskService.GetTasksForDays(dates);
 
@@ -39,7 +38,7 @@ namespace TimeHacker.Api.Controllers.Tasks
 
         [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
         [HttpPost("RefreshTasksForDays")]
-        public Ok<IAsyncEnumerable<TasksForDayReturn>> RefreshTasksForDays([FromBody] ICollection<DateOnly> dates)
+        public Ok<IAsyncEnumerable<TasksForDayDto>> RefreshTasksForDays([FromBody] ICollection<DateOnly> dates)
         {
             var data = taskService.RefreshTasksForDays(dates);
 
@@ -68,7 +67,7 @@ namespace TimeHacker.Api.Controllers.Tasks
             [FromBody] InputScheduleEntityModel inputScheduleEntityModel, 
             [FromServices] IScheduleEntityAppService scheduleEntityAppService)
         {
-            var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel);
+            var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto());
             var data = ScheduleEntityReturnModel.Create(entity);
 
             return TypedResults.Ok(data);

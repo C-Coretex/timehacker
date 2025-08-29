@@ -1,4 +1,5 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Api.Models.Return.ScheduleSnapshots
 {
@@ -16,10 +17,10 @@ namespace TimeHacker.Api.Models.Return.ScheduleSnapshots
         DateTime? UpdatedTimestamp
     )
     {
-        public static ScheduledTaskReturnModel Create(ScheduledTask scheduledTask)
+        public static ScheduledTaskReturnModel Create(ScheduledTaskDto scheduledTask)
         {
             return new ScheduledTaskReturnModel(
-                scheduledTask.Id,
+                scheduledTask.Id!.Value,
                 scheduledTask.ParentTaskId,
                 scheduledTask.Date,
                 scheduledTask.IsFixed,

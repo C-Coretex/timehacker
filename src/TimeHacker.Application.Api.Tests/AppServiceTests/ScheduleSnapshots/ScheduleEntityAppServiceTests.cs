@@ -3,7 +3,9 @@ using Moq;
 using System.Drawing;
 using System.Linq.Expressions;
 using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
+using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
+using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
@@ -51,21 +53,15 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
         [Trait("Save", "Should save data")]
         public async Task Save_ShouldSaveData(bool isCategory)
         {
-            var repeatingEntity = new RepeatingEntityModel()
-            {
-                EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                RepeatingData = new DayRepeatingEntity(2)
-            };
+            var repeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2));
 
-            var inputData = new InputScheduleEntityModel()
-            {
-                ScheduleEntityParentEnum =
-                    isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
-                ParentEntityId = isCategory
+            var inputData = new ScheduleEntityCreateDto(
+                isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
+                isCategory
                     ? _categories.First(x => x.UserId == _userId).Id
                     : _fixedTasks.First(x => x.UserId == _userId).Id,
-                RepeatingEntityModel = repeatingEntity
-            };
+                repeatingEntity
+                );
             var expected = await _scheduleEntityAppService.Save(inputData);
 
             var actual2 = isCategory
@@ -85,16 +81,10 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
         {
             await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                var actual = await _scheduleEntityAppService.Save(new InputScheduleEntityModel()
-                {
-                    ScheduleEntityParentEnum = isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
-                    ParentEntityId = existingEntry ? _scheduledEntities.First(x => x.UserId != _userId).Id : Guid.NewGuid(),
-                    RepeatingEntityModel = new RepeatingEntityModel()
-                    {
-                        EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                        RepeatingData = new DayRepeatingEntity(1)
-                    }
-                });
+                var actual = await _scheduleEntityAppService.Save(new ScheduleEntityCreateDto(
+                    isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
+                    existingEntry ? _scheduledEntities.First(x => x.UserId != _userId).Id : Guid.NewGuid(),
+                    new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1))));
             });
         }
 
@@ -109,11 +99,7 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
                 {
                     UserId = userId,
                     CreatedTimestamp = DateTime.Now,
-                    RepeatingEntity = new RepeatingEntityModel()
-                    {
-                        EntityType = RepeatingEntityTypeEnum.DayRepeatingEntity,
-                        RepeatingData = new DayRepeatingEntity(2)
-                    },
+                    RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2)),
                     ScheduledTasks = [new ScheduledTask() { Name = "" }],
                     ScheduledCategories = [new ScheduledCategory() { Name = "" }]
                 },

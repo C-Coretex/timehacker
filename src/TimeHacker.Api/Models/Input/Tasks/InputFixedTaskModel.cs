@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Api.Models.Input.Tasks
@@ -21,9 +21,9 @@ namespace TimeHacker.Api.Models.Input.Tasks
         [Required] 
         public required string EndTimestamp { get; init; }
 
-        public FixedTask CreateFixedTask()
+        public FixedTaskDto CreateFixedTaskDto()
         {
-            return new FixedTask
+            return new FixedTaskDto
             {
                 Name = Name,
                 Description = Description,

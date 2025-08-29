@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Return.Categories;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
-using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Api.Controllers.Categories
 {
@@ -18,7 +16,7 @@ namespace TimeHacker.Api.Controllers.Categories
         [HttpGet("GetAll")]
         public Ok<IAsyncEnumerable<CategoryReturnModel>> GetAll()
         {
-            var data = categoryService.GetAll().AsAsyncEnumerable().Select(CategoryReturnModel.Create);
+            var data = categoryService.GetAll().Select(CategoryReturnModel.Create);
             return TypedResults.Ok(data);
         }
 
@@ -49,14 +47,7 @@ namespace TimeHacker.Api.Controllers.Categories
         [HttpPut("Update/{id:guid}")]
         public async Task<Ok> Update(Guid id, [FromBody] InputCategoryModel inputCategoryModel)
         {
-            //TODO: when it will be record DTO - will use inputCategoryModel.CreateCategory() with { Id = id };
-            var category = new Category()
-            {
-                Id = id,
-                Name = inputCategoryModel.Name,
-                Description = inputCategoryModel.Description,
-                Color = inputCategoryModel.Color
-            };
+            var category = inputCategoryModel.CreateCategory() with { Id = id };
             await categoryService.UpdateAsync(category);
 
             return TypedResults.Ok();

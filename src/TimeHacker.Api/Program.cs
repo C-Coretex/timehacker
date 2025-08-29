@@ -4,6 +4,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Filters;
 using TimeHacker.Api.Helpers;
 using TimeHacker.Api.Middleware;
@@ -52,6 +53,9 @@ builder.Services.AddProblemDetails(options =>
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<LogExceptionFilter>();
+}).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new InputRepeatingEntityTypeConverter());
 });
 
 var uiUrl = builder.Configuration.GetValue<string>("AppSettings:uiUrl")!;
@@ -101,9 +105,9 @@ else
     app.UseHsts();
 }
 
-app.MapHealthChecks("/health");
-
 app.UseHttpsRedirection();
+
+app.MapHealthChecks("/health");
 
 app.UseRouting();
 

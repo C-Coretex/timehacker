@@ -433,10 +433,9 @@ namespace TimeHacker.Migrations.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(450)
                         .HasColumnType("uuid");
 
-                    b.Property<DateOnly>("Birthday")
+                    b.Property<DateOnly?>("Birthday")
                         .HasColumnType("date");
 
                     b.Property<DateTime>("CreatedTimestamp")
@@ -447,7 +446,8 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.Property<string>("IdentityId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
