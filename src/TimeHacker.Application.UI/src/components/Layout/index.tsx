@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { FC } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Breadcrumb,
   Layout as AntdLayout,
@@ -40,20 +41,14 @@ const getMainMenuItems = (isAuthenticated: boolean) => ([
     getItem('calendar', <CalendarOutlined />),
     getItem('tasks', <SnippetsOutlined />),
     getItem('categories', <ProductOutlined />),
-    ...(!isAuthenticated ? [
-        getItem('user', <UserOutlined />, [
-        getItem('profile'),
-        getItem('logout'),
-        ]),
-    ] : [
-        getItem('login', <ProductOutlined />),
-    ]),
+    !isAuthenticated ? getItem('login', <UserOutlined />) : getItem('profile', <UserOutlined />),
     getItem('help', <QuestionCircleOutlined />),
     getItem('about', <QuestionCircleOutlined />),
     getItem('settings', <SettingOutlined />),
 ]);
 
 const Layout: FC = () => {
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -62,7 +57,7 @@ const Layout: FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const mainMenuItems = getMainMenuItems(false);
+    const mainMenuItems = getMainMenuItems(isAuthenticated);
   // const activeLink = findActiveLink(location.pathname, mainMenuItems);
 
     const breadcrumbItems = [
