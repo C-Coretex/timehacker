@@ -111,11 +111,9 @@ app.UseSession();
 
 app.UseCors("AllowFrontend");
 
-
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.UseMiddleware<UserAccessorInitMiddleware>();
+
+app.UseAuthorization();
 
 app.MapIdentityApi<IdentityUser>();
 
@@ -202,10 +200,6 @@ static void AddIdentityServices(IServiceCollection services)
 
     services.ConfigureApplicationCookie(options =>
     {
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
-        options.Cookie.HttpOnly = true;
-
         // Prevent automatic redirects
         options.Events.OnRedirectToLogin = context =>
         {
