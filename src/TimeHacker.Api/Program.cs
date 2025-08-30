@@ -204,6 +204,9 @@ static void AddIdentityServices(IServiceCollection services)
 
     services.ConfigureApplicationCookie(options =>
     {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Required if SameSite=None
+
         // Prevent automatic redirects
         options.Events.OnRedirectToLogin = context =>
         {
