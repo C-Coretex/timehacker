@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeHacker.Domain.Contracts.Entities.Categories;
+using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Infrastructure.Configuration.Categories
 {
@@ -8,6 +8,7 @@ namespace TimeHacker.Infrastructure.Configuration.Categories
     {
         public void Configure(EntityTypeBuilder<CategoryDynamicTask> builder)
         {
+            builder.HasKey(x => new { x.CategoryId, x.DynamicTaskId });
             builder.HasKey(x => new { x.CategoryId, x.DynamicTaskId });
 
             builder.HasOne(x => x.DynamicTask).WithMany(x => x.CategoryDynamicTasks)

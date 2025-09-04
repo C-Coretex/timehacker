@@ -4,10 +4,10 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "timehacker.application",
+      "composeLaunchServiceName": "timehacker.api",
       "composeLaunchUrl": "http://localhost:5173",
       "serviceActions": {
-        "timehacker.application": "StartDebugging",
+        "timehacker.api": "StartDebugging",
         "pgadmin": "StartWithoutDebugging",
         "timehacker.infrastructure": "StartWithoutDebugging",
         "timehacker.infrastructure.identity": "StartWithoutDebugging",

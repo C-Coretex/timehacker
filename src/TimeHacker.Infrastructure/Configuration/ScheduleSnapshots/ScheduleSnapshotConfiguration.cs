@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
 {
-    public class ScheduleSnapshotConfiguration : IEntityTypeConfiguration<ScheduleSnapshot>
+    public class ScheduleSnapshotConfiguration : UserScopedEntityConfigurationBase<ScheduleSnapshot>
     {
-        public void Configure(EntityTypeBuilder<ScheduleSnapshot> builder)
+        public override void Configure(EntityTypeBuilder<ScheduleSnapshot> builder)
         {
-            builder.HasKey(u => new { u.UserId, u.Date });
-            builder.HasIndex(x => x.UserId);
-            builder.HasIndex(x => x.Date);
+            ConfigureUserScoped(builder);
 
-            builder.Property(x => x.UserId).HasMaxLength(450);
+            builder.HasAlternateKey(u => new { u.UserId, u.Date });
+
+            builder.HasIndex(x => x.Date);
         }
     }
 }

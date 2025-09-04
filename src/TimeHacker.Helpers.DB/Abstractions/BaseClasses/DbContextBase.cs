@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
@@ -19,144 +19,95 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
                 optionsBuilder.UseNpgsql(_connectionString);
         }
 
-        internal T AddEntity<T>(DbSet<T> entityCollection, T entity, bool saveChanges = true) where T : class, IDbModel
+        internal T AddEntity<T>(DbSet<T> entityCollection, T entity) where T : class, IDbEntity
+        {
+            return entityCollection.Add(entity).Entity;
+        }
+        internal async Task<T> AddEntityAndSaveAsync<T>(DbSet<T> entityCollection, T entity, CancellationToken cancellationToken = default) where T : class, IDbEntity
         {
             var newEntity = entityCollection.Add(entity).Entity;
-            if (saveChanges)
-                SaveChanges();
+            await base.SaveChangesAsync(cancellationToken);
 
             return newEntity;
         }
-        internal async Task<T> AddEntityAsync<T>(DbSet<T> entityCollection, T entity, bool saveChanges = true) where T : class, IDbModel
-        {
-            var newEntity = await entityCollection.AddAsync(entity);
-            if (saveChanges)
-                await SaveChangesAsync();
-
-            return newEntity.Entity;
-        }
-        internal IEnumerable<T> AddEntities<T>(DbSet<T> entityCollection, IEnumerable<T> entities, bool saveChanges = true) where T : class, IDbModel
+        internal void AddEntities<T>(DbSet<T> entityCollection, IEnumerable<T> entities) where T : class, IDbEntity
         {
             entityCollection.AddRange(entities);
-            if (saveChanges)
-                SaveChanges();
-
-            return entities;
         }
-        internal async Task<IEnumerable<T>> AddEntitiesAsync<T>(DbSet<T> entityCollection, IEnumerable<T> entities, bool saveChanges = true) where T : class, IDbModel
+        internal async Task AddEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class, IDbEntity
         {
-            await entityCollection.AddRangeAsync(entities);
-            if (saveChanges)
-                await SaveChangesAsync();
-
-            return entities;
+            entityCollection.AddRange(entities);
+            await SaveChangesAsync(cancellationToken);
         }
 
-        internal T UpdateEntity<T>(DbSet<T> entityCollection, T entity, bool saveChanges = true) where T : class, IDbModel
+        internal T UpdateEntity<T>(DbSet<T> entityCollection, T entity) where T : class, IDbEntity
+        {
+            return entityCollection.Update(entity).Entity;
+        }
+        internal async Task<T> UpdateEntityAndSaveAsync<T>(DbSet<T> entityCollection, T entity, CancellationToken cancellationToken = default) where T : class, IDbEntity
         {
             var newEntity = entityCollection.Update(entity).Entity;
-            if (saveChanges)
-                SaveChanges();
+            await SaveChangesAsync(cancellationToken);
 
             return newEntity;
         }
-        internal async Task<T> UpdateEntityAsync<T>(DbSet<T> entityCollection, T entity, bool saveChanges = true) where T : class, IDbModel
-        {
-            var newEntity = entityCollection.Update(entity).Entity;
-            if (saveChanges)
-                await SaveChangesAsync();
-
-            return newEntity;
-        }
-        internal IEnumerable<T> UpdateEntities<T>(DbSet<T> entityCollection, IEnumerable<T> entities, bool saveChanges = true) where T : class, IDbModel
+        internal void UpdateEntities<T>(DbSet<T> entityCollection, IEnumerable<T> entities) where T : class, IDbEntity
         {
             entityCollection.UpdateRange(entities);
-            if (saveChanges)
-                SaveChanges();
-
-            return entities;
         }
-        internal async Task<IEnumerable<T>> UpdateEntitiesAsync<T>(DbSet<T> entityCollection, IEnumerable<T> entities, bool saveChanges = true) where T : class, IDbModel
+        internal async Task UpdateEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class, IDbEntity
         {
             entityCollection.UpdateRange(entities);
-            if (saveChanges)
-                await SaveChangesAsync();
-
-            return entities;
+            await SaveChangesAsync(cancellationToken);
         }
 
-        internal void RemoveEntity<T>(DbSet<T> entityCollection, T model, bool saveChanges = true) where T : class, IDbModel, new()
+        internal void RemoveEntity<T>(DbSet<T> entityCollection, T model) where T : class, IDbEntity
         {
             entityCollection.Remove(model);
-            if (saveChanges)
-                SaveChanges();
         }
-        internal async Task RemoveEntityAsync<T>(DbSet<T> entityCollection, T model, bool saveChanges = true) where T : class, IDbModel, new()
+        internal async Task RemoveEntityAndSaveAsync<T>(DbSet<T> entityCollection, T model, CancellationToken cancellationToken = default) where T : class, IDbEntity, new()
         {
             entityCollection.Remove(model);
-            if (saveChanges)
-                await SaveChangesAsync();
+            await SaveChangesAsync(cancellationToken);
         }
-        internal void RemoveEntities<T>(DbSet<T> entityCollection, IEnumerable<T> models, bool saveChanges = true) where T : class, IDbModel, new()
+        internal void RemoveEntities<T>(DbSet<T> entityCollection, IEnumerable<T> models) where T : class, IDbEntity
         {
             entityCollection.RemoveRange(models);
-            if (saveChanges)
-                SaveChanges();
         }
-        internal async Task RemoveEntitiesAsync<T>(DbSet<T> entityCollection, IEnumerable<T> models, bool saveChanges = true) where T : class, IDbModel, new()
+        internal async Task RemoveEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, IEnumerable<T> models, CancellationToken cancellationToken = default) where T : class, IDbEntity, new()
         {
             entityCollection.RemoveRange(models);
-            if (saveChanges)
-                await SaveChangesAsync();
+            await SaveChangesAsync(cancellationToken);
         }
 
-        internal void RemoveEntity<T, TId>(DbSet<T> entityCollection, TId id, bool saveChanges = true) where T : class, IDbModel<TId>, new()
+        internal void RemoveEntity<T, TId>(DbSet<T> entityCollection, TId id) where T : class, IDbEntity<TId>, new()
         {
             entityCollection.Remove(new T() { Id = id });
-            if (saveChanges)
-                SaveChanges();
         }
-        internal async Task RemoveEntityAsync<T, TId>(DbSet<T> entityCollection, TId id, bool saveChanges = true) where T : class, IDbModel<TId>, new()
+        internal async Task RemoveEntityAndSaveAsync<T, TId>(DbSet<T> entityCollection, TId id, CancellationToken cancellationToken = default) where T : class, IDbEntity<TId>, new()
         {
             entityCollection.Remove(new T() { Id = id });
-            if (saveChanges)
-                await SaveChangesAsync();
+            await SaveChangesAsync(cancellationToken);
         }
-        internal void RemoveEntities<T, TId>(DbSet<T> entityCollection, IEnumerable<TId> ids, bool saveChanges = true) where T : class, IDbModel<TId>, new()
+        internal void RemoveEntities<T, TId>(DbSet<T> entityCollection, IEnumerable<TId> ids) where T : class, IDbEntity<TId>, new()
         {
             entityCollection.RemoveRange(ids.Select(id => new T() { Id = id }));
-            if (saveChanges)
-                SaveChanges();
         }
-        internal async Task RemoveEntitiesAsync<T, TId>(DbSet<T> entityCollection, IEnumerable<TId> ids, bool saveChanges = true) where T : class, IDbModel<TId>, new()
+        internal async Task RemoveEntitiesAndSaveAsync<T, TId>(DbSet<T> entityCollection, IEnumerable<TId> ids, CancellationToken cancellationToken = default) where T : class, IDbEntity<TId>, new()
         {
             entityCollection.RemoveRange(ids.Select(id => new T() { Id = id }));
-            if (saveChanges)
-                await SaveChangesAsync();
+            await SaveChangesAsync(cancellationToken);
         }
 
-        internal void RemoveEntities<T>(DbSet<T> entityCollection, Func<T, bool> selector, bool saveChanges = true) where T : class, IDbModel
+        internal void RemoveEntities<T>(DbSet<T> entityCollection, Func<T, bool> selector) where T : class, IDbEntity
         {
             var entitiesToRemove = entityCollection.Where(selector);
             entityCollection.RemoveRange(entitiesToRemove);
-            if (saveChanges)
-                SaveChanges();
         }
-        internal async Task RemoveEntitiesAsync<T>(DbSet<T> entityCollection, Func<T, bool> selector, bool saveChanges = true) where T : class, IDbModel
+        internal async Task RemoveEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, Func<T, bool> selector, CancellationToken cancellationToken = default) where T : class, IDbEntity
         {
             var entitiesToRemove = entityCollection.Where(selector);
             entityCollection.RemoveRange(entitiesToRemove);
-            if (saveChanges)
-                await SaveChangesAsync();
-        }
-
-        internal void SaveDBChanges()
-        {
-            SaveChanges();
-        }
-
-        internal async Task SaveDBChangesAsync(CancellationToken cancellationToken)
-        {
             await SaveChangesAsync(cancellationToken);
         }
     }

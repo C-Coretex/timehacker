@@ -1,12 +1,12 @@
-﻿using TimeHacker.Domain.Contracts.Entities.Categories;
-using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
+﻿using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.IModels;
+using TimeHacker.Domain.IRepositories.Categories;
 
 namespace TimeHacker.Infrastructure.Repositories.Categories
 {
-    public class CategoryRepository : RepositoryBase<TimeHackerDbContext, Category, Guid>, ICategoryRepository
+    public class CategoryRepository : UserScopedRepositoryBase<Category, Guid>, ICategoryRepository
     {
-        public CategoryRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.Category)
+        public CategoryRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) : base(dbContext, dbContext.Category, userAccessor)
         {}
     }
 }

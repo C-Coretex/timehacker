@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using TimeHacker.Domain.Contracts.IRepositories.Categories;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.Tags;
-using TimeHacker.Domain.Contracts.IRepositories.Tasks;
-using TimeHacker.Domain.Contracts.IRepositories.Users;
+using TimeHacker.Domain.IRepositories.Categories;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories.Tags;
+using TimeHacker.Domain.IRepositories.Tasks;
+using TimeHacker.Domain.IRepositories.Users;
 using TimeHacker.Infrastructure.Repositories.Categories;
 using TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
 using TimeHacker.Infrastructure.Repositories.Tags;

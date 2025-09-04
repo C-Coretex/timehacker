@@ -1,20 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.Entities.Tasks;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Infrastructure.Configuration.Tasks
 {
-    public class FixedTaskConfiguration : IEntityTypeConfiguration<FixedTask>
+    public class FixedTaskConfiguration : UserScopedEntityConfigurationBase<FixedTask>
     {
-        public void Configure(EntityTypeBuilder<FixedTask> builder)
+        public override void Configure(EntityTypeBuilder<FixedTask> builder)
         {
-            builder.HasKey(x => x.Id);
-            builder.HasIndex(x => x.UserId);
+            ConfigureUserScoped(builder);
+
             builder.HasIndex(x => x.CreatedTimestamp);
             builder.HasIndex(x => x.StartTimestamp);
 
-            builder.Property(x => x.UserId).IsRequired().HasMaxLength(450);
             builder.Property(x => x.Name).IsRequired().HasMaxLength(250);
             builder.Property(x => x.Description).HasMaxLength(516);
             builder.Property(x => x.Priority).IsRequired();

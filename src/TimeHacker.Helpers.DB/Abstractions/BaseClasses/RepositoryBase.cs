@@ -1,145 +1,188 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {
-    public class RepositoryBase<TDbContext, TModel> : IRepositoryBase<TModel>
-        where TModel : class, IDbModel, new()
+    /// <summary>
+    /// ExecuteUpdateAsync and ExecuteDeleteAsync should not be available for services. If you need them, extend specific repository with specific business logic method.
+    /// If you are using ExecuteUpdateAsync don't forget to manually set UpdatedTimestamp property, since SaveChangesAsync method is not being executed.
+    /// </summary>
+    public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TModel> dbSet) : IRepositoryBase<TModel>
+        where TModel : class, IDbEntity
         where TDbContext : DbContextBase<TDbContext>
     {
-        protected TDbContext _dbContext;
-        protected DbSet<TModel> _dbSet;
-
-        public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet)
+        private static readonly Lazy<Func<TModel, DateTime>?> UpdatedTimestampSelector = new(() =>
         {
-            _dbContext = dbContext;
-            _dbSet = dbSet;
+            var isUpdatable = typeof(IUpdatable).IsAssignableFrom(typeof(TModel));
+            if (!isUpdatable) return null;
+
+            var param = Expression.Parameter(typeof(TModel), "x");
+            var updatedProp = Expression.Property(param, nameof(IUpdatable.UpdatedTimestamp));
+            return (Func<TModel, DateTime>)Expression.Lambda(updatedProp, param).Compile();
+        });
+
+        protected TDbContext DbContext = dbContext;
+        protected DbSet<TModel> DbSet = dbSet;
+
+        protected virtual IQueryable<TModel> GetAllBase()
+        {
+            return DbSet;
         }
 
-        public virtual IQueryable<TModel> GetAll(params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates) => GetAll(true, includeExpansionDelegates);
+        public virtual IQueryable<TModel> GetAll(params QueryPipelineStep<TModel>[] queryPipelineSteps) => GetAll(true, queryPipelineSteps);
 
-        public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params QueryPipelineStep<TModel>[] queryPipelineSteps)
         {
-            var query = _dbSet.AsQueryable();
+            var query = GetAllBase();
             if (asNoTracking)
                 query = query.AsNoTracking();
 
-            foreach (var includeExpansionDelegate in includeExpansionDelegates)
-                query = includeExpansionDelegate(query);
+            foreach (var queryPipelineStep in queryPipelineSteps)
+                query = queryPipelineStep(query);
 
             return query;
         }
 
-        public virtual TModel Add(TModel model, bool saveChanges = true)
+        public virtual TModel Add(TModel model)
         {
-            return _dbContext.AddEntity<TModel>(_dbSet, model, saveChanges);
+            return DbContext.AddEntity(DbSet, model);
         }
-        public virtual Task<TModel> AddAsync(TModel model, bool saveChanges = true)
+        public virtual async Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.AddEntityAsync<TModel>(_dbSet, model, saveChanges);
-        }
-
-        public virtual IEnumerable<TModel> AddRange(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.AddEntities<TModel>(_dbSet, models, saveChanges);
-        }
-        public virtual Task<IEnumerable<TModel>> AddRangeAsync(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.AddEntitiesAsync<TModel>(_dbSet, models, saveChanges);
+            var entity = Add(model);
+            await SaveChangesAsync(cancellationToken);
+            return entity;
         }
 
-        public virtual void Delete(TModel model, bool saveChanges = true)
+        public virtual void AddRange(IEnumerable<TModel> models)
         {
-            _dbContext.RemoveEntity<TModel>(_dbSet, model, saveChanges);
+            DbContext.AddEntities(DbSet, models);
         }
-        public virtual Task DeleteAsync(TModel model, bool saveChanges = true)
+        public virtual Task AddRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
-            return _dbContext.RemoveEntityAsync<TModel>(_dbSet, model, saveChanges);
-        }
-
-        public virtual void DeleteRange(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            _dbContext.RemoveEntities<TModel>(_dbSet, models, saveChanges);
-        }
-        public virtual Task DeleteRangeAsync(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.RemoveEntitiesAsync<TModel>(_dbSet, models, saveChanges);
+            AddRange(models);
+            return SaveChangesAsync(cancellationToken);
         }
 
-        public virtual TModel Update(TModel model, bool saveChanges = true)
+        public virtual void Delete(TModel model)
         {
-            return _dbContext.UpdateEntity<TModel>(_dbSet, model, saveChanges);
+            DbContext.RemoveEntity(DbSet, model);
         }
-        public virtual Task<TModel> UpdateAsync(TModel model, bool saveChanges = true)
+        public virtual Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            return _dbContext.UpdateEntityAsync<TModel>(_dbSet, model, saveChanges);
-        }
-
-        public virtual IEnumerable<TModel> UpdateRange(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.UpdateEntities<TModel>(_dbSet, models, saveChanges);
-        }
-        public virtual Task<IEnumerable<TModel>> UpdateRangeAsync(IEnumerable<TModel> models, bool saveChanges = true)
-        {
-            return _dbContext.UpdateEntitiesAsync<TModel>(_dbSet, models, saveChanges);
+            Delete(model);
+            return SaveChangesAsync(cancellationToken);
         }
 
-        public virtual void SaveChanges()
+        public virtual void DeleteRange(IEnumerable<TModel> models)
         {
-            _dbContext.SaveDBChanges();
+            DbContext.RemoveEntities(DbSet, models);
+        }
+        public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
+        {
+            DeleteRange(models);
+            return SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task SaveChangesAsync(CancellationToken? cancellationToken = null)
+        public virtual Task<int> DeleteBy<TKey>(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            cancellationToken ??= CancellationToken.None;
-            return _dbContext.SaveDBChangesAsync(cancellationToken.Value);
+            return ExecuteDeleteAsync(predicate, cancellationToken);
+        }
+
+        public virtual TModel Update(TModel model)
+        {
+            return DbContext.UpdateEntity(DbSet, model);
+        }
+        public virtual async Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
+        {
+            var entity = Update(model);
+            await SaveChangesAsync(cancellationToken);
+            return entity;
+        }
+
+        public virtual void UpdateRange(IEnumerable<TModel> models)
+        {
+            DbContext.UpdateEntities(DbSet, models);
+        }
+        public virtual Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
+        {
+            UpdateRange(models);
+            return SaveChangesAsync(cancellationToken);
+        }
+
+        public virtual Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Func<TModel, TKey> propertySelector, TKey value, CancellationToken cancellationToken = default)
+        {
+            var updatedTimestampSelector = UpdatedTimestampSelector.Value;
+            if (updatedTimestampSelector == null)
+                return ExecuteUpdateAsync(predicate, setPropertyCalls => setPropertyCalls.SetProperty(propertySelector, value), cancellationToken);
+            
+            return ExecuteUpdateAsync(predicate,
+                setPropertyCalls => setPropertyCalls
+                    .SetProperty(propertySelector, value)
+                    .SetProperty(updatedTimestampSelector, DateTime.UtcNow), 
+                cancellationToken);
+        }
+
+        protected virtual Task<int> ExecuteUpdateAsync(
+            Expression<Func<TModel, bool>> predicate, 
+            Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, 
+            CancellationToken cancellationToken = default)
+        {
+            var query = GetAllBase().Where(predicate);
+            return query.ExecuteUpdateAsync(setPropertyCalls, cancellationToken);
+        }
+
+        protected virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            var query = GetAllBase().Where(predicate);
+            return query.ExecuteDeleteAsync(cancellationToken);
+        }
+
+        public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var now = DateTime.UtcNow;
+
+            var createdEntries = DbContext.ChangeTracker.Entries<ICreatable>().Where(entry => entry.State == EntityState.Added);
+            foreach (var entry in createdEntries)
+                entry.Entity.CreatedTimestamp = now;
+
+            var updatedEntries = DbContext.ChangeTracker.Entries<IUpdatable>().Where(entry => entry.State == EntityState.Modified);
+            foreach (var entry in updatedEntries)
+                entry.Entity.UpdatedTimestamp = now;
+
+            return DbContext.SaveChangesAsync(cancellationToken);
         }
     }
 
     public class RepositoryBase<TDbContext, TModel, TId> : RepositoryBase<TDbContext, TModel>, IRepositoryBase<TModel, TId>
-    where TModel : class, IDbModel<TId>, new()
+    where TModel : class, IDbEntity<TId>
     where TDbContext : DbContextBase<TDbContext>
     {
         public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet) : base(dbContext, dbSet)
         { }
 
-        public virtual TModel? GetById(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefault(x => x.Id!.Equals(id));
+            return GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
         }
 
-        public virtual bool Exists(TId id)
+        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params QueryPipelineStep<TModel>[] queryPipelineSteps)
         {
-            return GetAll().Any(x => x.Id!.Equals(id));
+            return await GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
         }
 
-        public virtual Task<bool> ExistsAsync(TId id)
-        {
-            return GetAll().AnyAsync(x => x.Id!.Equals(id));
-        }
 
-        public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, params IncludeExpansionDelegate<TModel>[] includeExpansionDelegates)
+        public virtual Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await GetAll(asNoTracking, includeExpansionDelegates).FirstOrDefaultAsync(x => x.Id!.Equals(id));
+            return ExecuteDeleteAsync(x => x.Id!.Equals(id), cancellationToken);
         }
-
-        public virtual void Delete(TId id, bool saveChanges = true)
+        public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
         {
-            _dbContext.RemoveEntity(_dbSet, id, saveChanges);
-        }
-        public virtual Task DeleteAsync(TId id, bool saveChanges = true)
-        {
-            return _dbContext.RemoveEntityAsync(_dbSet, id, saveChanges);
-        }
-
-        public virtual void DeleteRange(IEnumerable<TId> ids, bool saveChanges = true)
-        {
-            _dbContext.RemoveEntities(_dbSet, ids, saveChanges);
-        }
-        public virtual Task DeleteRangeAsync(IEnumerable<TId> ids, bool saveChanges = true)
-        {
-            return _dbContext.RemoveEntitiesAsync(_dbSet, ids, saveChanges);
+            return ExecuteDeleteAsync(x => ids.Contains(x.Id), cancellationToken);
         }
     }
 }

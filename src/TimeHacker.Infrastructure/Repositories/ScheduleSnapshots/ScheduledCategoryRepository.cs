@@ -1,12 +1,12 @@
-﻿using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
+﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IModels;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Repositories.ScheduleSnapshots
 {
-    public class ScheduledCategoryRepository : RepositoryBase<TimeHackerDbContext, ScheduledCategory, ulong>, IScheduledCategoryRepository
+    public class ScheduledCategoryRepository : UserScopedRepositoryBase<ScheduledCategory, Guid>, IScheduledCategoryRepository
     {
-        public ScheduledCategoryRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.ScheduledCategory)
+        public ScheduledCategoryRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) : base(dbContext, dbContext.ScheduledCategory, userAccessor)
         { }
     }
 }

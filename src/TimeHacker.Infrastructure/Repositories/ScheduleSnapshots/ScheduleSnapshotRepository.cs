@@ -1,12 +1,12 @@
-﻿using TimeHacker.Domain.Contracts.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Contracts.IRepositories.ScheduleSnapshots;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
+﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.IModels;
+using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Repositories.ScheduleSnapshots
 {
-    public class ScheduleSnapshotRepository : RepositoryBase<TimeHackerDbContext, ScheduleSnapshot>, IScheduleSnapshotRepository
+    public class ScheduleSnapshotRepository : UserScopedRepositoryBase<ScheduleSnapshot, Guid>, IScheduleSnapshotRepository
     {
-        public ScheduleSnapshotRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.ScheduleSnapshot)
+        public ScheduleSnapshotRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) : base(dbContext, dbContext.ScheduleSnapshot, userAccessor)
         { }
     }
 }

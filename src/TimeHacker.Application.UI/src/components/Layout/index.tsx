@@ -53,19 +53,16 @@ const getMainMenuItems = (isAuthenticated: boolean) => [
   getItem('calendar', <CalendarOutlined />),
   getItem('tasks', <SnippetsOutlined />),
   getItem('categories', <ProductOutlined />),
-  ...(!isAuthenticated
-    ? [
-        getItem('user', <UserOutlined />, [
-          getItem('profile'),
-          getItem('logout'),
-        ]),
-      ]
-    : [getItem('login', <ProductOutlined />)]),
+  !isAuthenticated
+    ? getItem('login', <UserOutlined />)
+    : getItem('profile', <UserOutlined />),
   getItem('help', <QuestionCircleOutlined />),
+  getItem('about', <QuestionCircleOutlined />),
   getItem('settings', <SettingOutlined />),
 ];
 
 const Layout: FC = () => {
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -74,8 +71,19 @@ const Layout: FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const mainMenuItems = getMainMenuItems(false);
+  const mainMenuItems = getMainMenuItems(isAuthenticated);
   // const activeLink = findActiveLink(location.pathname, mainMenuItems);
+
+  const breadcrumbItems = [
+    {
+      title: 'User',
+    },
+    {
+      title: 'Bill',
+    },
+  ];
+
+  <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />;
 
   return (
     <AntdLayout style={{ minHeight: '100vh' }}>
@@ -109,10 +117,12 @@ const Layout: FC = () => {
           <i>~TimeHacker~</i>
         </Header>
         <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            style={{ margin: '16px 0' }}
+            items={breadcrumbItems}
+            separator=">"
+          />
+
           <div
             style={{
               padding: 24,
@@ -125,7 +135,8 @@ const Layout: FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          TimeHacker ©{new Date().getFullYear()}
+          TimeHacker &copy;2024 &mdash; {new Date().getFullYear()} All rights
+          reserved.
         </Footer>
       </AntdLayout>
     </AntdLayout>
