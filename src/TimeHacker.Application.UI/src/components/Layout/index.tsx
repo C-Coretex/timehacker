@@ -12,6 +12,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 
+import { useAuth } from 'contexts/AuthContext';
 import { capitalize } from 'utils/helpers';
 
 const { Header, Content, Footer, Sider } = AntdLayout;

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
+import { AuthProvider } from 'contexts/AuthContext';
 import { ThemeProvider } from 'contexts/ThemeContext';
 import AppRoutes from 'config/AppRoutes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -14,9 +15,11 @@ const App = () => {
   return (
     <Router>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <AppRoutesWrapper />
-        </QueryClientProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <AppRoutesWrapper />
+          </QueryClientProvider>
+        </AuthProvider>
       </ThemeProvider>
     </Router>
   );
