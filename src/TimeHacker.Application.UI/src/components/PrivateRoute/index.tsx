@@ -23,16 +23,18 @@ const hasAccess = (
 
 const PrivateRoute: FC<PrivateRouteProps> = ({
   auth = true,
-  roles = [],
-  permissions = [],
+  // roles = [],
+  // permissions = [],
 }) => {
+  //const { isAuthenticated } = useAuth();
+
   if (auth && !authenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (auth && !hasAccess(roles, permissions)) {
-    return <UnauthorizedPage />;
-  }
+  // if (auth && !hasAccess(roles, permissions)) {
+  //   return <UnauthorizedPage />;
+  // }
 
   return <Outlet />;
 };

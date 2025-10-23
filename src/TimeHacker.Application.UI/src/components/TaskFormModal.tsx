@@ -36,6 +36,9 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
     return (
         <Modal
             open={open}
+            forceRender
+            destroyOnHidden
+            maskClosable={false}
             title={initialData ? 'Edit Task' : 'Add Task'}
             okText={initialData ? 'Update' : 'Create'}
             onCancel={onCancel}

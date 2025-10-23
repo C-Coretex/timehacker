@@ -30,6 +30,10 @@ const TasksPage: FC = () => {
         setEditingTask(null);
     }, []);
 
+    const [deleteModal, setDeleteModal] = React.useState<{ visible: boolean; id?: string }>({
+        visible: false,
+    });
+
     const columns = [
         { title: 'Name', dataIndex: 'name', key: 'name' },
         { title: 'Description', dataIndex: 'description', key: 'description' },
@@ -80,6 +84,7 @@ const TasksPage: FC = () => {
                     await createTask(payload);
                     notification.success({ message: 'Success', description: 'Task added!' });
                 }
+                await fetchTasks();
             } catch (error) {
                 notification.error({ message: 'Error', description: `Failed to ${id ? 'update' : 'add'} task.` });
             } finally {
@@ -89,20 +94,16 @@ const TasksPage: FC = () => {
         [createTask, updateTask, handleModalCancel]
     );
 
-    const handleDeleteTask = useCallback(
-        (id: string) => {
-            Modal.confirm({
-                title: 'Confirm Delete',
-                content: 'Are you sure you want to delete this task?',
-                okText: 'Delete',
-                okType: 'danger',
-                onOk: async () => {
-                    await deleteTask(id);
-                },
-            });
-        },
-        [deleteTask]
-    );
+    const confirmDelete = async () => {
+        if (!deleteModal.id) return;
+        await deleteTask(deleteModal.id);
+        await fetchTasks();
+        setDeleteModal({ visible: false });
+    };
+
+    const handleDeleteTask = useCallback((id: string) => {
+        setDeleteModal({ visible: true, id });
+    }, []);
 
     return (
         <div>
@@ -115,6 +116,17 @@ const TasksPage: FC = () => {
             {error && <Typography.Text type="danger">{error}</Typography.Text>}
             <Table columns={columns} dataSource={tasks} loading={loading} rowKey="id" locale={{ emptyText: 'No tasks created yet.' }} />
             <TaskFormModal open={isModalOpen} onCancel={handleModalCancel} onSave={handleSaveTask} initialData={editingTask} />
+            <Modal
+                open={deleteModal.visible}
+                title="Confirm Delete"
+                okText="Delete"
+                okType="danger"
+                onOk={confirmDelete}
+                onCancel={() => setDeleteModal({ visible: false })}
+            >
+                Are you sure you want to delete this task?
+            </Modal>
+
         </div>
     );
 };
