@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
-    <ProjectReference Include="..\TimeHacker.Helpers.Tests\TimeHacker.Helpers.Tests.csproj" />
+    <ProjectReference Include="..\TimeHacker.Tests.Helpers\TimeHacker.Tests.Helpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

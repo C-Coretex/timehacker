@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11217.181 d18.0
+VisualStudioVersion = 18.0.11217.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_Presentation", "01_Presentation", "{CE7F8AAE-2D76-4446-B29F-5309EA488EBF}"
 EndProject
@@ -53,7 +53,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeHacker.Application.Api.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeHacker.Domain.Services.Tests", "TimeHacker.Domain.Services.Tests\TimeHacker.Domain.Services.Tests.csproj", "{DD36CC17-117D-4D46-99BB-148D7398DFB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeHacker.Helpers.Tests", "TimeHacker.Helpers.Tests\TimeHacker.Helpers.Tests.csproj", "{8F3FE583-89A5-44EA-87BF-5837F190E259}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeHacker.Tests.Helpers", "TimeHacker.Tests.Helpers\TimeHacker.Tests.Helpers.csproj", "{646C1897-4BD6-0EDE-39B5-5923BD475437}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -155,12 +155,12 @@ Global
 		{DD36CC17-117D-4D46-99BB-148D7398DFB7}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
 		{DD36CC17-117D-4D46-99BB-148D7398DFB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD36CC17-117D-4D46-99BB-148D7398DFB7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F3FE583-89A5-44EA-87BF-5837F190E259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F3FE583-89A5-44EA-87BF-5837F190E259}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F3FE583-89A5-44EA-87BF-5837F190E259}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
-		{8F3FE583-89A5-44EA-87BF-5837F190E259}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
-		{8F3FE583-89A5-44EA-87BF-5837F190E259}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F3FE583-89A5-44EA-87BF-5837F190E259}.Release|Any CPU.Build.0 = Release|Any CPU
+		{646C1897-4BD6-0EDE-39B5-5923BD475437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{646C1897-4BD6-0EDE-39B5-5923BD475437}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{646C1897-4BD6-0EDE-39B5-5923BD475437}.NoVariablesDefault|Any CPU.ActiveCfg = Release|Any CPU
+		{646C1897-4BD6-0EDE-39B5-5923BD475437}.NoVariablesDefault|Any CPU.Build.0 = Release|Any CPU
+		{646C1897-4BD6-0EDE-39B5-5923BD475437}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{646C1897-4BD6-0EDE-39B5-5923BD475437}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -181,7 +181,7 @@ Global
 		{8DBDF0E2-B508-4F8D-BC4E-5212990777F9} = {75AA49D4-21DB-4561-A2EA-5BABA28AF6B9}
 		{87DE2DE4-8B57-F558-1F5E-5983C4ECC15F} = {8DBDF0E2-B508-4F8D-BC4E-5212990777F9}
 		{DD36CC17-117D-4D46-99BB-148D7398DFB7} = {8DBDF0E2-B508-4F8D-BC4E-5212990777F9}
-		{8F3FE583-89A5-44EA-87BF-5837F190E259} = {75AA49D4-21DB-4561-A2EA-5BABA28AF6B9}
+		{646C1897-4BD6-0EDE-39B5-5923BD475437} = {75AA49D4-21DB-4561-A2EA-5BABA28AF6B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F69EFFA5-D3C7-45B2-A448-D4BE05AC833D}
