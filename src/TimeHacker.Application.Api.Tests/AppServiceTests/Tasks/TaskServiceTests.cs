@@ -1,25 +1,20 @@
 ﻿using AwesomeAssertions;
 using MockQueryable;
 using Moq;
-using TimeHacker.Application.Api.AppServices.Categories;
-using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.AppServices.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IProcessors;
 using TimeHacker.Domain.IRepositories;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Domain.Models.EntityModels;
 using TimeHacker.Domain.Models.EntityModels.Enums;
 using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 using TimeHacker.Domain.Services.Processors;
 using TimeHacker.Domain.Services.Services;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
-using TimeHacker.Helpers.Tests.Mocks;
 using TimeHacker.Helpers.Tests.Mocks.Extensions;
 
 namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks;
@@ -148,7 +143,7 @@ public class TaskServiceTests
 
         _scheduleEntityRepository
             .Setup(x => x.GetAll(It.IsAny<QueryPipelineStep<ScheduleEntity>[]>()))
-            .Returns(scheduleEntities.AsQueryable().BuildMock());
+            .Returns(scheduleEntities.BuildMock());
         
 
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();

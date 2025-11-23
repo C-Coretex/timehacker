@@ -15,14 +15,14 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
         where TModel : class, IDbEntity
         where TDbContext : DbContextBase<TDbContext>
     {
-        private static readonly Lazy<Func<TModel, DateTime>?> UpdatedTimestampSelector = new(() =>
+        private static readonly Lazy<Expression<Func<TModel, DateTime>>?> UpdatedTimestampSelector = new(() =>
         {
             var isUpdatable = typeof(IUpdatable).IsAssignableFrom(typeof(TModel));
             if (!isUpdatable) return null;
 
             var param = Expression.Parameter(typeof(TModel), "x");
             var updatedProp = Expression.Property(param, nameof(IUpdatable.UpdatedTimestamp));
-            return (Func<TModel, DateTime>)Expression.Lambda(updatedProp, param).Compile();
+            return (Expression<Func<TModel, DateTime>>)Expression.Lambda(updatedProp, param);
         });
 
         protected TDbContext DbContext = dbContext;
@@ -114,7 +114,7 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
             return SaveChangesAsync(cancellationToken);
         }
 
-        public virtual Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Func<TModel, TKey> propertySelector, TKey value, CancellationToken cancellationToken = default)
+        public virtual Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Expression<Func<TModel, TKey>> propertySelector, TKey value, CancellationToken cancellationToken = default)
         {
             var updatedTimestampSelector = UpdatedTimestampSelector.Value;
             if (updatedTimestampSelector == null)
@@ -129,11 +129,11 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 
         protected virtual Task<int> ExecuteUpdateAsync(
             Expression<Func<TModel, bool>> predicate, 
-            Expression<Func<SetPropertyCalls<TModel>, SetPropertyCalls<TModel>>> setPropertyCalls, 
+            Action<UpdateSettersBuilder<TModel>> updateSettersBuilder, 
             CancellationToken cancellationToken = default)
         {
             var query = GetAllBase().Where(predicate);
-            return query.ExecuteUpdateAsync(setPropertyCalls, cancellationToken);
+            return query.ExecuteUpdateAsync(updateSettersBuilder, cancellationToken);
         }
 
         protected virtual Task<int> ExecuteDeleteAsync(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)

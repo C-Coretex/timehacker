@@ -175,9 +175,9 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
 
             _fixedTasksRepository.As<IUserScopedRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
 
-            _fixedTasksRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<FixedTask, bool>>>(), It.IsAny<Func<FixedTask, Guid?>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
-                .Callback<Expression<Func<FixedTask, bool>>, Func<FixedTask, Guid?>, Guid?, CancellationToken>((predicate, _, value, _) =>
-                {
+            _fixedTasksRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<FixedTask, bool>>>(), It.IsAny<Expression<Func<FixedTask, Guid?>>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+                .Callback<Expression<Func<FixedTask, bool>>, Expression<Func<FixedTask, Guid?>>, Guid?, CancellationToken>((predicate, _, value, _) =>
+                {   
                     var items = _fixedTasks.Where(predicate.Compile());
                     foreach (var item in items)
                         item.ScheduleEntityId = value;
@@ -218,8 +218,8 @@ namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
             ];
 
             _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories);
-            _categoriesRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<Func<Category, Guid?>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
-                .Callback<Expression<Func<Category, bool>>, Func<Category, Guid?>, Guid?, CancellationToken>((predicate, _, value, _) =>
+            _categoriesRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<Expression<Func<Category, Guid?>>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+                .Callback<Expression<Func<Category, bool>>, Expression<Func<Category, Guid?>>, Guid?, CancellationToken>((predicate, _, value, _) =>
                 {
                     var items = _categories.Where(predicate.Compile());
                     foreach (var item in items)

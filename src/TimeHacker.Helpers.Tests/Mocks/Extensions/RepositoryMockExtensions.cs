@@ -1,8 +1,5 @@
 ﻿using MockQueryable;
-using Moq;
-using System;
-using System.Linq.Expressions;
-using System.Threading;
+using Moq;  
 using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.IRepositories;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
@@ -39,13 +36,13 @@ namespace TimeHacker.Helpers.Tests.Mocks.Extensions
                 .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
 
             repository.Setup(x => x.GetAll(It.IsAny<bool>()))
-            .Returns(source.AsQueryable().BuildMock());
+            .Returns(source.BuildMock());
 
             repository.Setup(x => x.GetAll(It.IsAny<QueryPipelineStep<TModel>[]>()))
-                .Returns(source.AsQueryable().BuildMock());
+                .Returns(source.BuildMock());
 
             repository.Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny<QueryPipelineStep<TModel>[]>()))
-                .Returns(source.AsQueryable().BuildMock());
+                .Returns(source.BuildMock());
         }
 
         public static void SetupRepositoryMock<TModel, TId>(this Mock<IUserScopedRepositoryBase<TModel, TId>> repository, List<TModel> source) where TModel : class, IUserScopedEntity, IDbEntity<TId>
@@ -85,13 +82,13 @@ namespace TimeHacker.Helpers.Tests.Mocks.Extensions
                 .Returns<TModel>((entry) => entry);
 
             repository.Setup(x => x.GetAll(It.IsAny<bool>()))
-                .Returns(source.AsQueryable().BuildMock());
+                .Returns(source.BuildMock());
 
             repository.Setup(x => x.GetAll(It.IsAny<QueryPipelineStep<TModel>[]>()))
-                .Returns(source.AsQueryable().BuildMock());
+                .Returns(source.BuildMock());
 
             repository.Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny<QueryPipelineStep<TModel>[]>()))
-                .Returns(source.AsQueryable().BuildMock());
+                .Returns(source.BuildMock());
         }
 
     }

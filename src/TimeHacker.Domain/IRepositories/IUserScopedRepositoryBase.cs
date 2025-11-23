@@ -23,7 +23,7 @@ namespace TimeHacker.Domain.IRepositories
         Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
         Task UpdateRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default);
         Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default);
-        Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Func<TModel, TKey> propertySelector, TKey value, CancellationToken cancellationToken = default);
+        Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Expression<Func<TModel, TKey>> propertySelector, TKey value, CancellationToken cancellationToken = default);
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
         Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default);
