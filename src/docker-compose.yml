@@ -33,6 +33,8 @@ services:
         condition: service_healthy
       timehacker.infrastructure.identity:
         condition: service_healthy
+    environment:
+      - AppSettings__uiUrl=http://localhost:5173
 
   #Databases
   timehacker.infrastructure:
