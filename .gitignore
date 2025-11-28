@@ -450,3 +450,8 @@ FodyWeavers.xsd
 **/wwwroot/js/build
 
 .containers/
+
+.vscode/*
+!.vscode/settings.json
+
+**/TimeHacker.Application.UI/.env

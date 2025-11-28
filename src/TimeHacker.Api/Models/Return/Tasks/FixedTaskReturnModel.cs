@@ -3,7 +3,8 @@ using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Api.Models.Return.Tasks
 {
-    public class FixedTaskReturnModel(
+    public record FixedTaskReturnModel(
+        
         Guid Id,
         string Name,
         string? Description,

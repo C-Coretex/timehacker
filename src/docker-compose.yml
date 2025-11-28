@@ -1,7 +1,7 @@
-version: '1.1'
-  
+version: "1.1"
+
 services:
-#Frontend
+  #Frontend
   vite-app:
     container_name: timehacker.application.ui
     build:
@@ -14,11 +14,11 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-    command: ["npm", "run", "dev", "--", "--host"]
+    command: sh -c "npm install && npm run dev -- --host"
     stdin_open: true
     tty: true
 
-#Backend
+  #Backend
   timehacker.api:
     image: ${DOCKER_REGISTRY-}timehackerapi
     container_name: timehacker.api
@@ -34,7 +34,7 @@ services:
       timehacker.infrastructure.identity:
         condition: service_healthy
 
-#Databases
+  #Databases
   timehacker.infrastructure:
     image: postgres:latest
     container_name: timehacker.infrastructure
@@ -62,14 +62,14 @@ services:
     volumes:
       - ./.containers/timehacker-identity-db:/var/lib/postgresql/data
     ports:
-      - "5433:5432"  # Exposing a different host port to avoid conflicts
+      - "5433:5432" # Exposing a different host port to avoid conflicts
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-#pgAdmin
+  #pgAdmin
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:

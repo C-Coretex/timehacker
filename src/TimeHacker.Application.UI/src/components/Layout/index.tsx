@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import type { FC } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router';
-import {
-  Breadcrumb,
-  Layout as AntdLayout,
-  Menu,
-  theme,
-} from 'antd';
+import { Breadcrumb, Layout as AntdLayout, Menu, theme } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CalendarOutlined,
@@ -17,6 +12,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 
+import { useAuth } from 'contexts/AuthContext';
 import { capitalize } from 'utils/helpers';
 
 const { Header, Content, Footer, Sider } = AntdLayout;
@@ -31,40 +27,43 @@ type MenuItem = Required<MenuProps>['items'][number];
 //         return String(menuItem.key)
 //       }
 //     }
-  
+
 //     return null;
 // }
 
 const getItem = (
   key: React.Key,
   icon?: React.ReactNode,
-  children?: MenuItem[],
+  children?: MenuItem[]
 ): MenuItem => {
   return {
     key,
     icon,
     children,
-    label: children ? capitalize(key) : <NavLink to={`/${key === 'calendar' ? '' : key}`}>{capitalize(key)}</NavLink>
+    label: children ? (
+      capitalize(key)
+    ) : (
+      <NavLink to={`/${key === 'calendar' ? '' : key}`}>
+        {capitalize(key)}
+      </NavLink>
+    ),
   } as MenuItem;
-}
+};
 
-const getMainMenuItems = (isAuthenticated: boolean) => ([
-    getItem('calendar', <CalendarOutlined />),
-    getItem('tasks', <SnippetsOutlined />),
-    getItem('categories', <ProductOutlined />),
-    ...(!isAuthenticated ? [
-        getItem('user', <UserOutlined />, [
-        getItem('profile'),
-        getItem('logout'),
-        ]),
-    ] : [
-        getItem('login', <ProductOutlined />),
-    ]),
-    getItem('help', <QuestionCircleOutlined />),
-    getItem('settings', <SettingOutlined />),
-]);
+const getMainMenuItems = (isAuthenticated: boolean) => [
+  getItem('calendar', <CalendarOutlined />),
+  getItem('tasks', <SnippetsOutlined />),
+  getItem('categories', <ProductOutlined />),
+  !isAuthenticated
+    ? getItem('login', <UserOutlined />)
+    : getItem('profile', <UserOutlined />),
+  getItem('help', <QuestionCircleOutlined />),
+  getItem('about', <QuestionCircleOutlined />),
+  getItem('settings', <SettingOutlined />),
+];
 
 const Layout: FC = () => {
+  const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -73,15 +72,29 @@ const Layout: FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const mainMenuItems = getMainMenuItems(false);
+  const mainMenuItems = getMainMenuItems(isAuthenticated);
   // const activeLink = findActiveLink(location.pathname, mainMenuItems);
 
+  const breadcrumbItems = [
+    {
+      title: 'User',
+    },
+    {
+      title: 'Bill',
+    },
+  ];
+
+  <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />;
 
   return (
     <AntdLayout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div 
-          className="demo-logo-vertical" 
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+      >
+        <div
+          className="demo-logo-vertical"
           style={{
             height: '32px',
             margin: '16px',
@@ -89,7 +102,12 @@ const Layout: FC = () => {
             borderRadius: '6px',
           }}
         />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={mainMenuItems} />
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={['1']}
+          mode="inline"
+          items={mainMenuItems}
+        />
       </Sider>
       <AntdLayout>
         <Header
@@ -100,10 +118,12 @@ const Layout: FC = () => {
           <i>~TimeHacker~</i>
         </Header>
         <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item>User</Breadcrumb.Item>
-          <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            style={{ margin: '16px 0' }}
+            items={breadcrumbItems}
+            separator=">"
+          />
+
           <div
             style={{
               padding: 24,
@@ -116,7 +136,8 @@ const Layout: FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          TimeHacker ©{new Date().getFullYear()}
+          TimeHacker &copy;2024 &mdash; {new Date().getFullYear()} All rights
+          reserved.
         </Footer>
       </AntdLayout>
     </AntdLayout>

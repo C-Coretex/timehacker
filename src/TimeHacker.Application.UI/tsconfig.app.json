@@ -24,13 +24,7 @@
     "noUncheckedSideEffectImports": true,
 
     //custom
-    "baseUrl": "src",
-    "paths": {
-      "components/*": ["components/*"],
-      "pages/*": ["pages/*"],
-      "types/*": ["types/*"],
-      "utils/*": ["utils/*"],
-    },
+    "baseUrl": "src"
   },
   "include": ["src"]
 }

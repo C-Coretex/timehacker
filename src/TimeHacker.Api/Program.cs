@@ -58,6 +58,19 @@ builder.Services.AddControllers(options =>
     options.JsonSerializerOptions.Converters.Add(new InputRepeatingEntityTypeConverter());
 });
 
+var uiUrl = builder.Configuration.GetValue<string>("AppSettings:uiUrl")!;
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins(uiUrl)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks()
@@ -99,6 +112,8 @@ app.MapHealthChecks("/health");
 app.UseRouting();
 
 app.UseSession();
+
+app.UseCors("AllowFrontend");
 
 app.UseMiddleware<UserAccessorInitMiddleware>();
 
@@ -189,6 +204,9 @@ static void AddIdentityServices(IServiceCollection services)
 
     services.ConfigureApplicationCookie(options =>
     {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Required if SameSite=None
+
         // Prevent automatic redirects
         options.Events.OnRedirectToLogin = context =>
         {
