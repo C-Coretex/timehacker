@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Linq.Expressions;
 using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Categories

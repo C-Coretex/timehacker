@@ -1,6 +1,4 @@
-﻿using TimeHacker.Api.Helpers;
-
-namespace TimeHacker.Api.Middleware
+﻿namespace TimeHacker.Api.Middleware
 {
     public class UserAccessorInitMiddleware(RequestDelegate next)
     {

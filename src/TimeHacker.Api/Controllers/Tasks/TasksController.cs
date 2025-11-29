@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
-using TimeHacker.Api.Models.Input.Tasks;
+﻿using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.Models.ReturnModels;
 
 namespace TimeHacker.Api.Controllers.Tasks
 {

@@ -1,15 +1,4 @@
-﻿using AwesomeAssertions;
-using Moq;
-using TimeHacker.Application.Api.AppServices.Tasks;
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
-
-namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks
+﻿namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks
 {
     public class FixedTaskAppServiceTests
     {

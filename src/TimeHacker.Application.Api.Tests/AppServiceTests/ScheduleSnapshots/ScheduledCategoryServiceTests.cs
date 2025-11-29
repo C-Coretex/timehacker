@@ -1,13 +1,4 @@
-﻿using Moq;
-using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Helpers.Tests.Mocks;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
-
-namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
+﻿namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
 {
     public class ScheduledCategoryServiceTests
     {

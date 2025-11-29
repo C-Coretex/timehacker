@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using TimeHacker.Api.Models.Input.Users;
+﻿using TimeHacker.Api.Models.Input.Users;
 using TimeHacker.Api.Models.Return.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 

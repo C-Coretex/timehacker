@@ -1,23 +1,4 @@
-﻿using AwesomeAssertions;
-using MockQueryable;
-using Moq;
-using TimeHacker.Application.Api.AppServices.Tasks;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Services.Processors;
-using TimeHacker.Domain.Services.Services;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
-
-namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks;
+﻿namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks;
 
 public class TaskServiceTests
 {

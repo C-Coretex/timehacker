@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Infrastructure.Identity;
 
 namespace TimeHacker.Migrations.Identity.Factory

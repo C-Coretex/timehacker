@@ -1,5 +1,4 @@
-﻿using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Helpers.Domain.Extensions;
+﻿using TimeHacker.Helpers.Domain.Extensions;
 
 namespace TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes
 {

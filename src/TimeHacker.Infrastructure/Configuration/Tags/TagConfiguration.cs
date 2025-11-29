@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeHacker.Domain.Entities.Tags;
+﻿using TimeHacker.Domain.Entities.Tags;
 
 namespace TimeHacker.Infrastructure.Configuration.Tags
 {

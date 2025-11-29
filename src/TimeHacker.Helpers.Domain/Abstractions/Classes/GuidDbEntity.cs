@@ -1,6 +1,4 @@
-﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
-
-namespace TimeHacker.Helpers.Domain.Abstractions.Classes
+﻿namespace TimeHacker.Helpers.Domain.Abstractions.Classes
 {
     public abstract class GuidDbEntity : IDbEntity<Guid>, ICreatable, IUpdatable
     {

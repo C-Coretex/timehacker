@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Entities.EntityBase;
 
 namespace TimeHacker.Domain.Entities.Tags
 {

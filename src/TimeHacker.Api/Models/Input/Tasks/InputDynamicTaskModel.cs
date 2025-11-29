@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Api.Models.Input.Tasks
 {

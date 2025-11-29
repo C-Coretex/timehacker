@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Application.Api.Contracts.DTOs.Users;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 
 namespace TimeHacker.Api.Models.Input.Users
 {

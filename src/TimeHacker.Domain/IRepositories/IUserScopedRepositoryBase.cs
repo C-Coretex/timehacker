@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using TimeHacker.Domain.Entities.EntityBase;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
+﻿using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Domain.IRepositories

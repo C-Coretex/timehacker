@@ -1,5 +1,4 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tags;
-using TimeHacker.Domain.Entities.Tags;
 
 namespace TimeHacker.Application.Api.Contracts.IAppServices.Tags
 {

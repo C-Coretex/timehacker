@@ -1,12 +1,4 @@
-﻿using MockQueryable;
-using Moq;  
-using TimeHacker.Domain.Entities.EntityBase;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
-
-namespace TimeHacker.Helpers.Tests.Mocks.Extensions
+﻿namespace TimeHacker.Helpers.Tests.Mocks.Extensions
 {
     public static class RepositoryMockExtensions
     {

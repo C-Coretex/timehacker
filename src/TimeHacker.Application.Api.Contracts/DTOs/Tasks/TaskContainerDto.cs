@@ -1,6 +1,4 @@
 ﻿using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.Models.BusinessLogicModels;
-using TimeHacker.Domain.Models.ReturnModels;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks
 {

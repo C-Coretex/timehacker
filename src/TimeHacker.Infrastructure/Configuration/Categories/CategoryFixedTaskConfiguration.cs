@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.Categories;
+﻿using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Infrastructure.Configuration.Categories
 {

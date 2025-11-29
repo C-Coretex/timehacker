@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Users;
 
 namespace TimeHacker.Api.Helpers

@@ -1,14 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Application.Api.QueryPipelineSteps;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IProcessors;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Domain.IServices;
-using TimeHacker.Domain.Models.ReturnModels;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks
 {

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
+﻿using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;

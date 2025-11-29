@@ -1,7 +1,4 @@
-﻿using System.Text.Json;
-using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
-using System.Text.Json.Serialization;
-using TimeHacker.Domain.Models.EntityModels.Enums;
+﻿using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
 namespace TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities
 {

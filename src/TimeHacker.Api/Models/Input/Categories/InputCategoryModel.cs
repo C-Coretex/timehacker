@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Drawing;
+﻿using System.Drawing;
 using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Input.Categories

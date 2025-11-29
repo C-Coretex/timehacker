@@ -1,15 +1,4 @@
-﻿using AwesomeAssertions;
-using Moq;
-using TimeHacker.Application.Api.AppServices.Users;
-using TimeHacker.Application.Api.Contracts.DTOs.Users;
-using TimeHacker.Application.Api.Contracts.IAppServices.Users;
-using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Domain.IRepositories.Users;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
-using TimeHacker.Helpers.Tests.Mocks;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
-
-namespace TimeHacker.Application.Api.Tests.AppServiceTests.Users
+﻿namespace TimeHacker.Application.Api.Tests.AppServiceTests.Users
 {
     public class UserServiceTest
     {

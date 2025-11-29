@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks

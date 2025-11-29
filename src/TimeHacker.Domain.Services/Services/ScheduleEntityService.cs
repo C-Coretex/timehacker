@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IServices;
-using TimeHacker.Domain.Models.ReturnModels;
 
 namespace TimeHacker.Domain.Services.Services
 {

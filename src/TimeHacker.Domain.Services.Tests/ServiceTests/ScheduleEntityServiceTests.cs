@@ -1,24 +1,4 @@
-﻿using System.Drawing;
-using System.Linq.Expressions;
-using AwesomeAssertions;
-using Moq;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Domain.IServices;
-using TimeHacker.Domain.Models.EntityModels;
-using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Domain.Services.Services;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
-
-namespace TimeHacker.Domain.Services.Tests.ServiceTests
+﻿namespace TimeHacker.Domain.Services.Tests.ServiceTests
 {
     public class ScheduleEntityServiceTests
     {

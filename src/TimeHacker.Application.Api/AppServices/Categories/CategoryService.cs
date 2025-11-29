@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
-using TimeHacker.Domain.BusinessLogicExceptions;
-using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.IRepositories.Categories;
 
 namespace TimeHacker.Application.Api.AppServices.Categories

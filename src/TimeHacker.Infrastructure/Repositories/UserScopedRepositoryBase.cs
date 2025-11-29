@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.EntityBase;
-using TimeHacker.Domain.IModels;
+﻿using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.IRepositories;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;

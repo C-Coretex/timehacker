@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Models.ReturnModels;
-
-namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks
+﻿namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks
 {
     public record TasksForDayDto
     {

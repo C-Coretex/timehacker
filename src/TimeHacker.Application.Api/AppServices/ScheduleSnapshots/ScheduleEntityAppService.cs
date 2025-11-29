@@ -1,6 +1,5 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.Helpers.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
@@ -27,7 +26,7 @@ namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots
                         throw new NotFoundException(nameof(ScheduleEntityParentEnum.Category), scheduleEntityCreateDto.ParentEntityId.ToString());
                     break;
                 default:
-                    throw new NotProvidedException(nameof(scheduleEntityCreateDto.ScheduleEntityParentEnum));
+                    throw new NotProvidedException(nameof(scheduleEntityCreateDto));
             }
 
             var scheduleEntity = ScheduleEntityHelper.GetScheduleEntity(scheduleEntityCreateDto.RepeatingEntityModel, scheduleEntityCreateDto.EndsOnModel);
@@ -48,7 +47,7 @@ namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots
                         scheduleEntity.Id);
                     break;
                 default:
-                    throw new NotProvidedException(nameof(scheduleEntityCreateDto.ScheduleEntityParentEnum));
+                    throw new NotProvidedException(nameof(scheduleEntityCreateDto));
             }
             
             return ScheduleEntityDto.Create(scheduleEntity);

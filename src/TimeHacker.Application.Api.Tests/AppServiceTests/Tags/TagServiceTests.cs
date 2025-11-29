@@ -1,13 +1,4 @@
 ﻿using System.Drawing;
-using AwesomeAssertions;
-using Moq;
-using TimeHacker.Application.Api.AppServices.Tags;
-using TimeHacker.Application.Api.Contracts.DTOs.Tags;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tags;
-using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.Tags;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
 
 namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tags
 {

@@ -1,8 +1,4 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Domain.Models.ReturnModels;
-
-namespace TimeHacker.Domain.IServices
+﻿namespace TimeHacker.Domain.IServices
 {
     public interface IScheduleEntityService
     {

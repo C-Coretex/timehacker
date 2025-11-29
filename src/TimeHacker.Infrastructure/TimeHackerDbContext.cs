@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.Categories;
+﻿using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.Entities.Tasks;

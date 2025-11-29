@@ -1,5 +1,4 @@
 ﻿using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Infrastructure.Repositories.Tasks

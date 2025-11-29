@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using TimeHacker.Application.Api.Contracts.DTOs.Tags;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks

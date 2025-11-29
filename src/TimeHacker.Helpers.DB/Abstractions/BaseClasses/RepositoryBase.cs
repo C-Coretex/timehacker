@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore.Query;
 using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;

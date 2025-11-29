@@ -1,5 +1,4 @@
 ﻿using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tags;
 

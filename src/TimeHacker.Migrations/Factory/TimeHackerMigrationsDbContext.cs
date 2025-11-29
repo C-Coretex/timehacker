@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Infrastructure;
+﻿using TimeHacker.Infrastructure;
 
 namespace TimeHacker.Migrations.Factory
 {

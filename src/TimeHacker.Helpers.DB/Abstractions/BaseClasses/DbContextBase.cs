@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
+﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses
 {

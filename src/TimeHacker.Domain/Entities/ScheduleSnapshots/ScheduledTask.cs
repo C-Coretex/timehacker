@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.EntityBase;
-
-namespace TimeHacker.Domain.Entities.ScheduleSnapshots
+﻿namespace TimeHacker.Domain.Entities.ScheduleSnapshots
 {
     public class ScheduledTask : UserScopedEntityBase
     {

@@ -1,7 +1,5 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
-using TimeHacker.Domain.BusinessLogicExceptions;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Users;
 
 namespace TimeHacker.Application.Api.AppServices.Users

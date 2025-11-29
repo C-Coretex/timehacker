@@ -1,11 +1,4 @@
-﻿using AwesomeAssertions;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Models.EntityModels;
-using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Models.ReturnModels;
-
-namespace TimeHacker.Application.Api.Tests.RichModelTests
+﻿namespace TimeHacker.Application.Api.Tests.RichModelTests
 {
     public class ScheduleEntityTests
     {

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+﻿using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities
 {

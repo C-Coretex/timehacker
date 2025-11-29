@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.IModels;
-
-namespace TimeHacker.Helpers.Tests.Mocks
+﻿namespace TimeHacker.Helpers.Tests.Mocks
 {
     public class UserAccessorBaseMock: UserAccessorBase
     {

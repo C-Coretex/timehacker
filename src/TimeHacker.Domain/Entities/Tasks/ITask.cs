@@ -1,5 +1,4 @@
-﻿using TimeHacker.Domain.Entities.EntityBase;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
+﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Domain.Entities.Tasks
 {

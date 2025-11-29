@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Domain.Entities.Categories

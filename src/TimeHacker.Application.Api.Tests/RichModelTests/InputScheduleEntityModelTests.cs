@@ -1,13 +1,4 @@
-﻿using AwesomeAssertions;
-using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Helpers.ScheduleSnapshots;
-using TimeHacker.Domain.Models.EntityModels;
-using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
-
-namespace TimeHacker.Application.Api.Tests.RichModelTests
+﻿namespace TimeHacker.Application.Api.Tests.RichModelTests
 {
     public class InputScheduleEntityModelTests
     {

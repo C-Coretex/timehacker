@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeHacker.Domain.Entities.EntityBase;
+﻿using TimeHacker.Domain.Entities.EntityBase;
 
 namespace TimeHacker.Infrastructure.Configuration
 {

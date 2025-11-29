@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Infrastructure.Configuration.Tasks

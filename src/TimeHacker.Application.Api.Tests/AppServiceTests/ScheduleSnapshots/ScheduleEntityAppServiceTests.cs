@@ -1,23 +1,4 @@
-﻿using AwesomeAssertions;
-using Moq;
-using System.Drawing;
-using System.Linq.Expressions;
-using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Domain.Models.EntityModels;
-using TimeHacker.Domain.Models.EntityModels.Enums;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
+﻿using System.Drawing;
 
 namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots
 {

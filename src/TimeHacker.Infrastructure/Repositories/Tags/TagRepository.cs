@@ -1,5 +1,4 @@
 ﻿using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Tags;
 
 namespace TimeHacker.Infrastructure.Repositories.Tags

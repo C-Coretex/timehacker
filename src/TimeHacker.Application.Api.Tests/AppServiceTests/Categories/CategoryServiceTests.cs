@@ -1,14 +1,4 @@
 ﻿using System.Drawing;
-using AwesomeAssertions;
-using Moq;
-using TimeHacker.Application.Api.AppServices.Categories;
-using TimeHacker.Application.Api.Contracts.DTOs.Categories;
-using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Helpers.Tests.Mocks.Extensions;
 
 namespace TimeHacker.Application.Api.Tests.AppServiceTests.Categories
 {

@@ -1,8 +1,4 @@
-﻿using System.Linq.Expressions;
-using TimeHacker.Helpers.Domain.Abstractions.Delegates;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
-
-namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
+﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces
 {
     //for composite primary keys
     public interface IRepositoryBase<TModel> where TModel : class, IDbEntity
