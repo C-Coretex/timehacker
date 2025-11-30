@@ -8,27 +8,26 @@ using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 
-namespace TimeHacker.Application.Api.Extensions
+namespace TimeHacker.Application.Api.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection RegisterAppServices(this IServiceCollection serviceCollection)
     {
-        public static IServiceCollection RegisterAppServices(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddScoped<ICategoryAppService, CategoryService>();
+        serviceCollection.AddScoped<ICategoryAppService, CategoryService>();
 
-            serviceCollection.AddScoped<IScheduledTaskAppService, ScheduledTaskAppService>();
-            serviceCollection.AddScoped<IScheduleEntityAppService, ScheduleEntityAppService>();
-            serviceCollection.AddScoped<IScheduledCategoryAppService, ScheduledCategoryService>();
+        serviceCollection.AddScoped<IScheduledTaskAppService, ScheduledTaskAppService>();
+        serviceCollection.AddScoped<IScheduleEntityAppService, ScheduleEntityAppService>();
+        serviceCollection.AddScoped<IScheduledCategoryAppService, ScheduledCategoryService>();
 
-            serviceCollection.AddScoped<IDynamicTaskAppService, DynamicTaskAppService>();
-            serviceCollection.AddScoped<IFixedTaskAppService, FixedTaskAppService>();
-            serviceCollection.AddScoped<ITaskAppService, TaskService>();
+        serviceCollection.AddScoped<IDynamicTaskAppService, DynamicTaskAppService>();
+        serviceCollection.AddScoped<IFixedTaskAppService, FixedTaskAppService>();
+        serviceCollection.AddScoped<ITaskAppService, TaskService>();
 
-            serviceCollection.AddScoped<ITaskAppService, TaskService>();
+        serviceCollection.AddScoped<ITaskAppService, TaskService>();
 
-            serviceCollection.AddScoped<IUserAppService, UserService>();
+        serviceCollection.AddScoped<IUserAppService, UserService>();
 
-            return serviceCollection;
-        }
+        return serviceCollection;
     }
 }

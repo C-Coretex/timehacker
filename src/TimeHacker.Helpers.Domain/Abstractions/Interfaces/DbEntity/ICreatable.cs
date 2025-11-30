@@ -1,7 +1,6 @@
-﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity
+﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
+
+public interface ICreatable
 {
-    public interface ICreatable
-    {
-        DateTime CreatedTimestamp { get; set; }
-    }
+    DateTime CreatedTimestamp { get; set; }
 }

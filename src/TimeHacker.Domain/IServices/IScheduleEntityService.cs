@@ -1,9 +1,8 @@
-﻿namespace TimeHacker.Domain.IServices
-{
-    public interface IScheduleEntityService
-    {
-        IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from);
+﻿namespace TimeHacker.Domain.IServices;
 
-        Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated);
-    }
+public interface IScheduleEntityService
+{
+    IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from);
+
+    Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated);
 }

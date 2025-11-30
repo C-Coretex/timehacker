@@ -1,7 +1,6 @@
-﻿namespace TimeHacker.Domain.Entities.EntityBase
+﻿namespace TimeHacker.Domain.Entities.EntityBase;
+
+public interface IUserScopedEntity
 {
-    public interface IUserScopedEntity
-    {
-        public Guid UserId { get; set; }
-    }
+    public Guid UserId { get; set; }
 }

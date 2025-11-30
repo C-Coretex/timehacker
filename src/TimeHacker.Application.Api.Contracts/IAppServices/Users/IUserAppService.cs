@@ -1,11 +1,10 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 
-namespace TimeHacker.Application.Api.Contracts.IAppServices.Users
+namespace TimeHacker.Application.Api.Contracts.IAppServices.Users;
+
+public interface IUserAppService
 {
-    public interface IUserAppService
-    {
-        Task<UserDto?> GetCurrent();
-        Task UpdateAsync(UserDto user);
-        Task DeleteAsync();
-    }
+    Task<UserDto?> GetCurrent();
+    Task UpdateAsync(UserDto user);
+    Task DeleteAsync();
 }

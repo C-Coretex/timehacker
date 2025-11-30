@@ -1,10 +1,9 @@
 ﻿using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
-namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities
+namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
+
+public interface IInputRepeatingEntityType
 {
-    public interface IInputRepeatingEntityType
-    {
-        RepeatingEntityTypeEnum EntityType { get; init; }
-        IRepeatingEntityType CreateEntity();
-    }
+    RepeatingEntityTypeEnum EntityType { get; init; }
+    IRepeatingEntityType CreateEntity();
 }

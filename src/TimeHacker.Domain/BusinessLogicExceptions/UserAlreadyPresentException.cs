@@ -1,6 +1,5 @@
-﻿namespace TimeHacker.Domain.BusinessLogicExceptions
+﻿namespace TimeHacker.Domain.BusinessLogicExceptions;
+
+public class UserAlreadyPresentException : Exception
 {
-    public class UserAlreadyPresentException : Exception
-    {
-    }
 }

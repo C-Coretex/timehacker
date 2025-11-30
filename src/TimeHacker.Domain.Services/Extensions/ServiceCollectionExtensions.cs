@@ -1,16 +1,15 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace TimeHacker.Domain.Services.Extensions
+namespace TimeHacker.Domain.Services.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection RegisterDomainServices(this IServiceCollection serviceCollection)
     {
-        public static IServiceCollection RegisterDomainServices(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddScoped<IScheduleEntityService, ScheduleEntityService>();
+        serviceCollection.AddScoped<IScheduleEntityService, ScheduleEntityService>();
 
-            serviceCollection.AddScoped<ITaskTimelineProcessor, TaskTimelineProcessor>();
+        serviceCollection.AddScoped<ITaskTimelineProcessor, TaskTimelineProcessor>();
 
-            return serviceCollection;
-        }
+        return serviceCollection;
     }
 }

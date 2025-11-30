@@ -1,33 +1,32 @@
 ﻿using TimeHacker.Api.Models.Return.Tags;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
-namespace TimeHacker.Api.Models.Return.Tasks
+namespace TimeHacker.Api.Models.Return.Tasks;
+
+public record DynamicTaskReturnModel(
+    Guid? Id,
+    string Name,
+    string? Description,
+    byte Priority,
+    TimeSpan MinTimeToFinish,
+    TimeSpan MaxTimeToFinish,
+    TimeSpan? OptimalTimeToFinish,
+    DateTime CreatedTimestamp,
+    IEnumerable<TagReturnModel> Tags
+)
 {
-    public record DynamicTaskReturnModel(
-        Guid? Id,
-        string Name,
-        string? Description,
-        byte Priority,
-        TimeSpan MinTimeToFinish,
-        TimeSpan MaxTimeToFinish,
-        TimeSpan? OptimalTimeToFinish,
-        DateTime CreatedTimestamp,
-        IEnumerable<TagReturnModel> Tags
-    )
+    public static DynamicTaskReturnModel Create(DynamicTaskDto task)
     {
-        public static DynamicTaskReturnModel Create(DynamicTaskDto task)
-        {
-            return new DynamicTaskReturnModel(
-                task.Id,
-                task.Name,
-                task.Description,
-                task.Priority,
-                task.MinTimeToFinish,
-                task.MaxTimeToFinish,
-                task.OptimalTimeToFinish,
-                task.CreatedTimestamp,
-                task.Tags.Select(x => TagReturnModel.Create(x))
-            );
-        }
+        return new DynamicTaskReturnModel(
+            task.Id,
+            task.Name,
+            task.Description,
+            task.Priority,
+            task.MinTimeToFinish,
+            task.MaxTimeToFinish,
+            task.OptimalTimeToFinish,
+            task.CreatedTimestamp,
+            task.Tags.Select(x => TagReturnModel.Create(x))
+        );
     }
 }

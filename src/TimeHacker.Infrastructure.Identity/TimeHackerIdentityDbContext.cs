@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace TimeHacker.Infrastructure.Identity
+namespace TimeHacker.Infrastructure.Identity;
+
+public class TimeHackerIdentityDbContext : IdentityDbContext<IdentityUser>
 {
-    public class TimeHackerIdentityDbContext : IdentityDbContext<IdentityUser>
+    public TimeHackerIdentityDbContext(DbContextOptions<TimeHackerIdentityDbContext> options)
+        : base(options)
     {
-        public TimeHackerIdentityDbContext(DbContextOptions<TimeHackerIdentityDbContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
 
-            // Applies all configurations defined in this assembly
-            modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
-        }
+        // Applies all configurations defined in this assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 }

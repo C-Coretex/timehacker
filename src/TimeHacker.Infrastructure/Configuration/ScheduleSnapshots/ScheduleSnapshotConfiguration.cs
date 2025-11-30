@@ -1,16 +1,15 @@
 ﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
-namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots
+namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots;
+
+public class ScheduleSnapshotConfiguration : UserScopedEntityConfigurationBase<ScheduleSnapshot>
 {
-    public class ScheduleSnapshotConfiguration : UserScopedEntityConfigurationBase<ScheduleSnapshot>
+    public override void Configure(EntityTypeBuilder<ScheduleSnapshot> builder)
     {
-        public override void Configure(EntityTypeBuilder<ScheduleSnapshot> builder)
-        {
-            ConfigureUserScoped(builder);
+        ConfigureUserScoped(builder);
 
-            builder.HasAlternateKey(u => new { u.UserId, u.Date });
+        builder.HasAlternateKey(u => new { u.UserId, u.Date });
 
-            builder.HasIndex(x => x.Date);
-        }
+        builder.HasIndex(x => x.Date);
     }
 }

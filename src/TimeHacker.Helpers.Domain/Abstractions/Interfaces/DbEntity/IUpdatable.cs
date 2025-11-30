@@ -1,7 +1,6 @@
-﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity
+﻿namespace TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
+
+public interface IUpdatable
 {
-    public interface IUpdatable
-    {
-        DateTime? UpdatedTimestamp { get; set; }
-    }
+    DateTime? UpdatedTimestamp { get; set; }
 }
