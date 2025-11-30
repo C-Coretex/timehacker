@@ -3,14 +3,14 @@ version: "1.1"
 services:
   #Frontend
   vite-app:
-    container_name: timehacker.application.ui
+    container_name: timehacker.ui
     build:
-      context: ./TimeHacker.Application.UI/
+      context: ./TimeHacker.UI/
       target: development-dependencies-env
     ports:
       - "5173:5173"
     volumes:
-      - ./TimeHacker.Application.UI:/app
+      - ./TimeHacker.UI:/app
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
