@@ -32,7 +32,7 @@ public class TaskService(
 
         var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
 
-        snapshot = tasksForDay.CreateScheduleSnapshot();
+        snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
         snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot);
 
         return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
@@ -58,7 +58,7 @@ public class TaskService(
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                 var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
-                snapshot = tasksForDay.CreateScheduleSnapshot();
+                snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
                 snapshot = scheduleSnapshotRepository.Add(snapshot);
             }
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
@@ -82,21 +82,16 @@ public class TaskService(
         {
             var snapshot = await GetSnapshotForDate(date);
             if (snapshot != null)
-                await scheduleSnapshotRepository.Update(snapshot);
-            else
-            {
-                snapshot = new ScheduleSnapshot();
-                scheduleSnapshotRepository.Add(snapshot);
-            }
+                await scheduleSnapshotRepository.Delete(snapshot);
 
             var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
             var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
             var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
-            snapshot = tasksForDay.CreateScheduleSnapshot(snapshot);
+            snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
+            scheduleSnapshotRepository.Add(snapshot);
 
-
-            foreach(var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
+            foreach (var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
                 await scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value, date);
 
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));

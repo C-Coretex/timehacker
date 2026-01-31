@@ -22,14 +22,14 @@ public record TasksForDayReturn
         };
     }
 
-    public ScheduleSnapshot CreateScheduleSnapshot(ScheduleSnapshot? entity = null)
+    public ScheduleSnapshot CreateOrUpdateScheduleSnapshot(ScheduleSnapshot? entity = null)
     {
-        entity ??= new ScheduleSnapshot();
+        var newEntity = entity ?? new ScheduleSnapshot();
 
-        entity.Date = Date;
-        entity.ScheduledTasks = TasksTimeline.Select(x => x.CreateScheduledTask()).ToList();
-        entity.ScheduledCategories = CategoriesTimeline.Select(x => x.CreateScheduledCategory()).ToList();
+        newEntity.Date = Date;
+        newEntity.ScheduledTasks = TasksTimeline.Select(x => x.CreateScheduledTask()).ToList();
+        newEntity.ScheduledCategories = CategoriesTimeline.Select(x => x.CreateScheduledCategory()).ToList();
 
-        return entity;
+        return newEntity;
     }
 }
