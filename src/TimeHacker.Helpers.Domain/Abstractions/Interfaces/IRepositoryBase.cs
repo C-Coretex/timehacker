@@ -13,7 +13,7 @@ public interface IRepositoryBase<TModel> where TModel : class, IDbEntity
     Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
     void DeleteRange(IEnumerable<TModel> models);
     Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default);
-    Task<int> DeleteBy<TKey>(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<int> DeleteBy(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default);
     TModel Update(TModel model);
     Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
     void UpdateRange(IEnumerable<TModel> models);

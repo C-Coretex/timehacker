@@ -86,7 +86,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return SaveChangesAsync(cancellationToken);
     }
 
-    public virtual Task<int> DeleteBy<TKey>(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual Task<int> DeleteBy(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return ExecuteDeleteAsync(predicate, cancellationToken);
     }

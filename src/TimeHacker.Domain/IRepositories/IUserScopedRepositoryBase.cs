@@ -16,7 +16,7 @@ public interface IUserScopedRepositoryBase<TModel, in TId> where TModel : class,
     Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
     Task DeleteRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default);
     Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default);
-    Task<int> DeleteBy<TKey>(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<int> DeleteBy(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default);
     Task<TModel> Update(TModel model, CancellationToken cancellationToken = default);
     Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
     Task UpdateRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default);

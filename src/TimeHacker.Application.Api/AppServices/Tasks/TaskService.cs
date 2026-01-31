@@ -117,6 +117,7 @@ public class TaskService(
             foreach (var taskDate in taskDates)
             {
                 var task = scheduleEntity.FixedTask!.ShallowCopy();
+
                 var timeDifferenceInDays = task.EndTimestamp.Date - task.StartTimestamp.Date;
 
                 task.StartTimestamp = taskDate.ToDateTime(TimeOnly.FromDateTime(task.StartTimestamp));

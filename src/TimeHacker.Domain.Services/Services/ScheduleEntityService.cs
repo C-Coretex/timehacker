@@ -7,7 +7,7 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
 {
     public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
     {
-        var query = scheduleEntityRepository.GetAll().Include(x => x.FixedTask)
+        var query = scheduleEntityRepository.GetAll().Where(x => x.FixedTask != null)
             .Where(x => x.EndsOn == null || x.EndsOn >= from);
 
         return query.Select(scheduleEntity => new ScheduleEntityReturn()
@@ -20,8 +20,7 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
             EndsOn = scheduleEntity.EndsOn,
             ScheduledTasks = scheduleEntity.ScheduledTasks,
             ScheduledCategories = scheduleEntity.ScheduledCategories,
-            FixedTask = scheduleEntity.FixedTask,
-            Category = scheduleEntity.Category
+            FixedTask = scheduleEntity.FixedTask
         });
     }
 
@@ -39,6 +38,8 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
             return;
 
         scheduleEntity.LastEntityCreated = entityCreated;
+        if (scheduleEntity.FirstEntityCreated == null)
+            scheduleEntity.FirstEntityCreated = scheduleEntity.LastEntityCreated;
 
         await scheduleEntityRepository.SaveChangesAsync();
     }

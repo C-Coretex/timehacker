@@ -29,8 +29,9 @@ public class ScheduleEntityReturn: ScheduleEntity
     public IEnumerable<DateOnly> GetNextEntityDatesIn(DateOnly from, DateOnly to)
     {
         var maxIterations = 10_000;
-        var nextTaskDate = LastEntityCreated ?? DateOnly.FromDateTime(CreatedTimestamp);
-
+        //if we are recalculating already calculated data - go from beginning
+        var nextTaskDate = (LastEntityCreated > from ? FirstEntityCreated : LastEntityCreated) ?? DateOnly.FromDateTime(CreatedTimestamp); 
+        
         while (nextTaskDate < to)
         {
             nextTaskDate = RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate);

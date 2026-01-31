@@ -170,6 +170,25 @@ const CalendarPage: FC = () => {
     }
   }, [view, monthDays, weekDays, fetchFixedTasksForMonth, fetchWeekTasks]);
 
+  const eventStyleGetter = useCallback((event: CalendarEvent) => {
+    let style = {
+      backgroundColor: '#1890ff',
+      borderRadius: '5px',
+      opacity: 0.8,
+      color: 'white',
+      border: '0px',
+      display: 'block',
+    };
+
+    if (event.resource?.type === 'fixed') {
+      style.backgroundColor = '#52c41a';
+    } else if (event.resource?.type === 'dynamic') {
+      style.backgroundColor = '#faad14';
+    }
+
+    return { style };
+  }, []);
+
   return (
     <div style={{ padding: '1rem' }}>
       <Title level={2}>Tasks Calendar</Title>
@@ -203,6 +222,7 @@ const CalendarPage: FC = () => {
           onNavigate={handleNavigate}
           views={['month', 'week']}
           onSelectEvent={handleSelectEvent}
+          eventPropGetter={eventStyleGetter}
         />
       )}
 
