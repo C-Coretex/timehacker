@@ -10,9 +10,9 @@ public class CategoryFixedTaskConfiguration : IEntityTypeConfiguration<CategoryF
 
         builder.HasOne(x => x.FixedTask).WithMany(x => x.CategoryFixedTasks)
                .HasForeignKey(x => x.FixedTaskId).HasPrincipalKey(x => x.Id)
-               .OnDelete(DeleteBehavior.ClientCascade);
+               .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(x => x.Category).WithMany(x => x.CategoryFixedTasks)
                .HasForeignKey(x => x.CategoryId).HasPrincipalKey(x => x.Id)
-               .OnDelete(DeleteBehavior.ClientCascade);
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -27,7 +27,7 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
 
     public async Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated)
     {
-        var scheduleEntity = await scheduleEntityRepository.GetByIdAsync(id);
+        var scheduleEntity = await scheduleEntityRepository.GetByIdAsync(id, asNoTracking: false);
         if (scheduleEntity == null)
             return;
 
@@ -39,6 +39,7 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
             return;
 
         scheduleEntity.LastEntityCreated = entityCreated;
-        await scheduleEntityRepository.UpdateAndSaveAsync(scheduleEntity);
+
+        await scheduleEntityRepository.SaveChangesAsync();
     }
 }

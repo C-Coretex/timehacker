@@ -15,6 +15,6 @@ public class CategoryConfiguration : UserScopedEntityConfigurationBase<Category>
 
         builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.Category)
             .HasForeignKey<Category>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

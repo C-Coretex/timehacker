@@ -1,4 +1,5 @@
-﻿using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
+﻿using System.Text.Json.Nodes;
+using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
 namespace TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 
@@ -8,22 +9,25 @@ public class InputRepeatingEntityTypeConverter : JsonConverter<IInputRepeatingEn
     {
         using var doc = JsonDocument.ParseValue(ref reader);
 
-    if (!doc.RootElement.TryGetProperty(nameof(IInputRepeatingEntityType.EntityType), out var typeProp))
-        throw new JsonException("Missing 'type' discriminator");
+        if (!doc.RootElement.TryGetProperty(nameof(IInputRepeatingEntityType.EntityType), out var typeProp))
+            throw new JsonException("Missing 'type' discriminator");
 
-    var typeString = typeProp.GetString()!;
-    var typeEnum = Enum.Parse<RepeatingEntityTypeEnum>(typeString);
+        var typeString = typeProp.GetString()!;
+        var typeEnum = Enum.Parse<RepeatingEntityTypeEnum>(typeString);
 
-    var json = doc.RootElement.GetRawText();
+        // Parse as JsonNode and remove the EntityType property to avoid deserializing it
+        var jsonNode = JsonNode.Parse(doc.RootElement.GetRawText())!.AsObject();
+        jsonNode.Remove(nameof(IInputRepeatingEntityType.EntityType));
+        var json = jsonNode.ToJsonString();
 
-    return typeEnum switch
-    {
-        RepeatingEntityTypeEnum.DayRepeatingEntity => JsonSerializer.Deserialize<InputDayRepeatingEntityModel>(json, options),
-        RepeatingEntityTypeEnum.WeekRepeatingEntity => JsonSerializer.Deserialize<InputWeekRepeatingEntityModel>(json, options),
-        RepeatingEntityTypeEnum.MonthRepeatingEntity => JsonSerializer.Deserialize<InputMonthRepeatingEntityModel>(json, options),
-        RepeatingEntityTypeEnum.YearRepeatingEntity => JsonSerializer.Deserialize<InputYearRepeatingEntityModel>(json, options),
-        _ => throw new JsonException($"Unknown type: {typeString}")
-    };
+        return typeEnum switch
+        {
+            RepeatingEntityTypeEnum.DayRepeatingEntity => JsonSerializer.Deserialize<InputDayRepeatingEntityModel>(json, options),
+            RepeatingEntityTypeEnum.WeekRepeatingEntity => JsonSerializer.Deserialize<InputWeekRepeatingEntityModel>(json, options),
+            RepeatingEntityTypeEnum.MonthRepeatingEntity => JsonSerializer.Deserialize<InputMonthRepeatingEntityModel>(json, options),
+            RepeatingEntityTypeEnum.YearRepeatingEntity => JsonSerializer.Deserialize<InputYearRepeatingEntityModel>(json, options),
+            _ => throw new JsonException($"Unknown type: {typeString}")
+        };
     }
 
     public override void Write(Utf8JsonWriter writer, IInputRepeatingEntityType value, JsonSerializerOptions options)

@@ -21,6 +21,6 @@ public class FixedTaskConfiguration : UserScopedEntityConfigurationBase<FixedTas
 
         builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.FixedTask)
             .HasForeignKey<FixedTask>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

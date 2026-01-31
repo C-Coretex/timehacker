@@ -4,7 +4,7 @@ public class DayRepeatingEntity: IRepeatingEntityType
 {
     private int _daysCountToRepeat;
 
-    private int DaysCountToRepeat
+    public int DaysCountToRepeat
     {
         get => _daysCountToRepeat;
         set

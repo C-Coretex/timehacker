@@ -10,9 +10,9 @@ public class TagFixedTaskConfiguration : IEntityTypeConfiguration<TagFixedTask>
 
         builder.HasOne(x => x.Tag).WithMany(x => x.TagFixedTasks)
             .HasForeignKey(x => x.TagId).HasPrincipalKey(x => x.Id)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(x => x.Task).WithMany(x => x.TagFixedTasks)
             .HasForeignKey(x => x.TaskId).HasPrincipalKey(x => x.Id)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

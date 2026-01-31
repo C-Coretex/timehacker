@@ -10,6 +10,8 @@ import {
     type FixedTaskReturnModel,
     type InputFixedTask,
 } from '../api/fixedTasks';
+
+export { postNewScheduleForTask } from '../api/fixedTasks';
 import type { FixedTaskDisplayModel } from '../types';
 import api from '../api/api';
 
@@ -41,8 +43,9 @@ const useFixedTasks = () => {
         }
     }, []);
 
-    const createTask = useCallback(async (task: InputFixedTask) => {
-        await createFixedTask(task);
+    /** Returns the new task id (Guid) when creating. */
+    const createTask = useCallback(async (task: InputFixedTask): Promise<string> => {
+        return await createFixedTask(task);
     }, []);
 
     const updateTask = useCallback(async (id: string, task: InputFixedTask) => {

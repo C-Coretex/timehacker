@@ -9,5 +9,5 @@ public interface IDynamicTaskAppService
     Task<DynamicTaskDto?> GetByIdAsync(Guid id);
     public Task UpdateAsync(DynamicTaskDto task);
     public Task DeleteAsync(Guid id);
-    public Task AddAsync(DynamicTaskDto task);
+    public Task<Guid> AddAsync(DynamicTaskDto task);
 }

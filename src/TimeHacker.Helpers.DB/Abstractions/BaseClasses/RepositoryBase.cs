@@ -13,14 +13,14 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     where TModel : class, IDbEntity
     where TDbContext : DbContextBase<TDbContext>
 {
-    private static readonly Lazy<Expression<Func<TModel, DateTime>>?> UpdatedTimestampSelector = new(() =>
+    private static readonly Lazy<Expression<Func<TModel, DateTime?>>?> UpdatedTimestampSelector = new(() =>
     {
         var isUpdatable = typeof(IUpdatable).IsAssignableFrom(typeof(TModel));
         if (!isUpdatable) return null;
 
         var param = Expression.Parameter(typeof(TModel), "x");
         var updatedProp = Expression.Property(param, nameof(IUpdatable.UpdatedTimestamp));
-        return (Expression<Func<TModel, DateTime>>)Expression.Lambda(updatedProp, param);
+        return (Expression<Func<TModel, DateTime?>>)Expression.Lambda(updatedProp, param);
     });
 
     protected TDbContext DbContext = dbContext;

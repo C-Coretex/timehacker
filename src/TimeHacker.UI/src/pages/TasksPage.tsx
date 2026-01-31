@@ -4,9 +4,12 @@ import { Button, Modal, notification, Table, Tabs, Typography } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
-import useFixedTasks from '../hooks/useFixedTasks';
+import useFixedTasks, { postNewScheduleForTask } from '../hooks/useFixedTasks';
 import useDynamicTasks from '../hooks/useDynamicTasks';
-import TaskFormModal, { type FixedTaskFormData } from '../components/TaskFormModal';
+import TaskFormModal, {
+    type FixedTaskFormData,
+    type ScheduleFormPayload,
+} from '../components/TaskFormModal';
 import DynamicTaskFormModal from '../components/DynamicTaskFormModal';
 import type { FixedTaskDisplayModel } from '../types';
 import type { DynamicTaskReturnModel } from '../api/types';
@@ -165,7 +168,7 @@ const TasksPage: FC = () => {
   ];
 
   const handleSaveFixedTask = useCallback(
-    async (data: FixedTaskFormData, id?: string) => {
+    async (data: FixedTaskFormData, id?: string, schedule?: ScheduleFormPayload) => {
       try {
         const payload = {
           name: data.name,
@@ -178,7 +181,14 @@ const TasksPage: FC = () => {
           await updateFixedTask(id, payload);
           notification.success({ message: 'Success', description: 'Fixed task updated!' });
         } else {
-          await createFixedTask(payload);
+          const newId = await createFixedTask(payload);
+          if (schedule) {
+            await postNewScheduleForTask({
+              parentEntityId: newId,
+              repeatingEntityType: schedule.repeatingEntityType,
+              endsOnModel: schedule.endsOnModel ?? undefined,
+            });
+          }
           notification.success({ message: 'Success', description: 'Fixed task added!' });
         }
         await fetchFixedTasks();

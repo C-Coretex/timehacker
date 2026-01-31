@@ -9,5 +9,5 @@ public interface IFixedTaskAppService
     Task<FixedTaskDto?> GetByIdAsync(Guid id);
     Task UpdateAsync(FixedTaskDto task);
     Task DeleteAsync(Guid id);
-    Task AddAsync(FixedTaskDto task);
+    Task<Guid> AddAsync(FixedTaskDto task);
 }

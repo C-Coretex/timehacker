@@ -12,12 +12,12 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
         return dynamicTaskRepository.GetAll().Select(DynamicTaskDto.Selector).AsAsyncEnumerable();
     }
 
-    public async Task AddAsync(DynamicTaskDto task)
+    public async Task<Guid> AddAsync(DynamicTaskDto task)
     {
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        await dynamicTaskRepository.AddAndSaveAsync(task.GetEntity());
+        return (await dynamicTaskRepository.AddAndSaveAsync(task.GetEntity())).Id;
     }
 
     public async Task UpdateAsync(DynamicTaskDto task)

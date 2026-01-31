@@ -11,7 +11,7 @@ public class ScheduledCategoryConfiguration : UserScopedEntityConfigurationBase<
 
         builder.HasOne(x => x.ScheduleSnapshot).WithMany(x => x.ScheduledCategories)
                .HasForeignKey(x => new { x.UserId, x.Date }).HasPrincipalKey(x => new { x.UserId, x.Date })
-               .OnDelete(DeleteBehavior.ClientCascade);
+               .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.Color).IsRequired().HasConversion(
             v => v.ToArgb(),
@@ -20,6 +20,6 @@ public class ScheduledCategoryConfiguration : UserScopedEntityConfigurationBase<
 
         builder.HasOne(x => x.ScheduleEntity).WithMany(x => x.ScheduledCategories)
                 .HasForeignKey(x => x.ParentScheduleEntity).HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.ClientCascade);
+                .OnDelete(DeleteBehavior.Cascade);
     }
 }

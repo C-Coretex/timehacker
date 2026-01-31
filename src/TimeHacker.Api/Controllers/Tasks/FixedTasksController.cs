@@ -30,14 +30,14 @@ public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : Co
         return TypedResults.Ok(data);
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [HttpPost("Add")]
-    public async Task<Ok> Add([FromBody] InputFixedTaskModel inputFixedTaskModel)
+    public async Task<Ok<Guid>> Add([FromBody] InputFixedTaskModel inputFixedTaskModel)
     {
         var fixedTaskDto = inputFixedTaskModel.CreateFixedTaskDto();
-        await fixedTaskAppService.AddAsync(fixedTaskDto);
+        var id = await fixedTaskAppService.AddAsync(fixedTaskDto);
 
-        return TypedResults.Ok();
+        return TypedResults.Ok(id);
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]

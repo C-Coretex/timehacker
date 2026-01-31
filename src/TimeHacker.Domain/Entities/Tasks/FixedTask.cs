@@ -19,5 +19,16 @@ public class FixedTask : UserScopedEntityBase, ITask
     public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
     public virtual ICollection<TagFixedTask> TagFixedTasks { get; set; } = [];
 
-    public FixedTask ShallowCopy() => (FixedTask)MemberwiseClone();
+    public FixedTask ShallowCopy() => new()
+    {
+        Id = Id,
+        UserId = UserId,
+
+        ScheduleEntityId = ScheduleEntityId,
+        Name = Name,
+        Description = Description,
+        Priority = Priority,
+        StartTimestamp = StartTimestamp,
+        EndTimestamp = EndTimestamp
+    };
 }

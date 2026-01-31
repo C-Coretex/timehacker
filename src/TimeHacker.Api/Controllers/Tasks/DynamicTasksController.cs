@@ -30,14 +30,14 @@ public class DynamicTasksController(IDynamicTaskAppService dynamicTaskAppService
         return TypedResults.Ok(data);
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [HttpPost("Add")]
-    public async Task<Ok> Add([FromBody] InputDynamicTaskModel inputDynamicTaskModel)
+    public async Task<Ok<Guid>> Add([FromBody] InputDynamicTaskModel inputDynamicTaskModel)
     {
         var dynamicTask = inputDynamicTaskModel.CreateDynamicTaskDto();
-        await dynamicTaskAppService.AddAsync(dynamicTask);
+        var id = await dynamicTaskAppService.AddAsync(dynamicTask);
 
-        return TypedResults.Ok();
+        return TypedResults.Ok(id);
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]

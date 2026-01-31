@@ -10,9 +10,9 @@ public class TagDynamicTaskConfiguration : IEntityTypeConfiguration<TagDynamicTa
 
         builder.HasOne(x => x.Tag).WithMany(x => x.TagDynamicTasks)
             .HasForeignKey(x => x.TagId).HasPrincipalKey(x => x.Id)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(x => x.Task).WithMany(x => x.TagDynamicTasks)
             .HasForeignKey(x => x.TaskId).HasPrincipalKey(x => x.Id)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

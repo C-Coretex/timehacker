@@ -30,14 +30,14 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
         return TypedResults.Ok(data);
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [HttpPost("Add")]
-    public async Task<Ok> Add([FromBody] InputCategoryModel inputCategoryModel)
+    public async Task<Ok<Guid>> Add([FromBody] InputCategoryModel inputCategoryModel)
     {
         var category = inputCategoryModel.CreateCategory();
-        await categoryService.AddAsync(category);
+        var id = await categoryService.AddAsync(category);
 
-        return TypedResults.Ok();
+        return TypedResults.Ok(id);
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -11,9 +11,9 @@ public class CategoryDynamicTaskConfiguration : IEntityTypeConfiguration<Categor
 
         builder.HasOne(x => x.DynamicTask).WithMany(x => x.CategoryDynamicTasks)
                .HasForeignKey(x => x.DynamicTaskId).HasPrincipalKey(x => x.Id)
-               .OnDelete(DeleteBehavior.ClientCascade);
+               .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(x => x.Category).WithMany(x => x.CategoryDynamicTasks)
                .HasForeignKey(x => x.CategoryId).HasPrincipalKey(x => x.Id)
-               .OnDelete(DeleteBehavior.ClientCascade);
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

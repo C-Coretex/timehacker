@@ -9,9 +9,12 @@ public class CategoryService(ICategoryRepository categoryRepository)
 {
     public IAsyncEnumerable<CategoryDto> GetAll() => categoryRepository.GetAll(true).Select(CategoryDto.Selector).AsAsyncEnumerable();
 
-    public Task AddAsync(CategoryDto categoryDto)
+    public async Task<Guid> AddAsync(CategoryDto categoryDto)
     {
-        return categoryRepository.AddAndSaveAsync(categoryDto.GetEntity());
+        if (categoryDto == null)
+            throw new NotProvidedException(nameof(categoryDto));
+
+        return (await categoryRepository.AddAndSaveAsync(categoryDto.GetEntity())).Id;
     }
 
     public async Task UpdateAsync(CategoryDto categoryDto)

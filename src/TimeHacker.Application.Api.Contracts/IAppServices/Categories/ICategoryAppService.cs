@@ -8,5 +8,5 @@ public interface ICategoryAppService
     Task<CategoryDto?> GetByIdAsync(Guid id);
     Task UpdateAsync(CategoryDto task);
     Task DeleteAsync(Guid id);
-    Task AddAsync(CategoryDto task);
+    Task<Guid> AddAsync(CategoryDto task);
 }

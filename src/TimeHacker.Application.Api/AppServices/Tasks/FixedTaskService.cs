@@ -9,12 +9,12 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository)
 {
     public IAsyncEnumerable<FixedTaskDto> GetAll() => fixedTaskRepository.GetAll().Select(FixedTaskDto.Selector).AsAsyncEnumerable();
 
-    public Task AddAsync(FixedTaskDto task)
+    public async Task<Guid> AddAsync(FixedTaskDto task)
     {
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        return fixedTaskRepository.AddAndSaveAsync(task.GetEntity());
+        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity())).Id;
     }
 
     public async Task UpdateAsync(FixedTaskDto task)

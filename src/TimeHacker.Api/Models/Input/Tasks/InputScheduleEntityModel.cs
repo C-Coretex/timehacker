@@ -8,8 +8,6 @@ namespace TimeHacker.Api.Models.Input.Tasks;
 public record InputScheduleEntityModel
 {
     [Required]
-    public ScheduleEntityParentEnum ScheduleEntityParentEnum { get; set; }
-    [Required]
     public Guid ParentEntityId { get; set; }
     [Required]
     public required IInputRepeatingEntityType RepeatingEntityType { get; set; }
@@ -18,6 +16,6 @@ public record InputScheduleEntityModel
     public ScheduleEntityCreateDto CreateDto()
     {
         var repeatingEntityDto = new RepeatingEntityDto(RepeatingEntityType.EntityType, RepeatingEntityType.CreateEntity());
-        return new ScheduleEntityCreateDto(ScheduleEntityParentEnum, ParentEntityId, repeatingEntityDto, EndsOnModel);
+        return new ScheduleEntityCreateDto(ScheduleEntityParentEnum.FixedTask, ParentEntityId, repeatingEntityDto, EndsOnModel);
     }
 }
