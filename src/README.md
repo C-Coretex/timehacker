@@ -1,5 +1,7 @@
 # TimeHacker Backend - Developer Guide
 
+> **Note:** For frontend documentation, see [TimeHacker.UI/README.md](TimeHacker.UI/README.md)
+
 ## Architecture
 
 Clean Architecture with 4 layers:
