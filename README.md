@@ -10,3 +10,10 @@ Stack:
 - React
 - Docker
 - PostgreSQL
+  
+---
+### Backend readme:
+[src/README.md](src/README.md)
+
+### Frontend readme:
+[src/TimeHacker.UI/README.md](src/TimeHacker.UI/README.md)
