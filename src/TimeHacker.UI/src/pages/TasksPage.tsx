@@ -11,9 +11,7 @@ import TaskFormModal, {
     type ScheduleFormPayload,
 } from '../components/TaskFormModal';
 import DynamicTaskFormModal from '../components/DynamicTaskFormModal';
-import type { FixedTaskDisplayModel } from '../types';
-import type { DynamicTaskReturnModel } from '../api/types';
-import type { InputDynamicTask } from '../api/types';
+import type { FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
 
 const { Title } = Typography;
 

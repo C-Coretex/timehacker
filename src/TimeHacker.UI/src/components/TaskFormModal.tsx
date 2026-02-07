@@ -1,7 +1,7 @@
 // src/components/TaskFormModal.tsx
 import React, { useEffect } from 'react';
 import type { FC } from 'react';
-import { Modal, Form, Input, InputNumber, DatePicker, Checkbox, Select, Collapse } from 'antd';
+import { Modal, Form, Input, InputNumber, DatePicker, Checkbox, Select, Collapse, Alert } from 'antd';
 import moment from 'moment';
 import type {
     FixedTaskFormData,
@@ -161,6 +161,16 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                 >
                     <DatePicker showTime format="YYYY-MM-DD HH:mm" />
                 </Form.Item>
+
+                {!isCreate && (
+                    <Alert
+                        type="info"
+                        message="Schedule Information"
+                        description="If this task has a recurring schedule, it cannot be viewed or modified here. Schedules are set only during task creation."
+                        showIcon
+                        style={{ marginBottom: 16 }}
+                    />
+                )}
 
                 {isCreate && (
                     <>

@@ -12,7 +12,7 @@ import {
 } from '../api/fixedTasks';
 
 export { postNewScheduleForTask } from '../api/fixedTasks';
-import type { FixedTaskDisplayModel } from '../types';
+import type { FixedTaskDisplayModel } from '../api/types';
 import api from '../api/api';
 
 const useFixedTasks = () => {
