@@ -33,7 +33,7 @@ public class CategoryService(ICategoryRepository categoryRepository)
 
     public async Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await categoryRepository.GetAll(true).FirstAsync(x => x.Id == id, cancellationToken);
-        return CategoryDto.Create(entity);
+        var entity = await categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return entity != null ? CategoryDto.Create(entity) : null;
     }
 }

@@ -69,6 +69,54 @@ public class ScheduleEntityAppServiceTests
         });
     }
 
+    [Fact]
+    [Trait("Save", "Should throw on null repeating entity")]
+    public async Task Save_ShouldThrowOnNullRepeatingEntity()
+    {
+        var fixedTask = _fixedTasks.First(x => x.UserId == _userId);
+        var createDto = new ScheduleEntityCreateDto(
+            ScheduleEntityParentEnum.FixedTask,
+            fixedTask.Id,
+            null!); // Null RepeatingEntity
+
+        await Assert.ThrowsAnyAsync<Exception>(() =>
+            _scheduleEntityAppService.Save(createDto));
+    }
+
+    [Fact]
+    [Trait("Save", "Should respect user scoping")]
+    public async Task Save_ShouldRespectUserScoping()
+    {
+        var otherUserTask = _fixedTasks.First(x => x.UserId != _userId);
+        var createDto = new ScheduleEntityCreateDto(
+            ScheduleEntityParentEnum.FixedTask,
+            otherUserTask.Id,
+            new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1)));
+
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            _scheduleEntityAppService.Save(createDto));
+    }
+
+    [Fact]
+    [Trait("Save", "Should update schedule entity ID on parent")]
+    public async Task Save_ShouldUpdateScheduleEntityIdOnParent()
+    {
+        var fixedTask = _fixedTasks.First(x => x.UserId == _userId && x.ScheduleEntityId == null);
+        var originalScheduleEntityId = fixedTask.ScheduleEntityId;
+
+        var createDto = new ScheduleEntityCreateDto(
+            ScheduleEntityParentEnum.FixedTask,
+            fixedTask.Id,
+            new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1)));
+
+        var result = await _scheduleEntityAppService.Save(createDto);
+
+        result.Should().NotBeNull();
+        var updatedTask = _fixedTasks.First(x => x.Id == fixedTask.Id);
+        updatedTask.ScheduleEntityId.Should().NotBeNull();
+        updatedTask.ScheduleEntityId.Should().Be(result.Id.Value);
+    }
+
 
     #region Mock helpers
 
@@ -106,7 +154,7 @@ public class ScheduleEntityAppServiceTests
             }
         ];
 
-        _scheduleEntityRepository.As<IUserScopedRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduledEntities);
+        _scheduleEntityRepository.As<IUserScopedRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduledEntities, userId);
 
 
         _fixedTasks =
@@ -154,7 +202,7 @@ public class ScheduleEntityAppServiceTests
             }
         ];
 
-        _fixedTasksRepository.As<IUserScopedRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
+        _fixedTasksRepository.As<IUserScopedRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks, userId);
 
         _fixedTasksRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<FixedTask, bool>>>(), It.IsAny<Expression<Func<FixedTask, Guid?>>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .Callback<Expression<Func<FixedTask, bool>>, Expression<Func<FixedTask, Guid?>>, Guid?, CancellationToken>((predicate, _, value, _) =>
@@ -198,7 +246,7 @@ public class ScheduleEntityAppServiceTests
             }
         ];
 
-        _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories);
+        _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories, userId);
         _categoriesRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<Expression<Func<Category, Guid?>>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .Callback<Expression<Func<Category, bool>>, Expression<Func<Category, Guid?>>, Guid?, CancellationToken>((predicate, _, value, _) =>
             {

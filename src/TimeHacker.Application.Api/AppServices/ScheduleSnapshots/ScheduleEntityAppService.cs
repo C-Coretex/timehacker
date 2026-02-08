@@ -15,6 +15,9 @@ public class ScheduleEntityAppService(
 {
     public async Task<ScheduleEntityDto> Save(ScheduleEntityCreateDto scheduleEntityCreateDto, CancellationToken cancellationToken = default)
     {
+        if (scheduleEntityCreateDto.RepeatingEntityModel == null)
+            throw new NotProvidedException(nameof(scheduleEntityCreateDto.RepeatingEntityModel));
+
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)
         {
             case ScheduleEntityParentEnum.FixedTask:

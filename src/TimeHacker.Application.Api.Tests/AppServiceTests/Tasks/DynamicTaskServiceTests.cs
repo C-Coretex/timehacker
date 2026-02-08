@@ -53,6 +53,53 @@ public class DynamicTaskAppServiceTests
     }
 
     [Fact]
+    [Trait("UpdateAsync", "Should call update only once")]
+    public async Task UpdateAsync_ShouldCallUpdateOnce()
+    {
+        var taskToUpdate = _dynamicTasks.First(x => x.UserId == _userId);
+        var updateDto = new DynamicTaskDto
+        {
+            Id = taskToUpdate.Id,
+            Name = "Updated Name",
+            Priority = 2,
+            MinTimeToFinish = new TimeSpan(0, 20, 0),
+            MaxTimeToFinish = new TimeSpan(1, 30, 0),
+            OptimalTimeToFinish = new TimeSpan(0, 50, 0)
+        };
+
+        await _dynamicTaskAppService.UpdateAsync(updateDto);
+
+        _dynamicTasksRepository.Verify(
+            x => x.UpdateAndSaveAsync(It.IsAny<DynamicTask>(), It.IsAny<CancellationToken>()),
+            Times.Once,
+            "UpdateAndSaveAsync should be called exactly once, but duplicate calls detected (bug at lines 29-30 in DynamicTaskService)");
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should not double update entity")]
+    public async Task UpdateAsync_ShouldNotDoubleUpdateEntity()
+    {
+        var taskToUpdate = _dynamicTasks.First(x => x.UserId == _userId);
+        var originalName = taskToUpdate.Name;
+
+        var updateDto = new DynamicTaskDto
+        {
+            Id = taskToUpdate.Id,
+            Name = "Updated Name Once",
+            Priority = 3
+        };
+
+        await _dynamicTaskAppService.UpdateAsync(updateDto);
+
+        var updatedTask = _dynamicTasks.First(x => x.Id == taskToUpdate.Id);
+        updatedTask.Name.Should().Be("Updated Name Once");
+        updatedTask.Priority.Should().Be(3);
+
+        // Verify the task list doesn't have duplicates or corruption from double update
+        _dynamicTasks.Count(x => x.Id == taskToUpdate.Id).Should().Be(1);
+    }
+
+    [Fact]
     [Trait("DeleteAndSaveAsync", "Should delete entry")]
     public async Task DeleteAsync_ShouldDeleteEntry()
     {
@@ -80,6 +127,31 @@ public class DynamicTaskAppServiceTests
         var result = await _dynamicTaskAppService.GetByIdAsync(id);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
+    }
+
+    // Validation Tests
+    [Fact]
+    [Trait("AddAsync", "Should throw on null input")]
+    public async Task AddAsync_ShouldThrowNotProvidedException_WhenNullInput()
+    {
+        await Assert.ThrowsAsync<NotProvidedException>(() =>
+            _dynamicTaskAppService.AddAsync(null!));
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should throw on null input")]
+    public async Task UpdateAsync_ShouldThrowNotProvidedException_WhenNullInput()
+    {
+        await Assert.ThrowsAsync<NotProvidedException>(() =>
+            _dynamicTaskAppService.UpdateAsync(null!));
+    }
+
+    [Fact]
+    [Trait("GetByIdAsync", "Should return null for non-existent ID")]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenNonExistentId()
+    {
+        var result = await _dynamicTaskAppService.GetByIdAsync(Guid.NewGuid());
+        result.Should().BeNull();
     }
 
     #region Mock helpers

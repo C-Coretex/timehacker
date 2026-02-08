@@ -26,8 +26,7 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
             throw new NotProvidedException(nameof(task));
 
         var entity = await dynamicTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
-        entity = await dynamicTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);
-        await dynamicTaskRepository.UpdateAndSaveAsync(entity, cancellationToken);
+        await dynamicTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

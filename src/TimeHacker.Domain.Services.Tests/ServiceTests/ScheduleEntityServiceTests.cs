@@ -141,9 +141,59 @@ public class ScheduleEntityServiceTests
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
             await _scheduleEntityService.UpdateLastEntityCreated(
-                _scheduledEntities.First(x => x.UserId == _userId).Id, 
+                _scheduledEntities.First(x => x.UserId == _userId).Id,
                 DateOnly.FromDateTime(DateTime.Now.AddDays(1)));
         });
+    }
+
+    [Fact]
+    [Trait("UpdateLastEntityCreated", "Should throw on invalid future date")]
+    public async Task UpdateLastEntityCreated_ShouldThrowOnFutureDate()
+    {
+        var entity = _scheduledEntities.First(x => x.UserId == _userId && x.RepeatingEntity != null);
+
+        // Try to set a date that doesn't match the repeating pattern (odd number of days, pattern requires even)
+        var invalidDate = DateOnly.FromDateTime(DateTime.Now.AddDays(101));
+
+        await Assert.ThrowsAsync<DataIsNotCorrectException>(async () =>
+        {
+            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate);
+        });
+    }
+
+    [Fact]
+    [Trait("UpdateLastEntityCreated", "Should set FirstEntityCreated when null")]
+    public async Task UpdateLastEntityCreated_ShouldSetFirstEntityCreatedWhenNull()
+    {
+        var entity = _scheduledEntities.First(x => x.UserId == _userId && x.RepeatingEntity != null);
+        entity.FirstEntityCreated = null;
+        entity.LastEntityCreated = null;
+
+        // Valid date according to the repeating pattern (2 days after CreatedTimestamp)
+        var validDate = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(2));
+
+        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, validDate);
+
+        var updated = _scheduledEntities.First(x => x.Id == entity.Id);
+        updated.FirstEntityCreated.Should().Be(validDate);
+        updated.LastEntityCreated.Should().Be(validDate);
+    }
+
+    [Fact]
+    [Trait("UpdateLastEntityCreated", "Should not update when date is earlier")]
+    public async Task UpdateLastEntityCreated_ShouldNotUpdateWhenLastEntityCreatedIsLater()
+    {
+        var entity = _scheduledEntities.First(x => x.UserId == _userId && x.RepeatingEntity != null);
+        var futureDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10));
+        entity.LastEntityCreated = futureDate;
+
+        // Try to update with an earlier date
+        var earlierDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
+
+        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, earlierDate);
+
+        var updated = _scheduledEntities.First(x => x.Id == entity.Id);
+        updated.LastEntityCreated.Should().Be(futureDate);
     }
 
 

@@ -11,4 +11,5 @@ global using TimeHacker.Domain.Models.EntityModels.Enums;
 global using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 global using TimeHacker.Domain.IServices;
 global using TimeHacker.Domain.Services.Services;
+global using TimeHacker.Domain.BusinessLogicExceptions;
 global using TimeHacker.Helpers.Tests.Mocks.Extensions;

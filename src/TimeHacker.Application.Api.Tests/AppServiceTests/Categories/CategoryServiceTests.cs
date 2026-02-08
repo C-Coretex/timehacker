@@ -62,8 +62,10 @@ public class CategoryServiceTests
     {
         var result = _categoryService.GetAll().ToBlockingEnumerable().ToList();
 
-        result.Count.Should().Be(_categories.Count);
-        result.Should().BeEquivalentTo(_categories.Select(CategoryDto.Create).ToList());
+        // Should only return categories owned by the current user (user-scoped)
+        var expectedCount = _categories.Count(c => c.UserId == _userId);
+        result.Count.Should().Be(expectedCount);
+        result.Should().BeEquivalentTo(_categories.Where(c => c.UserId == _userId).Select(CategoryDto.Create).ToList());
     }
 
     [Fact]
@@ -74,6 +76,101 @@ public class CategoryServiceTests
         var result = await _categoryService.GetByIdAsync(id);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
+    }
+
+    // Validation Tests
+    [Fact]
+    [Trait("AddAsync", "Should throw on null input")]
+    public async Task AddAsync_ShouldThrowNotProvidedException_WhenNullInput()
+    {
+        await Assert.ThrowsAsync<NotProvidedException>(() =>
+            _categoryService.AddAsync(null!));
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should throw on null input")]
+    public async Task UpdateAsync_ShouldThrowNotProvidedException_WhenNullInput()
+    {
+        await Assert.ThrowsAsync<NotProvidedException>(() =>
+            _categoryService.UpdateAsync(null!));
+    }
+
+    [Fact]
+    [Trait("GetByIdAsync", "Should return null for non-existent ID")]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenNonExistentId()
+    {
+        var nonExistentId = Guid.NewGuid();
+
+        var result = await _categoryService.GetByIdAsync(nonExistentId);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    [Trait("DeleteAsync", "Should handle non-existent ID")]
+    public async Task DeleteAsync_ShouldHandleNonExistentId()
+    {
+        var nonExistentId = Guid.NewGuid();
+
+        await _categoryService.DeleteAsync(nonExistentId);
+    }
+
+    // Security Tests
+    [Fact]
+    [Trait("GetAll", "Should only return user owned categories")]
+    public async Task GetAll_ShouldOnlyReturnUserOwnedCategories()
+    {
+        var userCategoryIds = _categories.Where(c => c.UserId == _userId).Select(c => c.Id).ToHashSet();
+
+        var result = _categoryService.GetAll().ToBlockingEnumerable().ToList();
+
+        result.Should().NotBeEmpty();
+        result.Should().OnlyContain(c => c.Id.HasValue && userCategoryIds.Contains(c.Id.Value));
+        result.Count.Should().Be(_categories.Count(c => c.UserId == _userId));
+    }
+
+    [Fact]
+    [Trait("GetByIdAsync", "Should return null when accessing other user category")]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenAccessingOtherUserCategory()
+    {
+        var otherUserCategory = _categories.First(x => x.UserId != _userId);
+
+        var result = await _categoryService.GetByIdAsync(otherUserCategory.Id);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should not update other user categories")]
+    public async Task UpdateAsync_ShouldNotUpdateOtherUserCategories()
+    {
+        var otherUserCategory = _categories.First(x => x.UserId != _userId);
+        var originalName = otherUserCategory.Name;
+
+        var updateDto = new CategoryDto(
+            otherUserCategory.Id,
+            null,
+            "Hacked Name",
+            "Hacked Description",
+            Color.Red);
+
+        await _categoryService.UpdateAsync(updateDto);
+
+        var unchangedCategory = _categories.First(x => x.Id == otherUserCategory.Id);
+        unchangedCategory.Name.Should().Be(originalName);
+        unchangedCategory.Name.Should().NotBe("Hacked Name");
+    }
+
+    [Fact]
+    [Trait("DeleteAsync", "Should not delete other user categories")]
+    public async Task DeleteAsync_ShouldNotDeleteOtherUserCategories()
+    {
+        var otherUserCategory = _categories.First(x => x.UserId != _userId);
+        var otherCategoryId = otherUserCategory.Id;
+
+        await _categoryService.DeleteAsync(otherCategoryId);
+
+        _categories.Should().Contain(x => x.Id == otherCategoryId);
     }
 
     #region Mock helpers
@@ -118,7 +215,7 @@ public class CategoryServiceTests
             }
         ];
 
-        _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories);
+        _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories, userId);
     }
 
     #endregion

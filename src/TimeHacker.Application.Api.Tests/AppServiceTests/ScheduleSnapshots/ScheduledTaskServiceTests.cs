@@ -33,6 +33,28 @@ public class ScheduledTaskAppServiceTests
         result!.Id.Should().Be(id);
     }
 
+    [Fact]
+    [Trait("GetBy", "Should return null for non-existent ID")]
+    public async Task GetBy_ShouldReturnNull_WhenNonExistentId()
+    {
+        var nonExistentId = Guid.NewGuid();
+
+        var result = await _scheduledTaskAppService.GetBy(nonExistentId);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    [Trait("GetBy", "Should respect user scoping")]
+    public async Task GetBy_ShouldRespectUserScoping()
+    {
+        var otherUserTask = _scheduledTasks.First(x => x.UserId != _userId);
+
+        var result = await _scheduledTaskAppService.GetBy(otherUserTask.Id);
+
+        result.Should().BeNull();
+    }
+
     #region Mock helpers
 
     private void SetupMocks(Guid userId)
@@ -78,7 +100,7 @@ public class ScheduledTaskAppServiceTests
             }
         ];
 
-        _scheduledTaskRepository.As<IUserScopedRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks);
+        _scheduledTaskRepository.As<IUserScopedRepositoryBase<ScheduledTask, Guid>>().SetupRepositoryMock(_scheduledTasks, userId);
     }
 
     #endregion

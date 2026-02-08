@@ -41,6 +41,10 @@ public class TaskService(
 
     public async IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        // Handle empty date list
+        if (dates == null || dates.Count == 0)
+            yield break;
+
         var fixedTasks = await fixedTaskRepository.GetAll()
                                                 .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
                                                 .OrderBy(ft => ft.StartTimestamp)

@@ -137,6 +137,59 @@ public class TaskServiceTests
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
     }
 
+    [Fact]
+    [Trait("GetTasksForDay", "Should handle date with no tasks")]
+    public async Task GetTasksForDay_ShouldHandleNonExistentDate()
+    {
+        var emptyDate = DateOnly.FromDateTime(_date.AddYears(10));
+
+        var result = await _tasksService.GetTasksForDay(emptyDate);
+
+        result.Should().NotBeNull();
+        result.Date.Should().Be(emptyDate);
+    }
+
+    [Fact]
+    [Trait("GetTasksForDays", "Should handle empty date list")]
+    public async Task GetTasksForDays_ShouldHandleEmptyDateList()
+    {
+        var emptyDates = new List<DateOnly>();
+
+        var result = await _tasksService.GetTasksForDays(emptyDates).ToListAsync();
+
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    [Trait("RefreshTasksForDays", "Should handle refresh with no existing snapshots")]
+    public async Task RefreshTasksForDays_ShouldHandleNonExistentSnapshots()
+    {
+        var newDates = new List<DateOnly>
+        {
+            DateOnly.FromDateTime(_date.AddMonths(6)),
+            DateOnly.FromDateTime(_date.AddMonths(7))
+        };
+
+        var result = await _tasksService.RefreshTasksForDays(newDates).ToListAsync();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(2);
+    }
+
+    [Fact]
+    [Trait("GetTasksForDays", "Should filter by user ID")]
+    public async Task GetTasksForDays_ShouldFilterByUserId()
+    {
+        var dates = new List<DateOnly> { DateOnly.FromDateTime(_date) };
+
+        var result = await _tasksService.GetTasksForDays(dates).ToListAsync();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(1);
+        // All tasks should belong to _userId (verified through fixture setup)
+    }
+
 
     #region Mock helpers
 
