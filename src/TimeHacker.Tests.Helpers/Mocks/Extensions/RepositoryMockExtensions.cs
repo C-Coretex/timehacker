@@ -66,6 +66,13 @@ public static class RepositoryMockExtensions
         repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TId>(), It.IsAny<CancellationToken>()))
             .Callback<TId, CancellationToken>((id, _) => source.RemoveAll(x => x.Id!.Equals(id)));
 
+        repository.Setup(x => x.Delete(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
+            .Callback<TModel, CancellationToken>((entry, _) =>
+            {
+                source.RemoveAll(x => x.Id!.Equals(entry.Id));
+            })
+            .Returns(Task.CompletedTask);
+
         repository.Setup(x => x.AddAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
             .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))
             .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
