@@ -4,9 +4,9 @@ namespace TimeHacker.Application.Api.Contracts.IAppServices.Categories;
 
 public interface ICategoryAppService
 {
-    IAsyncEnumerable<CategoryDto> GetAll();
-    Task<CategoryDto?> GetByIdAsync(Guid id);
-    Task UpdateAsync(CategoryDto task);
-    Task DeleteAsync(Guid id);
-    Task<Guid> AddAsync(CategoryDto task);
+    IAsyncEnumerable<CategoryDto> GetAll(CancellationToken cancellationToken = default);
+    Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task UpdateAsync(CategoryDto task, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Guid> AddAsync(CategoryDto task, CancellationToken cancellationToken = default);
 }

@@ -67,7 +67,7 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should return, save and return snapshot after first call")]
     public async Task GetTasksForDays_ShouldReturnSaveAndReturnSnapshotAfterFirstCall()
     {
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
+        var dates = new List<DateTime> { _date.AddDays(-1), _date, _date.AddDays(1) };
 
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
@@ -79,7 +79,7 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should refresh snapshot")]
     public async Task GetTasksForDays_ShouldRefreshSnapshot()
     {
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
+        var dates = new List<DateTime> { _date.AddDays(-1), _date, _date.AddDays(1) };
 
         var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
         var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
@@ -95,7 +95,7 @@ public class TaskServiceTests
     [Trait("GetTasksForDays", "Should add scheduled tasks")]
     public async Task GetTasksForDays_ShouldAddScheduledTasks()
     {
-        var dates = new List<DateTime> { DateTime.Now.Date.AddDays(-1), _date, DateTime.Now.Date.AddDays(1) };
+        var dates = new List<DateTime> { _date.AddDays(-1), _date, _date.AddDays(1) };
 
         var fixedTask = new FixedTask()
         {

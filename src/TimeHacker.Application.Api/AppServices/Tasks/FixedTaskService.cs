@@ -8,34 +8,34 @@ namespace TimeHacker.Application.Api.AppServices.Tasks;
 public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, IScheduleEntityRepository scheduleEntityRepository)
     : IFixedTaskAppService
 {
-    public IAsyncEnumerable<FixedTaskDto> GetAll() => fixedTaskRepository.GetAll().Select(FixedTaskDto.Selector).AsAsyncEnumerable();
+    public IAsyncEnumerable<FixedTaskDto> GetAll(CancellationToken cancellationToken = default) => fixedTaskRepository.GetAll().Select(FixedTaskDto.Selector).AsAsyncEnumerable();
 
-    public async Task<Guid> AddAsync(FixedTaskDto task)
+    public async Task<Guid> AddAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity())).Id;
+        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken)).Id;
     }
 
-    public async Task UpdateAsync(FixedTaskDto task)
+    public async Task UpdateAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        var entity = await fixedTaskRepository.GetByIdAsync(task.Id!.Value);
-        await fixedTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity));
+        var entity = await fixedTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
+        await fixedTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        await scheduleEntityRepository.DeleteBy(x => x.FixedTask != null && x.FixedTask.Id == id);
-        await fixedTaskRepository.DeleteAndSaveAsync(id);
+        await scheduleEntityRepository.DeleteBy(x => x.FixedTask != null && x.FixedTask.Id == id, cancellationToken);
+        await fixedTaskRepository.DeleteAndSaveAsync(id, cancellationToken);
     }
 
-    public async Task<FixedTaskDto?> GetByIdAsync(Guid id)
+    public async Task<FixedTaskDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await fixedTaskRepository.GetByIdAsync(id);
+        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
         return FixedTaskDto.Create(entity);
     }
 }

@@ -7,25 +7,25 @@ namespace TimeHacker.Application.Api.AppServices.Users;
 public class UserService(IUserRepository userRepository, UserAccessorBase userAccessorBase)
     : IUserAppService
 {
-    public async Task<UserDto?> GetCurrent()
+    public async Task<UserDto?> GetCurrent(CancellationToken cancellationToken = default)
     {
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        var entity = await userRepository.GetByIdAsync(userId);
+        var entity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken);
         return UserDto.Create(entity);
     }
 
-    public async Task UpdateAsync(UserDto user)
+    public async Task UpdateAsync(UserDto user, CancellationToken cancellationToken = default)
     {
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        var userEntity = await userRepository.GetByIdAsync(userId) ?? throw new UserDoesNotExistException();
+        var userEntity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken) ?? throw new UserDoesNotExistException();
         userEntity = user.GetEntity(userEntity);
 
-        await userRepository.UpdateAndSaveAsync(userEntity);
+        await userRepository.UpdateAndSaveAsync(userEntity, cancellationToken);
     }
 
-    public async Task DeleteAsync()
+    public async Task DeleteAsync(CancellationToken cancellationToken = default)
     {
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        await userRepository.DeleteAndSaveAsync(userId);
+        await userRepository.DeleteAndSaveAsync(userId, cancellationToken);
     }
 }

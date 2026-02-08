@@ -24,9 +24,9 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
         });
     }
 
-    public async Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated)
+    public async Task UpdateLastEntityCreated(Guid id, DateOnly entityCreated, CancellationToken cancellationToken = default)
     {
-        var scheduleEntity = await scheduleEntityRepository.GetByIdAsync(id, asNoTracking: false);
+        var scheduleEntity = await scheduleEntityRepository.GetByIdAsync(id, asNoTracking: false, cancellationToken);
         if (scheduleEntity == null)
             return;
 
@@ -41,6 +41,6 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
         if (scheduleEntity.FirstEntityCreated == null)
             scheduleEntity.FirstEntityCreated = scheduleEntity.LastEntityCreated;
 
-        await scheduleEntityRepository.SaveChangesAsync();
+        await scheduleEntityRepository.SaveChangesAsync(cancellationToken);
     }
 }

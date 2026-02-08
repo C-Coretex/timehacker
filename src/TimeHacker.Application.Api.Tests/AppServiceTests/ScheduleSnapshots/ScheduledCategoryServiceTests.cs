@@ -19,7 +19,7 @@ public class ScheduledCategoryServiceTests
     public ScheduledCategoryServiceTests()
     {
         var userAccessor = new UserAccessorBaseMock(_userId, true);
-
+        SetupMocks(_userId);
         _scheduledCategoryService = new ScheduledCategoryService(_scheduledCategoryRepository.Object, userAccessor);
     }
 

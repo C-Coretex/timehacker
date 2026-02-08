@@ -455,3 +455,5 @@ FodyWeavers.xsd
 !.vscode/settings.json
 
 **/TimeHacker.Application.UI/.env
+
+.claude/

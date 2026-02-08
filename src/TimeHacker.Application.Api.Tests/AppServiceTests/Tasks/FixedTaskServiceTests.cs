@@ -5,6 +5,7 @@ public class FixedTaskAppServiceTests
     #region Mocks
 
     private readonly Mock<IFixedTaskRepository> _fixedTasksRepository = new();
+    private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
 
     #endregion
 
@@ -18,7 +19,7 @@ public class FixedTaskAppServiceTests
     public FixedTaskAppServiceTests()
     {
         SetupMocks(_userId);
-        _fixedTaskAppService = new FixedTaskAppService(_fixedTasksRepository.Object);
+        _fixedTaskAppService = new FixedTaskAppService(_fixedTasksRepository.Object, _scheduleEntityRepository.Object);
     }
 
     #endregion

@@ -12,9 +12,9 @@ public class UsersController(IUserAppService userService) : ControllerBase
     [ProducesResponseType(typeof(UserReturnModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("GetCurrent")]
-    public async Task<Results<Ok<UserReturnModel>, NotFound>> GetCurrent()
+    public async Task<Results<Ok<UserReturnModel>, NotFound>> GetCurrent(CancellationToken cancellationToken = default)
     {
-        var user = await userService.GetCurrent();
+        var user = await userService.GetCurrent(cancellationToken);
         if (user == null)
             return TypedResults.NotFound();
 
@@ -24,19 +24,19 @@ public class UsersController(IUserAppService userService) : ControllerBase
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpPut("Update")]
-    public async Task<Ok> Update([FromBody] UserUpdateModel inputUserModel)
+    public async Task<Ok> Update([FromBody] UserUpdateModel inputUserModel, CancellationToken cancellationToken = default)
     {
         //TODO: service to DTO, InputModel remains
-        await userService.UpdateAsync(inputUserModel.ToDto());
+        await userService.UpdateAsync(inputUserModel.ToDto(), cancellationToken);
 
         return TypedResults.Ok();
     }
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpDelete("Delete")]
-    public async Task<Ok> Delete()
+    public async Task<Ok> Delete(CancellationToken cancellationToken = default)
     {
-        await userService.DeleteAsync();
+        await userService.DeleteAsync(cancellationToken);
 
         return TypedResults.Ok();
     }

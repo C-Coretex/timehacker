@@ -41,28 +41,32 @@ public class ScheduleEntityServiceTests
                 CreatedTimestamp = date,
                 ScheduledTasks = [new ScheduledTask() { Name = "" }],
                 ScheduledCategories = [new ScheduledCategory() { Name = "" }],
-                EndsOn = null
+                EndsOn = null,
+                FixedTask = new FixedTask() { UserId = _userId }
             },
 
             new()
             {
                 UserId = _userId,
                 CreatedTimestamp = date.AddDays(-1),
-                EndsOn = DateOnly.FromDateTime(date)
+                EndsOn = DateOnly.FromDateTime(date),
+                FixedTask = new FixedTask() { UserId = _userId }
             },
 
             new()
             {
                 UserId = _userId,
                 CreatedTimestamp = date.AddDays(-1).AddMinutes(10),
-                EndsOn = DateOnly.FromDateTime(date.AddDays(-1).AddMinutes(10))
+                EndsOn = DateOnly.FromDateTime(date.AddDays(-1).AddMinutes(10)),
+                FixedTask = new FixedTask() { UserId = _userId }
             },
 
             new()
             {
                 UserId = _userId,
                 CreatedTimestamp = date.AddDays(-2),
-                EndsOn = DateOnly.FromDateTime(date.AddDays(-2))
+                EndsOn = DateOnly.FromDateTime(date.AddDays(-2)),
+                FixedTask = new FixedTask() { UserId = _userId }
             },
 
             new()
@@ -71,21 +75,24 @@ public class ScheduleEntityServiceTests
                 CreatedTimestamp = date,
                 ScheduledTasks = [new ScheduledTask() { Name = "" }],
                 ScheduledCategories = [new ScheduledCategory() { Name = "" }],
-                EndsOn = null
+                EndsOn = null,
+                FixedTask = new FixedTask() { UserId = Guid.NewGuid() }
             },
 
             new()
             {
                 UserId = Guid.NewGuid(),
                 CreatedTimestamp = date.AddDays(-1),
-                EndsOn = DateOnly.FromDateTime(date)
+                EndsOn = DateOnly.FromDateTime(date),
+                FixedTask = new FixedTask() { UserId = Guid.NewGuid() }
             },
 
             new()
             {
                 UserId = Guid.NewGuid(),
                 CreatedTimestamp = date.AddDays(-2),
-                EndsOn = DateOnly.FromDateTime(date.AddDays(-2))
+                EndsOn = DateOnly.FromDateTime(date.AddDays(-2)),
+                FixedTask = new FixedTask() { UserId = Guid.NewGuid() }
             }
         ]);
 
@@ -93,7 +100,7 @@ public class ScheduleEntityServiceTests
         var actual = _scheduleEntityService.GetAllFrom(from).ToList();
         actual.Should().NotBeNull();
 
-        var expected = _scheduledEntities.Where(x => x.EndsOn == null || x.EndsOn >= from)
+        var expected = _scheduledEntities.Where(x => x.FixedTask != null && (x.EndsOn == null || x.EndsOn >= from))
             .ToList();
         actual.Count.Should().Be(expected.Count);
         actual.Should().BeEquivalentTo(expected);

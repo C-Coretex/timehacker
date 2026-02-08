@@ -12,6 +12,7 @@ public class ScheduleEntityTests
         {
             RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2)),
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(DateTime.Now.AddDays(1)) : null,
+            FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(DateTime.Now.AddDays(1)) : null,
             EndsOn = endsOn ? DateOnly.FromDateTime(DateTime.Now.AddDays(6)) : null,
             CreatedTimestamp = DateTime.Now
         };
@@ -68,6 +69,7 @@ public class ScheduleEntityTests
             RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.WeekRepeatingEntity, new WeekRepeatingEntity([DayOfWeekEnum.Tuesday, DayOfWeekEnum.Monday, DayOfWeekEnum.Friday])),
             CreatedTimestamp = monday,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(monday.AddDays(1)) : null,
+            FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(monday.AddDays(1)) : null,
             EndsOn = endsOn ? DateOnly.FromDateTime(monday.AddDays(8)) : null
         };
         var dateFrom = DateOnly.FromDateTime(monday);
@@ -126,6 +128,7 @@ public class ScheduleEntityTests
             RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.MonthRepeatingEntity, new MonthRepeatingEntity(12)),
             CreatedTimestamp = january,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(12)) : null,
+            FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(12)) : null,
             EndsOn = endsOn ? DateOnly.FromDateTime(january.AddMonths(8)) : null
         };
         var dateFrom = DateOnly.FromDateTime(january);
@@ -156,6 +159,7 @@ public class ScheduleEntityTests
             RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.MonthRepeatingEntity, new MonthRepeatingEntity((byte)(isLapYear ? 29 : 31))),
             CreatedTimestamp = january,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(31)) : null,
+            FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(31)) : null,
             EndsOn = endsOn ? DateOnly.FromDateTime(january.AddMonths(8)) : null
         };
         var dateFrom = DateOnly.FromDateTime(january);
@@ -211,6 +215,7 @@ public class ScheduleEntityTests
             RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.YearRepeatingEntity, new YearRepeatingEntity(isLapYear ? 366 : 200)),
             CreatedTimestamp = january,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddYears(1)) : null,
+            FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddYears(1)) : null,
             EndsOn = endsOn ? DateOnly.FromDateTime(january.AddYears(5)) : null
         };
         var dateFrom = DateOnly.FromDateTime(january);

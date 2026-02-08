@@ -4,7 +4,7 @@ namespace TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 
 public interface ITaskAppService
 {
-    Task<TasksForDayDto> GetTasksForDay(DateOnly date);
-    IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates);
-    IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates);
+    Task<TasksForDayDto> GetTasksForDay(DateOnly date, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates, CancellationToken cancellationToken = default);
 }

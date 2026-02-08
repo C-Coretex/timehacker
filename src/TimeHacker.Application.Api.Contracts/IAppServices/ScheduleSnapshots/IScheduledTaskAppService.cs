@@ -4,5 +4,5 @@ namespace TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 
 public interface IScheduledTaskAppService
 {
-    Task<ScheduledTaskDto?> GetBy(Guid id);
+    Task<ScheduledTaskDto?> GetBy(Guid id, CancellationToken cancellationToken = default);
 }
