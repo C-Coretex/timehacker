@@ -115,9 +115,10 @@ app.UseSession();
 
 app.UseCors("AllowFrontend");
 
-app.UseMiddleware<UserAccessorInitMiddleware>();
-
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<UserAccessorInitMiddleware>();
 
 app.MapIdentityApi<IdentityUser>();
 
