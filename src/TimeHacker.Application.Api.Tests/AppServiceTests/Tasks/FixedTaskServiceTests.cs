@@ -11,8 +11,8 @@ public class FixedTaskAppServiceTests
 
     #region Properties & constructor
 
-    private List<FixedTask> _fixedTasks;
-    private List<ScheduleEntity> _scheduleEntities;
+    private List<FixedTask> _fixedTasks = null!;
+    private List<ScheduleEntity> _scheduleEntities = null!;
 
     private readonly IFixedTaskAppService _fixedTaskAppService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -33,7 +33,7 @@ public class FixedTaskAppServiceTests
         {
             Name = "TestFixedTask1000"
         };
-        await _fixedTaskAppService.AddAsync(newEntry);
+        await _fixedTaskAppService.AddAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _fixedTasks.FirstOrDefault(x => x.Name == newEntry.Name);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
@@ -48,7 +48,7 @@ public class FixedTaskAppServiceTests
             Id = _fixedTasks.First(x => x.UserId == _userId).Id,
             Name = "TestFixedTask1000"
         };
-        await _fixedTaskAppService.UpdateAsync(newEntry);
+        await _fixedTaskAppService.UpdateAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _fixedTasks.FirstOrDefault(x => x.Id == newEntry.Id);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
@@ -59,7 +59,7 @@ public class FixedTaskAppServiceTests
     public async Task DeleteAsync_ShouldUpdateEntry()
     {
         var idToDelete = _fixedTasks.First(x => x.UserId == _userId).Id;
-        await _fixedTaskAppService.DeleteAsync(idToDelete);
+        await _fixedTaskAppService.DeleteAsync(idToDelete, TestContext.Current.CancellationToken);
         var result = _fixedTasks.FirstOrDefault(x => x.Id == idToDelete);
         result.Should().BeNull();
     }
@@ -89,7 +89,7 @@ public class FixedTaskAppServiceTests
         };
         _scheduleEntities.Add(scheduleEntity);
 
-        await _fixedTaskAppService.DeleteAsync(fixedTaskId);
+        await _fixedTaskAppService.DeleteAsync(fixedTaskId, TestContext.Current.CancellationToken);
 
         _fixedTasks.Should().NotContain(x => x.Id == fixedTaskId);
 
@@ -140,7 +140,7 @@ public class FixedTaskAppServiceTests
         _scheduleEntities.Add(scheduleEntity1);
         _scheduleEntities.Add(scheduleEntity2);
 
-        await _fixedTaskAppService.DeleteAsync(fixedTask1Id);
+        await _fixedTaskAppService.DeleteAsync(fixedTask1Id, TestContext.Current.CancellationToken);
 
         _scheduleEntities.Should().NotContain(x => x.FixedTask != null && x.FixedTask.Id == fixedTask1Id);
         _scheduleEntities.Should().Contain(x => x.FixedTask != null && x.FixedTask.Id == fixedTask2Id);
@@ -152,14 +152,14 @@ public class FixedTaskAppServiceTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        await _fixedTaskAppService.DeleteAsync(nonExistentId);
+        await _fixedTaskAppService.DeleteAsync(nonExistentId, TestContext.Current.CancellationToken);
     }
 
     [Fact]
     [Trait("GetAll", "Should return correct data")]
     public async Task GetAll_ShouldReturnCorrectData()
     {
-        var result = await _fixedTaskAppService.GetAll().ToListAsync();
+        var result = await _fixedTaskAppService.GetAll(TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result.Count.Should().Be(_fixedTasks.Count);
         result.Should().BeEquivalentTo(_fixedTasks.Select(FixedTaskDto.Create).ToList());
@@ -170,7 +170,7 @@ public class FixedTaskAppServiceTests
     public async Task GetByIdAsync_ShouldUpdateEntry()
     {
         var id = _fixedTasks.First(x => x.UserId == _userId).Id;
-        var result = await _fixedTaskAppService.GetByIdAsync(id);
+        var result = await _fixedTaskAppService.GetByIdAsync(id, TestContext.Current.CancellationToken);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
     }
@@ -181,7 +181,7 @@ public class FixedTaskAppServiceTests
     public async Task AddAsync_ShouldThrowNotProvidedException_WhenNullInput()
     {
         await Assert.ThrowsAsync<NotProvidedException>(() =>
-            _fixedTaskAppService.AddAsync(null!));
+            _fixedTaskAppService.AddAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -189,14 +189,14 @@ public class FixedTaskAppServiceTests
     public async Task UpdateAsync_ShouldThrowNotProvidedException_WhenNullInput()
     {
         await Assert.ThrowsAsync<NotProvidedException>(() =>
-            _fixedTaskAppService.UpdateAsync(null!));
+            _fixedTaskAppService.UpdateAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
     [Trait("GetByIdAsync", "Should return null for non-existent ID")]
     public async Task GetByIdAsync_ShouldReturnNull_WhenNonExistentId()
     {
-        var result = await _fixedTaskAppService.GetByIdAsync(Guid.NewGuid());
+        var result = await _fixedTaskAppService.GetByIdAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
         result.Should().BeNull();
     }
 

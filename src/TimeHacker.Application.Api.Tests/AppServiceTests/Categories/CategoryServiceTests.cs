@@ -12,7 +12,7 @@ public class CategoryServiceTests
 
     #region Properties & constructor
 
-    private List<Category> _categories;
+    private List<Category> _categories = null!;
 
     private readonly ICategoryAppService _categoryService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -29,7 +29,7 @@ public class CategoryServiceTests
     public async Task AddAsync_ShouldAddEntry()
     {
         var newEntry = new CategoryDto(null, null, "TestCategory1000", "", Color.AliceBlue);
-        await _categoryService.AddAsync(newEntry);
+        await _categoryService.AddAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Name == newEntry.Name);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
@@ -40,7 +40,7 @@ public class CategoryServiceTests
     public async Task UpdateAsync_ShouldUpdateEntry()
     {
         var newEntry = new CategoryDto(_categories.First(x => x.UserId == _userId).Id, null, "TestCategory1000", "", Color.AliceBlue);
-        await _categoryService.UpdateAsync(newEntry);
+        await _categoryService.UpdateAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
@@ -51,7 +51,7 @@ public class CategoryServiceTests
     public async Task DeleteAsync_ShouldUpdateEntry()
     {
         var idToDelete = _categories.First(x => x.UserId == _userId).Id;
-        await _categoryService.DeleteAsync(idToDelete);
+        await _categoryService.DeleteAsync(idToDelete, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Id == idToDelete);
         result.Should().BeNull();
     }
@@ -60,7 +60,7 @@ public class CategoryServiceTests
     [Trait("GetAll", "Should return correct data")]
     public void GetAll_ShouldReturnCorrectData()
     {
-        var result = _categoryService.GetAll().ToBlockingEnumerable().ToList();
+        var result = _categoryService.GetAll(TestContext.Current.CancellationToken).ToBlockingEnumerable(TestContext.Current.CancellationToken).ToList();
 
         // Should only return categories owned by the current user (user-scoped)
         var expectedCount = _categories.Count(c => c.UserId == _userId);
@@ -73,7 +73,7 @@ public class CategoryServiceTests
     public async Task GetByIdAsync_ShouldUpdateEntry()
     {
         var id = _categories.First(x => x.UserId == _userId).Id;
-        var result = await _categoryService.GetByIdAsync(id);
+        var result = await _categoryService.GetByIdAsync(id, TestContext.Current.CancellationToken);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
     }
@@ -84,7 +84,7 @@ public class CategoryServiceTests
     public async Task AddAsync_ShouldThrowNotProvidedException_WhenNullInput()
     {
         await Assert.ThrowsAsync<NotProvidedException>(() =>
-            _categoryService.AddAsync(null!));
+            _categoryService.AddAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class CategoryServiceTests
     public async Task UpdateAsync_ShouldThrowNotProvidedException_WhenNullInput()
     {
         await Assert.ThrowsAsync<NotProvidedException>(() =>
-            _categoryService.UpdateAsync(null!));
+            _categoryService.UpdateAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class CategoryServiceTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        var result = await _categoryService.GetByIdAsync(nonExistentId);
+        var result = await _categoryService.GetByIdAsync(nonExistentId, TestContext.Current.CancellationToken);
 
         result.Should().BeNull();
     }
@@ -112,7 +112,7 @@ public class CategoryServiceTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        await _categoryService.DeleteAsync(nonExistentId);
+        await _categoryService.DeleteAsync(nonExistentId, TestContext.Current.CancellationToken);
     }
 
     // Security Tests
@@ -122,7 +122,7 @@ public class CategoryServiceTests
     {
         var userCategoryIds = _categories.Where(c => c.UserId == _userId).Select(c => c.Id).ToHashSet();
 
-        var result = _categoryService.GetAll().ToBlockingEnumerable().ToList();
+        var result = _categoryService.GetAll(TestContext.Current.CancellationToken).ToBlockingEnumerable(TestContext.Current.CancellationToken).ToList();
 
         result.Should().NotBeEmpty();
         result.Should().OnlyContain(c => c.Id.HasValue && userCategoryIds.Contains(c.Id.Value));
@@ -135,7 +135,7 @@ public class CategoryServiceTests
     {
         var otherUserCategory = _categories.First(x => x.UserId != _userId);
 
-        var result = await _categoryService.GetByIdAsync(otherUserCategory.Id);
+        var result = await _categoryService.GetByIdAsync(otherUserCategory.Id, TestContext.Current.CancellationToken);
 
         result.Should().BeNull();
     }
@@ -154,7 +154,7 @@ public class CategoryServiceTests
             "Hacked Description",
             Color.Red);
 
-        await _categoryService.UpdateAsync(updateDto);
+        await _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
 
         var unchangedCategory = _categories.First(x => x.Id == otherUserCategory.Id);
         unchangedCategory.Name.Should().Be(originalName);
@@ -168,7 +168,7 @@ public class CategoryServiceTests
         var otherUserCategory = _categories.First(x => x.UserId != _userId);
         var otherCategoryId = otherUserCategory.Id;
 
-        await _categoryService.DeleteAsync(otherCategoryId);
+        await _categoryService.DeleteAsync(otherCategoryId, TestContext.Current.CancellationToken);
 
         _categories.Should().Contain(x => x.Id == otherCategoryId);
     }

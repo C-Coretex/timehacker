@@ -10,7 +10,7 @@ public class ScheduledTaskAppServiceTests
 
     #region Properties & constructor
 
-    private List<ScheduledTask> _scheduledTasks;
+    private List<ScheduledTask> _scheduledTasks = null!;
 
     private readonly IScheduledTaskAppService _scheduledTaskAppService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -28,7 +28,7 @@ public class ScheduledTaskAppServiceTests
     public async Task GetBy_ShouldReturnCorrectData()
     {
         var id = _scheduledTasks.First().Id;
-        var result = await _scheduledTaskAppService.GetBy(id);
+        var result = await _scheduledTaskAppService.GetBy(id, TestContext.Current.CancellationToken);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
     }
@@ -39,7 +39,7 @@ public class ScheduledTaskAppServiceTests
     {
         var nonExistentId = Guid.NewGuid();
 
-        var result = await _scheduledTaskAppService.GetBy(nonExistentId);
+        var result = await _scheduledTaskAppService.GetBy(nonExistentId, TestContext.Current.CancellationToken);
 
         result.Should().BeNull();
     }
@@ -50,7 +50,7 @@ public class ScheduledTaskAppServiceTests
     {
         var otherUserTask = _scheduledTasks.First(x => x.UserId != _userId);
 
-        var result = await _scheduledTaskAppService.GetBy(otherUserTask.Id);
+        var result = await _scheduledTaskAppService.GetBy(otherUserTask.Id, TestContext.Current.CancellationToken);
 
         result.Should().BeNull();
     }

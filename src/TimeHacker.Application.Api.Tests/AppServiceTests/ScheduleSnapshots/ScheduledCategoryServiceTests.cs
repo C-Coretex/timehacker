@@ -10,7 +10,7 @@ public class ScheduledCategoryServiceTests
 
     #region Properties & constructor
 
-    private List<ScheduledCategory> _scheduledCategories;
+    private List<ScheduledCategory> _scheduledCategories = null!;
 
     private readonly IScheduledCategoryAppService _scheduledCategoryService;
 

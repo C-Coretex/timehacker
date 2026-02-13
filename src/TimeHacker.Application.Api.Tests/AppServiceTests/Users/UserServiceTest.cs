@@ -10,7 +10,7 @@ public class UserServiceTest
 
     #region Properties & constructor
 
-    private List<User> _users;
+    private List<User> _users = null!;
 
     private readonly IUserAppService _userService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -37,7 +37,7 @@ public class UserServiceTest
         };
         _users.Add(expectedUser);
 
-        var result = await _userService.GetCurrent();
+        var result = await _userService.GetCurrent(TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result!.Id.Should().Be(_userId);
@@ -50,7 +50,7 @@ public class UserServiceTest
     public async Task GetCurrent_ShouldReturnNullForNonExistentUser()
     {
 
-        var result = await _userService.GetCurrent();
+        var result = await _userService.GetCurrent(TestContext.Current.CancellationToken);
 
         result.Should().BeNull();
     }
@@ -75,7 +75,7 @@ public class UserServiceTest
             PhoneNumberForNotifications = "+37125844166"
         };
 
-        await _userService.UpdateAsync(updateDto);
+        await _userService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
 
         var updatedUser = _users.First(x => x.Id == _userId);
         updatedUser.Name.Should().Be("Updated Name");
@@ -94,7 +94,7 @@ public class UserServiceTest
         };
 
         await Assert.ThrowsAsync<UserDoesNotExistException>(() =>
-            _userService.UpdateAsync(updateDto));
+            _userService.UpdateAsync(updateDto, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class UserServiceTest
             Name = "Updated Current User"
         };
 
-        await _userService.UpdateAsync(updateDto);
+        await _userService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
 
         var updatedCurrentUser = _users.First(x => x.Id == _userId);
         updatedCurrentUser.Name.Should().Be("Updated Current User");
@@ -144,7 +144,7 @@ public class UserServiceTest
         };
         _users.Add(userToDelete);
 
-        await _userService.DeleteAsync();
+        await _userService.DeleteAsync(TestContext.Current.CancellationToken);
 
         _users.Should().NotContain(x => x.Id == _userId);
     }
@@ -157,7 +157,7 @@ public class UserServiceTest
         var unauthorizedService = new UserService(_userRepositoryMock.Object, unauthorizedAccessor);
 
         await Assert.ThrowsAnyAsync<Exception>(() =>
-            unauthorizedService.DeleteAsync());
+            unauthorizedService.DeleteAsync(TestContext.Current.CancellationToken));
     }
 
     #region Mock helpers

@@ -8,6 +8,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
 
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
     <Version>0.1.0.0</Version>
   </PropertyGroup>
 </Project>

@@ -10,7 +10,7 @@ public class DynamicTaskAppServiceTests
 
     #region Properties & constructor
 
-    private List<DynamicTask> _dynamicTasks;
+    private List<DynamicTask> _dynamicTasks = null!;
 
     private readonly IDynamicTaskAppService _dynamicTaskAppService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -31,7 +31,7 @@ public class DynamicTaskAppServiceTests
         {
             Name = "TestDynamicTask1000"
         };
-        await _dynamicTaskAppService.AddAsync(newEntry);
+        await _dynamicTaskAppService.AddAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _dynamicTasks.FirstOrDefault(x => x.Name == newEntry.Name);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
@@ -46,7 +46,7 @@ public class DynamicTaskAppServiceTests
             Id = _dynamicTasks.First(x => x.UserId == _userId).Id,
             Name = "TestDynamicTask1000"
         };
-        await _dynamicTaskAppService.UpdateAsync(newEntry);
+        await _dynamicTaskAppService.UpdateAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _dynamicTasks.FirstOrDefault(x => x.Id == newEntry.Id);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
@@ -67,7 +67,7 @@ public class DynamicTaskAppServiceTests
             OptimalTimeToFinish = new TimeSpan(0, 50, 0)
         };
 
-        await _dynamicTaskAppService.UpdateAsync(updateDto);
+        await _dynamicTaskAppService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
 
         _dynamicTasksRepository.Verify(
             x => x.UpdateAndSaveAsync(It.IsAny<DynamicTask>(), It.IsAny<CancellationToken>()),
@@ -89,7 +89,7 @@ public class DynamicTaskAppServiceTests
             Priority = 3
         };
 
-        await _dynamicTaskAppService.UpdateAsync(updateDto);
+        await _dynamicTaskAppService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
 
         var updatedTask = _dynamicTasks.First(x => x.Id == taskToUpdate.Id);
         updatedTask.Name.Should().Be("Updated Name Once");
@@ -104,7 +104,7 @@ public class DynamicTaskAppServiceTests
     public async Task DeleteAsync_ShouldDeleteEntry()
     {
         var id = _dynamicTasks.First(x => x.UserId == _userId).Id;
-        await _dynamicTaskAppService.DeleteAsync(id);
+        await _dynamicTaskAppService.DeleteAsync(id, TestContext.Current.CancellationToken);
         var result = _dynamicTasks.FirstOrDefault(x => x.Id == id);
         result.Should().BeNull();
     }
@@ -113,7 +113,7 @@ public class DynamicTaskAppServiceTests
     [Trait("GetAll", "Should return correct data")]
     public async Task GetAll_ShouldReturnCorrectData()
     {
-        var result = await _dynamicTaskAppService.GetAll().ToListAsync();
+        var result = await _dynamicTaskAppService.GetAll(TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result.Count.Should().Be(_dynamicTasks.Count);
         result.Should().BeEquivalentTo(_dynamicTasks.Select(DynamicTaskDto.Create).ToList());
@@ -124,7 +124,7 @@ public class DynamicTaskAppServiceTests
     public async Task GetByIdAsync_ShouldUpdateEntry()
     {
         var id = _dynamicTasks.First(x => x.UserId == _userId).Id;
-        var result = await _dynamicTaskAppService.GetByIdAsync(id);
+        var result = await _dynamicTaskAppService.GetByIdAsync(id, TestContext.Current.CancellationToken);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
     }
@@ -135,7 +135,7 @@ public class DynamicTaskAppServiceTests
     public async Task AddAsync_ShouldThrowNotProvidedException_WhenNullInput()
     {
         await Assert.ThrowsAsync<NotProvidedException>(() =>
-            _dynamicTaskAppService.AddAsync(null!));
+            _dynamicTaskAppService.AddAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -143,14 +143,14 @@ public class DynamicTaskAppServiceTests
     public async Task UpdateAsync_ShouldThrowNotProvidedException_WhenNullInput()
     {
         await Assert.ThrowsAsync<NotProvidedException>(() =>
-            _dynamicTaskAppService.UpdateAsync(null!));
+            _dynamicTaskAppService.UpdateAsync(null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
     [Trait("GetByIdAsync", "Should return null for non-existent ID")]
     public async Task GetByIdAsync_ShouldReturnNull_WhenNonExistentId()
     {
-        var result = await _dynamicTaskAppService.GetByIdAsync(Guid.NewGuid());
+        var result = await _dynamicTaskAppService.GetByIdAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
         result.Should().BeNull();
     }
 

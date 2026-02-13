@@ -6,7 +6,7 @@ namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 public record DynamicTaskDto()
 {
     public Guid? Id { get; init; }
-    public string Name { get; init; }
+    public required string Name { get; init; }
     public string? Description { get; init; }
     public byte Priority { get; init; }
     public TimeSpan MinTimeToFinish { get; init; }

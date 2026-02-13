@@ -15,10 +15,10 @@ public class TaskServiceTests
 
     #region Properties & constructor
 
-    private List<FixedTask> _fixedTasks;
-    private List<DynamicTask> _dynamicTasks;
-    private List<ScheduleSnapshot> _scheduleSnapshots;
-    private List<ScheduleEntity> _scheduleEntities;
+    private List<FixedTask> _fixedTasks = null!;
+    private List<DynamicTask> _dynamicTasks = null!;
+    private List<ScheduleSnapshot> _scheduleSnapshots = null!;
+    private List<ScheduleEntity> _scheduleEntities = null!;
 
     private readonly ITaskAppService _tasksService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -42,7 +42,7 @@ public class TaskServiceTests
     [Trait("GetTasksForDay", "Should return tasks for day")]
     public async Task GetTasksForDay_ShouldReturnTasksForDay()
     {
-        var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(_date));
+        var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(_date), TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Contains(result.TasksTimeline, tt => tt.Task.Name == "TestFixedTask1");
@@ -55,7 +55,7 @@ public class TaskServiceTests
     {
         var dates = new List<DateTime> { DateTime.Now.AddDays(-1), _date, DateTime.Now.AddDays(1) };
 
-        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         result.Should().HaveCount(dates.Count);
@@ -69,8 +69,8 @@ public class TaskServiceTests
     {
         var dates = new List<DateTime> { _date.AddDays(-1), _date, _date.AddDays(1) };
 
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
     }
@@ -81,10 +81,10 @@ public class TaskServiceTests
     {
         var dates = new List<DateTime> { _date.AddDays(-1), _date, _date.AddDays(1) };
 
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
-        var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
-        var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        var result3 = await _tasksService.RefreshTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        var result4 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
         result2.Should().NotBeEquivalentTo(result3, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
@@ -127,8 +127,8 @@ public class TaskServiceTests
             .Returns(scheduleEntities.BuildMock());
         
 
-        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
-        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList()).ToListAsync();
+        var result1 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        var result2 = await _tasksService.GetTasksForDays(dates.Select(DateOnly.FromDateTime).ToList(), TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result1.Should().NotBeNull();
         result1.Should().HaveCount(dates.Count);
@@ -143,7 +143,7 @@ public class TaskServiceTests
     {
         var emptyDate = DateOnly.FromDateTime(_date.AddYears(10));
 
-        var result = await _tasksService.GetTasksForDay(emptyDate);
+        var result = await _tasksService.GetTasksForDay(emptyDate, TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result.Date.Should().Be(emptyDate);
@@ -155,7 +155,7 @@ public class TaskServiceTests
     {
         var emptyDates = new List<DateOnly>();
 
-        var result = await _tasksService.GetTasksForDays(emptyDates).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(emptyDates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result.Should().BeEmpty();
@@ -171,7 +171,7 @@ public class TaskServiceTests
             DateOnly.FromDateTime(_date.AddMonths(7))
         };
 
-        var result = await _tasksService.RefreshTasksForDays(newDates).ToListAsync();
+        var result = await _tasksService.RefreshTasksForDays(newDates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result.Should().HaveCount(2);
@@ -183,7 +183,7 @@ public class TaskServiceTests
     {
         var dates = new List<DateOnly> { DateOnly.FromDateTime(_date) };
 
-        var result = await _tasksService.GetTasksForDays(dates).ToListAsync();
+        var result = await _tasksService.GetTasksForDays(dates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result.Should().HaveCount(1);

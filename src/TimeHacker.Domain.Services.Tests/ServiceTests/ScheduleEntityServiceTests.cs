@@ -10,9 +10,7 @@ public class ScheduleEntityServiceTests
 
     #region Properties & constructor
 
-    private List<FixedTask> _fixedTasks;
-    private List<Category> _categories;
-    private List<ScheduleEntity> _scheduledEntities;
+    private List<ScheduleEntity> _scheduledEntities = null!;
 
     private readonly Guid _userId = Guid.NewGuid();
 
@@ -112,7 +110,7 @@ public class ScheduleEntityServiceTests
     {
         var lastEntryCreated = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
         var scheduleEntityId = _scheduledEntities.First(x => x.UserId == _userId).Id;
-        await _scheduleEntityService.UpdateLastEntityCreated(scheduleEntityId, lastEntryCreated);
+        await _scheduleEntityService.UpdateLastEntityCreated(scheduleEntityId, lastEntryCreated, TestContext.Current.CancellationToken);
         var actual = _scheduledEntities.First(x => x.Id == scheduleEntityId);
         actual.LastEntityCreated.Should().Be(lastEntryCreated);
     }
@@ -123,13 +121,13 @@ public class ScheduleEntityServiceTests
     {
         if (!existingEntry)
         {
-            await _scheduleEntityService.UpdateLastEntityCreated(Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Now));
+            await _scheduleEntityService.UpdateLastEntityCreated(Guid.NewGuid(), DateOnly.FromDateTime(DateTime.Now), TestContext.Current.CancellationToken);
             return;
         }
 
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
-            await _scheduleEntityService.UpdateLastEntityCreated(_scheduledEntities.First(x => x.UserId != _userId).Id, DateOnly.FromDateTime(DateTime.Now));
+            await _scheduleEntityService.UpdateLastEntityCreated(_scheduledEntities.First(x => x.UserId != _userId).Id, DateOnly.FromDateTime(DateTime.Now), TestContext.Current.CancellationToken);
         });
     }
 
@@ -142,7 +140,8 @@ public class ScheduleEntityServiceTests
         {
             await _scheduleEntityService.UpdateLastEntityCreated(
                 _scheduledEntities.First(x => x.UserId == _userId).Id,
-                DateOnly.FromDateTime(DateTime.Now.AddDays(1)));
+                DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+                TestContext.Current.CancellationToken);
         });
     }
 
@@ -157,7 +156,7 @@ public class ScheduleEntityServiceTests
 
         await Assert.ThrowsAsync<DataIsNotCorrectException>(async () =>
         {
-            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate);
+            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate, TestContext.Current.CancellationToken);
         });
     }
 
@@ -172,7 +171,7 @@ public class ScheduleEntityServiceTests
         // Valid date according to the repeating pattern (2 days after CreatedTimestamp)
         var validDate = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(2));
 
-        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, validDate);
+        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, validDate, TestContext.Current.CancellationToken);
 
         var updated = _scheduledEntities.First(x => x.Id == entity.Id);
         updated.FirstEntityCreated.Should().Be(validDate);
@@ -190,7 +189,7 @@ public class ScheduleEntityServiceTests
         // Try to update with an earlier date
         var earlierDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
 
-        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, earlierDate);
+        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, earlierDate, TestContext.Current.CancellationToken);
 
         var updated = _scheduledEntities.First(x => x.Id == entity.Id);
         updated.LastEntityCreated.Should().Be(futureDate);

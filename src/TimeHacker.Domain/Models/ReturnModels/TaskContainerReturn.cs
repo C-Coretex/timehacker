@@ -8,7 +8,7 @@ public record TaskContainerReturn
 {
     public bool IsFixed { get; init; }
     public Guid? ScheduleEntityId { get; init; }
-    public ITask Task { get; init; }
+    public required ITask Task { get; init; }
     public TimeRange TimeRange { get; init; }
 
     public ScheduledTask CreateScheduledTask()

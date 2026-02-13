@@ -457,3 +457,4 @@ FodyWeavers.xsd
 **/TimeHacker.Application.UI/.env
 
 .claude/
+CLAUDE.md

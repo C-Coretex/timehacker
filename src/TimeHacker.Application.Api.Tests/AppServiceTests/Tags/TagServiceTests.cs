@@ -12,7 +12,7 @@ public class TagServiceTests
 
     #region Properties & constructor
 
-    private List<Tag> _tags;
+    private List<Tag> _tags = null!;
 
     private readonly ITagAppService _tagService;
     private readonly Guid _userId = Guid.NewGuid();
@@ -64,7 +64,7 @@ public class TagServiceTests
     [Trait("GetAll", "Should return correct data")]
     public async Task GetAll_ShouldReturnCorrectData()
     {
-        var result = await _tagService.GetAll().ToListAsync();
+        var result = await _tagService.GetAll().ToListAsync(TestContext.Current.CancellationToken);
 
         result.Count.Should().Be(_tags.Count);
         result.Should().BeEquivalentTo(_tags.Select(TagDto.Create));
