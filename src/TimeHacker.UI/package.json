@@ -14,7 +14,7 @@
     "@tanstack/react-query": "^5.81.5",
     "antd": "^5.26.1",
     "axios": "^1.11.0",
-    "moment": "^2.30.1",
+    "dayjs": "^1.11.13",
     "react": "^19.1.0",
     "react-big-calendar": "^1.19.4",
     "react-dom": "^19.1.0",

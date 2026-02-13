@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { FC } from 'react';
-import { Calendar, momentLocalizer, type View } from 'react-big-calendar';
-import moment from 'moment';
+import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
+import dayjs from 'dayjs';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Typography, Button, Spin, Alert, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
@@ -16,7 +16,7 @@ import {
 
 const { Title } = Typography;
 
-const localizer = momentLocalizer(moment);
+const localizer = dayjsLocalizer(dayjs);
 
 const CalendarPage: FC = () => {
   const [view, setView] = useState<View>('month');
@@ -255,11 +255,11 @@ const CalendarPage: FC = () => {
             </p>
             <p>
               <b>Start:</b>{' '}
-              {moment(selectedEvent.start).format('YYYY-MM-DD HH:mm')}
+              {dayjs(selectedEvent.start).format('YYYY-MM-DD HH:mm')}
             </p>
             <p>
               <b>End:</b>{' '}
-              {moment(selectedEvent.end).format('YYYY-MM-DD HH:mm')}
+              {dayjs(selectedEvent.end).format('YYYY-MM-DD HH:mm')}
             </p>
           </div>
         )}

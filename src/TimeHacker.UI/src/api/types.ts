@@ -1,5 +1,5 @@
 // src/api/types.ts
-import type moment from 'moment';
+import type { Dayjs } from 'dayjs';
 
 export interface FixedTaskReturnModel {
     id: string;
@@ -22,8 +22,8 @@ export interface FixedTaskFormData {
     name: string;
     description: string;
     priority: number;
-    startTimestamp: moment.Moment;
-    endTimestamp: moment.Moment;
+    startTimestamp: Dayjs;
+    endTimestamp: Dayjs;
 }
 
 export interface FixedTaskDisplayModel {
@@ -31,8 +31,8 @@ export interface FixedTaskDisplayModel {
     name: string;
     description: string;
     priority: number;
-    startTimestamp: moment.Moment;
-    endTimestamp: moment.Moment;
+    startTimestamp: Dayjs;
+    endTimestamp: Dayjs;
 }
 
 export interface DynamicTaskReturnModel {

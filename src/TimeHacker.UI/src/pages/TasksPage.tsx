@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import type { FC } from 'react';
 import { Button, Modal, notification, Table, Tabs, Typography } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import type { Dayjs } from 'dayjs';
 
 import useFixedTasks, { postNewScheduleForTask } from '../hooks/useFixedTasks';
 import useDynamicTasks from '../hooks/useDynamicTasks';
@@ -83,13 +83,13 @@ const TasksPage: FC = () => {
       title: 'Start',
       dataIndex: 'startTimestamp',
       key: 'startTimestamp',
-      render: (date: moment.Moment) => date.format('YYYY-MM-DD HH:mm'),
+      render: (date: Dayjs) => date.format('YYYY-MM-DD HH:mm'),
     },
     {
       title: 'End',
       dataIndex: 'endTimestamp',
       key: 'endTimestamp',
-      render: (date: moment.Moment) => date.format('YYYY-MM-DD HH:mm'),
+      render: (date: Dayjs) => date.format('YYYY-MM-DD HH:mm'),
     },
     {
       title: 'Actions',

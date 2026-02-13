@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import type { FC } from 'react';
 import { Modal, Form, Input, InputNumber, DatePicker, Checkbox, Select, Collapse, Alert } from 'antd';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import type {
     FixedTaskFormData,
     InputRepeatingEntityType,
@@ -51,8 +51,8 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                 name: initialData.name,
                 description: initialData.description,
                 priority: initialData.priority,
-                startTimestamp: initialData.startTimestamp ? moment(initialData.startTimestamp) : null,
-                endTimestamp: initialData.endTimestamp ? moment(initialData.endTimestamp) : null,
+                startTimestamp: initialData.startTimestamp ? dayjs(initialData.startTimestamp) : null,
+                endTimestamp: initialData.endTimestamp ? dayjs(initialData.endTimestamp) : null,
             });
         } else {
             form.resetFields();
@@ -95,7 +95,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
             values.endsOnMaxDate || values.endsOnMaxOccurrences != null
                 ? {
                       maxDate: values.endsOnMaxDate
-                          ? moment(values.endsOnMaxDate).format('YYYY-MM-DD')
+                          ? dayjs(values.endsOnMaxDate).format('YYYY-MM-DD')
                           : undefined,
                       maxOccurrences:
                           values.endsOnMaxOccurrences != null && values.endsOnMaxOccurrences > 0

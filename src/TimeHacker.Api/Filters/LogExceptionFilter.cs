@@ -5,6 +5,7 @@ namespace TimeHacker.Api.Filters;
 public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
 {
     private const string ExceptionTypeExtensionName = "ExceptionType";
+    private const string ParameterNameExtensionName = "ParameterName";
 
     public void OnException(ExceptionContext context)
     {
@@ -52,13 +53,13 @@ public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
             case NotProvidedException exception:
                 problemDetails.Title = $"Parameter '{exception.ParamName}' is not provided.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(NotProvidedException);
-                problemDetails.Extensions["ParameterName"] = exception.ParamName;
+                problemDetails.Extensions[ParameterNameExtensionName] = exception.ParamName;
 
                 return true;
             case DataIsNotCorrectException exception:
                 problemDetails.Title = $"Parameter '{exception.ParamName}' is not correct.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(DataIsNotCorrectException);
-                problemDetails.Extensions["ParameterName"] = exception.ParamName;
+                problemDetails.Extensions[ParameterNameExtensionName] = exception.ParamName;
 
                 return true;
             default:
@@ -78,6 +79,11 @@ public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
             "Unhandled exception in controller '{Controller}', action '{Action}', path: {Path}",
             controllerName,
             actionName,
-            context.HttpContext.Request.Path);
+            SanitizeValue(context.HttpContext.Request.Path.Value));
+    }
+
+    private static string SanitizeValue(string? value)
+    {
+        return value?.Replace("\r", string.Empty).Replace("\n", string.Empty) ?? string.Empty;
     }
 }

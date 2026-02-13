@@ -1,7 +1,7 @@
 // src/hooks/useFixedTasks.ts
 import { useState, useEffect, useCallback } from 'react';
 import { notification } from 'antd';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import {
     fetchFixedTasks,
     createFixedTask,
@@ -30,8 +30,8 @@ const useFixedTasks = () => {
                 name: task.name,
                 description: task.description,
                 priority: task.priority,
-                startTimestamp: moment(task.startTimestamp),
-                endTimestamp: moment(task.endTimestamp),
+                startTimestamp: dayjs(task.startTimestamp),
+                endTimestamp: dayjs(task.endTimestamp),
             }));
             setTasks(mappedTasks);
         } catch (err) {
