@@ -24,7 +24,7 @@ public class TasksController(ITaskAppService taskService)
 
     [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
     [HttpGet("GetTasksForDays")]
-    public Ok<IAsyncEnumerable<TasksForDayDto>> GetTasksForDays([FromBody] ICollection<DateOnly> dates, CancellationToken cancellationToken = default)
+    public Ok<IAsyncEnumerable<TasksForDayDto>> GetTasksForDays([FromQuery] ICollection<DateOnly> dates, CancellationToken cancellationToken = default)
     {
         var data = taskService.GetTasksForDays(dates, cancellationToken);
 

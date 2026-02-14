@@ -4,11 +4,10 @@ import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
 import dayjs from 'dayjs';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar-theme.css';
-import { Typography, Button, Spin, Alert, Modal } from 'antd';
+import { Button, Spin, Alert, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
-import api from '../../api/api';
 import {
-  fetchTasksForDay,
+  fetchTasksForDays,
   taskForDayToEvent,
   minutesToDate,
   refreshTasksForDays,
@@ -16,13 +15,11 @@ import {
 } from '../../api/tasks';
 import { useTheme } from '../../contexts/ThemeContext';
 
-const { Title } = Typography;
-
 const localizer = dayjsLocalizer(dayjs);
 
 const CalendarPage: FC = () => {
   const { darkMode } = useTheme();
-  const [view, setView] = useState<View>('month');
+  const [view, setView] = useState<View>('week');
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -43,47 +40,9 @@ const CalendarPage: FC = () => {
     setDate(newDate);
   }, []);
 
-  const fetchFixedTasksForMonth = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get<Array<{
-        id: string;
-        name: string;
-        description: string;
-        startTimestamp: string;
-        endTimestamp: string;
-      }>>('/api/FixedTasks/GetAll');
-      const tasks = response.data.map((task) => ({
-        id: task.id,
-        title: task.name,
-        start: new Date(task.startTimestamp),
-        end: new Date(task.endTimestamp),
-        allDay: false,
-        description: task.description,
-        resource: {
-          type: 'fixed' as const,
-          isFixed: true,
-          task: {
-            id: task.id,
-            name: task.name,
-            description: task.description,
-            priority: 0,
-          },
-          start: new Date(task.startTimestamp),
-          end: new Date(task.endTimestamp),
-        },
-      })) as CalendarEvent[];
-      setEvents(tasks);
-    } catch (err: unknown) {
-      const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-          : null;
-      setError(message ?? 'Failed to load tasks');
-    } finally {
-      setLoading(false);
-    }
+  const handleDrillDown = useCallback((newDate: Date) => {
+    setDate(newDate);
+    setView('week');
   }, []);
 
   const weekStart = useMemo(() => {
@@ -114,21 +73,12 @@ const CalendarPage: FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(weekStart);
-        d.setDate(d.getDate() + i);
-        return d;
-      });
-      const results = await Promise.all(days.map((d) => fetchTasksForDay(d)));
+      const results = await fetchTasksForDays(weekDays);
       const allEvents: CalendarEvent[] = [];
-      for (let i = 0; i < results.length; i++) {
-        const dayDate = days[i];
-        const timeline = results[i].tasksTimeline ?? [];
-        for (const item of timeline) {
-          const ev = taskForDayToEvent(item, dayDate, (d, mins) =>
-            minutesToDate(d, mins)
-          );
-          allEvents.push(ev);
+      for (const dayResult of results) {
+        const dayDate = new Date(dayResult.date);
+        for (const item of dayResult.tasksTimeline ?? []) {
+          allEvents.push(taskForDayToEvent(item, dayDate, minutesToDate));
         }
       }
       setEvents(allEvents);
@@ -141,15 +91,39 @@ const CalendarPage: FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [weekStart]);
+  }, [weekDays]);
+
+  const fetchMonthTasks = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const results = await fetchTasksForDays(monthDays);
+      const allEvents: CalendarEvent[] = [];
+      for (const dayResult of results) {
+        const dayDate = new Date(dayResult.date);
+        for (const item of dayResult.tasksTimeline ?? []) {
+          allEvents.push(taskForDayToEvent(item, dayDate, minutesToDate));
+        }
+      }
+      setEvents(allEvents);
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null;
+      setError(message ?? 'Failed to load tasks for month');
+    } finally {
+      setLoading(false);
+    }
+  }, [monthDays]);
 
   useEffect(() => {
     if (view === 'month') {
-      fetchFixedTasksForMonth();
+      fetchMonthTasks();
     } else if (view === 'week') {
       fetchWeekTasks();
     }
-  }, [view, date, fetchFixedTasksForMonth, fetchWeekTasks]);
+  }, [view, date, fetchMonthTasks, fetchWeekTasks]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -158,7 +132,7 @@ const CalendarPage: FC = () => {
       const datesToRefresh = view === 'month' ? monthDays : weekDays;
       await refreshTasksForDays(datesToRefresh);
       if (view === 'month') {
-        await fetchFixedTasksForMonth();
+        await fetchMonthTasks();
       } else {
         await fetchWeekTasks();
       }
@@ -171,7 +145,7 @@ const CalendarPage: FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [view, monthDays, weekDays, fetchFixedTasksForMonth, fetchWeekTasks]);
+  }, [view, monthDays, weekDays, fetchMonthTasks, fetchWeekTasks]);
 
   const eventStyleGetter = useCallback(
     (event: CalendarEvent) => {
@@ -201,10 +175,8 @@ const CalendarPage: FC = () => {
   );
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <Title level={2}>Tasks Calendar</Title>
-
-      <div style={{ marginBottom: '1rem', display: 'flex', gap: '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '8px' }}>
         <Button icon={<ReloadOutlined />} onClick={refresh}>
           Refresh
         </Button>
@@ -215,7 +187,7 @@ const CalendarPage: FC = () => {
           type="error"
           message={error}
           showIcon
-          style={{ marginBottom: '1rem' }}
+          style={{ marginBottom: '0.5rem' }}
         />
       )}
       {loading ? (
@@ -226,13 +198,14 @@ const CalendarPage: FC = () => {
           events={events}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: 500 }}
+          style={{ flex: 1 }}
           view={view}
           onView={handleViewChange}
           date={date}
           onNavigate={handleNavigate}
           views={['month', 'week']}
           onSelectEvent={handleSelectEvent}
+          onDrillDown={handleDrillDown}
           eventPropGetter={eventStyleGetter}
         />
       )}

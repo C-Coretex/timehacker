@@ -1,3 +1,14 @@
+/* ===== Calendar sizing ===== */
+.rbc-calendar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rbc-time-view {
+  overflow-y: auto;
+}
+
 /* ===== Light theme (default) ===== */
 .rbc-calendar {
   color: #333;

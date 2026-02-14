@@ -76,6 +76,16 @@ export async function fetchTasksForDay(date: Date): Promise<TasksForDayResponse>
   return response.data;
 }
 
+/** GET /api/Tasks/GetTasksForDays – fetch tasks for multiple dates in one request */
+export async function fetchTasksForDays(dates: Date[]): Promise<TasksForDayResponse[]> {
+  const params = new URLSearchParams();
+  for (const d of dates) {
+    params.append('dates', formatDateIso(d));
+  }
+  const response = await api.get<TasksForDayResponse[]>('/api/Tasks/GetTasksForDays', { params });
+  return response.data;
+}
+
 /** POST /api/Tasks/RefreshTasksForDays – refresh generated tasks for the given dates */
 export async function refreshTasksForDays(dates: Date[]): Promise<void> {
   const body = dates.map(formatDateIso);
