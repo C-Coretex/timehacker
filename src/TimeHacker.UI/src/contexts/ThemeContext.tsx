@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 const DARK_MODE = 'dark-mode';
@@ -27,6 +27,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     localStorage.setItem(DARK_MODE, JSON.stringify(darkMode));
+    document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
   return (
@@ -36,4 +37,12 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   );
 };
 
-export { ThemeContext, ThemeProvider };
+const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return context;
+};
+
+export { ThemeContext, ThemeProvider, useTheme };

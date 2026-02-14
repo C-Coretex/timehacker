@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import type { FC } from 'react';
-import { NavLink, Outlet } from 'react-router';
-import { Breadcrumb, Layout as AntdLayout, Menu, theme } from 'antd';
+import { NavLink, Outlet, useNavigate } from 'react-router';
+import { Layout as AntdLayout, Menu, theme, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CalendarOutlined,
+  ClockCircleOutlined,
   ProductOutlined,
   QuestionCircleOutlined,
   SettingOutlined,
@@ -18,18 +19,6 @@ import { capitalize } from 'utils/helpers';
 const { Header, Content, Footer, Sider } = AntdLayout;
 
 type MenuItem = Required<MenuProps>['items'][number];
-
-// const findActiveLink = (url: string, menuItems: MenuItem[]) => {
-//     for (const menuItem of menuItems) {
-//       if (url.includes('profile')) {
-//         return 'profile'
-//       } else if (url === menuItem?.label?.props?.href) {
-//         return String(menuItem.key)
-//       }
-//     }
-
-//     return null;
-// }
 
 const getItem = (
   key: React.Key,
@@ -62,8 +51,16 @@ const getMainMenuItems = (isAuthenticated: boolean) => [
   getItem('settings', <SettingOutlined />),
 ];
 
+const greetingByTime = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+};
+
 const Layout: FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
 
   const [collapsed, setCollapsed] = useState(false);
 
@@ -72,18 +69,6 @@ const Layout: FC = () => {
   } = theme.useToken();
 
   const mainMenuItems = getMainMenuItems(isAuthenticated);
-  // const activeLink = findActiveLink(location.pathname, mainMenuItems);
-
-  const breadcrumbItems = [
-    {
-      title: 'User',
-    },
-    {
-      title: 'Bill',
-    },
-  ];
-
-  <Breadcrumb style={{ margin: '16px 0' }} items={breadcrumbItems} />;
 
   return (
     <AntdLayout style={{ minHeight: '100vh' }}>
@@ -93,14 +78,24 @@ const Layout: FC = () => {
         onCollapse={(value) => setCollapsed(value)}
       >
         <div
-          className="demo-logo-vertical"
+          onClick={() => navigate('/')}
           style={{
             height: '32px',
             margin: '16px',
-            background: 'rgba(255, 255, 255, .2)',
-            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            cursor: 'pointer',
           }}
-        />
+        >
+          <ClockCircleOutlined style={{ color: '#1890ff', fontSize: collapsed ? 20 : 18 }} />
+          {!collapsed && (
+            <Typography.Text strong style={{ color: '#fff', fontSize: 16, whiteSpace: 'nowrap' }}>
+              TimeHacker
+            </Typography.Text>
+          )}
+        </div>
         <Menu
           theme="dark"
           defaultSelectedKeys={['1']}
@@ -112,17 +107,18 @@ const Layout: FC = () => {
         <Header
           style={{
             background: colorBgContainer,
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 24px',
           }}
         >
-          <i>~TimeHacker~</i>
+          <Typography.Text style={{ fontSize: 16 }}>
+            {greetingByTime()}
+            {user?.name ? `, ${user.name}` : ''}
+            {' — make every minute count'}
+          </Typography.Text>
         </Header>
-        <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb
-            style={{ margin: '16px 0' }}
-            items={breadcrumbItems}
-            separator=">"
-          />
-
+        <Content style={{ margin: '0 16px', marginTop: 16 }}>
           <div
             style={{
               padding: 24,
@@ -135,8 +131,7 @@ const Layout: FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          TimeHacker &copy;2024 &mdash; {new Date().getFullYear()} All rights
-          reserved.
+          TimeHacker
         </Footer>
       </AntdLayout>
     </AntdLayout>

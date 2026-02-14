@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
 import dayjs from 'dayjs';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './calendar-theme.css';
 import { Typography, Button, Spin, Alert, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import api from '../../api/api';
@@ -13,12 +14,14 @@ import {
   refreshTasksForDays,
   type CalendarEvent,
 } from '../../api/tasks';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const { Title } = Typography;
 
 const localizer = dayjsLocalizer(dayjs);
 
 const CalendarPage: FC = () => {
+  const { darkMode } = useTheme();
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -170,24 +173,32 @@ const CalendarPage: FC = () => {
     }
   }, [view, monthDays, weekDays, fetchFixedTasksForMonth, fetchWeekTasks]);
 
-  const eventStyleGetter = useCallback((event: CalendarEvent) => {
-    let style = {
-      backgroundColor: '#1890ff',
-      borderRadius: '5px',
-      opacity: 0.8,
-      color: 'white',
-      border: '0px',
-      display: 'block',
-    };
+  const eventStyleGetter = useCallback(
+    (event: CalendarEvent) => {
+      const colors = darkMode
+        ? { default: '#177ddc', fixed: '#49aa19', dynamic: '#d89614' }
+        : { default: '#1890ff', fixed: '#52c41a', dynamic: '#faad14' };
 
-    if (event.resource?.type === 'fixed') {
-      style.backgroundColor = '#52c41a';
-    } else if (event.resource?.type === 'dynamic') {
-      style.backgroundColor = '#faad14';
-    }
+      let backgroundColor = colors.default;
+      if (event.resource?.type === 'fixed') {
+        backgroundColor = colors.fixed;
+      } else if (event.resource?.type === 'dynamic') {
+        backgroundColor = colors.dynamic;
+      }
 
-    return { style };
-  }, []);
+      return {
+        style: {
+          backgroundColor,
+          borderRadius: '5px',
+          opacity: 0.85,
+          color: 'white',
+          border: '0px',
+          display: 'block',
+        },
+      };
+    },
+    [darkMode]
+  );
 
   return (
     <div style={{ padding: '1rem' }}>

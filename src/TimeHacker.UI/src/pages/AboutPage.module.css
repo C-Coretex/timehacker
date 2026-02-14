@@ -147,3 +147,41 @@
     animation: fadeIn 1s ease-out forwards;
     animation-delay: 0.2s;
 }
+
+:global(.dark) .aboutContainer {
+    color: #e0e0e0;
+}
+
+:global(.dark) .section {
+    background-color: #1f1f1f;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark) .section h1,
+:global(.dark) .section h2 {
+    color: #4da3ff;
+}
+
+:global(.dark) .section p,
+:global(.dark) .section ul {
+    color: #d0d0d0;
+}
+
+:global(.dark) .developerCard {
+    background-color: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark) .developerCard h3 {
+    color: #e0e0e0;
+}
+
+:global(.dark) .developerCard p {
+    color: #aaa;
+}
+
+:global(.dark) .developerPhoto {
+    background-color: #1a3a5c;
+    border-color: #4da3ff;
+}

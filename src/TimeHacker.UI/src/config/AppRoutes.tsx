@@ -6,6 +6,8 @@ import AboutPage from 'pages/AboutPage';
 import CalendarPage from 'pages/CalendarPage';
 import LoginPage from 'pages/LoginPage';
 import NotFoundPage from 'pages/NotFoundPage';
+import ProfilePage from 'pages/ProfilePage';
+import SettingsPage from 'pages/SettingsPage';
 import TasksPage from 'pages/TasksPage';
 
 const AppRoutes: RouteObject[] = [
@@ -18,6 +20,10 @@ const AppRoutes: RouteObject[] = [
         element: <AboutPage />,
       },
       {
+        path: 'settings',
+        element: <SettingsPage />,
+      },
+      {
         element: <PrivateRoute auth={true} />,
         children: [
           {
@@ -27,6 +33,10 @@ const AppRoutes: RouteObject[] = [
           {
             path: 'tasks',
             element: <TasksPage />,
+          },
+          {
+            path: 'profile',
+            element: <ProfilePage />,
           },
         ],
       },
