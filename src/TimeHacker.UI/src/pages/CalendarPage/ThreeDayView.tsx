@@ -8,7 +8,13 @@ interface ThreeDayViewProps {
   date: Date;
   localizer: {
     format: (date: Date, format: string, culture?: string) => string;
+    startOf: (date: Date, unit: string) => Date;
+    endOf: (date: Date, unit: string) => Date;
   };
+  min?: Date;
+  max?: Date;
+  scrollToTime?: Date;
+  enableAutoScroll?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
@@ -18,7 +24,15 @@ const ThreeDayView: FC<ThreeDayViewProps> & {
   navigate: (date: Date, action: NavigateAction) => Date;
   title: (date: Date, extra: { localizer: ThreeDayViewProps['localizer'] }) => string;
 } = (props) => {
-  const { date, localizer, ...rest } = props;
+  const {
+    date,
+    localizer,
+    min = localizer.startOf(new Date(), 'day'),
+    max = localizer.endOf(new Date(), 'day'),
+    scrollToTime = localizer.startOf(new Date(), 'day'),
+    enableAutoScroll = true,
+    ...rest
+  } = props;
 
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);
@@ -30,7 +44,19 @@ const ThreeDayView: FC<ThreeDayViewProps> & {
     range.push(d);
   }
 
-  return <TimeGrid {...rest} range={range} eventOffset={15} localizer={localizer} />;
+  return (
+    <TimeGrid
+      {...rest}
+      range={range}
+      eventOffset={15}
+      localizer={localizer}
+      date={date}
+      min={min}
+      max={max}
+      scrollToTime={scrollToTime}
+      enableAutoScroll={enableAutoScroll}
+    />
+  );
 };
 
 ThreeDayView.range = (date: Date): Date[] => {
