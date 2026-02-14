@@ -5,13 +5,11 @@ import {
   createDynamicTask,
   updateDynamicTask,
   deleteDynamicTask,
-  type DynamicTaskReturnModel,
-  type InputDynamicTask,
 } from '../api/dynamicTasks';
-import type { DynamicTaskReturnModel as DisplayModel } from '../api/types';
+import type { DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
 
 const useDynamicTasks = () => {
-  const [tasks, setTasks] = useState<DisplayModel[]>([]);
+  const [tasks, setTasks] = useState<DynamicTaskReturnModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

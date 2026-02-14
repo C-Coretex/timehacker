@@ -16,14 +16,14 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { FC } from 'react';
 import api from '../api/api';
 import { useAuth } from '../contexts/AuthContext';
 
 // constants for reuse
 const MIN_PASSWORD_LENGTH = 6;
-
+// TODO: add remember me (set useSessionCookies to false)
 // Small reusable field components
 const EmailField: React.FC = () => (
   <Form.Item
@@ -126,7 +126,7 @@ const LoginPage: FC = () => {
     }
   };
 
-  const loginTab: TabsProps['items'][number] = {
+  const loginTab: NonNullable<TabsProps['items']>[number] = {
     key: 'login',
     label: 'Login',
     children: (
@@ -163,7 +163,7 @@ const LoginPage: FC = () => {
     ),
   };
 
-  const registerTab: TabsProps['items'][number] = {
+  const registerTab: NonNullable<TabsProps['items']>[number] = {
     key: 'register',
     label: 'Register',
     children: (

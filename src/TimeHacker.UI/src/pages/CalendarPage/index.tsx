@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { FC } from 'react';
 import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
 import dayjs from 'dayjs';

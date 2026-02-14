@@ -10,32 +10,32 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.11",
-    "@tanstack/react-query": "^5.81.5",
-    "antd": "^5.26.1",
-    "axios": "^1.11.0",
-    "dayjs": "^1.11.13",
-    "react": "^19.1.0",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-query": "^5.90.21",
+    "antd": "^6.3.0",
+    "axios": "^1.13.5",
+    "dayjs": "^1.11.19",
+    "react": "^19.2.4",
     "react-big-calendar": "^1.19.4",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.2",
-    "tailwindcss": "^4.1.11"
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.0",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
-    "@types/node": "^24.0.3",
-    "@types/react": "^19.1.8",
-    "@types/react-big-calendar": "^1.16.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.4.1",
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-big-calendar": "^1.16.3",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^9.25.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "prettier": "3.6.2",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "eslint-plugin-react-refresh": "^0.5.0",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.55.0",
+    "vite": "^7.3.1"
   }
 }

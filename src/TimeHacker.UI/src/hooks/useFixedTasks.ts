@@ -7,13 +7,10 @@ import {
     createFixedTask,
     updateFixedTask,
     deleteFixedTask,
-    type FixedTaskReturnModel,
-    type InputFixedTask,
 } from '../api/fixedTasks';
 
 export { postNewScheduleForTask } from '../api/fixedTasks';
-import type { FixedTaskDisplayModel } from '../api/types';
-import api from '../api/api';
+import type { FixedTaskDisplayModel, InputFixedTask } from '../api/types';
 
 const useFixedTasks = () => {
     const [tasks, setTasks] = useState<FixedTaskDisplayModel[]>([]);

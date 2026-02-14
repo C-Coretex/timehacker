@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Modal, Form, Input, InputNumber } from 'antd';
 import type { DynamicTaskReturnModel, InputDynamicTask } from '../api/types';

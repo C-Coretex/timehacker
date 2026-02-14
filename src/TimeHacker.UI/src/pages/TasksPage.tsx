@@ -6,12 +6,10 @@ import type { Dayjs } from 'dayjs';
 
 import useFixedTasks, { postNewScheduleForTask } from '../hooks/useFixedTasks';
 import useDynamicTasks from '../hooks/useDynamicTasks';
-import TaskFormModal, {
-    type FixedTaskFormData,
-    type ScheduleFormPayload,
-} from '../components/TaskFormModal';
+import TaskFormModal from '../components/TaskFormModal';
+import type { ScheduleFormPayload } from '../components/TaskFormModal';
 import DynamicTaskFormModal from '../components/DynamicTaskFormModal';
-import type { FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
+import type { FixedTaskFormData, FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
 
 const { Title } = Typography;
 
@@ -305,7 +303,7 @@ const TasksPage: FC = () => {
         open={fixedModalOpen}
         onCancel={handleFixedModalCancel}
         onSave={handleSaveFixedTask}
-        initialData={editingFixedTask}
+        initialData={editingFixedTask ?? undefined}
       />
       <DynamicTaskFormModal
         open={dynamicModalOpen}

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { FC } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router';
+import { NavLink, Outlet } from 'react-router';
 import { Breadcrumb, Layout as AntdLayout, Menu, theme } from 'antd';
 import type { MenuProps } from 'antd';
 import {
@@ -63,8 +63,7 @@ const getMainMenuItems = (isAuthenticated: boolean) => [
 ];
 
 const Layout: FC = () => {
-  const { isAuthenticated, logout } = useAuth();
-  const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   const [collapsed, setCollapsed] = useState(false);
 
