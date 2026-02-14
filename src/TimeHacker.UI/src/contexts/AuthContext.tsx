@@ -11,6 +11,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
+    loading: boolean;
     login: (userData: User) => void;
     logout: () => void;
     fetchCurrentUser: () => Promise<void>;
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const fetchCurrentUser = async () => {
         try {
@@ -31,9 +33,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    // restore auth state from localStorage on app load
     useEffect(() => {
-        fetchCurrentUser();
+        fetchCurrentUser().finally(() => setLoading(false));
     }, []);
 
     const login = (userData: User) => {
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             value={{
                 user,
                 isAuthenticated: !!user,
+                loading,
                 login,
                 logout,
                 fetchCurrentUser,

@@ -1,19 +1,26 @@
 import type { FC } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { Spin } from 'antd';
+import { useAuth } from 'contexts/AuthContext';
 import type { PrivateRouteProps } from './types';
-
-// test data (later will be fetched from backend)
-const authenticated = true;
 
 const PrivateRoute: FC<PrivateRouteProps> = ({
   auth = true,
   // roles = [],
   // permissions = [],
 }) => {
-  //const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
-  if (auth && !authenticated) {
-    return <Navigate to="/login" replace />;
+  if (auth && loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (auth && !isAuthenticated) {
+    return <Navigate to="/login" state={{ message: 'Please log in to access this page' }} replace />;
   }
 
   // if (auth && !hasAccess(roles, permissions)) {

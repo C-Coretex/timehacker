@@ -14,16 +14,16 @@ const AppRoutes: RouteObject[] = [
     element: <Layout />,
     children: [
       {
-        index: true,
-        element: <CalendarPage />,
-      },
-      {
         path: 'about',
         element: <AboutPage />,
       },
       {
         element: <PrivateRoute auth={true} />,
         children: [
+          {
+            index: true,
+            element: <CalendarPage />,
+          },
           {
             path: 'tasks',
             element: <TasksPage />,

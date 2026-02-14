@@ -15,8 +15,8 @@ import {
   LoginOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useState, useMemo } from 'react';
 import type { FC } from 'react';
 import api from '../api/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -64,9 +64,18 @@ const LoginPage: FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { login, fetchCurrentUser } = useAuth();
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
+
+  const authMessage = useMemo(() => {
+    if (searchParams.get('expired') === 'true') {
+      return 'Your session has expired. Please log in again.';
+    }
+    return (location.state as { message?: string })?.message ?? null;
+  }, [location.state, searchParams]);
 
   // Handle login
   const handleLogin = async (values: { email: string; password: string }) => {
@@ -237,6 +246,10 @@ const LoginPage: FC = () => {
       <Typography.Text type="secondary">
         Sign in to access your smart calendar or create a new account.
       </Typography.Text>
+
+      {authMessage && (
+        <Alert type="warning" message={authMessage} showIcon style={{ marginTop: '1rem' }} />
+      )}
 
       {error && (
         <Alert type="error" message={error} style={{ marginTop: '1rem' }} />
