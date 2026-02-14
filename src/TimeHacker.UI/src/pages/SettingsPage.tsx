@@ -9,7 +9,7 @@ const SettingsPage: FC = () => {
   const { darkMode, updateDarkMode } = useTheme();
 
   return (
-    <div style={{ maxWidth: 600 }}>
+    <div style={{ maxWidth: 600, padding: '0 16px' }}>
       <Title level={3}>Settings</Title>
 
       <Card title="Appearance" style={{ marginTop: 16 }}>

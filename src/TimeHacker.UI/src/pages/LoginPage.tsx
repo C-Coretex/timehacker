@@ -239,7 +239,7 @@ const LoginPage: FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: '2rem auto' }}>
+    <div style={{ maxWidth: 480, margin: '2rem auto', padding: '0 16px' }}>
       <Typography.Title level={2} style={{ marginBottom: 0 }}>
         Welcome to TimeHacker
       </Typography.Title>

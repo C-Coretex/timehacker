@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
-import { Badge, Layout as AntdLayout, Menu, Space, Tag, theme, Tooltip, Typography } from 'antd';
+import { Badge, Button, Drawer, Layout as AntdLayout, Menu, Space, Tag, theme, Tooltip, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CalendarOutlined,
   ClockCircleOutlined,
   FireOutlined,
+  MenuOutlined,
   ProductOutlined,
   QuestionCircleOutlined,
   SettingOutlined,
@@ -17,6 +18,7 @@ import {
 import { useAuth } from 'contexts/AuthContext';
 import { capitalize } from 'utils/helpers';
 import { fetchTasksForDay, type TaskForDayItem } from '../../api/tasks';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const { Header, Content, Sider } = AntdLayout;
 
@@ -98,11 +100,35 @@ const computeSummary = (tasks: TaskForDayItem[]): DaySummary => {
   return { fixed, dynamic, fixedLeft, dynamicLeft, highPriority };
 };
 
+const SidebarLogo: FC<{ collapsed?: boolean; onClick: () => void }> = ({ collapsed, onClick }) => (
+  <div
+    onClick={onClick}
+    style={{
+      height: '32px',
+      margin: '16px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      cursor: 'pointer',
+    }}
+  >
+    <ClockCircleOutlined style={{ color: '#1890ff', fontSize: collapsed ? 20 : 18 }} />
+    {!collapsed && (
+      <Typography.Text strong style={{ color: '#fff', fontSize: 16, whiteSpace: 'nowrap' }}>
+        TimeHacker
+      </Typography.Text>
+    )}
+  </div>
+);
+
 const Layout: FC = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  const { isMobile } = useIsMobile();
 
   const [collapsed, setCollapsed] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [summary, setSummary] = useState<DaySummary | null>(null);
 
   const {
@@ -121,39 +147,46 @@ const Layout: FC = () => {
       .catch(() => setSummary(null));
   }, [isAuthenticated]);
 
+  const handleLogoClick = () => {
+    navigate('/');
+    setDrawerOpen(false);
+  };
+
+  const menuNode = (
+    <Menu
+      theme="dark"
+      defaultSelectedKeys={['1']}
+      mode="inline"
+      items={mainMenuItems}
+      onClick={() => setDrawerOpen(false)}
+    />
+  );
+
+  const tasksLeft = summary ? summary.fixedLeft + summary.dynamicLeft : 0;
+
   return (
     <AntdLayout style={{ height: '100vh', overflow: 'hidden' }}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-      >
-        <div
-          onClick={() => navigate('/')}
-          style={{
-            height: '32px',
-            margin: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            cursor: 'pointer',
-          }}
+      {isMobile ? (
+        <Drawer
+          placement="left"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          width={250}
+          styles={{ body: { padding: 0, background: '#001529' } }}
         >
-          <ClockCircleOutlined style={{ color: '#1890ff', fontSize: collapsed ? 20 : 18 }} />
-          {!collapsed && (
-            <Typography.Text strong style={{ color: '#fff', fontSize: 16, whiteSpace: 'nowrap' }}>
-              TimeHacker
-            </Typography.Text>
-          )}
-        </div>
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={['1']}
-          mode="inline"
-          items={mainMenuItems}
-        />
-      </Sider>
+          <SidebarLogo onClick={handleLogoClick} />
+          {menuNode}
+        </Drawer>
+      ) : (
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
+        >
+          <SidebarLogo collapsed={collapsed} onClick={handleLogoClick} />
+          {menuNode}
+        </Sider>
+      )}
       <AntdLayout>
         <Header
           style={{
@@ -161,16 +194,27 @@ const Layout: FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 24px',
+            padding: isMobile ? '0 12px' : '0 24px',
           }}
         >
-          <Typography.Text style={{ fontSize: 16 }}>
-            {greetingByTime()}
-            {user?.name ? `, ${user.name}` : ''}
-            {' — make every minute count'}
-          </Typography.Text>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            {isMobile && (
+              <Button
+                type="text"
+                icon={<MenuOutlined />}
+                onClick={() => setDrawerOpen(true)}
+              />
+            )}
+            <Typography.Text
+              style={{ fontSize: isMobile ? 14 : 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {greetingByTime()}
+              {user?.name ? `, ${user.name}` : ''}
+              {!isMobile && ' — make every minute count'}
+            </Typography.Text>
+          </div>
 
-          {summary && (
+          {summary && !isMobile && (
             <Space size="middle">
               <Tooltip title={`${summary.fixedLeft} of ${summary.fixed} fixed tasks remaining`}>
                 <Tag color="green">
@@ -193,17 +237,32 @@ const Layout: FC = () => {
               )}
             </Space>
           )}
+          {summary && isMobile && (
+            <Tooltip title={`${summary.fixedLeft}F + ${summary.dynamicLeft}D left${summary.highPriority > 0 ? `, ${summary.highPriority} high priority` : ''}`}>
+              <Badge count={tasksLeft} overflowCount={99} size="small">
+                <CalendarOutlined style={{ fontSize: 18 }} />
+              </Badge>
+            </Tooltip>
+          )}
         </Header>
-        <Content style={{ margin: '0 16px', marginTop: 16, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Content
+          style={{
+            margin: isMobile ? '0 8px' : '0 16px',
+            marginTop: isMobile ? 8 : 16,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
           <div
             style={{
-              padding: 24,
+              padding: isMobile ? 12 : 24,
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
-              overflow: 'hidden',
+              overflow: 'auto',
             }}
           >
             <Outlet />

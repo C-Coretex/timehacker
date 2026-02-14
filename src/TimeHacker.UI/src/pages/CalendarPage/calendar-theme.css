@@ -176,3 +176,53 @@
 .dark .rbc-label {
   color: #aaa;
 }
+
+/* ===== Mobile responsive ===== */
+@media (max-width: 767px) {
+  .rbc-toolbar {
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 13px;
+    padding: 4px 0;
+  }
+
+  .rbc-toolbar-label {
+    width: 100%;
+    text-align: center;
+    order: -1;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+
+  .rbc-toolbar button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .rbc-btn-group {
+    flex-wrap: wrap;
+  }
+
+  .rbc-header {
+    font-size: 12px;
+    padding: 4px 2px;
+  }
+
+  .rbc-time-header-cell .rbc-header {
+    font-size: 11px;
+  }
+
+  .rbc-label {
+    font-size: 11px;
+    padding: 0 4px;
+  }
+
+  .rbc-event {
+    font-size: 11px;
+    padding: 1px 3px;
+  }
+
+  .rbc-time-gutter {
+    min-width: 40px;
+  }
+}

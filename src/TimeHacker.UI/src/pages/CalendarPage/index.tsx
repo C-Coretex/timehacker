@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { FC } from 'react';
 import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
 import dayjs from 'dayjs';
@@ -14,12 +14,26 @@ import {
   type CalendarEvent,
 } from '../../api/tasks';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import ThreeDayView from './ThreeDayView';
 
 const localizer = dayjsLocalizer(dayjs);
 
+type ExtendedView = View | '3day';
+
+const calendarViews = {
+  month: true,
+  week: true,
+  day: true,
+  '3day': ThreeDayView,
+};
+
 const CalendarPage: FC = () => {
   const { darkMode } = useTheme();
-  const [view, setView] = useState<View>('week');
+  const { isMobile } = useIsMobile();
+  const initialViewSet = useRef(false);
+
+  const [view, setView] = useState<ExtendedView>(isMobile ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -27,13 +41,21 @@ const CalendarPage: FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // Set default view based on screen size only once on mount
+  useEffect(() => {
+    if (!initialViewSet.current) {
+      initialViewSet.current = true;
+      setView(isMobile ? 'day' : 'week');
+    }
+  }, [isMobile]);
+
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     setSelectedEvent(event);
     setIsModalVisible(true);
   }, []);
 
   const handleViewChange = useCallback((newView: View) => {
-    setView(newView);
+    setView(newView as ExtendedView);
   }, []);
 
   const handleNavigate = useCallback((newDate: Date) => {
@@ -42,9 +64,10 @@ const CalendarPage: FC = () => {
 
   const handleDrillDown = useCallback((newDate: Date) => {
     setDate(newDate);
-    setView('week');
+    setView('day');
   }, []);
 
+  // Compute date ranges for each view
   const weekStart = useMemo(() => {
     const d = new Date(date);
     d.setDate(d.getDate() - d.getDay());
@@ -69,73 +92,79 @@ const CalendarPage: FC = () => {
     return Array.from({ length: lastDay }, (_, i) => new Date(year, month, i + 1));
   }, [date]);
 
-  const fetchWeekTasks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const results = await fetchTasksForDays(weekDays);
-      const allEvents: CalendarEvent[] = [];
-      for (const dayResult of results) {
-        const dayDate = new Date(dayResult.date);
-        for (const item of dayResult.tasksTimeline ?? []) {
-          allEvents.push(taskForDayToEvent(item, dayDate, minutesToDate));
-        }
-      }
-      setEvents(allEvents);
-    } catch (err: unknown) {
-      const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-          : null;
-      setError(message ?? 'Failed to load tasks for week');
-    } finally {
-      setLoading(false);
-    }
-  }, [weekDays]);
+  const dayDates = useMemo(() => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return [d];
+  }, [date]);
 
-  const fetchMonthTasks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const results = await fetchTasksForDays(monthDays);
-      const allEvents: CalendarEvent[] = [];
-      for (const dayResult of results) {
-        const dayDate = new Date(dayResult.date);
-        for (const item of dayResult.tasksTimeline ?? []) {
-          allEvents.push(taskForDayToEvent(item, dayDate, minutesToDate));
-        }
+  const threeDayDates = useMemo(
+    () =>
+      Array.from({ length: 3 }, (_, i) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() + i);
+        return d;
+      }),
+    [date]
+  );
+
+  const getDatesForView = useCallback(
+    (v: ExtendedView): Date[] => {
+      switch (v) {
+        case 'month':
+          return monthDays;
+        case 'week':
+          return weekDays;
+        case 'day':
+          return dayDates;
+        case '3day':
+          return threeDayDates;
+        default:
+          return weekDays;
       }
-      setEvents(allEvents);
-    } catch (err: unknown) {
-      const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-          : null;
-      setError(message ?? 'Failed to load tasks for month');
-    } finally {
-      setLoading(false);
-    }
-  }, [monthDays]);
+    },
+    [monthDays, weekDays, dayDates, threeDayDates]
+  );
+
+  const fetchTasks = useCallback(
+    async (dates: Date[]) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const results = await fetchTasksForDays(dates);
+        const allEvents: CalendarEvent[] = [];
+        for (const dayResult of results) {
+          const dayDate = new Date(dayResult.date);
+          for (const item of dayResult.tasksTimeline ?? []) {
+            allEvents.push(taskForDayToEvent(item, dayDate, minutesToDate));
+          }
+        }
+        setEvents(allEvents);
+      } catch (err: unknown) {
+        const message =
+          err && typeof err === 'object' && 'response' in err
+            ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+            : null;
+        setError(message ?? 'Failed to load tasks');
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
-    if (view === 'month') {
-      fetchMonthTasks();
-    } else if (view === 'week') {
-      fetchWeekTasks();
-    }
-  }, [view, date, fetchMonthTasks, fetchWeekTasks]);
+    fetchTasks(getDatesForView(view));
+  }, [view, date, fetchTasks, getDatesForView]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const datesToRefresh = view === 'month' ? monthDays : weekDays;
-      await refreshTasksForDays(datesToRefresh);
-      if (view === 'month') {
-        await fetchMonthTasks();
-      } else {
-        await fetchWeekTasks();
-      }
+      const dates = getDatesForView(view);
+      await refreshTasksForDays(dates);
+      await fetchTasks(dates);
     } catch (err: unknown) {
       const message =
         err && typeof err === 'object' && 'response' in err
@@ -145,7 +174,7 @@ const CalendarPage: FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [view, monthDays, weekDays, fetchMonthTasks, fetchWeekTasks]);
+  }, [view, getDatesForView, fetchTasks]);
 
   const eventStyleGetter = useCallback(
     (event: CalendarEvent) => {
@@ -177,7 +206,7 @@ const CalendarPage: FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '8px' }}>
-        <Button icon={<ReloadOutlined />} onClick={refresh}>
+        <Button icon={<ReloadOutlined />} onClick={refresh} size={isMobile ? 'small' : 'middle'}>
           Refresh
         </Button>
       </div>
@@ -199,14 +228,15 @@ const CalendarPage: FC = () => {
           startAccessor="start"
           endAccessor="end"
           style={{ flex: 1 }}
-          view={view}
+          view={view as View}
           onView={handleViewChange}
           date={date}
           onNavigate={handleNavigate}
-          views={['month', 'week']}
+          views={calendarViews}
           onSelectEvent={handleSelectEvent}
           onDrillDown={handleDrillDown}
           eventPropGetter={eventStyleGetter}
+          messages={{ '3day': '3 Day' } as Record<string, string>}
         />
       )}
 

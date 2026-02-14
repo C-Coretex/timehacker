@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import type { FC } from 'react';
 import { Button, Modal, notification, Table, Tabs, Typography } from 'antd';
+import type { Breakpoint } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 
@@ -10,10 +11,12 @@ import TaskFormModal from '../components/TaskFormModal';
 import type { ScheduleFormPayload } from '../components/TaskFormModal';
 import DynamicTaskFormModal from '../components/DynamicTaskFormModal';
 import type { FixedTaskFormData, FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const { Title } = Typography;
 
 const TasksPage: FC = () => {
+  const { isMobile } = useIsMobile();
   const {
     tasks: fixedTasks,
     loading: fixedLoading,
@@ -75,35 +78,42 @@ const TasksPage: FC = () => {
 
   const fixedColumns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Description', dataIndex: 'description', key: 'description' },
-    { title: 'Priority', dataIndex: 'priority', key: 'priority' },
+    { title: 'Description', dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
+    { title: 'Priority', dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
     {
-      title: 'Start',
+      title: isMobile ? 'Start' : 'Start Time',
       dataIndex: 'startTimestamp',
       key: 'startTimestamp',
-      render: (date: Dayjs) => date.format('YYYY-MM-DD HH:mm'),
+      render: (date: Dayjs) => date.format(isMobile ? 'MM/DD HH:mm' : 'YYYY-MM-DD HH:mm'),
     },
     {
-      title: 'End',
+      title: isMobile ? 'End' : 'End Time',
       dataIndex: 'endTimestamp',
       key: 'endTimestamp',
-      render: (date: Dayjs) => date.format('YYYY-MM-DD HH:mm'),
+      render: (date: Dayjs) => date.format(isMobile ? 'MM/DD HH:mm' : 'YYYY-MM-DD HH:mm'),
     },
     {
       title: 'Actions',
       key: 'actions',
+      width: isMobile ? 80 : undefined,
       render: (_: unknown, task: FixedTaskDisplayModel) => (
         <>
-          <Button type="link" icon={<EditOutlined />} onClick={() => showEditFixedModal(task)}>
-            Edit
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => showEditFixedModal(task)}
+            size={isMobile ? 'small' : 'middle'}
+          >
+            {!isMobile && 'Edit'}
           </Button>
           <Button
             type="link"
             danger
             icon={<DeleteOutlined />}
             onClick={() => setDeleteModal({ visible: true, id: task.id, type: 'fixed' })}
+            size={isMobile ? 'small' : 'middle'}
           >
-            Delete
+            {!isMobile && 'Delete'}
           </Button>
         </>
       ),
@@ -122,41 +132,49 @@ const TasksPage: FC = () => {
 
   const dynamicColumns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Description', dataIndex: 'description', key: 'description' },
-    { title: 'Priority', dataIndex: 'priority', key: 'priority' },
+    { title: 'Description', dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
+    { title: 'Priority', dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
     {
-      title: 'Min duration',
+      title: isMobile ? 'Min' : 'Min duration',
       dataIndex: 'minTimeToFinish',
       key: 'minTimeToFinish',
       render: formatDuration,
     },
     {
-      title: 'Max duration',
+      title: isMobile ? 'Max' : 'Max duration',
       dataIndex: 'maxTimeToFinish',
       key: 'maxTimeToFinish',
       render: formatDuration,
     },
     {
-      title: 'Optimal duration',
+      title: isMobile ? 'Optimal' : 'Optimal duration',
       dataIndex: 'optimalTimeToFinish',
       key: 'optimalTimeToFinish',
       render: (v: string | null) => (v ? formatDuration(v) : '-'),
+      responsive: ['md'] as Breakpoint[],
     },
     {
       title: 'Actions',
       key: 'actions',
+      width: isMobile ? 80 : undefined,
       render: (_: unknown, task: DynamicTaskReturnModel) => (
         <>
-          <Button type="link" icon={<EditOutlined />} onClick={() => showEditDynamicModal(task)}>
-            Edit
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => showEditDynamicModal(task)}
+            size={isMobile ? 'small' : 'middle'}
+          >
+            {!isMobile && 'Edit'}
           </Button>
           <Button
             type="link"
             danger
             icon={<DeleteOutlined />}
             onClick={() => setDeleteModal({ visible: true, id: task.id, type: 'dynamic' })}
+            size={isMobile ? 'small' : 'middle'}
           >
-            Delete
+            {!isMobile && 'Delete'}
           </Button>
         </>
       ),
@@ -239,7 +257,7 @@ const TasksPage: FC = () => {
           marginBottom: '1rem',
         }}
       >
-        <Title level={2} style={{ margin: 0 }}>
+        <Title level={isMobile ? 4 : 2} style={{ margin: 0 }}>
           All Tasks
         </Title>
       </div>
@@ -252,7 +270,7 @@ const TasksPage: FC = () => {
             children: (
               <>
                 <div style={{ marginBottom: '1rem' }}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={showAddFixedModal}>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={showAddFixedModal} size={isMobile ? 'small' : 'middle'}>
                     Add Fixed Task
                   </Button>
                 </div>
@@ -267,6 +285,8 @@ const TasksPage: FC = () => {
                   loading={fixedLoading}
                   rowKey="id"
                   locale={{ emptyText: 'No fixed tasks yet.' }}
+                  scroll={isMobile ? { x: 500 } : undefined}
+                  size={isMobile ? 'small' : 'middle'}
                 />
               </>
             ),
@@ -277,7 +297,7 @@ const TasksPage: FC = () => {
             children: (
               <>
                 <div style={{ marginBottom: '1rem' }}>
-                  <Button type="primary" icon={<PlusOutlined />} onClick={showAddDynamicModal}>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={showAddDynamicModal} size={isMobile ? 'small' : 'middle'}>
                     Add Dynamic Task
                   </Button>
                 </div>
@@ -292,6 +312,8 @@ const TasksPage: FC = () => {
                   loading={dynamicLoading}
                   rowKey="id"
                   locale={{ emptyText: 'No dynamic tasks yet.' }}
+                  scroll={isMobile ? { x: 500 } : undefined}
+                  size={isMobile ? 'small' : 'middle'}
                 />
               </>
             ),
