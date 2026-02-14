@@ -208,6 +208,17 @@ static void AddIdentityServices(IServiceCollection services)
         options.Cookie.SameSite = SameSiteMode.None;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Required if SameSite=None
 
+        // Cookie lifetime
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // default
+        options.SlidingExpiration = true;
+        options.Events.OnSigningIn = context =>
+        {
+            if (context.Properties.IsPersistent)
+                context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7); // remember me 7 days
+
+            return Task.CompletedTask;
+        };
+
         // Prevent automatic redirects
         options.Events.OnRedirectToLogin = context =>
         {

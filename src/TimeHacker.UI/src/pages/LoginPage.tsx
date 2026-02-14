@@ -23,7 +23,6 @@ import { useAuth } from '../contexts/AuthContext';
 
 // constants for reuse
 const MIN_PASSWORD_LENGTH = 6;
-// TODO: add remember me (set useSessionCookies to false)
 // Small reusable field components
 const EmailField: React.FC = () => (
   <Form.Item
@@ -62,6 +61,7 @@ const PasswordField: React.FC<{ name?: string; label?: string }> = ({
 const LoginPage: FC = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login, fetchCurrentUser } = useAuth();
@@ -73,7 +73,7 @@ const LoginPage: FC = () => {
     setLoading(true);
     setError(null);
     try {
-      await api.post('/login?useCookies=true&useSessionCookies=true', values);
+      await api.post(`/login?useCookies=true&useSessionCookies=${!rememberMe}`, values);
       // Optionally hydrate user profile from API for breadcrumbs/menu
       await fetchCurrentUser();
       // You may also store minimal info immediately:
@@ -138,6 +138,11 @@ const LoginPage: FC = () => {
       >
         <EmailField />
         <PasswordField />
+        <Form.Item>
+          <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
+            Remember me
+          </Checkbox>
+        </Form.Item>
         <Form.Item>
           <Button
             type="primary"
