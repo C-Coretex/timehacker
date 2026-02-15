@@ -34,7 +34,7 @@ const LoginPage: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { login, fetchCurrentUser } = useAuth();
+  const { fetchCurrentUser } = useAuth();
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
 
@@ -51,14 +51,7 @@ const LoginPage: FC = () => {
     setError(null);
     try {
       await api.post(`/login?useCookies=true&useSessionCookies=${!rememberMe}`, values);
-      // Optionally hydrate user profile from API for breadcrumbs/menu
       await fetchCurrentUser();
-      // You may also store minimal info immediately:
-      login({
-        name: '',
-        phoneNumberForNotifications: '',
-        emailForNotifications: values.email,
-      });
       navigate('/'); // redirect to calendar
     } catch (err: any) {
       setError(err.response?.data?.message || t('login.loginFailed'));
@@ -89,13 +82,15 @@ const LoginPage: FC = () => {
         password: values.password,
       });
 
-      // after successful registration: switch to Login tab
+      // Auto-login after successful registration
+      await api.post(`/login?useCookies=true&useSessionCookies=${!rememberMe}`, {
+        email: values.email,
+        password: values.password,
+      });
+      await fetchCurrentUser();
       message.success(t('login.accountCreated'));
-      setActiveTab('login');
-
-      // Prefill email on the Login form and clear Register form
-      loginForm.setFieldsValue({ email: values.email });
       registerForm.resetFields();
+      navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || t('login.registrationFailed'));
     } finally {

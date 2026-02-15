@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import {
   Typography,
@@ -50,6 +50,10 @@ const ProfilePage: FC = () => {
   const [form] = Form.useForm();
   const { token } = theme.useToken();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
 
   if (!user) {
     return <Spin size="large" style={{ display: 'block', margin: '2rem auto' }} />;
