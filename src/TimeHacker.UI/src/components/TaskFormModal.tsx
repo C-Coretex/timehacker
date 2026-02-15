@@ -125,7 +125,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
             open={open}
             forceRender
             destroyOnHidden
-            maskClosable={false}
+            mask={{ closable: false }}
             title={initialData ? t('taskForm.editTask') : t('taskForm.addTask')}
             okText={initialData ? t('taskForm.update') : t('taskForm.create')}
             onCancel={onCancel}
@@ -167,7 +167,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                 {!isCreate && (
                     <Alert
                         type="info"
-                        message={t('taskForm.scheduleInfo')}
+                        title={t('taskForm.scheduleInfo')}
                         description={t('taskForm.scheduleInfoDescription')}
                         showIcon
                         style={{ marginBottom: 16 }}

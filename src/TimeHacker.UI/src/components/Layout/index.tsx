@@ -175,8 +175,7 @@ const Layout: FC = () => {
           placement="left"
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          width={250}
-          styles={{ body: { padding: 0, background: '#001529' } }}
+          styles={{ body: { padding: 0, background: '#001529' }, wrapper: { width: 250 } }}
         >
           <SidebarLogo onClick={handleLogoClick} />
           {menuNode}

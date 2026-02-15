@@ -103,7 +103,7 @@ export function taskForDayToEvent(
   const end = minutesToDateFn(date, endM);
   const task = item.task;
   return {
-    id: `${task.id}-${item.scheduleEntityId ?? date.toISOString()}`,
+    id: `${task.id}-${date.toISOString()}-${item.timeRange.start}`,
     title: task.name,
     start,
     end,

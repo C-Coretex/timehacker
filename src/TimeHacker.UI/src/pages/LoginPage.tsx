@@ -242,11 +242,11 @@ const LoginPage: FC = () => {
       </Typography.Text>
 
       {authMessage && (
-        <Alert type="warning" message={authMessage} showIcon style={{ marginTop: '1rem' }} />
+        <Alert type="warning" title={authMessage} showIcon style={{ marginTop: '1rem' }} />
       )}
 
       {error && (
-        <Alert type="error" message={error} style={{ marginTop: '1rem' }} />
+        <Alert type="error" title={error} style={{ marginTop: '1rem' }} />
       )}
 
       <Tabs

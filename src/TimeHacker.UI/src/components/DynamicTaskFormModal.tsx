@@ -82,8 +82,8 @@ const DynamicTaskFormModal: FC<DynamicTaskFormModalProps> = ({
     <Modal
       open={open}
       forceRender
-      destroyOnClose
-      maskClosable={false}
+      destroyOnHidden
+      mask={{ closable: false }}
       title={initialData ? t('dynamicTaskForm.editTask') : t('dynamicTaskForm.addTask')}
       okText={initialData ? t('dynamicTaskForm.update') : t('dynamicTaskForm.create')}
       onCancel={onCancel}

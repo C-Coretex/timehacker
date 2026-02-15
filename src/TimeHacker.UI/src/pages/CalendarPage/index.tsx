@@ -31,11 +31,11 @@ const calendarViews = {
 
 const CalendarPage: FC = () => {
   const { darkMode } = useTheme();
-  const { isMobile } = useIsMobile();
+  const { isMobile, screens } = useIsMobile();
   const { t, i18n } = useTranslation();
   const initialViewSet = useRef(false);
 
-  const [view, setView] = useState<ExtendedView>(isMobile ? 'day' : 'week');
+  const [view, setView] = useState<ExtendedView>('week');
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -43,13 +43,13 @@ const CalendarPage: FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Set default view based on screen size only once on mount
+  // Set default view based on screen size only once after breakpoints resolve
   useEffect(() => {
-    if (!initialViewSet.current) {
+    if (!initialViewSet.current && screens.md !== undefined) {
       initialViewSet.current = true;
       setView(isMobile ? 'day' : 'week');
     }
-  }, [isMobile]);
+  }, [isMobile, screens.md]);
 
   const handleSelectEvent = useCallback((event: CalendarEvent) => {
     setSelectedEvent(event);
@@ -226,7 +226,7 @@ const CalendarPage: FC = () => {
       {error && (
         <Alert
           type="error"
-          message={error}
+          title={error}
           showIcon
           style={{ marginBottom: '0.5rem' }}
         />
