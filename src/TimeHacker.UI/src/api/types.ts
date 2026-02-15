@@ -8,6 +8,7 @@ export interface FixedTaskReturnModel {
     priority: number;
     startTimestamp: string;
     endTimestamp: string;
+    repeatingEntity: ReturnRepeatingEntityModel | null;
 }
 
 export interface InputFixedTask {
@@ -33,6 +34,7 @@ export interface FixedTaskDisplayModel {
     priority: number;
     startTimestamp: Dayjs;
     endTimestamp: Dayjs;
+    repeatingEntity: ReturnRepeatingEntityModel | null;
 }
 
 export interface DynamicTaskReturnModel {
@@ -78,30 +80,23 @@ export const DayOfWeekEnum = {
 } as const;
 export type DayOfWeekEnum = (typeof DayOfWeekEnum)[keyof typeof DayOfWeekEnum];
 
-/** API expects entityType as string enum name, e.g. "DayRepeatingEntity" */
-export type RepeatingEntityTypeName =
-    | 'DayRepeatingEntity'
-    | 'WeekRepeatingEntity'
-    | 'MonthRepeatingEntity'
-    | 'YearRepeatingEntity';
-
 export interface InputDayRepeatingEntityModel {
-    entityType: RepeatingEntityTypeName;
+    entityType: typeof RepeatingEntityTypeEnum.DayRepeatingEntity;
     daysCountToRepeat: number;
 }
 
 export interface InputWeekRepeatingEntityModel {
-    entityType: RepeatingEntityTypeName;
+    entityType: typeof RepeatingEntityTypeEnum.WeekRepeatingEntity;
     repeatsOn: number[]; // DayOfWeekEnum values (1-7)
 }
 
 export interface InputMonthRepeatingEntityModel {
-    entityType: RepeatingEntityTypeName;
+    entityType: typeof RepeatingEntityTypeEnum.MonthRepeatingEntity;
     monthDayToRepeat: number; // 1-31
 }
 
 export interface InputYearRepeatingEntityModel {
-    entityType: RepeatingEntityTypeName;
+    entityType: typeof RepeatingEntityTypeEnum.YearRepeatingEntity;
     yearDayToRepeat: number; // 1-366
 }
 
@@ -110,6 +105,34 @@ export type InputRepeatingEntityType =
     | InputWeekRepeatingEntityModel
     | InputMonthRepeatingEntityModel
     | InputYearRepeatingEntityModel;
+
+// --- Return repeating entity models (from API) ---
+
+export interface ReturnDayRepeatingEntityModel {
+    entityType: typeof RepeatingEntityTypeEnum.DayRepeatingEntity;
+    daysCountToRepeat: number;
+}
+
+export interface ReturnWeekRepeatingEntityModel {
+    entityType: typeof RepeatingEntityTypeEnum.WeekRepeatingEntity;
+    repeatsOn: number[];
+}
+
+export interface ReturnMonthRepeatingEntityModel {
+    entityType: typeof RepeatingEntityTypeEnum.MonthRepeatingEntity;
+    monthDayToRepeat: number;
+}
+
+export interface ReturnYearRepeatingEntityModel {
+    entityType: typeof RepeatingEntityTypeEnum.YearRepeatingEntity;
+    yearDayToRepeat: number;
+}
+
+export type ReturnRepeatingEntityModel =
+    | ReturnDayRepeatingEntityModel
+    | ReturnWeekRepeatingEntityModel
+    | ReturnMonthRepeatingEntityModel
+    | ReturnYearRepeatingEntityModel;
 
 export interface EndsOnModel {
     maxDate?: string; // YYYY-MM-DD

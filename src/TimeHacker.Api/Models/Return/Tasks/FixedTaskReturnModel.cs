@@ -1,10 +1,11 @@
-﻿using TimeHacker.Api.Models.Return.Tags;
+using TimeHacker.Api.Models.Return.RepeatingEntities;
+using TimeHacker.Api.Models.Return.Tags;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 namespace TimeHacker.Api.Models.Return.Tasks;
 
 public record FixedTaskReturnModel(
-    
+
     Guid Id,
     string Name,
     string? Description,
@@ -12,6 +13,7 @@ public record FixedTaskReturnModel(
     DateTime StartTimestamp,
     DateTime EndTimestamp,
     DateTime CreatedTimestamp,
+    ReturnRepeatingEntityModelBase? RepeatingEntity,
     IEnumerable<TagReturnModel> Tags)
 {
     public static FixedTaskReturnModel Create(FixedTaskDto fixedTask)
@@ -24,6 +26,7 @@ public record FixedTaskReturnModel(
             fixedTask.StartTimestamp,
             fixedTask.EndTimestamp,
             fixedTask.CreatedTimestamp,
+            fixedTask.RepeatingEntity != null ? ReturnRepeatingEntityModelBase.Create(fixedTask.RepeatingEntity) : null,
             fixedTask.Tags.Select(TagReturnModel.Create)
         );
     }

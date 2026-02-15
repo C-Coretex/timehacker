@@ -1,14 +1,17 @@
 // src/components/TaskFormModal.tsx
 import { useEffect } from 'react';
 import type { FC } from 'react';
-import { Modal, Form, Input, InputNumber, DatePicker, Checkbox, Select, Collapse, Alert } from 'antd';
+import { Modal, Form, Input, InputNumber, DatePicker, Checkbox, Select, Collapse, Descriptions } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import {
+    RepeatingEntityTypeEnum,
+} from '../api/types';
 import type {
     FixedTaskFormData,
     InputRepeatingEntityType,
-    RepeatingEntityTypeName,
     EndsOnModel,
+    ReturnRepeatingEntityModel,
 } from '../api/types';
 
 export type ScheduleFormPayload = {
@@ -20,7 +23,7 @@ interface TaskFormModalProps {
     open: boolean;
     onCancel: () => void;
     onSave: (data: FixedTaskFormData, id?: string, schedule?: ScheduleFormPayload) => void;
-    initialData?: FixedTaskFormData & { id: string };
+    initialData?: FixedTaskFormData & { id: string; repeatingEntity?: ReturnRepeatingEntityModel | null };
 }
 
 const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initialData }) => {
@@ -30,11 +33,11 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
     const scheduleType = Form.useWatch('scheduleType', form);
     const isCreate = !initialData;
 
-    const repeatTypes: { value: RepeatingEntityTypeName; label: string }[] = [
-        { value: 'DayRepeatingEntity', label: t('taskForm.everyNDays') },
-        { value: 'WeekRepeatingEntity', label: t('taskForm.weekly') },
-        { value: 'MonthRepeatingEntity', label: t('taskForm.monthly') },
-        { value: 'YearRepeatingEntity', label: t('taskForm.yearly') },
+    const repeatTypes: { value: RepeatingEntityTypeEnum; label: string }[] = [
+        { value: RepeatingEntityTypeEnum.DayRepeatingEntity, label: t('taskForm.everyNDays') },
+        { value: RepeatingEntityTypeEnum.WeekRepeatingEntity, label: t('taskForm.weekly') },
+        { value: RepeatingEntityTypeEnum.MonthRepeatingEntity, label: t('taskForm.monthly') },
+        { value: RepeatingEntityTypeEnum.YearRepeatingEntity, label: t('taskForm.yearly') },
     ];
 
     const daysOfWeek = [
@@ -62,31 +65,31 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
     }, [initialData, form]);
 
     const buildSchedulePayload = (): ScheduleFormPayload | undefined => {
-        if (!addSchedule || !scheduleType) return undefined;
+        if (!addSchedule || scheduleType == null) return undefined;
         const values = form.getFieldsValue();
         let repeatingEntityType: InputRepeatingEntityType;
-        switch (scheduleType) {
-            case 'DayRepeatingEntity':
+        switch (scheduleType as RepeatingEntityTypeEnum) {
+            case RepeatingEntityTypeEnum.DayRepeatingEntity:
                 repeatingEntityType = {
-                    entityType: 'DayRepeatingEntity',
+                    entityType: RepeatingEntityTypeEnum.DayRepeatingEntity,
                     daysCountToRepeat: values.daysCountToRepeat ?? 1,
                 };
                 break;
-            case 'WeekRepeatingEntity':
+            case RepeatingEntityTypeEnum.WeekRepeatingEntity:
                 repeatingEntityType = {
-                    entityType: 'WeekRepeatingEntity',
+                    entityType: RepeatingEntityTypeEnum.WeekRepeatingEntity,
                     repeatsOn: values.repeatsOn ?? [],
                 };
                 break;
-            case 'MonthRepeatingEntity':
+            case RepeatingEntityTypeEnum.MonthRepeatingEntity:
                 repeatingEntityType = {
-                    entityType: 'MonthRepeatingEntity',
+                    entityType: RepeatingEntityTypeEnum.MonthRepeatingEntity,
                     monthDayToRepeat: values.monthDayToRepeat ?? 1,
                 };
                 break;
-            case 'YearRepeatingEntity':
+            case RepeatingEntityTypeEnum.YearRepeatingEntity:
                 repeatingEntityType = {
-                    entityType: 'YearRepeatingEntity',
+                    entityType: RepeatingEntityTypeEnum.YearRepeatingEntity,
                     yearDayToRepeat: values.yearDayToRepeat ?? 1,
                 };
                 break;
@@ -164,14 +167,29 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                     <DatePicker showTime format="YYYY-MM-DD HH:mm" />
                 </Form.Item>
 
-                {!isCreate && (
-                    <Alert
-                        type="info"
-                        title={t('taskForm.scheduleInfo')}
-                        description={t('taskForm.scheduleInfoDescription')}
-                        showIcon
+                {!isCreate && initialData?.repeatingEntity && (
+                    <Descriptions
+                        title={t('taskForm.currentSchedule')}
+                        bordered
+                        size="small"
+                        column={1}
                         style={{ marginBottom: 16 }}
-                    />
+                    >
+                        <Descriptions.Item label={t('taskForm.repeatType')}>
+                            {initialData.repeatingEntity.entityType === RepeatingEntityTypeEnum.DayRepeatingEntity &&
+                                t('taskForm.repeatsEveryNDays', { count: initialData.repeatingEntity.daysCountToRepeat })}
+                            {initialData.repeatingEntity.entityType === RepeatingEntityTypeEnum.WeekRepeatingEntity &&
+                                t('taskForm.repeatsWeeklyOn', {
+                                    days: initialData.repeatingEntity.repeatsOn
+                                        .map((d) => daysOfWeek.find((dw) => dw.value === d)?.label ?? String(d))
+                                        .join(', '),
+                                })}
+                            {initialData.repeatingEntity.entityType === RepeatingEntityTypeEnum.MonthRepeatingEntity &&
+                                t('taskForm.repeatsMonthlyOnDay', { day: initialData.repeatingEntity.monthDayToRepeat })}
+                            {initialData.repeatingEntity.entityType === RepeatingEntityTypeEnum.YearRepeatingEntity &&
+                                t('taskForm.repeatsYearlyOnDay', { day: initialData.repeatingEntity.yearDayToRepeat })}
+                        </Descriptions.Item>
+                    </Descriptions>
                 )}
 
                 {isCreate && (
@@ -191,7 +209,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                                 message: t('taskForm.selectRepeatType'),
                                             },
                                         ]}
-                                        initialValue="DayRepeatingEntity"
+                                        initialValue={RepeatingEntityTypeEnum.DayRepeatingEntity}
                                     >
                                         <Select
                                             options={repeatTypes}
@@ -199,7 +217,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                         />
                                     </Form.Item>
 
-                                    {scheduleType === 'DayRepeatingEntity' && (
+                                    {scheduleType === RepeatingEntityTypeEnum.DayRepeatingEntity && (
                                         <Form.Item
                                             name="daysCountToRepeat"
                                             label={t('taskForm.repeatEveryNDays')}
@@ -215,7 +233,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                         </Form.Item>
                                     )}
 
-                                    {scheduleType === 'WeekRepeatingEntity' && (
+                                    {scheduleType === RepeatingEntityTypeEnum.WeekRepeatingEntity && (
                                         <Form.Item
                                             name="repeatsOn"
                                             label={t('taskForm.repeatOnDays')}
@@ -238,7 +256,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                         </Form.Item>
                                     )}
 
-                                    {scheduleType === 'MonthRepeatingEntity' && (
+                                    {scheduleType === RepeatingEntityTypeEnum.MonthRepeatingEntity && (
                                         <Form.Item
                                             name="monthDayToRepeat"
                                             label={t('taskForm.dayOfMonth')}
@@ -261,7 +279,7 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                         </Form.Item>
                                     )}
 
-                                    {scheduleType === 'YearRepeatingEntity' && (
+                                    {scheduleType === RepeatingEntityTypeEnum.YearRepeatingEntity && (
                                         <Form.Item
                                             name="yearDayToRepeat"
                                             label={t('taskForm.dayOfYear')}

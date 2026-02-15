@@ -1,14 +1,14 @@
-﻿using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
-public record InputYearRepeatingEntityModel : IInputRepeatingEntityType
+public record InputYearRepeatingEntityModel : InputRepeatingEntityModelBase
 {
     [Required]
     public int YearDayToRepeat { get; set; }
-    public RepeatingEntityTypeEnum EntityType { get; init; } = RepeatingEntityTypeEnum.YearRepeatingEntity;
+    public override RepeatingEntityTypeEnum EntityType => RepeatingEntityTypeEnum.YearRepeatingEntity;
 
-    public IRepeatingEntityType CreateEntity()
+    public override IRepeatingEntityType CreateEntity()
     {
         return new YearRepeatingEntity(YearDayToRepeat);
     }

@@ -10,7 +10,7 @@ public record InputScheduleEntityModel
     [Required]
     public Guid ParentEntityId { get; set; }
     [Required]
-    public required IInputRepeatingEntityType RepeatingEntityType { get; set; }
+    public required InputRepeatingEntityModelBase RepeatingEntityType { get; set; }
     public EndsOnModel? EndsOnModel { get; set; } = null;
 
     public ScheduleEntityCreateDto CreateDto()

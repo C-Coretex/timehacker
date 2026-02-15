@@ -1,14 +1,14 @@
-﻿using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
-public record InputMonthRepeatingEntityModel : IInputRepeatingEntityType
+public record InputMonthRepeatingEntityModel : InputRepeatingEntityModelBase
 {
     [Required]
-    public byte MonthDayToRepeat { get; init; }
-    public RepeatingEntityTypeEnum EntityType { get; init; } = RepeatingEntityTypeEnum.MonthRepeatingEntity;
+    public byte MonthDayToRepeat { get; set; }
+    public override RepeatingEntityTypeEnum EntityType => RepeatingEntityTypeEnum.MonthRepeatingEntity;
 
-    public IRepeatingEntityType CreateEntity()
+    public override IRepeatingEntityType CreateEntity()
     {
         return new MonthRepeatingEntity(MonthDayToRepeat);
     }

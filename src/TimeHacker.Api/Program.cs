@@ -6,10 +6,8 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Filters;
-using TimeHacker.Api.Helpers;
 using TimeHacker.Api.Middleware;
 using TimeHacker.Application.Api.Extensions;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.Services.Extensions;
 using TimeHacker.Infrastructure.Extensions;
 using TimeHacker.Infrastructure.Identity;
@@ -214,7 +212,7 @@ static void AddIdentityServices(IServiceCollection services)
         options.Events.OnSigningIn = context =>
         {
             if (context.Properties.IsPersistent)
-                context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7); // remember me 7 days
+                context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(14); // remember me 14 days
 
             return Task.CompletedTask;
         };

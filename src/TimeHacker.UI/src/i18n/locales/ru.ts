@@ -167,6 +167,13 @@ const ru = {
     endsOnDate: 'Дата окончания (необязательно)',
     endsAfterOccurrences: 'Завершить после N повторений (необязательно)',
     noLimitPlaceholder: 'Оставьте пустым для без ограничений',
+    currentSchedule: 'Текущее расписание',
+    repeatsEveryNDays: 'Повторяется каждый {{count}} день',
+    repeatsEveryNDays_other: 'Повторяется каждые {{count}} дней',
+    repeatsWeeklyOn: 'Повторяется еженедельно: {{days}}',
+    repeatsMonthlyOnDay: 'Повторяется ежемесячно в {{day}}-й день',
+    repeatsYearlyOnDay: 'Повторяется ежегодно в {{day}}-й день',
+    noSchedule: 'Нет повторяющегося расписания',
   },
 
   // Dynamic task form modal

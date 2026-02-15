@@ -1,14 +1,14 @@
-﻿using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
-public record InputWeekRepeatingEntityModel : IInputRepeatingEntityType
+public record InputWeekRepeatingEntityModel : InputRepeatingEntityModelBase
 {
     [Required]
     public required IEnumerable<DayOfWeekEnum> RepeatsOn { get; set; }
-    public RepeatingEntityTypeEnum EntityType { get; init; } = RepeatingEntityTypeEnum.WeekRepeatingEntity;
+    public override RepeatingEntityTypeEnum EntityType => RepeatingEntityTypeEnum.WeekRepeatingEntity;
 
-    public IRepeatingEntityType CreateEntity()
+    public override IRepeatingEntityType CreateEntity()
     {
         return new WeekRepeatingEntity(RepeatsOn);
     }

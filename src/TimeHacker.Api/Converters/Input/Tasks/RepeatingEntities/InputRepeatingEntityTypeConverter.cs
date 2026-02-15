@@ -1,23 +1,23 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
 namespace TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 
-public class InputRepeatingEntityTypeConverter : JsonConverter<IInputRepeatingEntityType>
+public class InputRepeatingEntityTypeConverter : JsonConverter<InputRepeatingEntityModelBase>
 {
-    public override IInputRepeatingEntityType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override InputRepeatingEntityModelBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         using var doc = JsonDocument.ParseValue(ref reader);
 
-        if (!doc.RootElement.TryGetProperty(nameof(IInputRepeatingEntityType.EntityType), out var typeProp))
-            throw new JsonException("Missing 'type' discriminator");
+        if (!doc.RootElement.TryGetProperty(nameof(InputRepeatingEntityModelBase.EntityType), out var typeProp))
+            throw new JsonException("Missing 'EntityType' discriminator");
 
-        var typeString = typeProp.GetString()!;
+        var typeString = typeProp.GetRawText();
         var typeEnum = Enum.Parse<RepeatingEntityTypeEnum>(typeString);
 
         // Parse as JsonNode and remove the EntityType property to avoid deserializing it
         var jsonNode = JsonNode.Parse(doc.RootElement.GetRawText())!.AsObject();
-        jsonNode.Remove(nameof(IInputRepeatingEntityType.EntityType));
+        jsonNode.Remove(nameof(InputRepeatingEntityModelBase.EntityType));
         var json = jsonNode.ToJsonString();
 
         return typeEnum switch
@@ -26,13 +26,12 @@ public class InputRepeatingEntityTypeConverter : JsonConverter<IInputRepeatingEn
             RepeatingEntityTypeEnum.WeekRepeatingEntity => JsonSerializer.Deserialize<InputWeekRepeatingEntityModel>(json, options),
             RepeatingEntityTypeEnum.MonthRepeatingEntity => JsonSerializer.Deserialize<InputMonthRepeatingEntityModel>(json, options),
             RepeatingEntityTypeEnum.YearRepeatingEntity => JsonSerializer.Deserialize<InputYearRepeatingEntityModel>(json, options),
-            _ => throw new JsonException($"Unknown type: {typeString}")
+            _ => throw new JsonException($"Unknown type: {typeEnum}")
         };
     }
 
-    public override void Write(Utf8JsonWriter writer, IInputRepeatingEntityType value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, InputRepeatingEntityModelBase value, JsonSerializerOptions options)
     {
-        //will work, because it will serialize the concrete type, not the interface
         JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }
 }

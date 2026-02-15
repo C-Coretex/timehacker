@@ -167,6 +167,13 @@ const en = {
     endsOnDate: 'Ends on date (optional)',
     endsAfterOccurrences: 'End after N occurrences (optional)',
     noLimitPlaceholder: 'Leave empty for no limit',
+    currentSchedule: 'Current Schedule',
+    repeatsEveryNDays: 'Repeats every {{count}} day',
+    repeatsEveryNDays_other: 'Repeats every {{count}} days',
+    repeatsWeeklyOn: 'Repeats weekly on: {{days}}',
+    repeatsMonthlyOnDay: 'Repeats monthly on day {{day}}',
+    repeatsYearlyOnDay: 'Repeats yearly on day {{day}}',
+    noSchedule: 'No recurring schedule',
   },
 
   // Dynamic task form modal
