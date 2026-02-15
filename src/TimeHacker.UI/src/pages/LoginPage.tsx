@@ -18,47 +18,15 @@ import {
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../api/api';
 import { useAuth } from '../contexts/AuthContext';
 
 // constants for reuse
 const MIN_PASSWORD_LENGTH = 6;
-// Small reusable field components
-const EmailField: React.FC = () => (
-  <Form.Item
-    label="Email"
-    name="email"
-    rules={[
-      { required: true, message: 'Please enter your email' },
-      { type: 'email', message: 'Invalid email format' },
-    ]}
-    extra="Use a valid email address. We will use it for notifications."
-  >
-    <Input prefix={<MailOutlined />} placeholder="example@email.com" />
-  </Form.Item>
-);
-
-const PasswordField: React.FC<{ name?: string; label?: string }> = ({
-  name = 'password',
-  label = 'Password',
-}) => (
-  <Form.Item
-    label={label}
-    name={name}
-    rules={[
-      { required: true, message: 'Please enter your password' },
-      {
-        min: MIN_PASSWORD_LENGTH,
-        message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
-      },
-    ]}
-    extra="Use at least 6 characters. Strong passwords mix letters and numbers."
-  >
-    <Input.Password prefix={<LockOutlined />} placeholder="��������" />
-  </Form.Item>
-);
 
 const LoginPage: FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -72,10 +40,10 @@ const LoginPage: FC = () => {
 
   const authMessage = useMemo(() => {
     if (searchParams.get('expired') === 'true') {
-      return 'Your session has expired. Please log in again.';
+      return t('login.sessionExpired');
     }
     return (location.state as { message?: string })?.message ?? null;
-  }, [location.state, searchParams]);
+  }, [location.state, searchParams, t]);
 
   // Handle login
   const handleLogin = async (values: { email: string; password: string }) => {
@@ -93,7 +61,7 @@ const LoginPage: FC = () => {
       });
       navigate('/'); // redirect to calendar
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || t('login.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -122,22 +90,53 @@ const LoginPage: FC = () => {
       });
 
       // after successful registration: switch to Login tab
-      message.success('Account created. Please sign in.');
+      message.success(t('login.accountCreated'));
       setActiveTab('login');
 
       // Prefill email on the Login form and clear Register form
       loginForm.setFieldsValue({ email: values.email });
       registerForm.resetFields();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || t('login.registrationFailed'));
     } finally {
       setLoading(false);
     }
   };
 
+  const emailField = (
+    <Form.Item
+      label={t('login.email')}
+      name="email"
+      rules={[
+        { required: true, message: t('login.emailRequired') },
+        { type: 'email', message: t('login.emailInvalid') },
+      ]}
+      extra={t('login.emailHint')}
+    >
+      <Input prefix={<MailOutlined />} placeholder="example@email.com" />
+    </Form.Item>
+  );
+
+  const passwordField = (name = 'password', label = t('login.password')) => (
+    <Form.Item
+      label={label}
+      name={name}
+      rules={[
+        { required: true, message: t('login.passwordRequired') },
+        {
+          min: MIN_PASSWORD_LENGTH,
+          message: t('login.passwordMinLength', { min: MIN_PASSWORD_LENGTH }),
+        },
+      ]}
+      extra={t('login.passwordHint')}
+    >
+      <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
+    </Form.Item>
+  );
+
   const loginTab: NonNullable<TabsProps['items']>[number] = {
     key: 'login',
-    label: 'Login',
+    label: t('login.loginButton'),
     children: (
       <Form
         form={loginForm}
@@ -145,11 +144,11 @@ const LoginPage: FC = () => {
         onFinish={handleLogin}
         style={{ marginTop: '1rem' }}
       >
-        <EmailField />
-        <PasswordField />
+        {emailField}
+        {passwordField()}
         <Form.Item>
           <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
-            Remember me
+            {t('login.rememberMe')}
           </Checkbox>
         </Form.Item>
         <Form.Item>
@@ -160,7 +159,7 @@ const LoginPage: FC = () => {
             loading={loading}
             block
           >
-            Login
+            {t('login.loginButton')}
           </Button>
         </Form.Item>
         <Form.Item>
@@ -170,7 +169,7 @@ const LoginPage: FC = () => {
             onClick={handleDevLogin}
             block
           >
-            Quick Dev Login
+            {t('login.devLogin')}
           </Button>
         </Form.Item>
       </Form>
@@ -179,7 +178,7 @@ const LoginPage: FC = () => {
 
   const registerTab: NonNullable<TabsProps['items']>[number] = {
     key: 'register',
-    label: 'Register',
+    label: t('login.register'),
     children: (
       <Form
         form={registerForm}
@@ -187,28 +186,28 @@ const LoginPage: FC = () => {
         onFinish={handleRegister}
         style={{ marginTop: '1rem' }}
       >
-        <EmailField />
-        <PasswordField />
+        {emailField}
+        {passwordField()}
         {/* Confirm password with cross-field validation */}
         <Form.Item
-          label="Confirm Password"
+          label={t('login.confirmPassword')}
           name="confirmPassword"
           dependencies={['password']}
           rules={[
-            { required: true, message: 'Please confirm your password' },
+            { required: true, message: t('login.confirmPasswordRequired') },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('Passwords do not match'));
+                return Promise.reject(new Error(t('login.passwordsMismatch')));
               },
             }),
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Repeat your password"
+            placeholder={t('login.repeatPasswordPlaceholder')}
           />
         </Form.Item>
 
@@ -221,17 +220,17 @@ const LoginPage: FC = () => {
               validator: (_, value) =>
                 value
                   ? Promise.resolve()
-                  : Promise.reject(new Error('You must accept terms')),
+                  : Promise.reject(new Error(t('login.termsRequired'))),
             },
           ]}
-          extra="By creating an account you agree to our terms and privacy policy."
+          extra={t('login.termsHint')}
         >
-          <Checkbox>I accept the Terms and Privacy Policy</Checkbox>
+          <Checkbox>{t('login.termsCheckbox')}</Checkbox>
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading} block>
-            Create account
+            {t('login.createAccount')}
           </Button>
         </Form.Item>
       </Form>
@@ -241,10 +240,10 @@ const LoginPage: FC = () => {
   return (
     <div style={{ maxWidth: 480, margin: '2rem auto', padding: '0 16px' }}>
       <Typography.Title level={2} style={{ marginBottom: 0 }}>
-        Welcome to TimeHacker
+        {t('login.welcome')}
       </Typography.Title>
       <Typography.Text type="secondary">
-        Sign in to access your smart calendar or create a new account.
+        {t('login.subtitle')}
       </Typography.Text>
 
       {authMessage && (

@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'contexts/AuthContext';
 import type { PrivateRouteProps } from './types';
 
@@ -10,6 +11,7 @@ const PrivateRoute: FC<PrivateRouteProps> = ({
   // permissions = [],
 }) => {
   const { isAuthenticated, loading } = useAuth();
+  const { t } = useTranslation();
 
   if (auth && loading) {
     return (
@@ -20,7 +22,7 @@ const PrivateRoute: FC<PrivateRouteProps> = ({
   }
 
   if (auth && !isAuthenticated) {
-    return <Navigate to="/login" state={{ message: 'Please log in to access this page' }} replace />;
+    return <Navigate to="/login" state={{ message: t('privateRoute.loginRequired') }} replace />;
   }
 
   // if (auth && !hasAccess(roles, permissions)) {

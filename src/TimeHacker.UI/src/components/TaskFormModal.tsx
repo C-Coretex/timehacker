@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Modal, Form, Input, InputNumber, DatePicker, Checkbox, Select, Collapse, Alert } from 'antd';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import type {
     FixedTaskFormData,
     InputRepeatingEntityType,
@@ -22,28 +23,29 @@ interface TaskFormModalProps {
     initialData?: FixedTaskFormData & { id: string };
 }
 
-const REPEAT_TYPES: { value: RepeatingEntityTypeName; label: string }[] = [
-    { value: 'DayRepeatingEntity', label: 'Every N days' },
-    { value: 'WeekRepeatingEntity', label: 'Weekly (specific days)' },
-    { value: 'MonthRepeatingEntity', label: 'Monthly (day of month)' },
-    { value: 'YearRepeatingEntity', label: 'Yearly (day of year)' },
-];
-
-const DAYS_OF_WEEK = [
-    { value: 1, label: 'Mon' },
-    { value: 2, label: 'Tue' },
-    { value: 3, label: 'Wed' },
-    { value: 4, label: 'Thu' },
-    { value: 5, label: 'Fri' },
-    { value: 6, label: 'Sat' },
-    { value: 7, label: 'Sun' },
-];
-
 const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initialData }) => {
     const [form] = Form.useForm();
+    const { t } = useTranslation();
     const addSchedule = Form.useWatch('addSchedule', form);
     const scheduleType = Form.useWatch('scheduleType', form);
     const isCreate = !initialData;
+
+    const repeatTypes: { value: RepeatingEntityTypeName; label: string }[] = [
+        { value: 'DayRepeatingEntity', label: t('taskForm.everyNDays') },
+        { value: 'WeekRepeatingEntity', label: t('taskForm.weekly') },
+        { value: 'MonthRepeatingEntity', label: t('taskForm.monthly') },
+        { value: 'YearRepeatingEntity', label: t('taskForm.yearly') },
+    ];
+
+    const daysOfWeek = [
+        { value: 1, label: t('taskForm.mon') },
+        { value: 2, label: t('taskForm.tue') },
+        { value: 3, label: t('taskForm.wed') },
+        { value: 4, label: t('taskForm.thu') },
+        { value: 5, label: t('taskForm.fri') },
+        { value: 6, label: t('taskForm.sat') },
+        { value: 7, label: t('taskForm.sun') },
+    ];
 
     useEffect(() => {
         if (initialData) {
@@ -124,40 +126,40 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
             forceRender
             destroyOnHidden
             maskClosable={false}
-            title={initialData ? 'Edit Task' : 'Add Task'}
-            okText={initialData ? 'Update' : 'Create'}
+            title={initialData ? t('taskForm.editTask') : t('taskForm.addTask')}
+            okText={initialData ? t('taskForm.update') : t('taskForm.create')}
             onCancel={onCancel}
             onOk={() => form.submit()}
         >
             <Form form={form} onFinish={handleFinish} layout="vertical">
                 <Form.Item
                     name="name"
-                    label="Task Name"
-                    rules={[{ required: true, message: 'Please enter task name' }]}
+                    label={t('taskForm.taskName')}
+                    rules={[{ required: true, message: t('taskForm.taskNameRequired') }]}
                 >
                     <Input />
                 </Form.Item>
-                <Form.Item name="description" label="Description">
+                <Form.Item name="description" label={t('taskForm.description')}>
                     <Input.TextArea />
                 </Form.Item>
                 <Form.Item
                     name="priority"
-                    label="Priority"
-                    rules={[{ required: true, message: 'Please enter priority' }]}
+                    label={t('taskForm.priority')}
+                    rules={[{ required: true, message: t('taskForm.priorityRequired') }]}
                 >
                     <InputNumber min={1} max={10} />
                 </Form.Item>
                 <Form.Item
                     name="startTimestamp"
-                    label="Start Time"
-                    rules={[{ required: true, message: 'Please select start time' }]}
+                    label={t('taskForm.startTime')}
+                    rules={[{ required: true, message: t('taskForm.startTimeRequired') }]}
                 >
                     <DatePicker showTime format="YYYY-MM-DD HH:mm" />
                 </Form.Item>
                 <Form.Item
                     name="endTimestamp"
-                    label="End Time"
-                    rules={[{ required: true, message: 'Please select end time' }]}
+                    label={t('taskForm.endTime')}
+                    rules={[{ required: true, message: t('taskForm.endTimeRequired') }]}
                 >
                     <DatePicker showTime format="YYYY-MM-DD HH:mm" />
                 </Form.Item>
@@ -165,8 +167,8 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                 {!isCreate && (
                     <Alert
                         type="info"
-                        message="Schedule Information"
-                        description="If this task has a recurring schedule, it cannot be viewed or modified here. Schedules are set only during task creation."
+                        message={t('taskForm.scheduleInfo')}
+                        description={t('taskForm.scheduleInfoDescription')}
                         showIcon
                         style={{ marginBottom: 16 }}
                     />
@@ -175,36 +177,36 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                 {isCreate && (
                     <>
                         <Form.Item name="addSchedule" valuePropName="checked" initialValue={false}>
-                            <Checkbox>Add schedule (repeating)</Checkbox>
+                            <Checkbox>{t('taskForm.addSchedule')}</Checkbox>
                         </Form.Item>
                         {addSchedule && (
                             <Collapse defaultActiveKey={['schedule']}>
-                                <Collapse.Panel header="Schedule" key="schedule">
+                                <Collapse.Panel header={t('taskForm.schedule')} key="schedule">
                                     <Form.Item
                                         name="scheduleType"
-                                        label="Repeat type"
+                                        label={t('taskForm.repeatType')}
                                         rules={[
                                             {
                                                 required: true,
-                                                message: 'Select repeat type',
+                                                message: t('taskForm.selectRepeatType'),
                                             },
                                         ]}
                                         initialValue="DayRepeatingEntity"
                                     >
                                         <Select
-                                            options={REPEAT_TYPES}
-                                            placeholder="Select type"
+                                            options={repeatTypes}
+                                            placeholder={t('taskForm.selectType')}
                                         />
                                     </Form.Item>
 
                                     {scheduleType === 'DayRepeatingEntity' && (
                                         <Form.Item
                                             name="daysCountToRepeat"
-                                            label="Repeat every N days"
+                                            label={t('taskForm.repeatEveryNDays')}
                                             rules={[
                                                 {
                                                     required: true,
-                                                    message: 'Required',
+                                                    message: t('taskForm.required'),
                                                 },
                                             ]}
                                             initialValue={1}
@@ -216,21 +218,21 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                     {scheduleType === 'WeekRepeatingEntity' && (
                                         <Form.Item
                                             name="repeatsOn"
-                                            label="Repeat on days"
+                                            label={t('taskForm.repeatOnDays')}
                                             rules={[
                                                 {
                                                     required: true,
-                                                    message: 'Select at least one day',
+                                                    message: t('taskForm.selectAtLeastOneDay'),
                                                 },
                                                 {
                                                     type: 'array',
                                                     min: 1,
-                                                    message: 'Select at least one day',
+                                                    message: t('taskForm.selectAtLeastOneDay'),
                                                 },
                                             ]}
                                         >
                                             <Checkbox.Group
-                                                options={DAYS_OF_WEEK}
+                                                options={daysOfWeek}
                                                 style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
                                             />
                                         </Form.Item>
@@ -239,14 +241,14 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                     {scheduleType === 'MonthRepeatingEntity' && (
                                         <Form.Item
                                             name="monthDayToRepeat"
-                                            label="Day of month (1–31)"
+                                            label={t('taskForm.dayOfMonth')}
                                             rules={[
-                                                { required: true, message: 'Required' },
+                                                { required: true, message: t('taskForm.required') },
                                                 {
                                                     type: 'number',
                                                     min: 1,
                                                     max: 31,
-                                                    message: 'Between 1 and 31',
+                                                    message: t('taskForm.between1And31'),
                                                 },
                                             ]}
                                             initialValue={1}
@@ -262,14 +264,14 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                     {scheduleType === 'YearRepeatingEntity' && (
                                         <Form.Item
                                             name="yearDayToRepeat"
-                                            label="Day of year (1–366)"
+                                            label={t('taskForm.dayOfYear')}
                                             rules={[
-                                                { required: true, message: 'Required' },
+                                                { required: true, message: t('taskForm.required') },
                                                 {
                                                     type: 'number',
                                                     min: 1,
                                                     max: 366,
-                                                    message: 'Between 1 and 366',
+                                                    message: t('taskForm.between1And366'),
                                                 },
                                             ]}
                                             initialValue={1}
@@ -282,16 +284,16 @@ const TaskFormModal: FC<TaskFormModalProps> = ({ open, onCancel, onSave, initial
                                         </Form.Item>
                                     )}
 
-                                    <Form.Item name="endsOnMaxDate" label="Ends on date (optional)">
+                                    <Form.Item name="endsOnMaxDate" label={t('taskForm.endsOnDate')}>
                                         <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
                                     </Form.Item>
                                     <Form.Item
                                         name="endsOnMaxOccurrences"
-                                        label="End after N occurrences (optional)"
+                                        label={t('taskForm.endsAfterOccurrences')}
                                     >
                                         <InputNumber
                                             min={1}
-                                            placeholder="Leave empty for no limit"
+                                            placeholder={t('taskForm.noLimitPlaceholder')}
                                             style={{ width: '100%' }}
                                         />
                                     </Form.Item>

@@ -4,6 +4,7 @@ import { Button, Modal, notification, Table, Tabs, Typography } from 'antd';
 import type { Breakpoint } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 import useFixedTasks, { postNewScheduleForTask } from '../hooks/useFixedTasks';
 import useDynamicTasks from '../hooks/useDynamicTasks';
@@ -17,6 +18,7 @@ const { Title } = Typography;
 
 const TasksPage: FC = () => {
   const { isMobile } = useIsMobile();
+  const { t } = useTranslation();
   const {
     tasks: fixedTasks,
     loading: fixedLoading,
@@ -77,23 +79,23 @@ const TasksPage: FC = () => {
   }, []);
 
   const fixedColumns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Description', dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
-    { title: 'Priority', dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+    { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
+    { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
+    { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
     {
-      title: isMobile ? 'Start' : 'Start Time',
+      title: isMobile ? t('tasks.start') : t('tasks.startTime'),
       dataIndex: 'startTimestamp',
       key: 'startTimestamp',
       render: (date: Dayjs) => date.format(isMobile ? 'MM/DD HH:mm' : 'YYYY-MM-DD HH:mm'),
     },
     {
-      title: isMobile ? 'End' : 'End Time',
+      title: isMobile ? t('tasks.end') : t('tasks.endTime'),
       dataIndex: 'endTimestamp',
       key: 'endTimestamp',
       render: (date: Dayjs) => date.format(isMobile ? 'MM/DD HH:mm' : 'YYYY-MM-DD HH:mm'),
     },
     {
-      title: 'Actions',
+      title: t('tasks.actions'),
       key: 'actions',
       width: isMobile ? 80 : undefined,
       render: (_: unknown, task: FixedTaskDisplayModel) => (
@@ -104,7 +106,7 @@ const TasksPage: FC = () => {
             onClick={() => showEditFixedModal(task)}
             size={isMobile ? 'small' : 'middle'}
           >
-            {!isMobile && 'Edit'}
+            {!isMobile && t('tasks.edit')}
           </Button>
           <Button
             type="link"
@@ -113,7 +115,7 @@ const TasksPage: FC = () => {
             onClick={() => setDeleteModal({ visible: true, id: task.id, type: 'fixed' })}
             size={isMobile ? 'small' : 'middle'}
           >
-            {!isMobile && 'Delete'}
+            {!isMobile && t('tasks.delete')}
           </Button>
         </>
       ),
@@ -131,30 +133,30 @@ const TasksPage: FC = () => {
   };
 
   const dynamicColumns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Description', dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
-    { title: 'Priority', dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+    { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
+    { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
+    { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
     {
-      title: isMobile ? 'Min' : 'Min duration',
+      title: isMobile ? t('tasks.min') : t('tasks.minDuration'),
       dataIndex: 'minTimeToFinish',
       key: 'minTimeToFinish',
       render: formatDuration,
     },
     {
-      title: isMobile ? 'Max' : 'Max duration',
+      title: isMobile ? t('tasks.max') : t('tasks.maxDuration'),
       dataIndex: 'maxTimeToFinish',
       key: 'maxTimeToFinish',
       render: formatDuration,
     },
     {
-      title: isMobile ? 'Optimal' : 'Optimal duration',
+      title: isMobile ? t('tasks.optimal') : t('tasks.optimalDuration'),
       dataIndex: 'optimalTimeToFinish',
       key: 'optimalTimeToFinish',
       render: (v: string | null) => (v ? formatDuration(v) : '-'),
       responsive: ['md'] as Breakpoint[],
     },
     {
-      title: 'Actions',
+      title: t('tasks.actions'),
       key: 'actions',
       width: isMobile ? 80 : undefined,
       render: (_: unknown, task: DynamicTaskReturnModel) => (
@@ -165,7 +167,7 @@ const TasksPage: FC = () => {
             onClick={() => showEditDynamicModal(task)}
             size={isMobile ? 'small' : 'middle'}
           >
-            {!isMobile && 'Edit'}
+            {!isMobile && t('tasks.edit')}
           </Button>
           <Button
             type="link"
@@ -174,7 +176,7 @@ const TasksPage: FC = () => {
             onClick={() => setDeleteModal({ visible: true, id: task.id, type: 'dynamic' })}
             size={isMobile ? 'small' : 'middle'}
           >
-            {!isMobile && 'Delete'}
+            {!isMobile && t('tasks.delete')}
           </Button>
         </>
       ),
@@ -193,7 +195,7 @@ const TasksPage: FC = () => {
         };
         if (id) {
           await updateFixedTask(id, payload);
-          notification.success({ message: 'Success', description: 'Fixed task updated!' });
+          notification.success({ message: t('tasks.success'), description: t('tasks.fixedTaskUpdated') });
         } else {
           const newId = await createFixedTask(payload);
           if (schedule) {
@@ -203,16 +205,16 @@ const TasksPage: FC = () => {
               endsOnModel: schedule.endsOnModel ?? undefined,
             });
           }
-          notification.success({ message: 'Success', description: 'Fixed task added!' });
+          notification.success({ message: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
         }
         await fetchFixedTasks();
       } catch {
-        notification.error({ message: 'Error', description: 'Failed to save fixed task.' });
+        notification.error({ message: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
       } finally {
         handleFixedModalCancel();
       }
     },
-    [createFixedTask, updateFixedTask, fetchFixedTasks, handleFixedModalCancel]
+    [createFixedTask, updateFixedTask, fetchFixedTasks, handleFixedModalCancel, t]
   );
 
   const handleSaveDynamicTask = useCallback(
@@ -220,19 +222,19 @@ const TasksPage: FC = () => {
       try {
         if (id) {
           await updateDynamicTask(id, data);
-          notification.success({ message: 'Success', description: 'Dynamic task updated!' });
+          notification.success({ message: t('tasks.success'), description: t('tasks.dynamicTaskUpdated') });
         } else {
           await createDynamicTask(data);
-          notification.success({ message: 'Success', description: 'Dynamic task added!' });
+          notification.success({ message: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
         }
         await fetchDynamicTasks();
       } catch {
-        notification.error({ message: 'Error', description: 'Failed to save dynamic task.' });
+        notification.error({ message: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
       } finally {
         handleDynamicModalCancel();
       }
     },
-    [createDynamicTask, updateDynamicTask, fetchDynamicTasks, handleDynamicModalCancel]
+    [createDynamicTask, updateDynamicTask, fetchDynamicTasks, handleDynamicModalCancel, t]
   );
 
   const confirmDelete = async () => {
@@ -258,7 +260,7 @@ const TasksPage: FC = () => {
         }}
       >
         <Title level={isMobile ? 4 : 2} style={{ margin: 0 }}>
-          All Tasks
+          {t('tasks.allTasks')}
         </Title>
       </div>
 
@@ -266,12 +268,12 @@ const TasksPage: FC = () => {
         items={[
           {
             key: 'fixed',
-            label: 'Fixed Tasks',
+            label: t('tasks.fixedTasks'),
             children: (
               <>
                 <div style={{ marginBottom: '1rem' }}>
                   <Button type="primary" icon={<PlusOutlined />} onClick={showAddFixedModal} size={isMobile ? 'small' : 'middle'}>
-                    Add Fixed Task
+                    {t('tasks.addFixedTask')}
                   </Button>
                 </div>
                 {fixedError && (
@@ -284,7 +286,7 @@ const TasksPage: FC = () => {
                   dataSource={fixedTasks}
                   loading={fixedLoading}
                   rowKey="id"
-                  locale={{ emptyText: 'No fixed tasks yet.' }}
+                  locale={{ emptyText: t('tasks.noFixedTasks') }}
                   scroll={isMobile ? { x: 500 } : undefined}
                   size={isMobile ? 'small' : 'middle'}
                 />
@@ -293,12 +295,12 @@ const TasksPage: FC = () => {
           },
           {
             key: 'dynamic',
-            label: 'Dynamic Tasks',
+            label: t('tasks.dynamicTasks'),
             children: (
               <>
                 <div style={{ marginBottom: '1rem' }}>
                   <Button type="primary" icon={<PlusOutlined />} onClick={showAddDynamicModal} size={isMobile ? 'small' : 'middle'}>
-                    Add Dynamic Task
+                    {t('tasks.addDynamicTask')}
                   </Button>
                 </div>
                 {dynamicError && (
@@ -311,7 +313,7 @@ const TasksPage: FC = () => {
                   dataSource={dynamicTasks}
                   loading={dynamicLoading}
                   rowKey="id"
-                  locale={{ emptyText: 'No dynamic tasks yet.' }}
+                  locale={{ emptyText: t('tasks.noDynamicTasks') }}
                   scroll={isMobile ? { x: 500 } : undefined}
                   size={isMobile ? 'small' : 'middle'}
                 />
@@ -335,13 +337,13 @@ const TasksPage: FC = () => {
       />
       <Modal
         open={deleteModal.visible}
-        title="Confirm Delete"
-        okText="Delete"
+        title={t('tasks.confirmDelete')}
+        okText={t('tasks.delete')}
         okType="danger"
         onOk={confirmDelete}
         onCancel={() => setDeleteModal({ visible: false })}
       >
-        Are you sure you want to delete this task?
+        {t('tasks.confirmDeleteMessage')}
       </Modal>
     </div>
   );

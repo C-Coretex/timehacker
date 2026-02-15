@@ -6,6 +6,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar-theme.css';
 import { Button, Spin, Alert, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import {
   fetchTasksForDays,
   taskForDayToEvent,
@@ -31,6 +32,7 @@ const calendarViews = {
 const CalendarPage: FC = () => {
   const { darkMode } = useTheme();
   const { isMobile } = useIsMobile();
+  const { t, i18n } = useTranslation();
   const initialViewSet = useRef(false);
 
   const [view, setView] = useState<ExtendedView>(isMobile ? 'day' : 'week');
@@ -146,12 +148,12 @@ const CalendarPage: FC = () => {
           err && typeof err === 'object' && 'response' in err
             ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
             : null;
-        setError(message ?? 'Failed to load tasks');
+        setError(message ?? t('calendar.loadFailed'));
       } finally {
         setLoading(false);
       }
     },
-    []
+    [t]
   );
 
   useEffect(() => {
@@ -170,11 +172,11 @@ const CalendarPage: FC = () => {
         err && typeof err === 'object' && 'response' in err
           ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
           : null;
-      setError(message ?? 'Failed to refresh tasks');
+      setError(message ?? t('calendar.refreshFailed'));
     } finally {
       setLoading(false);
     }
-  }, [view, getDatesForView, fetchTasks]);
+  }, [view, getDatesForView, fetchTasks, t]);
 
   const eventStyleGetter = useCallback(
     (event: CalendarEvent) => {
@@ -203,11 +205,21 @@ const CalendarPage: FC = () => {
     [darkMode]
   );
 
+  const calendarMessages = useMemo(() => ({
+    today: t('calendar.today'),
+    previous: t('calendar.previous'),
+    next: t('calendar.next'),
+    month: t('calendar.month'),
+    week: t('calendar.week'),
+    day: t('calendar.day'),
+    '3day': t('calendar.threeDayView'),
+  }), [t]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '8px' }}>
         <Button icon={<ReloadOutlined />} onClick={refresh} size={isMobile ? 'small' : 'middle'}>
-          Refresh
+          {t('calendar.refresh')}
         </Button>
       </div>
 
@@ -236,16 +248,17 @@ const CalendarPage: FC = () => {
           onSelectEvent={handleSelectEvent}
           onDrillDown={handleDrillDown}
           eventPropGetter={eventStyleGetter}
-          messages={{ '3day': '3 Day' } as Record<string, string>}
+          culture={i18n.language?.startsWith('ru') ? 'ru' : 'en'}
+          messages={calendarMessages as Record<string, string>}
         />
       )}
 
       <Modal
         open={isModalVisible}
-        title="Task Details"
+        title={t('calendar.taskDetails')}
         footer={[
           <Button key="close" onClick={() => setIsModalVisible(false)}>
-            Close
+            {t('calendar.close')}
           </Button>,
         ]}
         onCancel={() => setIsModalVisible(false)}
@@ -253,26 +266,26 @@ const CalendarPage: FC = () => {
         {selectedEvent && (
           <div>
             <p>
-              <b>Type:</b>{' '}
-              {selectedEvent.resource?.type === 'dynamic' ? 'Dynamic' : 'Fixed'}
+              <b>{t('calendar.type')}</b>{' '}
+              {selectedEvent.resource?.type === 'dynamic' ? t('calendar.dynamic') : t('calendar.fixed')}
             </p>
             <p>
-              <b>Title:</b> {selectedEvent.title}
+              <b>{t('calendar.titleLabel')}</b> {selectedEvent.title}
             </p>
             <p>
-              <b>Description:</b>{' '}
+              <b>{t('calendar.descriptionLabel')}</b>{' '}
               {selectedEvent.description ?? selectedEvent.resource?.task.description ?? '-'}
             </p>
             <p>
-              <b>Priority:</b>{' '}
+              <b>{t('calendar.priorityLabel')}</b>{' '}
               {selectedEvent.resource?.task.priority ?? '-'}
             </p>
             <p>
-              <b>Start:</b>{' '}
+              <b>{t('calendar.startLabel')}</b>{' '}
               {dayjs(selectedEvent.start).format('YYYY-MM-DD HH:mm')}
             </p>
             <p>
-              <b>End:</b>{' '}
+              <b>{t('calendar.endLabel')}</b>{' '}
               {dayjs(selectedEvent.end).format('YYYY-MM-DD HH:mm')}
             </p>
           </div>

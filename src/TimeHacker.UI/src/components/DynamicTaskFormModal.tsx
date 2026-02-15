@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Modal, Form, Input, InputNumber } from 'antd';
+import { useTranslation } from 'react-i18next';
 import type { DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
 
 export interface DynamicTaskFormData {
@@ -43,6 +44,7 @@ const DynamicTaskFormModal: FC<DynamicTaskFormModalProps> = ({
   initialData,
 }) => {
   const [form] = Form.useForm<DynamicTaskFormData>();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (initialData) {
@@ -82,45 +84,45 @@ const DynamicTaskFormModal: FC<DynamicTaskFormModalProps> = ({
       forceRender
       destroyOnClose
       maskClosable={false}
-      title={initialData ? 'Edit Dynamic Task' : 'Add Dynamic Task'}
-      okText={initialData ? 'Update' : 'Create'}
+      title={initialData ? t('dynamicTaskForm.editTask') : t('dynamicTaskForm.addTask')}
+      okText={initialData ? t('dynamicTaskForm.update') : t('dynamicTaskForm.create')}
       onCancel={onCancel}
       onOk={() => form.submit()}
     >
       <Form form={form} onFinish={handleFinish} layout="vertical">
         <Form.Item
           name="name"
-          label="Task Name"
-          rules={[{ required: true, message: 'Please enter task name' }]}
+          label={t('dynamicTaskForm.taskName')}
+          rules={[{ required: true, message: t('dynamicTaskForm.taskNameRequired') }]}
         >
           <Input />
         </Form.Item>
-        <Form.Item name="description" label="Description">
+        <Form.Item name="description" label={t('dynamicTaskForm.description')}>
           <Input.TextArea />
         </Form.Item>
         <Form.Item
           name="priority"
-          label="Priority"
-          rules={[{ required: true, message: 'Please enter priority' }]}
+          label={t('dynamicTaskForm.priority')}
+          rules={[{ required: true, message: t('dynamicTaskForm.priorityRequired') }]}
         >
           <InputNumber min={0} max={255} />
         </Form.Item>
         <Form.Item
           name="minMinutes"
-          label="Min duration (minutes)"
-          rules={[{ required: true, message: 'Please enter min duration' }]}
+          label={t('dynamicTaskForm.minDuration')}
+          rules={[{ required: true, message: t('dynamicTaskForm.minDurationRequired') }]}
         >
           <InputNumber min={1} />
         </Form.Item>
         <Form.Item
           name="maxMinutes"
-          label="Max duration (minutes)"
-          rules={[{ required: true, message: 'Please enter max duration' }]}
+          label={t('dynamicTaskForm.maxDuration')}
+          rules={[{ required: true, message: t('dynamicTaskForm.maxDurationRequired') }]}
         >
           <InputNumber min={1} />
         </Form.Item>
-        <Form.Item name="optimalMinutes" label="Optimal duration (minutes, optional)">
-          <InputNumber min={0} placeholder="Optional" />
+        <Form.Item name="optimalMinutes" label={t('dynamicTaskForm.optimalDuration')}>
+          <InputNumber min={0} placeholder={t('dynamicTaskForm.optional')} />
         </Form.Item>
       </Form>
     </Modal>

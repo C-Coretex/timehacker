@@ -20,6 +20,7 @@ import {
   MailOutlined,
   PhoneOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from 'contexts/AuthContext';
 import api from '../api/api';
 
@@ -48,6 +49,7 @@ const ProfilePage: FC = () => {
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
   const { token } = theme.useToken();
+  const { t } = useTranslation();
 
   if (!user) {
     return <Spin size="large" style={{ display: 'block', margin: '2rem auto' }} />;
@@ -87,7 +89,7 @@ const ProfilePage: FC = () => {
       });
       await fetchCurrentUser();
       setEditing(false);
-      message.success('Profile updated');
+      message.success(t('profile.profileUpdated'));
     } catch (err: unknown) {
       const msg =
         err && typeof err === 'object' && 'response' in err
@@ -121,7 +123,7 @@ const ProfilePage: FC = () => {
             {initials}
           </Avatar>
           <Title level={4} style={{ marginTop: 12, marginBottom: 0 }}>
-            {user.name || 'No name set'}
+            {user.name || t('profile.noNameSet')}
           </Title>
           {user.emailForNotifications && (
             <Text type="secondary">{user.emailForNotifications}</Text>
@@ -134,48 +136,48 @@ const ProfilePage: FC = () => {
           <>
             <InfoRow
               icon={<UserOutlined />}
-              label="Name"
+              label={t('profile.name')}
               value={user.name}
             />
             <InfoRow
               icon={<MailOutlined />}
-              label="Email for notifications"
+              label={t('profile.emailNotifications')}
               value={user.emailForNotifications}
             />
             <InfoRow
               icon={<PhoneOutlined />}
-              label="Phone for notifications"
+              label={t('profile.phoneNotifications')}
               value={user.phoneNumberForNotifications}
             />
             <Divider />
             <Button icon={<EditOutlined />} onClick={handleEdit} block>
-              Edit profile
+              {t('profile.editProfile')}
             </Button>
           </>
         ) : (
           <>
             <Form form={form} layout="vertical">
               <Form.Item
-                label="Name"
+                label={t('profile.name')}
                 name="name"
-                rules={[{ required: true, message: 'Name is required' }]}
+                rules={[{ required: true, message: t('profile.nameRequired') }]}
               >
                 <Input prefix={<UserOutlined />} maxLength={64} />
               </Form.Item>
               <Form.Item
-                label="Email for notifications"
+                label={t('profile.emailNotifications')}
                 name="emailForNotifications"
                 rules={[
                   {
                     pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: 'Please enter a valid email address',
+                    message: t('profile.invalidEmail'),
                   },
                 ]}
               >
                 <Input prefix={<MailOutlined />} type="email" />
               </Form.Item>
               <Form.Item
-                label="Phone for notifications"
+                label={t('profile.phoneNotifications')}
                 name="phoneNumberForNotifications"
               >
                 <Input prefix={<PhoneOutlined />} />
@@ -187,7 +189,7 @@ const ProfilePage: FC = () => {
                 onClick={handleCancel}
                 style={{ flex: 1 }}
               >
-                Cancel
+                {t('profile.cancel')}
               </Button>
               <Button
                 type="primary"
@@ -196,7 +198,7 @@ const ProfilePage: FC = () => {
                 loading={saving}
                 style={{ flex: 1 }}
               >
-                Save
+                {t('profile.save')}
               </Button>
             </div>
           </>

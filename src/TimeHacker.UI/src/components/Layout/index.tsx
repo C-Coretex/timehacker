@@ -14,9 +14,10 @@ import {
   SnippetsOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'contexts/AuthContext';
-import { capitalize } from 'utils/helpers';
 import { fetchTasksForDay, type TaskForDayItem } from '../../api/tasks';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
@@ -27,39 +28,41 @@ type MenuItem = Required<MenuProps>['items'][number];
 const getItem = (
   key: React.Key,
   icon?: React.ReactNode,
+  t?: TFunction,
   children?: MenuItem[]
 ): MenuItem => {
+  const label = t ? t(`nav.${key}`) : String(key);
   return {
     key,
     icon,
     children,
     label: children ? (
-      capitalize(key)
+      label
     ) : (
       <NavLink to={`/${key === 'calendar' ? '' : key}`}>
-        {capitalize(key)}
+        {label}
       </NavLink>
     ),
   } as MenuItem;
 };
 
-const getMainMenuItems = (isAuthenticated: boolean) => [
-  getItem('calendar', <CalendarOutlined />),
-  getItem('tasks', <SnippetsOutlined />),
-  getItem('categories', <ProductOutlined />),
+const getMainMenuItems = (isAuthenticated: boolean, t: TFunction) => [
+  getItem('calendar', <CalendarOutlined />, t),
+  getItem('tasks', <SnippetsOutlined />, t),
+  getItem('categories', <ProductOutlined />, t),
   !isAuthenticated
-    ? getItem('login', <UserOutlined />)
-    : getItem('profile', <UserOutlined />),
-  getItem('help', <QuestionCircleOutlined />),
-  getItem('about', <QuestionCircleOutlined />),
-  getItem('settings', <SettingOutlined />),
+    ? getItem('login', <UserOutlined />, t)
+    : getItem('profile', <UserOutlined />, t),
+  getItem('help', <QuestionCircleOutlined />, t),
+  getItem('about', <QuestionCircleOutlined />, t),
+  getItem('settings', <SettingOutlined />, t),
 ];
 
-const greetingByTime = (): string => {
+const greetingByTime = (t: TFunction): string => {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return t('greeting.morning');
+  if (hour < 18) return t('greeting.afternoon');
+  return t('greeting.evening');
 };
 
 interface DaySummary {
@@ -126,6 +129,7 @@ const Layout: FC = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
+  const { t } = useTranslation();
 
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -135,7 +139,7 @@ const Layout: FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const mainMenuItems = getMainMenuItems(isAuthenticated);
+  const mainMenuItems = getMainMenuItems(isAuthenticated, t);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -208,29 +212,29 @@ const Layout: FC = () => {
             <Typography.Text
               style={{ fontSize: isMobile ? 14 : 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              {greetingByTime()}
+              {greetingByTime(t)}
               {user?.name ? `, ${user.name}` : ''}
-              {!isMobile && ' — make every minute count'}
+              {!isMobile && ` ${t('greeting.tagline')}`}
             </Typography.Text>
           </div>
 
           {summary && !isMobile && (
             <Space size="middle">
-              <Tooltip title={`${summary.fixedLeft} of ${summary.fixed} fixed tasks remaining`}>
+              <Tooltip title={t('header.fixedRemaining', { left: summary.fixedLeft, total: summary.fixed })}>
                 <Tag color="green">
-                  <CalendarOutlined /> Fixed: {summary.fixedLeft}/{summary.fixed}
+                  <CalendarOutlined /> {t('header.fixedTag', { left: summary.fixedLeft, total: summary.fixed })}
                 </Tag>
               </Tooltip>
-              <Tooltip title={`${summary.dynamicLeft} of ${summary.dynamic} dynamic tasks remaining`}>
+              <Tooltip title={t('header.dynamicRemaining', { left: summary.dynamicLeft, total: summary.dynamic })}>
                 <Tag color="orange">
-                  <SnippetsOutlined /> Dynamic: {summary.dynamicLeft}/{summary.dynamic}
+                  <SnippetsOutlined /> {t('header.dynamicTag', { left: summary.dynamicLeft, total: summary.dynamic })}
                 </Tag>
               </Tooltip>
               {summary.highPriority > 0 && (
-                <Tooltip title={`${summary.highPriority} high priority task${summary.highPriority > 1 ? 's' : ''} today`}>
+                <Tooltip title={t('header.highPriority', { count: summary.highPriority })}>
                   <Badge count={summary.highPriority} overflowCount={99}>
                     <Tag color="red">
-                      <FireOutlined /> Priority
+                      <FireOutlined /> {t('header.priorityLabel')}
                     </Tag>
                   </Badge>
                 </Tooltip>
@@ -238,7 +242,11 @@ const Layout: FC = () => {
             </Space>
           )}
           {summary && isMobile && (
-            <Tooltip title={`${summary.fixedLeft}F + ${summary.dynamicLeft}D left${summary.highPriority > 0 ? `, ${summary.highPriority} high priority` : ''}`}>
+            <Tooltip title={
+              summary.highPriority > 0
+                ? t('header.mobileTooltipWithPriority', { fixed: summary.fixedLeft, dynamic: summary.dynamicLeft, priority: summary.highPriority })
+                : t('header.mobileTooltip', { fixed: summary.fixedLeft, dynamic: summary.dynamicLeft })
+            }>
               <Badge count={tasksLeft} overflowCount={99} size="small">
                 <CalendarOutlined style={{ fontSize: 18 }} />
               </Badge>
