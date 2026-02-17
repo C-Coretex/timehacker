@@ -1,6 +1,14 @@
 // src/api/types.ts
 import type { Dayjs } from 'dayjs';
 
+export interface ScheduleEntityReturnModel {
+    id: string;
+    repeatingEntity: ReturnRepeatingEntityModel;
+    scheduleCreated: string;  // ISO datetime
+    lastTaskCreated: string | null;  // ISO date (YYYY-MM-DD)
+    endsOn: string | null;  // ISO date (YYYY-MM-DD)
+}
+
 export interface FixedTaskReturnModel {
     id: string;
     name: string;
@@ -8,7 +16,8 @@ export interface FixedTaskReturnModel {
     priority: number;
     startTimestamp: string;
     endTimestamp: string;
-    repeatingEntity: ReturnRepeatingEntityModel | null;
+    scheduleEntity: ScheduleEntityReturnModel | null;
+    tags: unknown[];
 }
 
 export interface InputFixedTask {
@@ -34,7 +43,8 @@ export interface FixedTaskDisplayModel {
     priority: number;
     startTimestamp: Dayjs;
     endTimestamp: Dayjs;
-    repeatingEntity: ReturnRepeatingEntityModel | null;
+    scheduleEntity: ScheduleEntityReturnModel | null;
+    tags: unknown[];
 }
 
 export interface DynamicTaskReturnModel {

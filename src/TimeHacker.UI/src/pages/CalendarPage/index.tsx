@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import type { FC } from 'react';
 import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
 import dayjs from 'dayjs';
+import updateLocale from 'dayjs/plugin/updateLocale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar-theme.css';
 import { Button, Spin, Alert, Modal, notification, Descriptions, Tag, Badge, Space, Divider } from 'antd';
@@ -25,7 +26,7 @@ import UnifiedTaskFormModal from '../../components/UnifiedTaskFormModal';
 import type { ScheduleFormPayload } from '../../components/UnifiedTaskFormModal';
 import type { FixedTaskFormData, InputDynamicTask } from '../../api/types';
 
-const localizer = dayjsLocalizer(dayjs);
+dayjs.extend(updateLocale);
 
 type ExtendedView = View | '3day';
 
@@ -54,6 +55,19 @@ const CalendarPage: FC = () => {
   const [scheduleData, setScheduleData] = useState<any>(null);
   const [loadingSchedule, setLoadingSchedule] = useState(false);
 
+  // Create localizer with correct week start setting
+  const localizer = useMemo(() => {
+    // weekStartSetting: 'sunday' = 0, 'monday' = 1
+    const weekStartDay = weekStartSetting === 'monday' ? 1 : 0;
+
+    // Update dayjs locale to use the correct week start
+    dayjs.updateLocale('en', {
+      weekStart: weekStartDay,
+    });
+
+    return dayjsLocalizer(dayjs);
+  }, [weekStartSetting]);
+
   // Set default view based on screen size only once after breakpoints resolve
   useEffect(() => {
     if (!initialViewSet.current && screens.md !== undefined) {
@@ -72,7 +86,7 @@ const CalendarPage: FC = () => {
       setLoadingSchedule(true);
       try {
         const taskData = await fetchFixedTaskById(event.resource.task.id);
-        setScheduleData(taskData.repeatingEntity);
+        setScheduleData(taskData.scheduleEntity);
       } catch (error) {
         console.error('Failed to fetch schedule data:', error);
       } finally {
@@ -418,37 +432,53 @@ const CalendarPage: FC = () => {
                 {loadingSchedule ? (
                   <Spin size="small" />
                 ) : scheduleData ? (
-                  <Descriptions
-                    title={t('taskForm.repeat')}
-                    column={1}
-                    bordered
-                    size="small"
-                    labelStyle={{ fontWeight: 600 }}
-                  >
-                    <Descriptions.Item label={t('taskForm.repeatType')}>
-                      {scheduleData.entityType === 1 && (
-                        <span>{t('taskForm.repeatsEveryNDays', { count: scheduleData.daysCountToRepeat })}</span>
-                      )}
-                      {scheduleData.entityType === 2 && (
-                        <span>
-                          {t('taskForm.repeatsWeeklyOn', {
-                            days: scheduleData.repeatsOn
-                              .sort()
-                              .map((d: number) =>
-                                t(`taskForm.${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][d - 1]}`)
-                              )
-                              .join(', '),
-                          })}
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                      <div>
+                        <span style={{ fontWeight: 600 }}>{t('tasks.recurringSchedule')}</span>
+                        <div style={{ marginTop: '8px' }}>
+                          {scheduleData.repeatingEntity.entityType === 1 && (
+                            <span>{t('taskForm.repeatsEveryNDays', { count: scheduleData.repeatingEntity.daysCountToRepeat })}</span>
+                          )}
+                          {scheduleData.repeatingEntity.entityType === 2 && (
+                            <span>
+                              {t('taskForm.repeatsWeeklyOn', {
+                                days: scheduleData.repeatingEntity.repeatsOn
+                                  .sort()
+                                  .map((d: number) =>
+                                    t(`taskForm.${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][d - 1]}`)
+                                  )
+                                  .join(', '),
+                              })}
+                            </span>
+                          )}
+                          {scheduleData.repeatingEntity.entityType === 3 && (
+                            <span>{t('taskForm.repeatsMonthlyOnDay', { day: scheduleData.repeatingEntity.monthDayToRepeat })}</span>
+                          )}
+                          {scheduleData.repeatingEntity.entityType === 4 && (
+                            <span>{t('taskForm.repeatsYearlyOnDay', { day: scheduleData.repeatingEntity.yearDayToRepeat })}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <Divider style={{ margin: '8px 0' }} />
+                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                        <span style={{ fontSize: '13px', opacity: 0.7 }}>
+                          {t('tasks.scheduleCreated')}: {dayjs(scheduleData.scheduleCreated).format('MMM D, YYYY HH:mm')}
                         </span>
-                      )}
-                      {scheduleData.entityType === 3 && (
-                        <span>{t('taskForm.repeatsMonthlyOnDay', { day: scheduleData.monthDayToRepeat })}</span>
-                      )}
-                      {scheduleData.entityType === 4 && (
-                        <span>{t('taskForm.repeatsYearlyOnDay', { day: scheduleData.yearDayToRepeat })}</span>
-                      )}
-                    </Descriptions.Item>
-                  </Descriptions>
+
+                        {scheduleData.endsOn ? (
+                          <span style={{ fontSize: '13px', color: '#faad14', fontWeight: 600 }}>
+                            {t('tasks.endsOn')}: {dayjs(scheduleData.endsOn).format('MMM D, YYYY')}
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: '13px', opacity: 0.7 }}>
+                            {t('tasks.recurringIndefinitely')}
+                          </span>
+                        )}
+                      </Space>
+                    </Space>
+                  </div>
                 ) : null}
               </>
             )}

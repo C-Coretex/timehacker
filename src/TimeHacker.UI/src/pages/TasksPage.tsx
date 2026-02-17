@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import type { FC } from 'react';
-import { Button, Modal, notification, Table, Tabs, Typography } from 'antd';
+import { Button, Modal, notification, Space, Table, Tabs, Tag, Typography } from 'antd';
 import type { Breakpoint } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +11,7 @@ import useFixedTasks, { postNewScheduleForTask } from '../hooks/useFixedTasks';
 import useDynamicTasks from '../hooks/useDynamicTasks';
 import UnifiedTaskFormModal from '../components/UnifiedTaskFormModal';
 import type { ScheduleFormPayload } from '../components/UnifiedTaskFormModal';
-import type { FixedTaskFormData, FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
+import type { FixedTaskFormData, FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask, ScheduleEntityReturnModel } from '../api/types';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 const { Title } = Typography;
@@ -85,6 +86,37 @@ const TasksPage: FC = () => {
     { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
     { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
     { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+    {
+      title: t('tasks.schedule'),
+      dataIndex: 'scheduleEntity',
+      key: 'schedule',
+      responsive: ['lg'] as Breakpoint[],
+      render: (scheduleEntity: ScheduleEntityReturnModel | null) => {
+        if (!scheduleEntity) {
+          return <Tag>{t('tasks.oneTime')}</Tag>;
+        }
+
+        const typeLabels: Record<number, string> = {
+          1: t('tasks.daily'),
+          2: t('tasks.weekly'),
+          3: t('tasks.monthly'),
+          4: t('tasks.yearly'),
+        };
+
+        return (
+          <Space direction="vertical" size={0}>
+            <Tag color="blue">
+              {typeLabels[scheduleEntity.repeatingEntity.entityType]}
+            </Tag>
+            {scheduleEntity.endsOn && (
+              <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                {t('tasks.endsShort')}: {dayjs(scheduleEntity.endsOn).format('MMM D, YYYY')}
+              </Typography.Text>
+            )}
+          </Space>
+        );
+      },
+    },
     {
       title: isMobile ? t('tasks.start') : t('tasks.startTime'),
       dataIndex: 'startTimestamp',

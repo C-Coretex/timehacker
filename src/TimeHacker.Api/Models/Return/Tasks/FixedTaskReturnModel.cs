@@ -1,4 +1,5 @@
 using TimeHacker.Api.Models.Return.RepeatingEntities;
+using TimeHacker.Api.Models.Return.ScheduleSnapshots;
 using TimeHacker.Api.Models.Return.Tags;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
@@ -13,7 +14,7 @@ public record FixedTaskReturnModel(
     DateTime StartTimestamp,
     DateTime EndTimestamp,
     DateTime CreatedTimestamp,
-    ReturnRepeatingEntityModelBase? RepeatingEntity,
+    ScheduleEntityReturnModel? ScheduleEntity,
     IEnumerable<TagReturnModel> Tags)
 {
     public static FixedTaskReturnModel Create(FixedTaskDto fixedTask)
@@ -26,7 +27,7 @@ public record FixedTaskReturnModel(
             fixedTask.StartTimestamp,
             fixedTask.EndTimestamp,
             fixedTask.CreatedTimestamp,
-            fixedTask.RepeatingEntity != null ? ReturnRepeatingEntityModelBase.Create(fixedTask.RepeatingEntity) : null,
+            fixedTask.ScheduleEntity != null ? ScheduleEntityReturnModel.Create(fixedTask.ScheduleEntity) : null,
             fixedTask.Tags.Select(TagReturnModel.Create)
         );
     }

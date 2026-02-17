@@ -16,6 +16,9 @@ import {
   Col,
   Button,
   Descriptions,
+  Divider,
+  Space,
+  Typography,
   theme,
 } from 'antd';
 import dayjs from 'dayjs';
@@ -28,6 +31,7 @@ import type {
   InputRepeatingEntityType,
   EndsOnModel,
   ReturnRepeatingEntityModel,
+  ScheduleEntityReturnModel,
   DynamicTaskReturnModel,
 } from '../api/types';
 import { useIsMobile } from '../hooks/useIsMobile';
@@ -61,7 +65,7 @@ interface UnifiedTaskFormModalProps {
   onCancel: () => void;
   onSaveFixed: (data: FixedTaskFormData, id?: string, schedule?: ScheduleFormPayload) => void;
   onSaveDynamic: (data: InputDynamicTask, id?: string) => void;
-  initialFixedData?: FixedTaskFormData & { id: string; repeatingEntity?: ReturnRepeatingEntityModel | null };
+  initialFixedData?: FixedTaskFormData & { id: string; scheduleEntity?: ScheduleEntityReturnModel | null };
   initialDynamicData?: DynamicTaskReturnModel | null;
   initialTab?: TaskTab;
   defaultDate?: Date;
@@ -460,29 +464,47 @@ const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
       )}
 
       {/* Show existing schedule in edit mode */}
-      {isEditFixed && initialFixedData?.repeatingEntity && (
-        <Descriptions
-          title={t('taskForm.currentSchedule')}
-          bordered
-          size="small"
-          column={1}
-          style={{ marginTop: 12 }}
-        >
-          <Descriptions.Item label={t('taskForm.repeatType')}>
-            {initialFixedData.repeatingEntity.entityType === RepeatingEntityTypeEnum.DayRepeatingEntity &&
-              t('taskForm.repeatsEveryNDays', { count: initialFixedData.repeatingEntity.daysCountToRepeat })}
-            {initialFixedData.repeatingEntity.entityType === RepeatingEntityTypeEnum.WeekRepeatingEntity &&
-              t('taskForm.repeatsWeeklyOn', {
-                days: initialFixedData.repeatingEntity.repeatsOn
-                  .map((d) => daysOfWeek.find((dw) => dw.value === d)?.label ?? String(d))
-                  .join(', '),
-              })}
-            {initialFixedData.repeatingEntity.entityType === RepeatingEntityTypeEnum.MonthRepeatingEntity &&
-              t('taskForm.repeatsMonthlyOnDay', { day: initialFixedData.repeatingEntity.monthDayToRepeat })}
-            {initialFixedData.repeatingEntity.entityType === RepeatingEntityTypeEnum.YearRepeatingEntity &&
-              t('taskForm.repeatsYearlyOnDay', { day: initialFixedData.repeatingEntity.yearDayToRepeat })}
-          </Descriptions.Item>
-        </Descriptions>
+      {isEditFixed && initialFixedData?.scheduleEntity && (
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg" style={{ marginTop: 12 }}>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            {/* Existing schedule type display */}
+            <div>
+              <Typography.Text strong>{t('tasks.recurringSchedule')}</Typography.Text>
+              <div style={{ marginTop: '8px' }}>
+                {initialFixedData.scheduleEntity.repeatingEntity.entityType === RepeatingEntityTypeEnum.DayRepeatingEntity &&
+                  t('taskForm.repeatsEveryNDays', { count: initialFixedData.scheduleEntity.repeatingEntity.daysCountToRepeat })}
+                {initialFixedData.scheduleEntity.repeatingEntity.entityType === RepeatingEntityTypeEnum.WeekRepeatingEntity &&
+                  t('taskForm.repeatsWeeklyOn', {
+                    days: initialFixedData.scheduleEntity.repeatingEntity.repeatsOn
+                      .map((d) => daysOfWeek.find((dw) => dw.value === d)?.label ?? String(d))
+                      .join(', '),
+                  })}
+                {initialFixedData.scheduleEntity.repeatingEntity.entityType === RepeatingEntityTypeEnum.MonthRepeatingEntity &&
+                  t('taskForm.repeatsMonthlyOnDay', { day: initialFixedData.scheduleEntity.repeatingEntity.monthDayToRepeat })}
+                {initialFixedData.scheduleEntity.repeatingEntity.entityType === RepeatingEntityTypeEnum.YearRepeatingEntity &&
+                  t('taskForm.repeatsYearlyOnDay', { day: initialFixedData.scheduleEntity.repeatingEntity.yearDayToRepeat })}
+              </div>
+            </div>
+
+            {/* NEW: Schedule metadata section */}
+            <Divider style={{ margin: '8px 0' }} />
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+                {t('tasks.scheduleCreated')}: {dayjs(initialFixedData.scheduleEntity.scheduleCreated).format('MMM D, YYYY HH:mm')}
+              </Typography.Text>
+
+              {initialFixedData.scheduleEntity.endsOn ? (
+                <Typography.Text type="warning" style={{ fontSize: '13px' }}>
+                  <strong>{t('tasks.endsOn')}: {dayjs(initialFixedData.scheduleEntity.endsOn).format('MMM D, YYYY')}</strong>
+                </Typography.Text>
+              ) : (
+                <Typography.Text type="secondary" style={{ fontSize: '13px' }}>
+                  {t('tasks.recurringIndefinitely')}
+                </Typography.Text>
+              )}
+            </Space>
+          </Space>
+        </div>
       )}
     </>
   );

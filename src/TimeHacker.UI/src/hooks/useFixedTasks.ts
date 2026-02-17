@@ -29,7 +29,8 @@ const useFixedTasks = () => {
                 priority: task.priority,
                 startTimestamp: dayjs(task.startTimestamp),
                 endTimestamp: dayjs(task.endTimestamp),
-                repeatingEntity: task.repeatingEntity ?? null,
+                scheduleEntity: task.scheduleEntity ?? null,
+                tags: task.tags ?? [],
             }));
             setTasks(mappedTasks);
         } catch (err) {

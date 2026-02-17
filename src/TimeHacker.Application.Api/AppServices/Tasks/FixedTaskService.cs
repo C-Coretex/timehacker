@@ -9,7 +9,8 @@ namespace TimeHacker.Application.Api.AppServices.Tasks;
 public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, IScheduleEntityRepository scheduleEntityRepository)
     : IFixedTaskAppService
 {
-    public IAsyncEnumerable<FixedTaskDto> GetAll(CancellationToken cancellationToken = default) => fixedTaskRepository.GetAll().Select(FixedTaskDto.Selector).AsAsyncEnumerable();
+    public IAsyncEnumerable<FixedTaskDto> GetAll(CancellationToken cancellationToken = default) =>
+        fixedTaskRepository.GetAll().Select(FixedTaskDto.Selector).AsAsyncEnumerable();
 
     public async Task<Guid> AddAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {

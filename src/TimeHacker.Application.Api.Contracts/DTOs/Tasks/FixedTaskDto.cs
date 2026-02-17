@@ -1,4 +1,5 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.Tags;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.Tasks;
 
@@ -17,7 +18,7 @@ public record FixedTaskDto
 
     public DateTime CreatedTimestamp { get; set; }
     public IEnumerable<TagDto> Tags { get; init; } = [];
-    public RepeatingEntityDto? RepeatingEntity { get; set; }
+    public ScheduleEntityDto? ScheduleEntity { get; set; }
 
     public static Expression<Func<FixedTask, FixedTaskDto>> Selector =>
         x => new FixedTaskDto
@@ -30,7 +31,13 @@ public record FixedTaskDto
             EndTimestamp = x.EndTimestamp,
             CreatedTimestamp = x.CreatedTimestamp,
             Tags = x.TagFixedTasks.Select(tagTask => TagDto.Create(tagTask.Tag)),
-            RepeatingEntity = x.ScheduleEntity != null ? x.ScheduleEntity.RepeatingEntity : null
+            ScheduleEntity = x.ScheduleEntity != null ? new ScheduleEntityDto(
+                x.ScheduleEntity.Id,
+                x.ScheduleEntity.RepeatingEntity,
+                x.ScheduleEntity.CreatedTimestamp,
+                x.ScheduleEntity.LastEntityCreated,
+                x.ScheduleEntity.EndsOn
+            ) : null
         };
 
     private static readonly Func<FixedTask, FixedTaskDto> CreateFunc = Selector.Compile();
