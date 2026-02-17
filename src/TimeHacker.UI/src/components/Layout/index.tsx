@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
-import { Badge, Button, Drawer, Layout as AntdLayout, Menu, Space, Tag, theme, Tooltip, Typography } from 'antd';
+import { Badge, Button, Calendar, Drawer, Layout as AntdLayout, Menu, Space, Tag, theme, Tooltip, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CalendarOutlined,
   ClockCircleOutlined,
+  DoubleLeftOutlined,
+  DoubleRightOutlined,
   FireOutlined,
+  LeftOutlined,
   MenuOutlined,
   ProductOutlined,
   QuestionCircleOutlined,
+  RightOutlined,
   SettingOutlined,
   SnippetsOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 
 import { useAuth } from 'contexts/AuthContext';
+import { useCalendarDate } from 'contexts/CalendarDateContext';
 import { fetchTasksForDay, type TaskForDayItem } from '../../api/tasks';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
@@ -125,11 +131,67 @@ const SidebarLogo: FC<{ collapsed?: boolean; onClick: () => void }> = ({ collaps
   </div>
 );
 
+const MiniCalendar: FC<{ selectedDate: Date; onSelect: (date: Date) => void }> = ({ selectedDate, onSelect }) => (
+  <div className="mini-cal" style={{ padding: '4px 8px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+    <Calendar
+      fullscreen={false}
+      value={dayjs(selectedDate)}
+      onSelect={(date) => onSelect(date.toDate())}
+      headerRender={({ value, onChange }) => (
+        <div style={{ padding: '4px 0' }}>
+          <div style={{ textAlign: 'center', fontWeight: 600, fontSize: 13, marginBottom: 4 }}>
+            {value.format('MMMM YYYY')}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
+            <Button
+              type="text"
+              size="small"
+              icon={<DoubleLeftOutlined />}
+              onClick={() => onChange(value.subtract(1, 'year'))}
+              aria-label="Previous year"
+            />
+            <Button
+              type="text"
+              size="small"
+              icon={<LeftOutlined />}
+              onClick={() => onChange(value.subtract(1, 'month'))}
+              aria-label="Previous month"
+            />
+            <Button
+              type="text"
+              size="small"
+              onClick={() => onChange(dayjs())}
+              aria-label="Today"
+            >
+              <CalendarOutlined />
+            </Button>
+            <Button
+              type="text"
+              size="small"
+              icon={<RightOutlined />}
+              onClick={() => onChange(value.add(1, 'month'))}
+              aria-label="Next month"
+            />
+            <Button
+              type="text"
+              size="small"
+              icon={<DoubleRightOutlined />}
+              onClick={() => onChange(value.add(1, 'year'))}
+              aria-label="Next year"
+            />
+          </div>
+        </div>
+      )}
+    />
+  </div>
+);
+
 const Layout: FC = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
+  const { selectedDate, setSelectedDate } = useCalendarDate();
 
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -156,6 +218,12 @@ const Layout: FC = () => {
     setDrawerOpen(false);
   };
 
+  const handleMiniCalendarSelect = (date: Date) => {
+    setSelectedDate(date);
+    navigate('/');
+    setDrawerOpen(false);
+  };
+
   const menuNode = (
     <Menu
       theme="dark"
@@ -175,19 +243,25 @@ const Layout: FC = () => {
           placement="left"
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          styles={{ body: { padding: 0, background: '#001529' }, wrapper: { width: 250 } }}
+          styles={{ body: { padding: 0, background: '#001529' }, wrapper: { width: 280 } }}
         >
           <SidebarLogo onClick={handleLogoClick} />
           {menuNode}
+          <MiniCalendar selectedDate={selectedDate} onSelect={handleMiniCalendarSelect} />
         </Drawer>
       ) : (
         <Sider
           collapsible
           collapsed={collapsed}
           onCollapse={(value) => setCollapsed(value)}
+          width={240}
+          style={{ overflow: 'auto' }}
         >
           <SidebarLogo collapsed={collapsed} onClick={handleLogoClick} />
           {menuNode}
+          {!collapsed && (
+            <MiniCalendar selectedDate={selectedDate} onSelect={handleMiniCalendarSelect} />
+          )}
         </Sider>
       )}
       <AntdLayout>

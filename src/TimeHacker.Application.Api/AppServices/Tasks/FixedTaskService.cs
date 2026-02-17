@@ -1,5 +1,6 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
+using TimeHacker.Application.Api.QueryPipelineSteps;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tasks;
 
@@ -35,7 +36,7 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
 
     public async Task<FixedTaskDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
+        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken, queryPipelineSteps: QueryPipelineFixedTasks.IncludeRepeatingData);
         return FixedTaskDto.Create(entity);
     }
 }

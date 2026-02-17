@@ -3,8 +3,8 @@
 //for composite primary keys
 public interface IRepositoryBase<TModel> where TModel : class, IDbEntity
 {
-    IQueryable<TModel> GetAll(params QueryPipelineStep<TModel>[] queryPipelineSteps);
-    IQueryable<TModel> GetAll(bool asNoTracking = true, params QueryPipelineStep<TModel>[] queryPipelineSteps);
+    IQueryable<TModel> GetAll(params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps);
+    IQueryable<TModel> GetAll(bool asNoTracking = true, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps);
     TModel Add(TModel model);
     Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
     void AddRange(IEnumerable<TModel> models);
@@ -25,7 +25,7 @@ public interface IRepositoryBase<TModel> where TModel : class, IDbEntity
 public interface IRepositoryBase<TModel, in TId>: IRepositoryBase<TModel> where TModel : class, IDbEntity<TId>
 {
     Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default);
-    Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params QueryPipelineStep<TModel>[] queryPipelineSteps);
+    Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps);
 
     Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default);
     Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);

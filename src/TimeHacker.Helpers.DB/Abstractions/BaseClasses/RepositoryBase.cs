@@ -31,9 +31,9 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return DbSet;
     }
 
-    public virtual IQueryable<TModel> GetAll(params QueryPipelineStep<TModel>[] queryPipelineSteps) => GetAll(true, queryPipelineSteps);
+    public virtual IQueryable<TModel> GetAll(params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps) => GetAll(true, queryPipelineSteps);
 
-    public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params QueryPipelineStep<TModel>[] queryPipelineSteps)
+    public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
         var query = GetAllBase();
         if (asNoTracking)
@@ -168,7 +168,7 @@ where TDbContext : DbContextBase<TDbContext>
         return GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
     }
 
-    public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params QueryPipelineStep<TModel>[] queryPipelineSteps)
+    public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
         return await GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
     }

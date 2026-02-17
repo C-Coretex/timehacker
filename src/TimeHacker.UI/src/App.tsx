@@ -8,6 +8,8 @@ import 'dayjs/locale/ru';
 import 'i18n/index';
 import { AuthProvider } from 'contexts/AuthContext';
 import { ThemeProvider, useTheme } from 'contexts/ThemeContext';
+import { CalendarDateProvider } from 'contexts/CalendarDateContext';
+import { SettingsProvider } from 'contexts/SettingsContext';
 import AppRoutes from 'config/AppRoutes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -42,11 +44,15 @@ const App = () => {
     <Router>
       <ThemeProvider>
         <ThemedApp>
-          <AuthProvider>
-            <QueryClientProvider client={queryClient}>
-              <AppRoutesWrapper />
-            </QueryClientProvider>
-          </AuthProvider>
+          <SettingsProvider>
+            <AuthProvider>
+              <CalendarDateProvider>
+                <QueryClientProvider client={queryClient}>
+                  <AppRoutesWrapper />
+                </QueryClientProvider>
+              </CalendarDateProvider>
+            </AuthProvider>
+          </SettingsProvider>
         </ThemedApp>
       </ThemeProvider>
     </Router>

@@ -3,7 +3,7 @@ using TimeHacker.Helpers.Domain.Abstractions.Delegates;
 
 namespace TimeHacker.Application.Api.QueryPipelineSteps;
 
-public static class QueryPipelineScheduleSnapshots
+internal static class QueryPipelineScheduleSnapshots
 {
     public static QueryPipelineStep<ScheduleSnapshot> IncludeScheduledData => query =>
     {

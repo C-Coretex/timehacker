@@ -8,9 +8,8 @@ import { useTranslation } from 'react-i18next';
 
 import useFixedTasks, { postNewScheduleForTask } from '../hooks/useFixedTasks';
 import useDynamicTasks from '../hooks/useDynamicTasks';
-import TaskFormModal from '../components/TaskFormModal';
-import type { ScheduleFormPayload } from '../components/TaskFormModal';
-import DynamicTaskFormModal from '../components/DynamicTaskFormModal';
+import UnifiedTaskFormModal from '../components/UnifiedTaskFormModal';
+import type { ScheduleFormPayload } from '../components/UnifiedTaskFormModal';
 import type { FixedTaskFormData, FixedTaskDisplayModel, DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
 import { useIsMobile } from '../hooks/useIsMobile';
 
@@ -38,9 +37,9 @@ const TasksPage: FC = () => {
     deleteTask: deleteDynamicTask,
   } = useDynamicTasks();
 
-  const [fixedModalOpen, setFixedModalOpen] = React.useState(false);
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalTab, setModalTab] = React.useState<'fixed' | 'dynamic'>('fixed');
   const [editingFixedTask, setEditingFixedTask] = React.useState<FixedTaskDisplayModel | null>(null);
-  const [dynamicModalOpen, setDynamicModalOpen] = React.useState(false);
   const [editingDynamicTask, setEditingDynamicTask] = React.useState<DynamicTaskReturnModel | null>(null);
   const [deleteModal, setDeleteModal] = React.useState<{
     visible: boolean;
@@ -50,31 +49,35 @@ const TasksPage: FC = () => {
 
   const showAddFixedModal = useCallback(() => {
     setEditingFixedTask(null);
-    setFixedModalOpen(true);
+    setEditingDynamicTask(null);
+    setModalTab('fixed');
+    setModalOpen(true);
   }, []);
 
   const showEditFixedModal = useCallback((task: FixedTaskDisplayModel) => {
     setEditingFixedTask(task);
-    setFixedModalOpen(true);
+    setEditingDynamicTask(null);
+    setModalTab('fixed');
+    setModalOpen(true);
   }, []);
 
   const showAddDynamicModal = useCallback(() => {
+    setEditingFixedTask(null);
     setEditingDynamicTask(null);
-    setDynamicModalOpen(true);
+    setModalTab('dynamic');
+    setModalOpen(true);
   }, []);
 
   const showEditDynamicModal = useCallback((task: DynamicTaskReturnModel) => {
     setEditingDynamicTask(task);
-    setDynamicModalOpen(true);
-  }, []);
-
-  const handleFixedModalCancel = useCallback(() => {
-    setFixedModalOpen(false);
     setEditingFixedTask(null);
+    setModalTab('dynamic');
+    setModalOpen(true);
   }, []);
 
-  const handleDynamicModalCancel = useCallback(() => {
-    setDynamicModalOpen(false);
+  const handleModalCancel = useCallback(() => {
+    setModalOpen(false);
+    setEditingFixedTask(null);
     setEditingDynamicTask(null);
   }, []);
 
@@ -211,10 +214,10 @@ const TasksPage: FC = () => {
       } catch {
         notification.error({ message: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
       } finally {
-        handleFixedModalCancel();
+        handleModalCancel();
       }
     },
-    [createFixedTask, updateFixedTask, fetchFixedTasks, handleFixedModalCancel, t]
+    [createFixedTask, updateFixedTask, fetchFixedTasks, handleModalCancel, t]
   );
 
   const handleSaveDynamicTask = useCallback(
@@ -231,10 +234,10 @@ const TasksPage: FC = () => {
       } catch {
         notification.error({ message: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
       } finally {
-        handleDynamicModalCancel();
+        handleModalCancel();
       }
     },
-    [createDynamicTask, updateDynamicTask, fetchDynamicTasks, handleDynamicModalCancel, t]
+    [createDynamicTask, updateDynamicTask, fetchDynamicTasks, handleModalCancel, t]
   );
 
   const confirmDelete = async () => {
@@ -323,17 +326,14 @@ const TasksPage: FC = () => {
         ]}
       />
 
-      <TaskFormModal
-        open={fixedModalOpen}
-        onCancel={handleFixedModalCancel}
-        onSave={handleSaveFixedTask}
-        initialData={editingFixedTask ?? undefined}
-      />
-      <DynamicTaskFormModal
-        open={dynamicModalOpen}
-        onCancel={handleDynamicModalCancel}
-        onSave={handleSaveDynamicTask}
-        initialData={editingDynamicTask}
+      <UnifiedTaskFormModal
+        open={modalOpen}
+        onCancel={handleModalCancel}
+        onSaveFixed={handleSaveFixedTask}
+        onSaveDynamic={handleSaveDynamicTask}
+        initialFixedData={editingFixedTask ?? undefined}
+        initialDynamicData={editingDynamicTask}
+        initialTab={modalTab}
       />
       <Modal
         open={deleteModal.visible}

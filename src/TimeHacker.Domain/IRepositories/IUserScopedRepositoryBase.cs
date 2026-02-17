@@ -6,8 +6,8 @@ namespace TimeHacker.Domain.IRepositories;
 //not inherited from IRepositoryBase, because some of the methods are changed to be Tasks, since they are async (e.g. Delete)
 public interface IUserScopedRepositoryBase<TModel, in TId> where TModel : class, IDbEntity<TId>, IUserScopedEntity
 {
-    IQueryable<TModel> GetAll(params QueryPipelineStep<TModel>[] QueryPipelineSteps);
-    IQueryable<TModel> GetAll(bool asNoTracking = true, params QueryPipelineStep<TModel>[] QueryPipelineSteps);
+    IQueryable<TModel> GetAll(params IEnumerable<QueryPipelineStep<TModel>> QueryPipelineSteps);
+    IQueryable<TModel> GetAll(bool asNoTracking = true, params IEnumerable<QueryPipelineStep<TModel>> QueryPipelineSteps);
     TModel Add(TModel model);
     Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default);
     void AddRange(IEnumerable<TModel> models);
@@ -25,7 +25,7 @@ public interface IUserScopedRepositoryBase<TModel, in TId> where TModel : class,
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
     Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default);
-    Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params QueryPipelineStep<TModel>[] queryPipelineSteps);
+    Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps);
 
     Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default);
     Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
