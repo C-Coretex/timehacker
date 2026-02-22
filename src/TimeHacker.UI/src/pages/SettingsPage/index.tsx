@@ -1,75 +1,36 @@
+import type { FC } from 'react';
 import { Card, Select, Switch, Space, Typography } from 'antd';
-import { BulbOutlined, ClockCircleOutlined, CalendarOutlined, GlobalOutlined } from '@ant-design/icons';
-import type { FC, ReactNode } from 'react';
-import { useMemo } from 'react';
+import { BulbOutlined, CalendarOutlined, ClockCircleOutlined, GlobalOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+
 import { useTheme } from 'contexts/ThemeContext';
 import { useSettings } from 'contexts/SettingsContext';
 import type { TimeFormat, WeekStart } from 'contexts/SettingsContext';
-import { useTranslation } from 'react-i18next';
-
-const { Title, Text } = Typography;
-
-interface SettingItemProps {
-  icon: ReactNode;
-  label: string;
-  hint: string;
-  control: ReactNode;
-}
-
-const SettingItem: FC<SettingItemProps> = ({ icon, label, hint, control }) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    }}
-  >
-    <Space size={12} align="start">
-      <div style={{ fontSize: 20, paddingTop: 2 }}>{icon}</div>
-      <div>
-        <Text strong>{label}</Text>
-        <br />
-        <Text type="secondary" style={{ fontSize: 13 }}>
-          {hint}
-        </Text>
-      </div>
-    </Space>
-    {control}
-  </div>
-);
+import SettingItem from './components/SettingItem';
 
 const SettingsPage: FC = () => {
   const { darkMode, updateDarkMode } = useTheme();
   const { timeFormat, setTimeFormat, weekStart, setWeekStart } = useSettings();
   const { t, i18n } = useTranslation();
 
-  const languageOptions = useMemo(
-    () => [
-      { value: 'en', label: 'English' },
-      { value: 'ru', label: 'Русский' },
-    ],
-    []
-  );
+  const languageOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'ru', label: 'Русский' },
+  ];
 
-  const timeFormatOptions = useMemo(
-    () => [
-      { value: '12h' as TimeFormat, label: t('settings.time12h') },
-      { value: '24h' as TimeFormat, label: t('settings.time24h') },
-    ],
-    [t]
-  );
+  const timeFormatOptions = [
+    { value: '12h' as TimeFormat, label: t('settings.time12h') },
+    { value: '24h' as TimeFormat, label: t('settings.time24h') },
+  ];
 
-  const weekStartOptions = useMemo(
-    () => [
-      { value: 'sunday' as WeekStart, label: t('settings.sunday') },
-      { value: 'monday' as WeekStart, label: t('settings.monday') },
-    ],
-    [t]
-  );
+  const weekStartOptions = [
+    { value: 'sunday' as WeekStart, label: t('settings.sunday') },
+    { value: 'monday' as WeekStart, label: t('settings.monday') },
+  ];
 
   return (
     <div style={{ maxWidth: 600, padding: '0 16px' }}>
-      <Title level={3}>{t('settings.title')}</Title>
+      <Typography.Title level={3}>{t('settings.title')}</Typography.Title>
 
       <Card title={t('settings.appearance')} style={{ marginTop: 16 }}>
         <Space direction="vertical" size={24} style={{ width: '100%' }}>

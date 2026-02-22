@@ -19,6 +19,16 @@ interface ThreeDayViewProps {
   [key: string]: any;
 }
 
+const buildThreeDayRange = (date: Date): Date[] => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  return Array.from({ length: 3 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+};
+
 const ThreeDayView: FC<ThreeDayViewProps> & {
   range: (date: Date) => Date[];
   navigate: (date: Date, action: NavigateAction) => Date;
@@ -34,20 +44,10 @@ const ThreeDayView: FC<ThreeDayViewProps> & {
     ...rest
   } = props;
 
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-
-  const range: Date[] = [];
-  for (let i = 0; i < 3; i++) {
-    const d = new Date(start);
-    d.setDate(d.getDate() + i);
-    range.push(d);
-  }
-
   return (
     <TimeGrid
       {...rest}
-      range={range}
+      range={buildThreeDayRange(date)}
       eventOffset={15}
       localizer={localizer}
       date={date}
@@ -59,18 +59,7 @@ const ThreeDayView: FC<ThreeDayViewProps> & {
   );
 };
 
-ThreeDayView.range = (date: Date): Date[] => {
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-
-  const range: Date[] = [];
-  for (let i = 0; i < 3; i++) {
-    const d = new Date(start);
-    d.setDate(d.getDate() + i);
-    range.push(d);
-  }
-  return range;
-};
+ThreeDayView.range = buildThreeDayRange;
 
 ThreeDayView.navigate = (date: Date, action: NavigateAction): Date => {
   const newDate = new Date(date);

@@ -283,4 +283,4 @@ docker compose up
 - i18n support with English/Russian languages
 - Session expiry automatically redirects to login with alert
 - Calendar supports custom 3-day view alongside standard views
-- Task timeline generation cached in daily snapshots for performance
+- Task timeline stored in daily snapshots to preserve the generated schedule — snapshots are not regenerated automatically, ensuring the day's plan stays stable
