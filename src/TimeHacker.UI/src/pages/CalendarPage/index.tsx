@@ -17,6 +17,7 @@ import type { CalendarEvent } from '../../utils/calendarUtils';
 import type { ScheduleEntityReturnModel } from '../../api/types';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useCalendarDate } from '../../contexts/CalendarDateContext';
+import type { CalendarView } from '../../contexts/CalendarDateContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import ThreeDayView from './ThreeDayView';
@@ -27,8 +28,6 @@ import CustomCalendarEvent from './components/CustomCalendarEvent';
 import EventDetailModal from './components/EventDetailModal';
 
 dayjs.extend(updateLocale);
-
-type ExtendedView = View | '3day';
 
 const calendarViews = {
   month: true,
@@ -43,9 +42,7 @@ const CalendarPage: FC = () => {
   const { t, i18n } = useTranslation();
   const { timeDisplayFormat, weekStart: weekStartSetting } = useSettings();
   const initialViewSet = useRef(false);
-  const { selectedDate, setSelectedDate } = useCalendarDate();
-
-  const [view, setView] = useState<ExtendedView>('week');
+  const { selectedDate, setSelectedDate, calendarView, setCalendarView } = useCalendarDate();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +62,7 @@ const CalendarPage: FC = () => {
   useEffect(() => {
     if (!initialViewSet.current && screens.md !== undefined) {
       initialViewSet.current = true;
-      setView(isMobile ? 'day' : 'week');
+      setCalendarView(isMobile ? 'day' : 'week');
     }
   }, [isMobile, screens.md]);
 
@@ -112,7 +109,7 @@ const CalendarPage: FC = () => {
   );
 
   const getDatesForView = useCallback(
-    (v: ExtendedView): Date[] => {
+    (v: CalendarView): Date[] => {
       switch (v) {
         case 'month': return monthDays;
         case 'week': return weekDays;
@@ -154,14 +151,14 @@ const CalendarPage: FC = () => {
   );
 
   useEffect(() => {
-    fetchTasks(getDatesForView(view));
-  }, [view, selectedDate, fetchTasks, getDatesForView]);
+    fetchTasks(getDatesForView(calendarView));
+  }, [calendarView, selectedDate, fetchTasks, getDatesForView]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const dates = getDatesForView(view);
+      const dates = getDatesForView(calendarView);
       await refreshTasksForDays(dates);
       await fetchTasks(dates);
     } catch (err: unknown) {
@@ -173,7 +170,7 @@ const CalendarPage: FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [view, getDatesForView, fetchTasks, t]);
+  }, [calendarView, getDatesForView, fetchTasks, t]);
 
   // --- Event handlers ---
 
@@ -215,12 +212,12 @@ const CalendarPage: FC = () => {
         }
         setTaskModalOpen(false);
         notification.success({ message: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
-        await fetchTasks(getDatesForView(view));
+        await fetchTasks(getDatesForView(calendarView));
       } catch {
         notification.error({ message: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
       }
     },
-    [fetchTasks, getDatesForView, view, t]
+    [fetchTasks, getDatesForView, calendarView, t]
   );
 
   const handleSaveDynamic = useCallback(
@@ -229,12 +226,12 @@ const CalendarPage: FC = () => {
         await createDynamicTask(data);
         setTaskModalOpen(false);
         notification.success({ message: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
-        await fetchTasks(getDatesForView(view));
+        await fetchTasks(getDatesForView(calendarView));
       } catch {
         notification.error({ message: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
       }
     },
-    [fetchTasks, getDatesForView, view, t]
+    [fetchTasks, getDatesForView, calendarView, t]
   );
 
   const eventStyleGetter = useCallback(
@@ -304,13 +301,13 @@ const CalendarPage: FC = () => {
           startAccessor="start"
           endAccessor="end"
           style={{ flex: 1 }}
-          view={view as View}
-          onView={(v) => setView(v as ExtendedView)}
+          view={calendarView as View}
+          onView={(v) => setCalendarView(v as CalendarView)}
           date={selectedDate}
           onNavigate={setSelectedDate}
           views={calendarViews}
           onSelectEvent={handleSelectEvent}
-          onDrillDown={(date) => { setSelectedDate(date); setView('day'); }}
+          onDrillDown={(date) => { setSelectedDate(date); setCalendarView('day'); }}
           eventPropGetter={eventStyleGetter}
           culture={i18n.language?.startsWith('ru') ? 'ru' : 'en'}
           messages={calendarMessages as Record<string, string>}

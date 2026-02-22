@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'contexts/AuthContext';
 import { useCalendarDate } from 'contexts/CalendarDateContext';
+import { useSettings } from 'contexts/SettingsContext';
 import { fetchTasksForDay } from '../../api/tasks';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import SidebarLogo from './SidebarLogo';
@@ -37,7 +38,9 @@ const Layout: FC = () => {
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
-  const { selectedDate, setSelectedDate } = useCalendarDate();
+  const { selectedDate, setSelectedDate, calendarView } = useCalendarDate();
+  const { weekStart } = useSettings();
+  const weekStartDay = weekStart === 'monday' ? 1 : 0;
 
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -91,7 +94,7 @@ const Layout: FC = () => {
         >
           <SidebarLogo onClick={handleLogoClick} />
           {menuNode}
-          <MiniCalendar selectedDate={selectedDate} onSelect={handleMiniCalendarSelect} />
+          <MiniCalendar selectedDate={selectedDate} onSelect={handleMiniCalendarSelect} currentView={calendarView} weekStartDay={weekStartDay} />
         </Drawer>
       ) : (
         <Sider
@@ -104,7 +107,7 @@ const Layout: FC = () => {
           <SidebarLogo collapsed={collapsed} onClick={handleLogoClick} />
           {menuNode}
           {!collapsed && (
-            <MiniCalendar selectedDate={selectedDate} onSelect={handleMiniCalendarSelect} />
+            <MiniCalendar selectedDate={selectedDate} onSelect={handleMiniCalendarSelect} currentView={calendarView} weekStartDay={weekStartDay} />
           )}
         </Sider>
       )}
