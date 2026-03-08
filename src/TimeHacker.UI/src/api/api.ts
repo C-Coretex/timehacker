@@ -9,7 +9,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         const url = error.config?.url ?? '';
-        const isAuthCheck = url.includes('/api/User/GetCurrent');
+        const isAuthCheck = url.includes('/api/users/me');
         const isAuthEndpoint = url.includes('/login') || url.includes('/register');
 
         if (error.response?.status === 401 && !isAuthCheck && !isAuthEndpoint) {

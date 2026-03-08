@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
-import { ConfigProvider, theme } from 'antd';
+import { App as AntdApp, ConfigProvider, theme } from 'antd';
 import enUS from 'antd/locale/en_US';
 import ruRU from 'antd/locale/ru_RU';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +32,9 @@ const ThemedApp = ({ children }: { children: React.ReactNode }) => {
       }}
       locale={antdLocale}
     >
-      {children}
+      <AntdApp>
+        {children}
+      </AntdApp>
     </ConfigProvider>
   );
 };

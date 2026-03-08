@@ -24,8 +24,6 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<IFixedTaskAppService, FixedTaskAppService>();
         serviceCollection.AddScoped<ITaskAppService, TaskService>();
 
-        serviceCollection.AddScoped<ITaskAppService, TaskService>();
-
         serviceCollection.AddScoped<IUserAppService, UserService>();
 
         return serviceCollection;

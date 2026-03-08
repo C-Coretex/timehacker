@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
 
 namespace TimeHacker.Api.Filters;
 
-public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
+public class LogExceptionFilter(ILoggerFactory loggerFactory, IWebHostEnvironment environment) : IExceptionFilter
 {
     private const string ExceptionTypeExtensionName = "ExceptionType";
     private const string ParameterNameExtensionName = "ParameterName";
@@ -23,8 +25,10 @@ public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
         var problemDetails = new ProblemDetails
         {
             Status = StatusCodes.Status400BadRequest,
-            Detail = context.Exception.Message
+            Detail = environment.IsDevelopment() ? $"{context.Exception.Message}\n{context.Exception.StackTrace}" : null
         };
+        var traceId = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
+        problemDetails.Extensions["traceId"] = traceId;
         objectResult = new ObjectResult(problemDetails)
         {
             StatusCode = StatusCodes.Status400BadRequest
@@ -34,8 +38,10 @@ public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
         switch (context.Exception)
         {
             case UserAlreadyPresentException:
+                problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "User data is already present.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(UserAlreadyPresentException);
+                objectResult = new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status409Conflict };
 
                 return true;
             case UserDoesNotExistException:
@@ -44,20 +50,25 @@ public class LogExceptionFilter(ILoggerFactory loggerFactory) : IExceptionFilter
 
                 return true;
             case NotFoundException exception:
-                problemDetails.Title = $"Resource '{exception.ResourceName}' by Id '{exception.ResourceId}' is not found.";
+                problemDetails.Status = StatusCodes.Status404NotFound;
+                problemDetails.Title = "Resource is not found.";
+                problemDetails.Detail = $"Resource '{exception.ResourceName}' by Id '{exception.ResourceId}' is not found.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(NotFoundException);
                 problemDetails.Extensions["ResourceName"] = exception.ResourceName;
                 problemDetails.Extensions["Identifier"] = exception.ResourceId;
+                objectResult = new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status404NotFound };
 
                 return true;
             case NotProvidedException exception:
-                problemDetails.Title = $"Parameter '{exception.ParamName}' is not provided.";
+                problemDetails.Title = "Parameter is not provided.";
+                problemDetails.Detail = $"Parameter '{exception.ParamName}' is not provided.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(NotProvidedException);
                 problemDetails.Extensions[ParameterNameExtensionName] = exception.ParamName;
 
                 return true;
             case DataIsNotCorrectException exception:
-                problemDetails.Title = $"Parameter '{exception.ParamName}' is not correct.";
+                problemDetails.Title = "Parameter is not correct.";
+                problemDetails.Detail = $"Parameter '{exception.ParamName}' is not correct.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(DataIsNotCorrectException);
                 problemDetails.Extensions[ParameterNameExtensionName] = exception.ParamName;
 

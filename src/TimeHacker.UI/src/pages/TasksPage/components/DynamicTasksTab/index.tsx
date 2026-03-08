@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { FC } from 'react';
-import { Button, Modal, notification, Table, Typography } from 'antd';
+import { App, Button, Table, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +14,7 @@ const DynamicTasksTab: FC = () => {
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
   const { tasks, loading, error, createTask, updateTask, deleteTask } = useDynamicTasks();
+  const { notification, modal } = App.useApp();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<DynamicTaskReturnModel | null>(null);
@@ -34,7 +35,7 @@ const DynamicTasksTab: FC = () => {
   }, []);
 
   const handleDelete = useCallback((id: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: t('tasks.confirmDelete'),
       content: t('tasks.confirmDeleteMessage'),
       okText: t('tasks.delete'),
@@ -48,13 +49,13 @@ const DynamicTasksTab: FC = () => {
       try {
         if (id) {
           await updateTask(id, data);
-          notification.success({ message: t('tasks.success'), description: t('tasks.dynamicTaskUpdated') });
+          notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskUpdated') });
         } else {
           await createTask(data);
-          notification.success({ message: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
+          notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
         }
       } catch {
-        notification.error({ message: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
+        notification.error({ title: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
       } finally {
         closeModal();
       }

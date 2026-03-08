@@ -46,7 +46,7 @@ public class TaskService(
             yield break;
 
         var fixedTasks = await fixedTaskRepository.GetAll()
-                                                .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
+                                                .Where(ft => dates.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
                                                 .OrderBy(ft => ft.StartTimestamp)
                                                 .ToListAsync(cancellationToken);
 
@@ -78,7 +78,7 @@ public class TaskService(
     public async IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var fixedTasks = await fixedTaskRepository.GetAll()
-                                                .Where(ft => dates.Any(d => d == DateOnly.FromDateTime(ft.StartTimestamp)))
+                                                .Where(ft => dates.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
                                                 .OrderBy(ft => ft.StartTimestamp)
                                                 .ToListAsync(cancellationToken);
 

@@ -33,7 +33,7 @@ const SettingsPage: FC = () => {
       <Typography.Title level={3}>{t('settings.title')}</Typography.Title>
 
       <Card title={t('settings.appearance')} style={{ marginTop: 16 }}>
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={24} style={{ width: '100%' }}>
           <SettingItem
             icon={<BulbOutlined />}
             label={t('settings.darkMode')}
@@ -57,7 +57,7 @@ const SettingsPage: FC = () => {
       </Card>
 
       <Card title={t('settings.calendar')} style={{ marginTop: 16 }}>
-        <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={24} style={{ width: '100%' }}>
           <SettingItem
             icon={<ClockCircleOutlined />}
             label={t('settings.timeFormat')}

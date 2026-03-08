@@ -1,12 +1,4 @@
-/** Format date as dd.MM.yyyy for API query params */
-export function formatDateForApi(d: Date): string {
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-/** Format date as YYYY-MM-DD for request bodies */
+/** Format date as YYYY-MM-DD (ISO 8601) */
 export function formatDateIso(d: Date): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');

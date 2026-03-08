@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar-theme.css';
-import { Alert, Button, notification, Spin } from 'antd';
+import { Alert, App, Button, Spin } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -38,6 +38,7 @@ const calendarViews = {
 
 const CalendarPage: FC = () => {
   const { darkMode } = useTheme();
+  const { notification } = App.useApp();
   const { isMobile, screens } = useIsMobile();
   const { t, i18n } = useTranslation();
   const { timeDisplayFormat, weekStart: weekStartSetting } = useSettings();
@@ -211,10 +212,10 @@ const CalendarPage: FC = () => {
           });
         }
         setTaskModalOpen(false);
-        notification.success({ message: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
+        notification.success({ title: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
         await fetchTasks(getDatesForView(calendarView));
       } catch {
-        notification.error({ message: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
+        notification.error({ title: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
       }
     },
     [fetchTasks, getDatesForView, calendarView, t]
@@ -225,10 +226,10 @@ const CalendarPage: FC = () => {
       try {
         await createDynamicTask(data);
         setTaskModalOpen(false);
-        notification.success({ message: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
+        notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
         await fetchTasks(getDatesForView(calendarView));
       } catch {
-        notification.error({ message: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
+        notification.error({ title: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
       }
     },
     [fetchTasks, getDatesForView, calendarView, t]

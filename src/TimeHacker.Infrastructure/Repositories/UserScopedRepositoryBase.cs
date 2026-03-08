@@ -1,4 +1,5 @@
-﻿using TimeHacker.Domain.Entities.EntityBase;
+﻿using TimeHacker.Domain.BusinessLogicExceptions;
+using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.IRepositories;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
@@ -37,11 +38,11 @@ public class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDb
     {
         var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
         if (model.UserId != userId)
-            return;
+            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
         var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
-        if(!entityExistsForThisUser)
-            return;
+        if (!entityExistsForThisUser)
+            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
         base.Delete(model);
     }
@@ -56,11 +57,11 @@ public class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDb
     {
         var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
         if (model.UserId != userId)
-            return model;
+            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
         var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
         if (!entityExistsForThisUser)
-            return model;
+            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
         return base.Update(model);
     }

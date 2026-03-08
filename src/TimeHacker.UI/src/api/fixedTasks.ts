@@ -6,22 +6,22 @@ import type {
 } from './types';
 import api from './api';
 
-const API_BASE_URL = '/api/FixedTasks';
-const TASKS_API_URL = '/api/Tasks';
+const API_BASE_URL = '/api/fixed-tasks';
+const TASKS_API_URL = '/api/tasks';
 
 export const fetchFixedTasks = async (): Promise<FixedTaskReturnModel[]> => {
-    const response = await api.get(`${API_BASE_URL}/GetAll`);
+    const response = await api.get(`${API_BASE_URL}`);
     return response.data;
 };
 
 export const fetchFixedTaskById = async (id: string): Promise<FixedTaskReturnModel> => {
-    const response = await api.get(`${API_BASE_URL}/GetById/${id}`);
+    const response = await api.get(`${API_BASE_URL}/${id}`);
     return response.data;
 };
 
 /** Add fixed task. Returns the new task's Id (Guid). */
 export const createFixedTask = async (task: InputFixedTask): Promise<string> => {
-    const response = await api.post<string>(`${API_BASE_URL}/Add`, task);
+    const response = await api.post<string>(`${API_BASE_URL}`, task);
     return response.data;
 };
 
@@ -53,14 +53,14 @@ export const postNewScheduleForTask = async (
     body: InputScheduleEntityModel
 ): Promise<unknown> => {
     const payload = toScheduleRequestBody(body);
-    const response = await api.post(`${TASKS_API_URL}/PostNewScheduleForTask`, payload);
+    const response = await api.post(`${TASKS_API_URL}/schedules`, payload);
     return response.data;
 };
 
 export const updateFixedTask = async (id: string, task: InputFixedTask): Promise<void> => {
-    await api.put(`${API_BASE_URL}/Update/${id}`, task);
+    await api.put(`${API_BASE_URL}/${id}`, task);
 };
 
 export const deleteFixedTask = async (id: string): Promise<void> => {
-    await api.delete(`${API_BASE_URL}/Delete/${id}`);
+    await api.delete(`${API_BASE_URL}/${id}`);
 };

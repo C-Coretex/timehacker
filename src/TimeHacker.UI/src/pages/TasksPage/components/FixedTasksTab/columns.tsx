@@ -18,7 +18,7 @@ const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunc
   };
 
   return (
-    <Space direction="vertical" size={0}>
+    <Space orientation="vertical" size={0}>
       <Tag color="blue">{typeLabels[scheduleEntity.repeatingEntity.entityType]}</Tag>
       {scheduleEntity.endsOn && (
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>

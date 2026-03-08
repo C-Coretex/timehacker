@@ -16,7 +16,7 @@ public class YearRepeatingEntity: IRepeatingEntityType
                     $"Property value must not be greater than maximum days in year ({MaxYearDay})",
                     nameof(YearDayToRepeat)),
                 < 1 => throw new ArgumentException(
-                    $"Property value must not be at least first day in month (1)",
+                    $"Property value must be at least first day in year (1)",
                     nameof(YearDayToRepeat)),
                 _ => value
             };

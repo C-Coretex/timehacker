@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { notification } from 'antd';
+import { App } from 'antd';
 
 interface UseEntityCrudOptions<TDisplay> {
   fetchFn: () => Promise<TDisplay[]>;
@@ -22,6 +22,7 @@ export function useEntityCrud<TDisplay>({
   fetchFn,
   fetchErrorMessage,
 }: UseEntityCrudOptions<TDisplay>): UseEntityCrudResult<TDisplay> {
+  const { notification } = App.useApp();
   const [items, setItems] = useState<TDisplay[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +41,7 @@ export function useEntityCrud<TDisplay>({
     } catch {
       const msg = errorMsgRef.current;
       setError(msg);
-      notification.error({ message: 'Error', description: msg });
+      notification.error({ title: 'Error', description: msg });
     } finally {
       setLoading(false);
     }
@@ -52,7 +53,7 @@ export function useEntityCrud<TDisplay>({
         await action();
         await fetch();
       } catch {
-        notification.error({ message: 'Error', description: errorMessage });
+        notification.error({ title: 'Error', description: errorMessage });
       }
     },
     [fetch]

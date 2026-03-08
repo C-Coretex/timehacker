@@ -1,5 +1,5 @@
 import api from './api';
-import { formatDateForApi, formatDateIso } from '../utils/timeUtils';
+import { formatDateIso } from '../utils/timeUtils';
 
 export interface TaskForDayItem {
   isFixed: boolean;
@@ -23,8 +23,8 @@ export interface TasksForDayResponse {
 }
 
 export async function fetchTasksForDay(date: Date): Promise<TasksForDayResponse> {
-  const response = await api.get<TasksForDayResponse>('/api/Tasks/GetTasksForDay', {
-    params: { date: formatDateForApi(date) },
+  const response = await api.get<TasksForDayResponse>('/api/tasks/timeline/day', {
+    params: { date: formatDateIso(date) },
   });
   return response.data;
 }
@@ -34,11 +34,11 @@ export async function fetchTasksForDays(dates: Date[]): Promise<TasksForDayRespo
   for (const d of dates) {
     params.append('dates', formatDateIso(d));
   }
-  const response = await api.get<TasksForDayResponse[]>('/api/Tasks/GetTasksForDays', { params });
+  const response = await api.get<TasksForDayResponse[]>('/api/tasks/timeline', { params });
   return response.data;
 }
 
 export async function refreshTasksForDays(dates: Date[]): Promise<void> {
   const body = dates.map(formatDateIso);
-  await api.post('/api/Tasks/RefreshTasksForDays', body);
+  await api.post('/api/tasks/timeline/refresh', body);
 }

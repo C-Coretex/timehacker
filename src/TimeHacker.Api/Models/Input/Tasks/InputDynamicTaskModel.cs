@@ -1,10 +1,15 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
+using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
+using TimeHacker.Domain.BusinessLogicExceptions;
 
 namespace TimeHacker.Api.Models.Input.Tasks;
 
 public record InputDynamicTaskModel
 {
-    [Required] public required string Name { get; init; }
+    [Required]
+    [StringLength(250, MinimumLength = 1)]
+    public required string Name { get; init; }
+
+    [StringLength(516)]
     public string? Description { get; init; }
 
     public IEnumerable<Guid> CategoryIds { get; init; } = [];
@@ -17,8 +22,11 @@ public record InputDynamicTaskModel
 
     public TimeSpan? OptimalTimeToFinish { get; init; }
 
-    public DynamicTaskDto CreateDynamicTaskDto()
+    public DynamicTaskDto CreateDto()
     {
+        if (MinTimeToFinish >= MaxTimeToFinish)
+            throw new DataIsNotCorrectException($"{nameof(MinTimeToFinish)} must be less than {nameof(MaxTimeToFinish)}.", nameof(MinTimeToFinish));
+
         return new DynamicTaskDto()
         {
             Name = Name,

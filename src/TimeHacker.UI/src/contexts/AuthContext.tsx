@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const fetchCurrentUser = async () => {
         try {
-            const response = await api.get<User>('/api/User/GetCurrent');
+            const response = await api.get<User>('/api/users/me');
             setUser(response.data);
         } catch (error) {
             console.error('Failed to fetch current user:', error);

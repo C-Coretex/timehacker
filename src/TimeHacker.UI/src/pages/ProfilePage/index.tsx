@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import {
-  Avatar, Button, Card, Divider, Form, Input, message, Spin, theme, Typography,
+  App, Avatar, Button, Card, Divider, Form, Input, Spin, theme, Typography,
 } from 'antd';
 import {
   CloseOutlined, EditOutlined, MailOutlined, PhoneOutlined, SaveOutlined, UserOutlined,
@@ -19,6 +19,7 @@ const ProfilePage: FC = () => {
   const [form] = Form.useForm();
   const { token } = theme.useToken();
   const { t } = useTranslation();
+  const { message } = App.useApp();
 
   useEffect(() => {
     fetchCurrentUser();
@@ -50,7 +51,7 @@ const ProfilePage: FC = () => {
     try {
       const values = await form.validateFields();
       setSaving(true);
-      await api.put('/api/User/Update', {
+      await api.put('/api/users/me', {
         name: values.name,
         phoneNumberForNotifications: values.phoneNumberForNotifications || null,
         emailForNotifications: values.emailForNotifications || null,
