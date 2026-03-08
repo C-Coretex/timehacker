@@ -13,7 +13,7 @@ api.interceptors.response.use(
         const isAuthEndpoint = url.includes('/login') || url.includes('/register');
 
         if (error.response?.status === 401 && !isAuthCheck && !isAuthEndpoint) {
-            window.location.href = '/login?expired=true';
+            window.location.href = '/app/login?expired=true';
         }
         return Promise.reject(error);
     }

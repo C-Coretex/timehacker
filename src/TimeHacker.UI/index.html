@@ -1,13 +1,234 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>TimeHacker — Smart Time Management & Task Scheduling</title>
+  <meta name="description" content="TimeHacker helps you plan every day with precision. Schedule fixed tasks, let dynamic tasks fill your free slots automatically, and set recurring patterns that work for your life." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://timehacker.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://timehacker.app/" />
+  <meta property="og:title" content="TimeHacker — Smart Time Management & Task Scheduling" />
+  <meta property="og:description" content="Schedule fixed tasks, let dynamic tasks fill free slots automatically, and set recurring patterns that work for your life." />
+  <meta property="og:image" content="https://timehacker.app/og-image.png" />
+  <meta property="og:site_name" content="TimeHacker" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TimeHacker — Smart Time Management" />
+  <meta name="twitter:description" content="Intelligent task scheduling with dynamic slot-filling and recurring patterns." />
+  <meta name="twitter:image" content="https://timehacker.app/og-image.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TimeHacker",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "Web",
+    "description": "Smart time management and task scheduling application with recurring schedules, dynamic task allocation, and calendar views.",
+    "url": "https://timehacker.app/",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Fixed task scheduling with calendar integration",
+      "Dynamic task auto-allocation",
+      "Recurring schedules (daily, weekly, monthly, yearly)",
+      "Month, week, day, and 3-day calendar views",
+      "Priority-based task management"
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="/landing.css" />
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────────────────────── -->
+  <header role="banner">
+    <nav class="nav" aria-label="Main navigation">
+      <div class="container nav-inner">
+        <a href="/" class="nav-logo" aria-label="TimeHacker home">
+          <span class="nav-logo-icon" aria-hidden="true">&#9200;</span>
+          TimeHacker
+        </a>
+
+        <ul class="nav-links" id="nav-links" role="list">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li class="nav-cta">
+            <a href="/app/login" class="btn btn-primary" style="padding: 7px 18px; font-size: 0.88rem;">Sign In</a>
+          </li>
+        </ul>
+
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ── Hero ──────────────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-badge" aria-label="Product type">
+            <span aria-hidden="true">&#10022;</span> Time Management App
+          </div>
+
+          <h1 id="hero-title">
+            Take back control<br>of <span class="highlight">your time</span>
+          </h1>
+
+          <p class="hero-sub">
+            TimeHacker combines fixed scheduling, intelligent dynamic task allocation,
+            and recurring patterns to make every day feel intentional &mdash; not reactive.
+          </p>
+
+          <div class="hero-cta">
+            <a href="/app/login" class="btn btn-primary btn-lg">
+              Get Started Free &rarr;
+            </a>
+            <a href="#features" class="btn btn-secondary btn-lg">See Features</a>
+          </div>
+
+          <p class="hero-note">No credit card required &nbsp;&middot;&nbsp; Free to use</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Features ──────────────────────────────────────────────── -->
+    <section id="features" class="features" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-label">Features</p>
+          <h2 class="section-title" id="features-title">Everything you need to own your day</h2>
+          <p class="section-sub">Plan with precision, adapt with ease. TimeHacker gives you the tools to structure time without the friction.</p>
+        </div>
+
+        <div class="feature-grid" role="list">
+          <article class="feature-card" role="listitem">
+            <div class="feature-icon" aria-hidden="true">&#128197;</div>
+            <h3>Fixed Task Scheduling</h3>
+            <p>Pin tasks to exact times on your calendar. Meetings, workouts, appointments &mdash; always where you expect them.</p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-icon" aria-hidden="true">&#9889;</div>
+            <h3>Dynamic Auto-Allocation</h3>
+            <p>Define flexible tasks with time budgets. TimeHacker automatically slots them into your free time based on priority.</p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-icon" aria-hidden="true">&#128260;</div>
+            <h3>Recurring Schedules</h3>
+            <p>Set daily, weekly, monthly, or yearly recurrences. Your routine writes itself &mdash; you just follow it.</p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-icon" aria-hidden="true">&#128467;</div>
+            <h3>Multiple Calendar Views</h3>
+            <p>Switch between month, week, day, or 3-day views. See your time the way you think about it.</p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-icon" aria-hidden="true">&#127991;</div>
+            <h3>Categories &amp; Tags</h3>
+            <p>Organise tasks with color-coded categories and tags. Instantly see where your time is going at a glance.</p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <div class="feature-icon" aria-hidden="true">&#127919;</div>
+            <h3>Priority-Based Planning</h3>
+            <p>Assign priorities and let the algorithm front-load what matters most into your available slots.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── How It Works ───────────────────────────────────────────── -->
+    <section id="how-it-works" class="how" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-header centered">
+          <p class="section-label">How It Works</p>
+          <h2 class="section-title" id="how-title">From setup to structured day in minutes</h2>
+          <p class="section-sub">TimeHacker&apos;s planning model is simple by design &mdash; powerful in practice.</p>
+        </div>
+
+        <ol class="steps-grid" aria-label="Steps to get started">
+          <li class="step">
+            <div class="step-number" aria-label="Step 1">1</div>
+            <h3>Create your tasks</h3>
+            <p>Add fixed tasks with exact start and end times, or dynamic tasks with a min/max time budget and a priority level.</p>
+          </li>
+          <li class="step">
+            <div class="step-number" aria-label="Step 2">2</div>
+            <h3>Set your schedules</h3>
+            <p>Attach a recurring schedule to any task or category. Choose the pattern &mdash; daily, weekly on specific days, monthly, or yearly.</p>
+          </li>
+          <li class="step">
+            <div class="step-number" aria-label="Step 3">3</div>
+            <h3>Let the algorithm plan</h3>
+            <p>TimeHacker lays out fixed tasks first, then intelligently fills every free slot with your dynamic tasks by priority.</p>
+          </li>
+          <li class="step">
+            <div class="step-number" aria-label="Step 4">4</div>
+            <h3>Review &amp; execute</h3>
+            <p>Open any calendar view, see your full day at a glance, and mark tasks complete as you go.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ── CTA ───────────────────────────────────────────────────── -->
+    <section class="cta-section" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-card">
+          <h2 id="cta-title">Ready to stop reacting and start planning?</h2>
+          <p>Join TimeHacker and turn your to-do list into a structured, achievable daily schedule.</p>
+          <div class="cta-actions">
+            <a href="/app/login" class="btn btn-primary btn-lg">Create Free Account</a>
+            <a href="/app/" class="btn btn-secondary btn-lg">Open App</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────────────── -->
+  <footer role="contentinfo">
+    <div class="container footer-inner">
+      <a href="/" class="footer-logo" aria-label="TimeHacker home">TimeHacker</a>
+
+      <nav aria-label="Footer navigation">
+        <ul class="footer-links" role="list">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="/app/login">Sign In</a></li>
+        </ul>
+      </nav>
+
+      <p class="footer-copy">&copy; <span id="year"></span> TimeHacker. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/landing.js" defer></script>
+
+</body>
 </html>

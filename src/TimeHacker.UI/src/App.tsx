@@ -43,7 +43,7 @@ const App = () => {
   const queryClient = new QueryClient();
 
   return (
-    <Router>
+    <Router basename="/app">
       <ThemeProvider>
         <ThemedApp>
           <SettingsProvider>

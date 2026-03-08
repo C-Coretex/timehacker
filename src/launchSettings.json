@@ -5,7 +5,7 @@
       "commandVersion": "1.0",
       "composeLaunchAction": "LaunchBrowser",
       "composeLaunchServiceName": "timehacker.api",
-      "composeLaunchUrl": "http://localhost:5173",
+      "composeLaunchUrl": "http://localhost:5173/app",
       "serviceActions": {
         "timehacker.api": "StartDebugging",
         "pgadmin": "StartWithoutDebugging",
