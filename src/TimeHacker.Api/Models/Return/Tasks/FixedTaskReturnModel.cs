@@ -1,4 +1,3 @@
-using TimeHacker.Api.Models.Return.RepeatingEntities;
 using TimeHacker.Api.Models.Return.ScheduleSnapshots;
 using TimeHacker.Api.Models.Return.Tags;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
@@ -19,6 +18,8 @@ public record FixedTaskReturnModel(
 {
     public static FixedTaskReturnModel Create(FixedTaskDto fixedTask)
     {
+        ArgumentNullException.ThrowIfNull(fixedTask, nameof(fixedTask));
+
         return new FixedTaskReturnModel(
             fixedTask.Id!.Value,
             fixedTask.Name,

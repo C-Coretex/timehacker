@@ -6,7 +6,7 @@ public class InputScheduleEntityModelTests
     [Trait("DayRepeatingEntity", "Should return correct data without EndsOnModel")]
     public void GetScheduleEntity_ShouldReturnCorrectDataWithoutEndsOnModel()
     {
-        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity());
+        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity());
 
         var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
@@ -17,7 +17,7 @@ public class InputScheduleEntityModelTests
     [Trait("DayRepeatingEntity", "Should return correct data with EndsOnModel without MaxOccurrences")]
     public void GetScheduleEntity_ShouldReturnCorrectDataWithEndsOnModelWithoutMaxOccurrences()
     {
-        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity());
+        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity());
 
         var maxDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10));
         var endsOnModel = new EndsOnModel()
@@ -35,7 +35,7 @@ public class InputScheduleEntityModelTests
     [Trait("DayRepeatingEntity", "Should return correct data with EndsOnModel with MaxOccurrences")]
     public void GetScheduleEntity_ShouldReturnCorrectDataWithEndsOnModelWithMaxOccurrences([CombinatorialValues(0, 1, 5, 10)] uint maxOccurrences, bool isMaxDate)
     {
-        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2));
+        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
 
         var maxDate = isMaxDate ? (DateOnly?)DateOnly.FromDateTime(DateTime.Now.AddDays(8)) : null;
         var endsOnModel = new EndsOnModel()

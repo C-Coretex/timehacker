@@ -6,7 +6,6 @@ public class TaskServiceTests
 
     private readonly Mock<IDynamicTaskRepository> _dynamicTasksRepository = new();
     private readonly Mock<IFixedTaskRepository> _fixedTasksRepository = new();
-    private readonly Mock<ICategoryRepository> _categoryRepository = new();
     private readonly Mock<IScheduleSnapshotRepository> _scheduleSnapshotRepository = new();
 
     private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
@@ -117,7 +116,7 @@ public class TaskServiceTests
                 LastEntityCreated = null,
                 EndsOn = null,
                 CreatedTimestamp = dates[0],
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1)),
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1)),
                 FixedTask = fixedTask
             }
         };

@@ -34,10 +34,10 @@ public class ScheduleEntityAppServiceTests
     [Trait("Save", "Should save data")]
     public async Task Save_ShouldSaveData(bool isCategory)
     {
-        var repeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2));
+        var repeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
 
         var inputData = new ScheduleEntityCreateDto(
-            isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
+            isCategory ? ScheduleEntityParentType.Category : ScheduleEntityParentType.FixedTask,
             isCategory
                 ? _categories.First(x => x.UserId == _userId).Id
                 : _fixedTasks.First(x => x.UserId == _userId).Id,
@@ -63,9 +63,9 @@ public class ScheduleEntityAppServiceTests
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
             var actual = await _scheduleEntityAppService.Save(new ScheduleEntityCreateDto(
-                isCategory ? ScheduleEntityParentEnum.Category : ScheduleEntityParentEnum.FixedTask,
+                isCategory ? ScheduleEntityParentType.Category : ScheduleEntityParentType.FixedTask,
                 existingEntry ? _scheduledEntities.First(x => x.UserId != _userId).Id : Guid.NewGuid(),
-                new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1))), TestContext.Current.CancellationToken);
+                new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1))), TestContext.Current.CancellationToken).ConfigureAwait(false);
         });
     }
 
@@ -75,7 +75,7 @@ public class ScheduleEntityAppServiceTests
     {
         var fixedTask = _fixedTasks.First(x => x.UserId == _userId);
         var createDto = new ScheduleEntityCreateDto(
-            ScheduleEntityParentEnum.FixedTask,
+            ScheduleEntityParentType.FixedTask,
             fixedTask.Id,
             null!); // Null RepeatingEntity
 
@@ -89,9 +89,9 @@ public class ScheduleEntityAppServiceTests
     {
         var otherUserTask = _fixedTasks.First(x => x.UserId != _userId);
         var createDto = new ScheduleEntityCreateDto(
-            ScheduleEntityParentEnum.FixedTask,
+            ScheduleEntityParentType.FixedTask,
             otherUserTask.Id,
-            new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1)));
+            new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1)));
 
         await Assert.ThrowsAsync<NotFoundException>(() =>
             _scheduleEntityAppService.Save(createDto, TestContext.Current.CancellationToken));
@@ -105,9 +105,9 @@ public class ScheduleEntityAppServiceTests
         var originalScheduleEntityId = fixedTask.ScheduleEntityId;
 
         var createDto = new ScheduleEntityCreateDto(
-            ScheduleEntityParentEnum.FixedTask,
+            ScheduleEntityParentType.FixedTask,
             fixedTask.Id,
-            new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(1)));
+            new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1)));
 
         var result = await _scheduleEntityAppService.Save(createDto, TestContext.Current.CancellationToken);
 
@@ -128,7 +128,7 @@ public class ScheduleEntityAppServiceTests
             {
                 UserId = userId,
                 CreatedTimestamp = DateTime.Now,
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2)),
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2)),
                 ScheduledTasks = [new ScheduledTask() { Name = "" }],
                 ScheduledCategories = [new ScheduledCategory() { Name = "" }]
             },

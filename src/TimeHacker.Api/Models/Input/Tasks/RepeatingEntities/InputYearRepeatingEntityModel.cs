@@ -6,7 +6,7 @@ public record InputYearRepeatingEntityModel : InputRepeatingEntityModelBase
 {
     [Required]
     public int YearDayToRepeat { get; set; }
-    public override RepeatingEntityTypeEnum EntityType => RepeatingEntityTypeEnum.YearRepeatingEntity;
+    public override RepeatingEntityType EntityType => RepeatingEntityType.YearRepeatingEntity;
 
     public override IRepeatingEntityType CreateEntity()
     {

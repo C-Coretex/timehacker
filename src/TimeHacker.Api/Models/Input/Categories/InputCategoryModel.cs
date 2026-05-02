@@ -3,7 +3,7 @@ using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Input.Categories;
 
-public record InputCategoryModel
+public sealed record InputCategoryModel
 {
     public Guid? ScheduleEntityId { get; set; }
 

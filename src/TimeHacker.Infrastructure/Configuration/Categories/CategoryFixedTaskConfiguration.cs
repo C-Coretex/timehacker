@@ -6,6 +6,8 @@ public class CategoryFixedTaskConfiguration : IEntityTypeConfiguration<CategoryF
 {
     public void Configure(EntityTypeBuilder<CategoryFixedTask> builder)
     {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
         builder.HasKey(x => new { x.CategoryId, x.FixedTaskId });
 
         builder.HasOne(x => x.FixedTask).WithMany(x => x.CategoryFixedTasks)

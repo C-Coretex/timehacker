@@ -1,6 +1,6 @@
 ﻿namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots;
 
-public class ScheduledCategoryServiceTests
+internal sealed class ScheduledCategoryServiceTests
 {
     #region Mocks
 

@@ -11,6 +11,8 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
+
             migrationBuilder.AddColumn<DateOnly>(
                 name: "FirstEntityCreated",
                 table: "ScheduleEntity",
@@ -21,6 +23,8 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
+
             migrationBuilder.DropColumn(
                 name: "FirstEntityCreated",
                 table: "ScheduleEntity");

@@ -1,0 +1,44 @@
+root = true
+
+# C# files
+[*.cs]
+
+#### Core EditorConfig Options ####
+
+# Indentation and spacing
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+# New line preferences
+end_of_line = crlf
+insert_final_newline = false
+
+
+# NET.CodeAnalyzers
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = suggestion
+
+
+# CA1859: Use concrete types when possible for improved performance
+dotnet_diagnostic.CA1859.severity = suggestion
+
+# CA5394: Do not use insecure randomness
+dotnet_diagnostic.CA5394.severity = suggestion
+
+# CA1716: Identifiers should not match keywords
+dotnet_diagnostic.CA1716.severity = suggestion
+
+#CA1812: Avoid uninstantiated internal classes
+dotnet_diagnostic.CA1812.severity = suggestion
+
+
+#CA1515: Consider making public types internal
+[TimeHacker.Api/**]
+dotnet_diagnostic.CA1515.severity = none
+
+
+# CA1062: Validate arguments of public methods
+[**/Controllers/**]
+dotnet_diagnostic.CA1062.severity = none

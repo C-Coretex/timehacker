@@ -6,7 +6,7 @@ public record InputDayRepeatingEntityModel : InputRepeatingEntityModelBase
 {
     [Required]
     public int DaysCountToRepeat { get; set; }
-    public override RepeatingEntityTypeEnum EntityType => RepeatingEntityTypeEnum.DayRepeatingEntity;
+    public override RepeatingEntityType EntityType => RepeatingEntityType.DayRepeatingEntity;
 
     public override IRepeatingEntityType CreateEntity()
     {

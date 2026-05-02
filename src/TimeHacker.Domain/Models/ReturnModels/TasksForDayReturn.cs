@@ -5,11 +5,13 @@ namespace TimeHacker.Domain.Models.ReturnModels;
 public record TasksForDayReturn
 {
     public DateOnly Date { get; init; }
-    public List<TaskContainerReturn> TasksTimeline { get; init; } = [];
-    public List<CategoryContainerReturn> CategoriesTimeline { get; init; } = [];
+    public ICollection<TaskContainerReturn> TasksTimeline { get; init; } = [];
+    public ICollection<CategoryContainerReturn> CategoriesTimeline { get; init; } = [];
 
     public static TasksForDayReturn Create(ScheduleSnapshot scheduleSnapshot)
     {
+        ArgumentNullException.ThrowIfNull(scheduleSnapshot, nameof(scheduleSnapshot));
+
         return new TasksForDayReturn()
         {
             Date = scheduleSnapshot.Date,
@@ -27,8 +29,12 @@ public record TasksForDayReturn
         var newEntity = entity ?? new ScheduleSnapshot();
 
         newEntity.Date = Date;
-        newEntity.ScheduledTasks = TasksTimeline.Select(x => x.CreateScheduledTask()).ToList();
-        newEntity.ScheduledCategories = CategoriesTimeline.Select(x => x.CreateScheduledCategory()).ToList();
+
+        newEntity.ScheduledTasks.Clear();
+        TasksTimeline.Select(x => x.CreateScheduledTask()).ForEach(newEntity.ScheduledTasks.Add);
+
+        newEntity.ScheduledCategories.Clear();
+        CategoriesTimeline.Select(x => x.CreateScheduledCategory()).ForEach(newEntity.ScheduledCategories.Add);
 
         return newEntity;
     }

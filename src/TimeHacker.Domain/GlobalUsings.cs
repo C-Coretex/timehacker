@@ -1,5 +1,7 @@
 ﻿global using System.Linq.Expressions;
 
+global using TimeHacker.Helpers.Domain.Extensions;
+
 global using TimeHacker.Domain.Models.EntityModels.Enums;
 global using TimeHacker.Domain.Models.ReturnModels;
 

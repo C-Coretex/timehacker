@@ -4,25 +4,15 @@ namespace TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 public class WeekRepeatingEntity: IRepeatingEntityType
 {
-    private IEnumerable<DayOfWeekEnum> _repeatsOn = [];
+    public ICollection<Enums.DayOfWeek> RepeatsOn => field;
 
-    public IEnumerable<DayOfWeekEnum> RepeatsOn
+    public WeekRepeatingEntity(IEnumerable<Enums.DayOfWeek> repeatsOn)
     {
-        get => _repeatsOn;
-        set
-        {
-            if (!value.Any())
-                throw new ArgumentException("At least one day of week must be chosen", nameof(RepeatsOn));
+        var orderedRepeatsOn = repeatsOn.OrderBy(x => x).ToList();
+        if (orderedRepeatsOn.Count == 0)
+            throw new ArgumentException("At least one day of week must be chosen", nameof(repeatsOn));
 
-            _repeatsOn = value.OrderBy(x => x).ToList(); 
-        }
-    }
-
-    public WeekRepeatingEntity() 
-    {}
-    public WeekRepeatingEntity(IEnumerable<DayOfWeekEnum> repeatsOn)
-    {
-        RepeatsOn = repeatsOn;
+        RepeatsOn = orderedRepeatsOn;
     }
 
     public DateOnly GetNextTaskDate(DateOnly startingFrom)
@@ -39,7 +29,7 @@ public class WeekRepeatingEntity: IRepeatingEntityType
         {
             nextDayOfWeek = (int)RepeatsOn.First();
             //Add last day of week, since we need to travel from currentDayOfWeek to the end of the week
-            daysToAdd += (int)DayOfWeekEnum.Sunday;
+            daysToAdd += (int)Enums.DayOfWeek.Sunday;
         }
 
         daysToAdd += nextDayOfWeek.Value - currentDayOfWeek;

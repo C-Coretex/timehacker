@@ -3,7 +3,7 @@
 namespace TimeHacker.Domain.DTOs.RepeatingEntity;
 
 public record RepeatingEntityDto(
-    RepeatingEntityTypeEnum EntityType,
+    RepeatingEntityType EntityType,
     IRepeatingEntityType RepeatingData
     )
 {

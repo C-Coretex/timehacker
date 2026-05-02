@@ -1,11 +1,11 @@
 ﻿using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.IRepositories.Categories;
 
 namespace TimeHacker.Infrastructure.Repositories.Categories;
 
-public class CategoryRepository : UserScopedRepositoryBase<Category, Guid>, ICategoryRepository
+internal sealed class CategoryRepository : UserScopedRepositoryBase<Category, Guid>, ICategoryRepository
 {
-    public CategoryRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) : base(dbContext, dbContext.Category, userAccessor)
+    public CategoryRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) 
+        : base(dbContext ?? throw new ArgumentNullException(nameof(dbContext)), dbContext.Category, userAccessor)
     {}
 }

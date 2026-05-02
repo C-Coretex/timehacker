@@ -48,6 +48,6 @@ public class MonthRepeatingEntity: IRepeatingEntityType
             startingFrom = startingFrom.AddMonths(1);
         }
 
-        throw new Exception("No next task date found");
+        throw new InvalidOperationException("No next task date found");
     }
 }

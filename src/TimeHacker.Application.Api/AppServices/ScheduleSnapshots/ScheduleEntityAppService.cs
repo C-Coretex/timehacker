@@ -15,41 +15,43 @@ public class ScheduleEntityAppService(
 {
     public async Task<ScheduleEntityDto> Save(ScheduleEntityCreateDto scheduleEntityCreateDto, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(scheduleEntityCreateDto, nameof(scheduleEntityCreateDto));
+
         if (scheduleEntityCreateDto.RepeatingEntityModel == null)
-            throw new NotProvidedException(nameof(scheduleEntityCreateDto.RepeatingEntityModel));
+            throw new NotProvidedException(nameof(scheduleEntityCreateDto.RepeatingEntityModel), nameof(scheduleEntityCreateDto));
 
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)
         {
-            case ScheduleEntityParentEnum.FixedTask:
-                if(!await fixedTaskRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken))
-                    throw new NotFoundException(nameof(ScheduleEntityParentEnum.FixedTask), scheduleEntityCreateDto.ParentEntityId.ToString());
+            case ScheduleEntityParentType.FixedTask:
+                if(!await fixedTaskRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken).ConfigureAwait(false))
+                    throw new NotFoundException(nameof(ScheduleEntityParentType.FixedTask), scheduleEntityCreateDto.ParentEntityId.ToString());
                 break;
-            case ScheduleEntityParentEnum.Category:
-                if (!await categoryRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken))
-                    throw new NotFoundException(nameof(ScheduleEntityParentEnum.Category), scheduleEntityCreateDto.ParentEntityId.ToString());
+            case ScheduleEntityParentType.Category:
+                if (!await categoryRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken).ConfigureAwait(false))
+                    throw new NotFoundException(nameof(ScheduleEntityParentType.Category), scheduleEntityCreateDto.ParentEntityId.ToString());
                 break;
             default:
                 throw new NotProvidedException(nameof(scheduleEntityCreateDto));
         }
 
         var scheduleEntity = ScheduleEntityHelper.GetScheduleEntity(scheduleEntityCreateDto.RepeatingEntityModel, scheduleEntityCreateDto.EndsOnModel);
-        scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(scheduleEntity, cancellationToken);
+        scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(scheduleEntity, cancellationToken).ConfigureAwait(false);
 
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)
         {
-            case ScheduleEntityParentEnum.FixedTask:
+            case ScheduleEntityParentType.FixedTask:
                 await fixedTaskRepository.UpdateProperty(
                     x => x.Id == scheduleEntityCreateDto.ParentEntityId,
                     x => x.ScheduleEntityId,
                     scheduleEntity.Id,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 break;
-            case ScheduleEntityParentEnum.Category:
+            case ScheduleEntityParentType.Category:
                 await categoryRepository.UpdateProperty(
                     x => x.Id == scheduleEntityCreateDto.ParentEntityId,
                     x => x.ScheduleEntityId,
                     scheduleEntity.Id,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
                 break;
             default:
                 throw new NotProvidedException(nameof(scheduleEntityCreateDto));

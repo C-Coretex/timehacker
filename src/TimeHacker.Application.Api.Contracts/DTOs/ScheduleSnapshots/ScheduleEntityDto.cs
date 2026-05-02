@@ -13,6 +13,8 @@ public record ScheduleEntityDto(
 {
     public static ScheduleEntityDto Create(ScheduleEntity scheduleEntity)
     {
+        ArgumentNullException.ThrowIfNull(scheduleEntity, nameof(scheduleEntity));
+
         return new ScheduleEntityDto(
             scheduleEntity.Id,
             scheduleEntity.RepeatingEntity,

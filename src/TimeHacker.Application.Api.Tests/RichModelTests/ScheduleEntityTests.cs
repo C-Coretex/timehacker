@@ -10,7 +10,7 @@ public class ScheduleEntityTests
     {
         var newEntity = new ScheduleEntityReturn()
         {
-            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2)),
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2)),
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(DateTime.Now.AddDays(1)) : null,
             FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(DateTime.Now.AddDays(1)) : null,
             EndsOn = endsOn ? DateOnly.FromDateTime(DateTime.Now.AddDays(6)) : null,
@@ -47,7 +47,7 @@ public class ScheduleEntityTests
         {
             var newEntity = new ScheduleEntityReturn()
             {
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(0)),
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(0)),
                 LastEntityCreated = null,
                 EndsOn = null
             };
@@ -66,11 +66,11 @@ public class ScheduleEntityTests
 
         var newEntity = new ScheduleEntityReturn()
         {
-            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.WeekRepeatingEntity, new WeekRepeatingEntity([DayOfWeekEnum.Tuesday, DayOfWeekEnum.Monday, DayOfWeekEnum.Friday])),
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.WeekRepeatingEntity, new WeekRepeatingEntity([Domain.Models.EntityModels.Enums.DayOfWeek.Tuesday, Domain.Models.EntityModels.Enums.DayOfWeek.Monday, Domain.Models.EntityModels.Enums.DayOfWeek.Friday])),
             CreatedTimestamp = monday,
-            LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(monday.AddDays(1)) : null,
-            FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(monday.AddDays(1)) : null,
-            EndsOn = endsOn ? DateOnly.FromDateTime(monday.AddDays(8)) : null
+            LastEntityCreated = lastEntityCreated ? global::System.DateOnly.FromDateTime(monday.AddDays(1)) : null,
+            FirstEntityCreated = lastEntityCreated ? global::System.DateOnly.FromDateTime(monday.AddDays(1)) : null,
+            EndsOn = endsOn ? global::System.DateOnly.FromDateTime(monday.AddDays(8)) : null
         };
         var dateFrom = DateOnly.FromDateTime(monday);
         var dateTo = DateOnly.FromDateTime(monday.AddDays(14));
@@ -106,7 +106,7 @@ public class ScheduleEntityTests
         {
             var newEntity = new ScheduleEntityReturn()
             {
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.WeekRepeatingEntity, new WeekRepeatingEntity([])),
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.WeekRepeatingEntity, new WeekRepeatingEntity([])),
                 LastEntityCreated = null,
                 EndsOn = null
             };
@@ -125,7 +125,7 @@ public class ScheduleEntityTests
 
         var newEntity = new ScheduleEntityReturn()
         {
-            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.MonthRepeatingEntity, new MonthRepeatingEntity(12)),
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.MonthRepeatingEntity, new MonthRepeatingEntity(12)),
             CreatedTimestamp = january,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(12)) : null,
             FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(12)) : null,
@@ -156,7 +156,7 @@ public class ScheduleEntityTests
 
         var newEntity = new ScheduleEntityReturn()
         {
-            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.MonthRepeatingEntity, new MonthRepeatingEntity((byte)(isLapYear ? 29 : 31))),
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.MonthRepeatingEntity, new MonthRepeatingEntity((byte)(isLapYear ? 29 : 31))),
             CreatedTimestamp = january,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(31)) : null,
             FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddDays(31)) : null,
@@ -193,7 +193,7 @@ public class ScheduleEntityTests
         {
             var newEntity = new ScheduleEntityReturn()
             {
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.MonthRepeatingEntity, new MonthRepeatingEntity(days)),
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.MonthRepeatingEntity, new MonthRepeatingEntity(days)),
                 LastEntityCreated = null,
                 EndsOn = null
             };
@@ -212,7 +212,7 @@ public class ScheduleEntityTests
 
         var newEntity = new ScheduleEntityReturn()
         {
-            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.YearRepeatingEntity, new YearRepeatingEntity(isLapYear ? 366 : 200)),
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.YearRepeatingEntity, new YearRepeatingEntity(isLapYear ? 366 : 200)),
             CreatedTimestamp = january,
             LastEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddYears(1)) : null,
             FirstEntityCreated = lastEntityCreated ? DateOnly.FromDateTime(january.AddYears(1)) : null,
@@ -253,7 +253,7 @@ public class ScheduleEntityTests
         {
             var newEntity = new ScheduleEntityReturn()
             {
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.YearRepeatingEntity, new YearRepeatingEntity(days)),
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.YearRepeatingEntity, new YearRepeatingEntity(days)),
                 LastEntityCreated = null,
                 EndsOn = null
             };

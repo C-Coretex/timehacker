@@ -8,6 +8,8 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
+
             migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
@@ -209,7 +211,7 @@ namespace TimeHacker.Migrations.Migrations
                         name: "FK_ScheduledCategory_ScheduleSnapshot_UserId_Date",
                         columns: x => new { x.UserId, x.Date },
                         principalTable: "ScheduleSnapshot",
-                        principalColumns: new[] { "UserId", "Date" });
+                        principalColumns: ["UserId", "Date"]);
                     table.ForeignKey(
                         name: "FK_ScheduledCategory_User_UserId",
                         column: x => x.UserId,
@@ -338,7 +340,7 @@ namespace TimeHacker.Migrations.Migrations
                         name: "FK_ScheduledTask_ScheduleSnapshot_UserId_Date",
                         columns: x => new { x.UserId, x.Date },
                         principalTable: "ScheduleSnapshot",
-                        principalColumns: new[] { "UserId", "Date" });
+                        principalColumns: ["UserId", "Date"]);
                     table.ForeignKey(
                         name: "FK_ScheduledTask_ScheduledCategory_ScheduledCategoryId",
                         column: x => x.ScheduledCategoryId,
@@ -417,7 +419,7 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledCategory_UserId_Date",
                 table: "ScheduledCategory",
-                columns: new[] { "UserId", "Date" });
+                columns: ["UserId", "Date"]);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledTask_IsCompleted",
@@ -442,7 +444,7 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledTask_UserId_Date",
                 table: "ScheduledTask",
-                columns: new[] { "UserId", "Date" });
+                columns: ["UserId", "Date"]);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduleEntity_EndsOn",
@@ -494,6 +496,8 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
+
             migrationBuilder.DropTable(
                 name: "CategoryDynamicTask");
 

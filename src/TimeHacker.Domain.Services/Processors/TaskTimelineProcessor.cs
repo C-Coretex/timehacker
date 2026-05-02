@@ -28,7 +28,7 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
         return returnData;
     }
 
-    private IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
+    private static IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
     {
         return fixedTasks.Select(fixedTask => new TaskContainerReturn()
         {
@@ -39,7 +39,7 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
         });
     }
 
-    private IEnumerable<TaskContainerReturn> GetDynamicTasksTimeline(IList<DynamicTask> dynamicTasks, IEnumerable<TimeRange> timeRanges)
+    private static IEnumerable<TaskContainerReturn> GetDynamicTasksTimeline(IList<DynamicTask> dynamicTasks, IEnumerable<TimeRange> timeRanges)
     {
         var startTimeSpan = DaytimeConstants.StartOfDay;
         TimeRange timeRange;
@@ -140,7 +140,7 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
                 dynamicTasksCopy.Add(chosenDynamicTask);
 
             var possibleTaskTimeline = new List<DynamicTaskContainer>();
-            if (dynamicTasksCopy.Any())
+            if (dynamicTasksCopy.Count != 0)
                 possibleTaskTimeline = GetDynamicTasksForTimeRangeRecursive(dynamicTasksCopy, newTimeRange).ToList();
 
             possibleTaskTimeline.Add(chosenDynamicTask);

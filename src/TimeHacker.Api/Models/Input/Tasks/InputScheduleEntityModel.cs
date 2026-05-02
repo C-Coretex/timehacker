@@ -11,11 +11,11 @@ public record InputScheduleEntityModel
     public Guid ParentEntityId { get; set; }
     [Required]
     public required InputRepeatingEntityModelBase RepeatingEntityType { get; set; }
-    public EndsOnModel? EndsOnModel { get; set; } = null;
+    public EndsOnModel? EndsOnModel { get; set; }
 
     public ScheduleEntityCreateDto CreateDto()
     {
         var repeatingEntityDto = new RepeatingEntityDto(RepeatingEntityType.EntityType, RepeatingEntityType.CreateEntity());
-        return new ScheduleEntityCreateDto(ScheduleEntityParentEnum.FixedTask, ParentEntityId, repeatingEntityDto, EndsOnModel);
+        return new ScheduleEntityCreateDto(ScheduleEntityParentType.FixedTask, ParentEntityId, repeatingEntityDto, EndsOnModel);
     }
 }

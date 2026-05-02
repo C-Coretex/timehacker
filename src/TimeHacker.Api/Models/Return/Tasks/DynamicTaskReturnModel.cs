@@ -17,6 +17,8 @@ public record DynamicTaskReturnModel(
 {
     public static DynamicTaskReturnModel Create(DynamicTaskDto task)
     {
+        ArgumentNullException.ThrowIfNull(task, nameof(task));
+
         return new DynamicTaskReturnModel(
             task.Id,
             task.Name,

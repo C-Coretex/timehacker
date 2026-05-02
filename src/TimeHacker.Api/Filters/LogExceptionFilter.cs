@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Diagnostics;
 
 namespace TimeHacker.Api.Filters;
 
-public class LogExceptionFilter(ILoggerFactory loggerFactory, IWebHostEnvironment environment) : IExceptionFilter
+internal sealed partial class LogExceptionFilter(ILoggerFactory loggerFactory, IWebHostEnvironment environment) : IExceptionFilter
 {
     private const string ExceptionTypeExtensionName = "ExceptionType";
     private const string ParameterNameExtensionName = "ParameterName";
@@ -81,20 +81,35 @@ public class LogExceptionFilter(ILoggerFactory loggerFactory, IWebHostEnvironmen
 
     private void LogException(ExceptionContext context)
     {
-        var controllerName = context.ActionDescriptor.RouteValues["controller"];
-        var actionName = context.ActionDescriptor.RouteValues["action"];
+        var descriptor = context.HttpContext
+            .GetEndpoint()?
+            .Metadata
+            .GetMetadata<ControllerActionDescriptor>();
 
-        var logger = loggerFactory.CreateLogger($"Controller:{controllerName} - Action:{actionName}");
+        var controllerType = descriptor?.ControllerTypeInfo.AsType() ?? typeof(LogExceptionFilter);
+        var actionName = descriptor?.ActionName ?? context.ActionDescriptor.RouteValues["action"];
 
-        logger.LogError(context.Exception,
-            "Unhandled exception in controller '{Controller}', action '{Action}', path: {Path}",
-            controllerName,
+        var logger = loggerFactory.CreateLogger(controllerType);
+
+        LogUnhandledException(
+            logger,
+            context.Exception,
+            controllerType.Name,
             actionName,
             SanitizeValue(context.HttpContext.Request.Path.Value));
     }
 
     private static string SanitizeValue(string? value)
     {
-        return value?.Replace("\r", string.Empty).Replace("\n", string.Empty) ?? string.Empty;
+        return value?
+            .Replace("\r", string.Empty, StringComparison.Ordinal)
+            .Replace("\n", string.Empty, StringComparison.Ordinal) 
+            ?? string.Empty;
     }
+
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "Unhandled exception in controller '{Controller}', action '{Action}', path: '{Path}'")]
+    private static partial void LogUnhandledException(
+        ILogger logger, Exception ex, string? controller, string? action, string? path);
 }

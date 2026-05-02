@@ -1,10 +1,8 @@
-using System.Globalization;
 using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Return.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.BusinessLogicExceptions;
 
 namespace TimeHacker.Api.Controllers.Tasks;
 
@@ -21,7 +19,7 @@ public class TasksController(ITaskAppService taskService)
         if (!DateOnly.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateParsed))
             throw new DataIsNotCorrectException($"'{date}' is not a valid date. Expected format: yyyy-MM-dd", nameof(date));
 
-        var data = await taskService.GetTasksForDay(dateParsed, cancellationToken);
+        var data = await taskService.GetTasksForDay(dateParsed, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok(data);
     }
@@ -52,7 +50,7 @@ public class TasksController(ITaskAppService taskService)
         [FromServices] IScheduledTaskAppService scheduledTaskAppService,
         CancellationToken cancellationToken = default)
     {
-        var entity = await scheduledTaskAppService.GetBy(id, cancellationToken);
+        var entity = await scheduledTaskAppService.GetBy(id, cancellationToken).ConfigureAwait(false);
         if(entity == null)
             return TypedResults.NotFound();
 
@@ -68,7 +66,7 @@ public class TasksController(ITaskAppService taskService)
         [FromServices] IScheduleEntityAppService scheduleEntityAppService,
         CancellationToken cancellationToken = default)
     {
-        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(), cancellationToken);
+        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(), cancellationToken).ConfigureAwait(false);
         var data = ScheduleEntityReturnModel.Create(entity);
 
         return TypedResults.Created("", data);

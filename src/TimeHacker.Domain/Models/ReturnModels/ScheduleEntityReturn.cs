@@ -1,21 +1,37 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿using TimeHacker.Domain.DTOs.RepeatingEntity;
+using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Domain.Models.ReturnModels;
 
-public class ScheduleEntityReturn: ScheduleEntity
+public record ScheduleEntityReturn
 {
-    public ScheduleEntityReturn()
-    {
-        
-    }
+    public Guid Id { get; init; }
+    public DateTime CreatedTimestamp { get; init; }
+
+    public Guid UserId { get; init; }
+
+    public RepeatingEntityDto RepeatingEntity { get; init; } = null!;
+    public DateOnly? FirstEntityCreated { get; init; }
+    public DateOnly? LastEntityCreated { get; init; }
+    public DateOnly? EndsOn { get; init; }
+
+    public virtual ICollection<ScheduledTask> ScheduledTasks { get; init; } = [];
+    public virtual ICollection<ScheduledCategory> ScheduledCategories { get; init; } = [];
+
+    public virtual FixedTask? FixedTask { get; init; }
+    public virtual Category? Category { get; init; }
 
     public static ScheduleEntityReturn Create(ScheduleEntity scheduleEntity)
     {
+        ArgumentNullException.ThrowIfNull(scheduleEntity, nameof(scheduleEntity));
         return new ScheduleEntityReturn()
         {
             Id = scheduleEntity.Id,
             UserId = scheduleEntity.UserId,
             RepeatingEntity = scheduleEntity.RepeatingEntity,
+            FirstEntityCreated = scheduleEntity.FirstEntityCreated,
             CreatedTimestamp = scheduleEntity.CreatedTimestamp,
             LastEntityCreated = scheduleEntity.LastEntityCreated,
             EndsOn = scheduleEntity.EndsOn,

@@ -17,7 +17,7 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken)).Id;
+        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken).ConfigureAwait(false)).Id;
     }
 
     public async Task UpdateAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
@@ -25,19 +25,19 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        var entity = await fixedTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
-        await fixedTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);
+        var entity = await fixedTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+        await fixedTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken).ConfigureAwait(false);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        await scheduleEntityRepository.DeleteBy(x => x.FixedTask != null && x.FixedTask.Id == id, cancellationToken);
-        await fixedTaskRepository.DeleteAndSaveAsync(id, cancellationToken);
+        await scheduleEntityRepository.DeleteBy(x => x.FixedTask != null && x.FixedTask.Id == id, cancellationToken).ConfigureAwait(false);
+        await fixedTaskRepository.DeleteAndSaveAsync(id, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<FixedTaskDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken, queryPipelineSteps: QueryPipelineFixedTasks.IncludeRepeatingData);
+        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken, queryPipelineSteps: QueryPipelineFixedTasks.IncludeRepeatingData).ConfigureAwait(false);
         return FixedTaskDto.Create(entity);
     }
 }

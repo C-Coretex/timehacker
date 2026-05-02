@@ -18,23 +18,23 @@ public class TaskService(
 {
     public async Task<TasksForDayDto> GetTasksForDay(DateOnly date, CancellationToken cancellationToken = default)
     {
-        var snapshot = await GetSnapshotForDate(date, cancellationToken);
+        var snapshot = await GetSnapshotForDate(date, cancellationToken).ConfigureAwait(false);
         if (snapshot != null)
             return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
 
         var fixedTasks = await fixedTaskRepository.GetAll()
                                           .Where(ft => DateOnly.FromDateTime(ft.StartTimestamp) == date)
                                           .OrderBy(ft => ft.StartTimestamp)
-                                          .ToListAsync(cancellationToken);
+                                          .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken);
+        var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date, cancellationToken: cancellationToken).ToListAsync(cancellationToken);
+        var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date, cancellationToken: cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
 
         var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
 
         snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
-        snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot, cancellationToken);
+        snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot, cancellationToken).ConfigureAwait(false);
 
         return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
     }
@@ -45,21 +45,31 @@ public class TaskService(
         if (dates == null || dates.Count == 0)
             yield break;
 
-        var fixedTasks = await fixedTaskRepository.GetAll()
-                                                .Where(ft => dates.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
-                                                .OrderBy(ft => ft.StartTimestamp)
-                                                .ToListAsync(cancellationToken);
+        var snapshots = await GetSnapshotsForDates(dates).ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken);
+        var datesWithoutSnapshots = dates.Where(d => !snapshots.Any(s => s.Date == d)).ToList();
 
-        var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken);
+        var fixedTasks = datesWithoutSnapshots.Count > 0 
+            ? await fixedTaskRepository.GetAll()
+                .Where(ft => datesWithoutSnapshots.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
+                .OrderBy(ft => ft.StartTimestamp)
+                .ToListAsync(cancellationToken).ConfigureAwait(false)
+            : [];
+
+        var dynamicTasks = datesWithoutSnapshots.Count > 0 
+            ? await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken).ConfigureAwait(false)
+            : [];
+
+        var scheduledFixedTasks = datesWithoutSnapshots.Count > 0 
+            ? await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false)
+            : [];
 
         foreach (var date in dates)
         {
-            if(cancellationToken.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested)
                 yield break;
 
-            var snapshot = await GetSnapshotForDate(date, cancellationToken);
+            var snapshot = snapshots.FirstOrDefault(s => s.Date == date);
             if (snapshot == null)
             {
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
@@ -72,28 +82,29 @@ public class TaskService(
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
         }
 
-        await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken);
+        await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(dates, nameof(dates));
+
         var fixedTasks = await fixedTaskRepository.GetAll()
                                                 .Where(ft => dates.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
                                                 .OrderBy(ft => ft.StartTimestamp)
-                                                .ToListAsync(cancellationToken);
+                                                .ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken);
+        var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken).ConfigureAwait(false);
 
-        var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken);
-
+        var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken).ConfigureAwait(false);
         foreach (var date in dates)
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
 
-            var snapshot = await GetSnapshotForDate(date, cancellationToken);
+            var snapshot = await GetSnapshotForDate(date, cancellationToken).ConfigureAwait(false);
             if (snapshot != null)
-                await scheduleSnapshotRepository.Delete(snapshot, cancellationToken);
+                await scheduleSnapshotRepository.Delete(snapshot, cancellationToken).ConfigureAwait(false);
 
             var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
             var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
@@ -103,18 +114,25 @@ public class TaskService(
             scheduleSnapshotRepository.Add(snapshot);
 
             foreach (var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
-                await scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value, date, cancellationToken);
+                await scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value, date, cancellationToken).ConfigureAwait(false);
 
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
         }
 
-        await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken);
+        await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private Task<ScheduleSnapshot?> GetSnapshotForDate(DateOnly date, CancellationToken cancellationToken = default)
     {
         return scheduleSnapshotRepository.GetAll(QueryPipelineScheduleSnapshots.IncludeScheduledData)
             .FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
+    }
+
+    private IAsyncEnumerable<ScheduleSnapshot> GetSnapshotsForDates(IEnumerable<DateOnly> dates)
+    {
+        return scheduleSnapshotRepository.GetAll(QueryPipelineScheduleSnapshots.IncludeScheduledData)
+            .Where(x => dates.Contains(x.Date))
+            .AsAsyncEnumerable();
     }
 
     private async IAsyncEnumerable<FixedTask> GetFixedTasksForScheduledTasks(DateOnly from, DateOnly? to = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)

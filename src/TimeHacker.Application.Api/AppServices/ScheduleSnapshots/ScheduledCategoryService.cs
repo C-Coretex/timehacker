@@ -12,4 +12,9 @@ public class ScheduledCategoryService: IScheduledCategoryAppService
         _scheduledCategoryRepository = scheduledCategoryRepository;
         _userAccessorBase = userAccessorBase;
     }
+
+    public void Dummy()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -2,8 +2,12 @@
 
 public static class RepositoryMockExtensions
 {
+#pragma warning disable CA1002 // Do not expose generic lists
     public static void SetupRepositoryMock<TModel, TId>(this Mock<IRepositoryBase<TModel, TId>> repository, List<TModel> source) where TModel : class, IDbEntity<TId>
+#pragma warning restore CA1002 // Do not expose generic lists
     {
+        ArgumentNullException.ThrowIfNull(repository, nameof(repository));
+
         repository.As<IRepositoryBase<TModel>>().SetupRepositoryMock(source);
 
         repository.Setup(x => x.UpdateAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
@@ -25,8 +29,11 @@ public static class RepositoryMockExtensions
             .Returns(Task.CompletedTask);
     }
 
-    public static void SetupRepositoryMock<TModel>(this Mock<IRepositoryBase<TModel>> repository, List<TModel> source) where TModel : class, IDbEntity
+    public static void SetupRepositoryMock<TModel>(this Mock<IRepositoryBase<TModel>> repository, ICollection<TModel> source) where TModel : class, IDbEntity
     {
+        ArgumentNullException.ThrowIfNull(repository, nameof(repository));
+        ArgumentNullException.ThrowIfNull(source, nameof(source));
+
         repository.Setup(x => x.AddAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
             .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))
             .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
@@ -38,13 +45,19 @@ public static class RepositoryMockExtensions
             .Returns(source.BuildMock());
     }
 
+#pragma warning disable CA1002 // Do not expose generic lists
     public static void SetupRepositoryMock<TModel, TId>(this Mock<IUserScopedRepositoryBase<TModel, TId>> repository, List<TModel> source) where TModel : class, IUserScopedEntity, IDbEntity<TId>
+#pragma warning restore CA1002 // Do not expose generic lists
     {
         SetupRepositoryMock(repository, source, null);
     }
 
+#pragma warning disable CA1002 // Do not expose generic lists
     public static void SetupRepositoryMock<TModel, TId>(this Mock<IUserScopedRepositoryBase<TModel, TId>> repository, List<TModel> source, Guid? currentUserId) where TModel : class, IUserScopedEntity, IDbEntity<TId>
+#pragma warning restore CA1002 // Do not expose generic lists
     {
+        ArgumentNullException.ThrowIfNull(repository, nameof(repository));
+
         // Helper to get user-scoped data
         List<TModel> GetUserScopedData() => currentUserId.HasValue
             ? source.Where(x => x.UserId == currentUserId.Value).ToList()

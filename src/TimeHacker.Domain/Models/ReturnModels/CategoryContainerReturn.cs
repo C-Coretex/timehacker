@@ -24,6 +24,8 @@ public record CategoryContainerReturn
     //NOT FULLY IMPLEMENTED
     public static CategoryContainerReturn Create(ScheduledCategory scheduledCategory)
     {
+        ArgumentNullException.ThrowIfNull(scheduledCategory, nameof(scheduledCategory));
+
         return new CategoryContainerReturn
         {
             TimeRange = new TimeRange(scheduledCategory.Start, scheduledCategory.End),

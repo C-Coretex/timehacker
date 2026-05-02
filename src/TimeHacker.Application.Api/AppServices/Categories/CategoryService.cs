@@ -9,21 +9,21 @@ public class CategoryService(ICategoryRepository categoryRepository)
 {
     public IAsyncEnumerable<CategoryDto> GetAll(CancellationToken cancellationToken = default) => categoryRepository.GetAll(true).Select(CategoryDto.Selector).AsAsyncEnumerable();
 
-    public async Task<Guid> AddAsync(CategoryDto categoryDto, CancellationToken cancellationToken = default)
+    public async Task<Guid> AddAsync(CategoryDto category, CancellationToken cancellationToken = default)
     {
-        if (categoryDto == null)
-            throw new NotProvidedException(nameof(categoryDto));
+        if (category == null)
+            throw new NotProvidedException(nameof(category));
 
-        return (await categoryRepository.AddAndSaveAsync(categoryDto.GetEntity(), cancellationToken)).Id;
+        return (await categoryRepository.AddAndSaveAsync(category.GetEntity(), cancellationToken).ConfigureAwait(false)).Id;
     }
 
-    public async Task UpdateAsync(CategoryDto categoryDto, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(CategoryDto category, CancellationToken cancellationToken = default)
     {
-        if (categoryDto == null)
-            throw new NotProvidedException(nameof(categoryDto));
+        if (category == null)
+            throw new NotProvidedException(nameof(category));
 
-        var entity = await categoryRepository.GetByIdAsync(categoryDto.Id!.Value, cancellationToken: cancellationToken);
-        await categoryRepository.UpdateAndSaveAsync(categoryDto.GetEntity(entity), cancellationToken);
+        var entity = await categoryRepository.GetByIdAsync(category.Id!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+        await categoryRepository.UpdateAndSaveAsync(category.GetEntity(entity), cancellationToken).ConfigureAwait(false);
     }
 
     public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -33,7 +33,7 @@ public class CategoryService(ICategoryRepository categoryRepository)
 
     public async Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var entity = await categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         return entity != null ? CategoryDto.Create(entity) : null;
     }
 }

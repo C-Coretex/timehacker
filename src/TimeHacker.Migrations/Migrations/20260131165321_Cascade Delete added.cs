@@ -10,6 +10,8 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Category_ScheduleEntity_ScheduleEntityId",
                 table: "Category");
@@ -129,9 +131,9 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_ScheduledCategory_ScheduleSnapshot_UserId_Date",
                 table: "ScheduledCategory",
-                columns: new[] { "UserId", "Date" },
+                columns: ["UserId", "Date"],
                 principalTable: "ScheduleSnapshot",
-                principalColumns: new[] { "UserId", "Date" },
+                principalColumns: ["UserId", "Date"],
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
@@ -145,9 +147,9 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_ScheduledTask_ScheduleSnapshot_UserId_Date",
                 table: "ScheduledTask",
-                columns: new[] { "UserId", "Date" },
+                columns: ["UserId", "Date"],
                 principalTable: "ScheduleSnapshot",
-                principalColumns: new[] { "UserId", "Date" },
+                principalColumns: ["UserId", "Date"],
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
@@ -194,6 +196,8 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Category_ScheduleEntity_ScheduleEntityId",
                 table: "Category");
@@ -306,9 +310,9 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_ScheduledCategory_ScheduleSnapshot_UserId_Date",
                 table: "ScheduledCategory",
-                columns: new[] { "UserId", "Date" },
+                columns: ["UserId", "Date"],
                 principalTable: "ScheduleSnapshot",
-                principalColumns: new[] { "UserId", "Date" });
+                principalColumns: ["UserId", "Date"]);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ScheduledTask_ScheduleEntity_ParentScheduleEntityId",
@@ -320,9 +324,9 @@ namespace TimeHacker.Migrations.Migrations
             migrationBuilder.AddForeignKey(
                 name: "FK_ScheduledTask_ScheduleSnapshot_UserId_Date",
                 table: "ScheduledTask",
-                columns: new[] { "UserId", "Date" },
+                columns: ["UserId", "Date"],
                 principalTable: "ScheduleSnapshot",
-                principalColumns: new[] { "UserId", "Date" });
+                principalColumns: ["UserId", "Date"]);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ScheduledTask_ScheduledCategory_ScheduledCategoryId",

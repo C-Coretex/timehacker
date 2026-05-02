@@ -5,9 +5,9 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 public abstract class ContextFactoryBase<TContext> : IContextFactory<TContext> where TContext : DbContext
 {
     protected string DbConnectionString { get; set; }
-    public ContextFactoryBase(string dbConnectionString)
+    protected ContextFactoryBase(string dbConnectionString)
     {
-        this.DbConnectionString = dbConnectionString;
+        DbConnectionString = dbConnectionString;
     }
 
     public abstract TContext CreateContext();

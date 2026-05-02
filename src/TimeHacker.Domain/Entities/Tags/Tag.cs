@@ -9,6 +9,6 @@ public class Tag : UserScopedEntityBase
 
     public Color Color { get; set; }
 
-    public virtual ICollection<TagFixedTask> TagFixedTasks { get; set; } = [];
-    public virtual ICollection<TagDynamicTask> TagDynamicTasks { get; set; } = [];
+    public virtual ICollection<TagFixedTask> TagFixedTasks { get; init; } = [];
+    public virtual ICollection<TagDynamicTask> TagDynamicTasks { get; init; } = [];
 }

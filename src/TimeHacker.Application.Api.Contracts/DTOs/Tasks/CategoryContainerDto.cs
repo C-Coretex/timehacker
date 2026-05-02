@@ -9,6 +9,8 @@ public record CategoryContainerDto
 
     public static CategoryContainerDto Create(CategoryContainerReturn category)
     {
+        ArgumentNullException.ThrowIfNull(category, nameof(category));
+
         return new CategoryContainerDto
         {
             Category = category.Category != null ? CategoryDto.Create(category.Category) : null,

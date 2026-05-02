@@ -2,7 +2,7 @@
 
 namespace TimeHacker.Infrastructure.Converters;
 
-internal class DateTimeUtcConverter : ValueConverter<DateTime, DateTime>
+internal sealed class DateTimeUtcConverter : ValueConverter<DateTime, DateTime>
 {
     public DateTimeUtcConverter()
         : base(

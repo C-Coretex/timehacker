@@ -8,6 +8,8 @@ public static class ScheduleEntityHelper
 {
     public static ScheduleEntity GetScheduleEntity(RepeatingEntityDto repeatingEntityModel, EndsOnModel? endsOnModel)
     {
+        ArgumentNullException.ThrowIfNull(repeatingEntityModel, nameof(repeatingEntityModel));
+
         var scheduleEntity = new ScheduleEntity
         {
             RepeatingEntity = repeatingEntityModel

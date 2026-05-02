@@ -6,6 +6,8 @@ public class TagDynamicTaskConfiguration : IEntityTypeConfiguration<TagDynamicTa
 {
     public void Configure(EntityTypeBuilder<TagDynamicTask> builder)
     {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
         builder.HasKey(x => new { x.TagId, x.TaskId });
 
         builder.HasOne(x => x.Tag).WithMany(x => x.TagDynamicTasks)

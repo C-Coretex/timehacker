@@ -8,7 +8,7 @@ public class FixedTask : UserScopedEntityBase, ITask
 {
     public Guid? ScheduleEntityId { get; set; }
 
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public byte Priority { get; set; }
 
@@ -16,8 +16,8 @@ public class FixedTask : UserScopedEntityBase, ITask
     public DateTime EndTimestamp { get; set; }
 
     public virtual ScheduleEntity? ScheduleEntity { get; set; }
-    public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
-    public virtual ICollection<TagFixedTask> TagFixedTasks { get; set; } = [];
+    public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; init; } = [];
+    public virtual ICollection<TagFixedTask> TagFixedTasks { get; init; } = [];
 
     public FixedTask ShallowCopy() => new()
     {

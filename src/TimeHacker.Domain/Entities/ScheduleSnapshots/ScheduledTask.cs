@@ -12,7 +12,7 @@ public class ScheduledTask : UserScopedEntityBase
     public required string Name { get; set; }
     public string? Description { get; set; }
     public byte Priority { get; set; }
-    public bool IsCompleted { get; set; } = false;
+    public bool IsCompleted { get; set; }
     public TimeSpan Start { get; set; }
     public TimeSpan End { get; set; }
 

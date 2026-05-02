@@ -2,4 +2,5 @@
 
 public interface IScheduledCategoryAppService
 {
+    void Dummy();
 }

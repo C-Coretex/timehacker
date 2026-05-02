@@ -17,6 +17,6 @@ public class ScheduledCategory : UserScopedEntityBase
     public TimeSpan End { get; set; }
 
     public virtual ScheduleSnapshot ScheduleSnapshot { get; set; } = null!;
-    public virtual ICollection<ScheduledTask> ScheduledTasks { get; set; } = [];
+    public virtual ICollection<ScheduledTask> ScheduledTasks { get; init; } = [];
     public virtual ScheduleEntity? ScheduleEntity { get; set; }
 }

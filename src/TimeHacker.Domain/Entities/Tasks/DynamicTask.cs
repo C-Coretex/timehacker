@@ -13,6 +13,6 @@ public class DynamicTask : UserScopedEntityBase, ITask
     public TimeSpan MaxTimeToFinish { get; set; }
     public TimeSpan? OptimalTimeToFinish { get; set; }
 
-    public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
-    public virtual ICollection<TagDynamicTask> TagDynamicTasks { get; set; } = [];
+    public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; init; } = [];
+    public virtual ICollection<TagDynamicTask> TagDynamicTasks { get; init; } = [];
 }

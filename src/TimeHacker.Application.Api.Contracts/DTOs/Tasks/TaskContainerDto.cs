@@ -11,6 +11,8 @@ public record TaskContainerDto
 
     public static TaskContainerDto Create(TaskContainerReturn task)
     {
+        ArgumentNullException.ThrowIfNull(task, nameof(task));
+
         return new TaskContainerDto
         {
             IsFixed = task.IsFixed,

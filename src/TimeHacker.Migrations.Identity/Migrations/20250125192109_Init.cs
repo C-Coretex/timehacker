@@ -10,6 +10,7 @@ namespace TimeHacker.Migrations.Identity.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -196,6 +197,7 @@ namespace TimeHacker.Migrations.Identity.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

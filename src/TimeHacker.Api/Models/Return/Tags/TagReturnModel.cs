@@ -10,5 +10,10 @@ public record TagReturnModel(
     Color Color
 )
 {
-    public static TagReturnModel Create(TagDto tag) =>  new TagReturnModel(tag.Id!.Value, tag.Name, tag.Category, tag.Color);
+    public static TagReturnModel Create(TagDto tag) 
+    {
+        ArgumentNullException.ThrowIfNull(tag, nameof(tag));
+
+        return new TagReturnModel(tag.Id!.Value, tag.Name, tag.Category, tag.Color);
+    }
 }

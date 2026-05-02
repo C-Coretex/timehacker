@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TimeHacker.Infrastructure.Converters;
 
-internal class ColorConverter : ValueConverter<Color, int>
+internal sealed class ColorConverter : ValueConverter<Color, int>
 {
     public ColorConverter()
         : base(

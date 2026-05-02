@@ -8,18 +8,21 @@ public class IdentityMigrationsDbContext : IdentityDbContext<IdentityUser>
 {
     public IdentityMigrationsDbContext(DbContextOptions options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         // Apply all configurations
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TimeHackerIdentityDbContext).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(TimeHackerIdentityDbContext).Assembly);
     }
 
     public static void ApplyMigrations(string connectionString)
     {
         var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString);
-        var db = new IdentityMigrationsDbContext(optionsBuilder.Options).Database;
+
+        using var context = new IdentityMigrationsDbContext(optionsBuilder.Options);
+        var db = context.Database;    
         var pendingMigrations = db.GetPendingMigrations();
 
         if (pendingMigrations.Any())

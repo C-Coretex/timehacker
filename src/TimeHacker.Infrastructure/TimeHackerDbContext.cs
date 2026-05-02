@@ -44,7 +44,9 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
+        ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+
         // Applies all configurations defined in this assembly
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
@@ -52,6 +54,8 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
+
+        ArgumentNullException.ThrowIfNull(configurationBuilder, nameof(configurationBuilder));
 
         configurationBuilder
             .Properties<DateTime>()

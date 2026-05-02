@@ -10,11 +10,12 @@ public class TimeHackerIdentityDbContext : IdentityDbContext<IdentityUser>
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         // Applies all configurations defined in this assembly
-        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+        builder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 }

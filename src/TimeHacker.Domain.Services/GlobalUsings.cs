@@ -1,4 +1,5 @@
 ﻿global using TimeHacker.Helpers.Domain.Helpers;
+global using TimeHacker.Helpers.Domain.Extensions;
 
 global using TimeHacker.Domain.Constants;
 global using TimeHacker.Domain.BusinessLogicExceptions;

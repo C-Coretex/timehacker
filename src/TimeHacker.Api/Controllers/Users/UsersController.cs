@@ -14,7 +14,7 @@ public class UsersController(IUserAppService userService) : ControllerBase
     [HttpGet("me")]
     public async Task<Results<Ok<UserReturnModel>, NotFound>> GetCurrent(CancellationToken cancellationToken = default)
     {
-        var user = await userService.GetCurrent(cancellationToken);
+        var user = await userService.GetCurrent(cancellationToken).ConfigureAwait(false);
         if (user == null)
             return TypedResults.NotFound();
 
@@ -26,7 +26,7 @@ public class UsersController(IUserAppService userService) : ControllerBase
     [HttpPut("me")]
     public async Task<Ok> Update([FromBody] UserUpdateModel inputUserModel, CancellationToken cancellationToken = default)
     {
-        await userService.UpdateAsync(inputUserModel.CreateDto(), cancellationToken);
+        await userService.UpdateAsync(inputUserModel.CreateDto(), cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok();
     }
@@ -35,7 +35,7 @@ public class UsersController(IUserAppService userService) : ControllerBase
     [HttpDelete("me")]
     public async Task<NoContent> Delete(CancellationToken cancellationToken = default)
     {
-        await userService.DeleteAsync(cancellationToken);
+        await userService.DeleteAsync(cancellationToken).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

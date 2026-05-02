@@ -1,5 +1,4 @@
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
-using TimeHacker.Domain.BusinessLogicExceptions;
 
 namespace TimeHacker.Api.Models.Input.Tasks;
 

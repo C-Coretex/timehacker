@@ -1,7 +1,8 @@
 ﻿namespace TimeHacker.Domain.Models.EntityModels.Enums;
 
-public enum DayOfWeekEnum
+public enum DayOfWeek
 {
+    None = 0,
     Monday = 1,
     Tuesday = 2,
     Wednesday = 3,

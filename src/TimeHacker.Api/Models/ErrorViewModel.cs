@@ -1,6 +1,6 @@
 namespace TimeHacker.Api.Models;
 
-public class ErrorViewModel
+internal sealed class ErrorViewModel
 {
     public string? RequestId { get; set; }
 

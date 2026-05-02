@@ -1,0 +1,77 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="NoVariablesDefault" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/01_Presentation/">
+    <Project Path="TimeHacker.Api/TimeHacker.Api.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.UI/timehacker.ui.esproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+      <Build />
+      <Deploy />
+    </Project>
+  </Folder>
+  <Folder Name="/02_Application/">
+    <Project Path="TimeHacker.Application.Api.Contracts/TimeHacker.Application.Api.Contracts.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.Application.Api/TimeHacker.Application.Api.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/03_Domain/">
+    <Project Path="TimeHacker.Domain.Services/TimeHacker.Domain.Services.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.Domain/TimeHacker.Domain.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/04_Infrastructure/">
+    <Project Path="TimeHacker.Infrastructure.Identity/TimeHacker.Infrastructure.Identity.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.Infrastructure/TimeHacker.Infrastructure.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.Migrations.Identity/TimeHacker.Migrations.Identity.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.Migrations/TimeHacker.Migrations.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/05_Helpers/">
+    <Project Path="TimeHacker.Helpers.Db/TimeHacker.Helpers.Db.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Debug" />
+    </Project>
+    <Project Path="TimeHacker.Helpers.Domain/TimeHacker.Helpers.Domain.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/06_Tests/">
+    <Project Path="TimeHacker.Tests.Helpers/TimeHacker.Tests.Helpers.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/06_Tests/UnitTests/">
+    <Project Path="TimeHacker.Application.Api.Tests/TimeHacker.Application.Api.Tests.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+    <Project Path="TimeHacker.Domain.Services.Tests/TimeHacker.Domain.Services.Tests.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    <Build />
+  </Project>
+</Solution>

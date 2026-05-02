@@ -9,4 +9,13 @@ public static class CollectionExtensions
 
         return null;
     }
+
+    public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        ArgumentNullException.ThrowIfNull(collection, nameof(collection));
+        ArgumentNullException.ThrowIfNull(items, nameof(items));
+
+        foreach (var item in items)
+            collection.Add(item);
+    }
 }

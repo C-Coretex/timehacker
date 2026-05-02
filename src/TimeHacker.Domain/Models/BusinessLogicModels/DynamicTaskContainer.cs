@@ -2,11 +2,11 @@
 
 namespace TimeHacker.Domain.Models.BusinessLogicModels;
 
-public struct DynamicTaskContainer
+public readonly record struct DynamicTaskContainer
 {
     public DynamicTask Task { get; init; }
     public int CountOfUses { get; init; }
-    public TimeRange TimeRange { get; set; } = new TimeRange();
+    public TimeRange TimeRange { get; init; } = new TimeRange();
 
     public DynamicTaskContainer(DynamicTask task, int countOfUses)
     {

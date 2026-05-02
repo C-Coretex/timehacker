@@ -6,7 +6,7 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Infrastructure.Repositories;
 
-public class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDbContext, TModel, TId>, IUserScopedRepositoryBase<TModel, TId>
+internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDbContext, TModel, TId>, IUserScopedRepositoryBase<TModel, TId>
     where TModel : class, IDbEntity<TId>, IUserScopedEntity
 {
     private readonly UserAccessorBase _userAccessor;
@@ -24,23 +24,29 @@ public class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDb
 
     public override TModel Add(TModel model)
     {
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+
         model.UserId = _userAccessor.GetUserIdOrThrowUnauthorized();
         return base.Add(model);
     }
 
     public override void AddRange(IEnumerable<TModel> models)
     {
+        ArgumentNullException.ThrowIfNull(models, nameof(models));
+
         foreach (var model in models)
             Add(model);
     }
 
     public async Task Delete(TModel model, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+
         var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
         if (model.UserId != userId)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
-        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
+        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken).ConfigureAwait(false);
         if (!entityExistsForThisUser)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
@@ -49,17 +55,21 @@ public class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDb
 
     public async Task DeleteRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(models, nameof(models));
+
         foreach (var model in models)
-            await Delete(model, cancellationToken);
+            await Delete(model, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<TModel> Update(TModel model, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+
         var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
         if (model.UserId != userId)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
-        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
+        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken).ConfigureAwait(false);
         if (!entityExistsForThisUser)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
@@ -68,7 +78,9 @@ public class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDb
 
     public async Task UpdateRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(models, nameof(models));
+
         foreach (var model in models)
-            await Update(model, cancellationToken);
+            await Update(model, cancellationToken).ConfigureAwait(false);
     }
 }

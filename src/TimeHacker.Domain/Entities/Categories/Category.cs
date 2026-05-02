@@ -13,6 +13,6 @@ public class Category : UserScopedEntityBase
 
 
     public virtual ScheduleEntity? ScheduleEntity { get; set; }
-    public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; set; } = [];
-    public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; set; } = [];
+    public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; init; } = [];
+    public virtual ICollection<CategoryDynamicTask> CategoryDynamicTasks { get; init; } = [];
 }

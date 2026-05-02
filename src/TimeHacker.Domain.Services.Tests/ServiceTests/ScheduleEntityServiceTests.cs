@@ -1,4 +1,6 @@
-﻿namespace TimeHacker.Domain.Services.Tests.ServiceTests;
+﻿using TimeHacker.Domain.Models.ReturnModels;
+
+namespace TimeHacker.Domain.Services.Tests.ServiceTests;
 
 public class ScheduleEntityServiceTests
 {
@@ -37,8 +39,8 @@ public class ScheduleEntityServiceTests
             {
                 UserId = _userId,
                 CreatedTimestamp = date,
-                ScheduledTasks = [new ScheduledTask() { Name = "" }],
-                ScheduledCategories = [new ScheduledCategory() { Name = "" }],
+                ScheduledTasks = [new() { Name = "" }],
+                ScheduledCategories = [new() { Name = "" }],
                 EndsOn = null,
                 FixedTask = new FixedTask() { UserId = _userId }
             },
@@ -98,8 +100,11 @@ public class ScheduleEntityServiceTests
         var actual = _scheduleEntityService.GetAllFrom(from).ToList();
         actual.Should().NotBeNull();
 
-        var expected = _scheduledEntities.Where(x => x.FixedTask != null && (x.EndsOn == null || x.EndsOn >= from))
+        var expected = _scheduledEntities
+            .Where(x => x.FixedTask != null && (x.EndsOn == null || x.EndsOn >= from))
+            .Select(ScheduleEntityReturn.Create)
             .ToList();
+
         actual.Count.Should().Be(expected.Count);
         actual.Should().BeEquivalentTo(expected);
     }
@@ -127,7 +132,10 @@ public class ScheduleEntityServiceTests
 
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
-            await _scheduleEntityService.UpdateLastEntityCreated(_scheduledEntities.First(x => x.UserId != _userId).Id, DateOnly.FromDateTime(DateTime.Now), TestContext.Current.CancellationToken);
+            await _scheduleEntityService.UpdateLastEntityCreated(
+                _scheduledEntities.First(x => x.UserId != _userId).Id, 
+                DateOnly.FromDateTime(DateTime.Now), 
+                TestContext.Current.CancellationToken).ConfigureAwait(false);
         });
     }
 
@@ -141,7 +149,7 @@ public class ScheduleEntityServiceTests
             await _scheduleEntityService.UpdateLastEntityCreated(
                 _scheduledEntities.First(x => x.UserId == _userId).Id,
                 DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
-                TestContext.Current.CancellationToken);
+                TestContext.Current.CancellationToken).ConfigureAwait(false);
         });
     }
 
@@ -156,7 +164,7 @@ public class ScheduleEntityServiceTests
 
         await Assert.ThrowsAsync<DataIsNotCorrectException>(async () =>
         {
-            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate, TestContext.Current.CancellationToken);
+            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate, TestContext.Current.CancellationToken).ConfigureAwait(false);
         });
     }
 
@@ -206,7 +214,7 @@ public class ScheduleEntityServiceTests
             {
                 UserId = userId,
                 CreatedTimestamp = DateTime.Now,
-                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityTypeEnum.DayRepeatingEntity, new DayRepeatingEntity(2)), 
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2)), 
                 ScheduledTasks = [new ScheduledTask() { Name = "" }],
                 ScheduledCategories = [new ScheduledCategory() { Name = "" }]
             },

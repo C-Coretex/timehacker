@@ -6,7 +6,7 @@ public record InputMonthRepeatingEntityModel : InputRepeatingEntityModelBase
 {
     [Required]
     public byte MonthDayToRepeat { get; set; }
-    public override RepeatingEntityTypeEnum EntityType => RepeatingEntityTypeEnum.MonthRepeatingEntity;
+    public override RepeatingEntityType EntityType => RepeatingEntityType.MonthRepeatingEntity;
 
     public override IRepeatingEntityType CreateEntity()
     {

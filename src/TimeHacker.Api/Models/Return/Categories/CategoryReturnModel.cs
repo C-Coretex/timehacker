@@ -12,6 +12,8 @@ public record CategoryReturnModel(
 {
     public static CategoryReturnModel Create(CategoryDto category)
     {
+        ArgumentNullException.ThrowIfNull(category, nameof(category));
+
         return new CategoryReturnModel(category.Id!.Value, category.Name, category.Description, category.Color);
     }
 }

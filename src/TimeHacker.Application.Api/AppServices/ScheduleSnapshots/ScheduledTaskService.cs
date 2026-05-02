@@ -9,7 +9,7 @@ public class ScheduledTaskAppService(IScheduledTaskRepository scheduledTaskRepos
 {
     public async Task<ScheduledTaskDto?> GetBy(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await scheduledTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
+        var entity = await scheduledTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken).ConfigureAwait(false);
         return entity != null ? ScheduledTaskDto.Create(entity) : null;
     }
 }

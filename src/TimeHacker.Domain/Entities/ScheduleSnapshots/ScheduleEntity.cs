@@ -11,8 +11,8 @@ public class ScheduleEntity : UserScopedEntityBase
     public DateOnly? LastEntityCreated { get; set; }
     public DateOnly? EndsOn { get; set; }
 
-    public virtual ICollection<ScheduledTask> ScheduledTasks { get; set; } = [];
-    public virtual ICollection<ScheduledCategory> ScheduledCategories { get; set; } = [];
+    public virtual ICollection<ScheduledTask> ScheduledTasks { get; init; } = [];
+    public virtual ICollection<ScheduledCategory> ScheduledCategories { get; init; } = [];
 
     public virtual FixedTask? FixedTask { get; set; }
     public virtual Category? Category { get; set; }

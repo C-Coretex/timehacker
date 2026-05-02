@@ -22,7 +22,7 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
     [HttpGet("{id:guid}")]
     public async Task<Results<Ok<CategoryReturnModel>, NotFound>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await categoryService.GetByIdAsync(id, cancellationToken);
+        var entity = await categoryService.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
         if (entity == null)
             return TypedResults.NotFound();
 
@@ -35,7 +35,7 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
     public async Task<Created<Guid>> Add([FromBody] InputCategoryModel inputCategoryModel, CancellationToken cancellationToken = default)
     {
         var category = inputCategoryModel.CreateDto();
-        var id = await categoryService.AddAsync(category, cancellationToken);
+        var id = await categoryService.AddAsync(category, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Created($"/api/categories/{id}", id);
     }
@@ -46,7 +46,7 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
     public async Task<Ok> Update(Guid id, [FromBody] InputCategoryModel inputCategoryModel, CancellationToken cancellationToken = default)
     {
         var category = inputCategoryModel.CreateDto() with { Id = id };
-        await categoryService.UpdateAsync(category, cancellationToken);
+        await categoryService.UpdateAsync(category, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.Ok();
     }
@@ -56,7 +56,7 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
     [HttpDelete("{id:guid}")]
     public async Task<NoContent> Delete(Guid id, CancellationToken cancellationToken = default)
     {
-        await categoryService.DeleteAsync(id, cancellationToken);
+        await categoryService.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
 
         return TypedResults.NoContent();
     }

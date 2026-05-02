@@ -29,6 +29,8 @@ public record TaskContainerReturn
 
     public static TaskContainerReturn Create(ScheduledTask task)
     {
+        ArgumentNullException.ThrowIfNull(task, nameof(task));
+
         var entity = new TaskContainerReturn
         {
             IsFixed = task.IsFixed,

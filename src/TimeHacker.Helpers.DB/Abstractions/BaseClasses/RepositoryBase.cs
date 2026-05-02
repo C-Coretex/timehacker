@@ -23,8 +23,8 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return (Expression<Func<TModel, DateTime?>>)Expression.Lambda(updatedProp, param);
     });
 
-    protected TDbContext DbContext = dbContext;
-    protected DbSet<TModel> DbSet = dbSet;
+    protected TDbContext DbContext { get; set; } = dbContext;
+    protected DbSet<TModel> DbSet { get; set; } = dbSet;
 
     protected virtual IQueryable<TModel> GetAllBase()
     {
@@ -35,6 +35,8 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
+        ArgumentNullException.ThrowIfNull(queryPipelineSteps, nameof(queryPipelineSteps));
+
         var query = GetAllBase();
         if (asNoTracking)
             query = query.AsNoTracking();
@@ -47,18 +49,18 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual TModel Add(TModel model)
     {
-        return DbContext.AddEntity(DbSet, model);
+        return DbContextBase<TDbContext>.AddEntity(DbSet, model);
     }
     public virtual async Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         var entity = Add(model);
-        await SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return entity;
     }
 
     public virtual void AddRange(IEnumerable<TModel> models)
     {
-        DbContext.AddEntities(DbSet, models);
+        DbContextBase<TDbContext>.AddEntities(DbSet, models);
     }
     public virtual Task AddRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
@@ -68,7 +70,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual void Delete(TModel model)
     {
-        DbContext.RemoveEntity(DbSet, model);
+        DbContextBase<TDbContext>.RemoveEntity(DbSet, model);
     }
     public virtual Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
@@ -78,7 +80,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual void DeleteRange(IEnumerable<TModel> models)
     {
-        DbContext.RemoveEntities(DbSet, models);
+        DbContextBase<TDbContext>.RemoveEntities(DbSet, models);
     }
     public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
@@ -93,18 +95,18 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual TModel Update(TModel model)
     {
-        return DbContext.UpdateEntity(DbSet, model);
+        return DbContextBase<TDbContext>.UpdateEntity(DbSet, model);
     }
     public virtual async Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         var entity = Update(model);
-        await SaveChangesAsync(cancellationToken);
+        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return entity;
     }
 
     public virtual void UpdateRange(IEnumerable<TModel> models)
     {
-        DbContext.UpdateEntities(DbSet, models);
+        DbContextBase<TDbContext>.UpdateEntities(DbSet, models);
     }
     public virtual Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
@@ -168,9 +170,9 @@ where TDbContext : DbContextBase<TDbContext>
         return GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
     }
 
-    public virtual async Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
+    public virtual Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
-        return await GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
+        return GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
     }
 
 

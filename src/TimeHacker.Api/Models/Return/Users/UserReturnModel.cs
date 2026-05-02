@@ -10,6 +10,8 @@ public record UserReturnModel(
 {
     public static UserReturnModel Create(UserDto user)
     {
+        ArgumentNullException.ThrowIfNull(user, nameof(user));
+
         return new UserReturnModel(
             user.Name,
             user.PhoneNumberForNotifications,

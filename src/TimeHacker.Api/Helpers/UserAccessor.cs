@@ -5,7 +5,7 @@ using TimeHacker.Domain.IRepositories.Users;
 
 namespace TimeHacker.Api.Helpers;
 
-public class UserAccessor : UserAccessorBase
+internal sealed class UserAccessor : UserAccessorBase
 {
     private readonly IUserRepository _userRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -39,15 +39,13 @@ public class UserAccessor : UserAccessorBase
         if (session == null || string.IsNullOrWhiteSpace(userIdentityId))
             return;
 
-        UserId = await GetOrCreateUserId(userIdentityId);
-
-        if (UserId != null)
-            session.Set(UserIdKey, UserId.Value.ToByteArray());
+        UserId = await GetOrCreateUserId(userIdentityId).ConfigureAwait(false);
+        session.Set(UserIdKey, UserId.Value.ToByteArray());
     }
 
     private async Task<Guid> GetOrCreateUserId(string userIdentityId)
     {
-        var userId = await _userRepository.GetAll().Where(x => x.IdentityId == userIdentityId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
+        var userId = await _userRepository.GetAll().Where(x => x.IdentityId == userIdentityId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync().ConfigureAwait(false);
         if (userId.HasValue)
             return userId.Value;
 
@@ -56,13 +54,13 @@ public class UserAccessor : UserAccessorBase
             IdentityId = userIdentityId,
             Name = "New User"
         };
-        entity = await _userRepository.AddAndSaveAsync(entity);
+        entity = await _userRepository.AddAndSaveAsync(entity).ConfigureAwait(false);
         return entity.Id;
     }
 
     public new bool IsUserValid => ValidateUser();
 
-    protected bool ValidateUser()
+    private bool ValidateUser()
     {
         return UserId.HasValue;
     }

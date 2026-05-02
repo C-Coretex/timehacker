@@ -4,8 +4,11 @@ using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 
 namespace TimeHacker.Infrastructure.Repositories.Users;
 
-public class UserRepository : RepositoryBase<TimeHackerDbContext, User, Guid>, IUserRepository
+internal sealed class UserRepository : RepositoryBase<TimeHackerDbContext, User, Guid>, IUserRepository
 {
-    public UserRepository(TimeHackerDbContext dbContext) : base(dbContext, dbContext.User)
-    { }
+    public UserRepository(TimeHackerDbContext dbContext) 
+        : base(dbContext ?? throw new ArgumentNullException(nameof(dbContext)), dbContext.User)
+    { 
+    
+    }
 }

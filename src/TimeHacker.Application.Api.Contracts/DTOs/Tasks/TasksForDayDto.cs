@@ -8,6 +8,8 @@ public record TasksForDayDto
 
     public static TasksForDayDto Create(TasksForDayReturn tasksForDay)
     {
+        ArgumentNullException.ThrowIfNull(tasksForDay, nameof(tasksForDay));
+
         return new TasksForDayDto
         {
             Date = tasksForDay.Date,
