@@ -102,8 +102,8 @@ internal sealed partial class LogExceptionFilter(ILoggerFactory loggerFactory, I
     private static string SanitizeValue(string? value)
     {
         return value?
-            .Replace("\r", string.Empty, StringComparison.Ordinal)
-            .Replace("\n", string.Empty, StringComparison.Ordinal) 
+            .Replace("\r", string.Empty)
+            .Replace("\n", string.Empty) 
             ?? string.Empty;
     }
 

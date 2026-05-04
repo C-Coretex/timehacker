@@ -25,7 +25,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task<T> AddEntityAndSaveAsync<T>(DbSet<T> entityCollection, T entity, CancellationToken cancellationToken = default) where T : class, IDbEntity
     {
         var newEntity = entityCollection.Add(entity).Entity;
-        await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await base.SaveChangesAsync(cancellationToken);
 
         return newEntity;
     }
@@ -36,7 +36,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task AddEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class, IDbEntity
     {
         entityCollection.AddRange(entities);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
 
     internal static T UpdateEntity<T>(DbSet<T> entityCollection, T entity) where T : class, IDbEntity
@@ -46,7 +46,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task<T> UpdateEntityAndSaveAsync<T>(DbSet<T> entityCollection, T entity, CancellationToken cancellationToken = default) where T : class, IDbEntity
     {
         var newEntity = entityCollection.Update(entity).Entity;
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
 
         return newEntity;
     }
@@ -57,7 +57,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task UpdateEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class, IDbEntity
     {
         entityCollection.UpdateRange(entities);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
 
     internal static void RemoveEntity<T>(DbSet<T> entityCollection, T model) where T : class, IDbEntity
@@ -67,7 +67,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task RemoveEntityAndSaveAsync<T>(DbSet<T> entityCollection, T model, CancellationToken cancellationToken = default) where T : class, IDbEntity, new()
     {
         entityCollection.Remove(model);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
     internal static void RemoveEntities<T>(DbSet<T> entityCollection, IEnumerable<T> models) where T : class, IDbEntity
     {
@@ -76,7 +76,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task RemoveEntitiesAndSaveAsync<T>(DbSet<T> entityCollection, IEnumerable<T> models, CancellationToken cancellationToken = default) where T : class, IDbEntity, new()
     {
         entityCollection.RemoveRange(models);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
 
     internal static void RemoveEntity<T, TId>(DbSet<T> entityCollection, TId id) where T : class, IDbEntity<TId>, new()
@@ -86,7 +86,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task RemoveEntityAndSaveAsync<T, TId>(DbSet<T> entityCollection, TId id, CancellationToken cancellationToken = default) where T : class, IDbEntity<TId>, new()
     {
         entityCollection.Remove(new T() { Id = id });
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
     internal static void RemoveEntities<T, TId>(DbSet<T> entityCollection, IEnumerable<TId> ids) where T : class, IDbEntity<TId>, new()
     {
@@ -95,7 +95,7 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     internal async Task RemoveEntitiesAndSaveAsync<T, TId>(DbSet<T> entityCollection, IEnumerable<TId> ids, CancellationToken cancellationToken = default) where T : class, IDbEntity<TId>, new()
     {
         entityCollection.RemoveRange(ids.Select(id => new T() { Id = id }));
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
 
     internal static void RemoveEntities<T>(DbSet<T> entityCollection, Func<T, bool> selector) where T : class, IDbEntity
@@ -107,6 +107,6 @@ public class DbContextBase<TContext> : DbContext where TContext : DbContext
     {
         var entitiesToRemove = entityCollection.Where(selector);
         entityCollection.RemoveRange(entitiesToRemove);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
     }
 }

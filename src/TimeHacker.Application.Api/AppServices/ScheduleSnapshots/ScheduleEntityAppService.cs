@@ -23,11 +23,11 @@ public class ScheduleEntityAppService(
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)
         {
             case ScheduleEntityParentType.FixedTask:
-                if(!await fixedTaskRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken).ConfigureAwait(false))
+                if(!await fixedTaskRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken))
                     throw new NotFoundException(nameof(ScheduleEntityParentType.FixedTask), scheduleEntityCreateDto.ParentEntityId.ToString());
                 break;
             case ScheduleEntityParentType.Category:
-                if (!await categoryRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken).ConfigureAwait(false))
+                if (!await categoryRepository.ExistsAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken))
                     throw new NotFoundException(nameof(ScheduleEntityParentType.Category), scheduleEntityCreateDto.ParentEntityId.ToString());
                 break;
             default:
@@ -35,7 +35,7 @@ public class ScheduleEntityAppService(
         }
 
         var scheduleEntity = ScheduleEntityHelper.GetScheduleEntity(scheduleEntityCreateDto.RepeatingEntityModel, scheduleEntityCreateDto.EndsOnModel);
-        scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(scheduleEntity, cancellationToken).ConfigureAwait(false);
+        scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(scheduleEntity, cancellationToken);
 
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)
         {
@@ -44,14 +44,14 @@ public class ScheduleEntityAppService(
                     x => x.Id == scheduleEntityCreateDto.ParentEntityId,
                     x => x.ScheduleEntityId,
                     scheduleEntity.Id,
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken);
                 break;
             case ScheduleEntityParentType.Category:
                 await categoryRepository.UpdateProperty(
                     x => x.Id == scheduleEntityCreateDto.ParentEntityId,
                     x => x.ScheduleEntityId,
                     scheduleEntity.Id,
-                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken);
                 break;
             default:
                 throw new NotProvidedException(nameof(scheduleEntityCreateDto));

@@ -22,7 +22,7 @@ public class DynamicTasksController(IDynamicTaskAppService dynamicTaskAppService
     [HttpGet("{id:guid}")]
     public async Task<Results<Ok<DynamicTaskReturnModel>, NotFound>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await dynamicTaskAppService.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
+        var entity = await dynamicTaskAppService.GetByIdAsync(id, cancellationToken);
         if (entity == null)
             return TypedResults.NotFound();
 
@@ -35,7 +35,7 @@ public class DynamicTasksController(IDynamicTaskAppService dynamicTaskAppService
     public async Task<Created<Guid>> Add([FromBody] InputDynamicTaskModel inputDynamicTaskModel, CancellationToken cancellationToken = default)
     {
         var dynamicTask = inputDynamicTaskModel.CreateDto();
-        var id = await dynamicTaskAppService.AddAsync(dynamicTask, cancellationToken).ConfigureAwait(false);
+        var id = await dynamicTaskAppService.AddAsync(dynamicTask, cancellationToken);
 
         return TypedResults.Created($"/api/dynamic-tasks/{id}", id);
     }
@@ -46,7 +46,7 @@ public class DynamicTasksController(IDynamicTaskAppService dynamicTaskAppService
     public async Task<Ok> Update(Guid id, [FromBody] InputDynamicTaskModel inputDynamicTaskModel, CancellationToken cancellationToken = default)
     {
         var dynamicTaskDto = inputDynamicTaskModel.CreateDto() with { Id = id };
-        await dynamicTaskAppService.UpdateAsync(dynamicTaskDto, cancellationToken).ConfigureAwait(false);
+        await dynamicTaskAppService.UpdateAsync(dynamicTaskDto, cancellationToken);
 
         return TypedResults.Ok();
     }
@@ -56,7 +56,7 @@ public class DynamicTasksController(IDynamicTaskAppService dynamicTaskAppService
     [HttpDelete("{id:guid}")]
     public async Task<NoContent> Delete(Guid id, CancellationToken cancellationToken = default)
     {
-        await dynamicTaskAppService.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
+        await dynamicTaskAppService.DeleteAsync(id, cancellationToken);
 
         return TypedResults.NoContent();
     }

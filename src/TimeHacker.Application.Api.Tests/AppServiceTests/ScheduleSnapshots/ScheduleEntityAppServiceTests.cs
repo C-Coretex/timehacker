@@ -65,7 +65,7 @@ public class ScheduleEntityAppServiceTests
             var actual = await _scheduleEntityAppService.Save(new ScheduleEntityCreateDto(
                 isCategory ? ScheduleEntityParentType.Category : ScheduleEntityParentType.FixedTask,
                 existingEntry ? _scheduledEntities.First(x => x.UserId != _userId).Id : Guid.NewGuid(),
-                new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1))), TestContext.Current.CancellationToken).ConfigureAwait(false);
+                new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1))), TestContext.Current.CancellationToken);
         });
     }
 

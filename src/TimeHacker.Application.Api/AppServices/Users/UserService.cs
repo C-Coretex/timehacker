@@ -10,7 +10,7 @@ public class UserService(IUserRepository userRepository, UserAccessorBase userAc
     public async Task<UserDto?> GetCurrent(CancellationToken cancellationToken = default)
     {
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        var entity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var entity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken);
         return UserDto.Create(entity);
     }
 
@@ -19,15 +19,15 @@ public class UserService(IUserRepository userRepository, UserAccessorBase userAc
         ArgumentNullException.ThrowIfNull(user, nameof(user));
 
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        var userEntity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false) ?? throw new UserDoesNotExistException();
+        var userEntity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken) ?? throw new UserDoesNotExistException();
         userEntity = user.GetEntity(userEntity);
 
-        await userRepository.UpdateAndSaveAsync(userEntity, cancellationToken).ConfigureAwait(false);
+        await userRepository.UpdateAndSaveAsync(userEntity, cancellationToken);
     }
 
     public async Task DeleteAsync(CancellationToken cancellationToken = default)
     {
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        await userRepository.DeleteAndSaveAsync(userId, cancellationToken).ConfigureAwait(false);
+        await userRepository.DeleteAndSaveAsync(userId, cancellationToken);
     }
 }

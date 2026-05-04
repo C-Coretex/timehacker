@@ -17,7 +17,7 @@ public class TagService(ITagRepository tagRepository)
         if (tag == null)
             throw new NotProvidedException(nameof(tag));
 
-        var entity = await tagRepository.AddAndSaveAsync(tag.GetEntity()).ConfigureAwait(false);
+        var entity = await tagRepository.AddAndSaveAsync(tag.GetEntity());
         return TagDto.Create(entity);
     }
 
@@ -26,8 +26,8 @@ public class TagService(ITagRepository tagRepository)
         if (tag == null)
             throw new NotProvidedException(nameof(tag));
 
-        var entity = await tagRepository.GetByIdAsync(tag.Id!.Value).ConfigureAwait(false);
-        entity = await tagRepository.UpdateAndSaveAsync(tag.GetEntity(entity)).ConfigureAwait(false);
+        var entity = await tagRepository.GetByIdAsync(tag.Id!.Value);
+        entity = await tagRepository.UpdateAndSaveAsync(tag.GetEntity(entity));
         return TagDto.Create(entity);
     }
 

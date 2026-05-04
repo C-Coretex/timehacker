@@ -46,7 +46,7 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
         if (model.UserId != userId)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
-        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken).ConfigureAwait(false);
+        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
         if (!entityExistsForThisUser)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
@@ -58,7 +58,7 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
         ArgumentNullException.ThrowIfNull(models, nameof(models));
 
         foreach (var model in models)
-            await Delete(model, cancellationToken).ConfigureAwait(false);
+            await Delete(model, cancellationToken);
     }
 
     public async Task<TModel> Update(TModel model, CancellationToken cancellationToken = default)
@@ -69,7 +69,7 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
         if (model.UserId != userId)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
-        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken).ConfigureAwait(false);
+        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
         if (!entityExistsForThisUser)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
@@ -81,6 +81,6 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
         ArgumentNullException.ThrowIfNull(models, nameof(models));
 
         foreach (var model in models)
-            await Update(model, cancellationToken).ConfigureAwait(false);
+            await Update(model, cancellationToken);
     }
 }

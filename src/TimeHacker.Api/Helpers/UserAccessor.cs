@@ -39,13 +39,13 @@ internal sealed class UserAccessor : UserAccessorBase
         if (session == null || string.IsNullOrWhiteSpace(userIdentityId))
             return;
 
-        UserId = await GetOrCreateUserId(userIdentityId).ConfigureAwait(false);
+        UserId = await GetOrCreateUserId(userIdentityId);
         session.Set(UserIdKey, UserId.Value.ToByteArray());
     }
 
     private async Task<Guid> GetOrCreateUserId(string userIdentityId)
     {
-        var userId = await _userRepository.GetAll().Where(x => x.IdentityId == userIdentityId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync().ConfigureAwait(false);
+        var userId = await _userRepository.GetAll().Where(x => x.IdentityId == userIdentityId).Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
         if (userId.HasValue)
             return userId.Value;
 
@@ -54,7 +54,7 @@ internal sealed class UserAccessor : UserAccessorBase
             IdentityId = userIdentityId,
             Name = "New User"
         };
-        entity = await _userRepository.AddAndSaveAsync(entity).ConfigureAwait(false);
+        entity = await _userRepository.AddAndSaveAsync(entity);
         return entity.Id;
     }
 

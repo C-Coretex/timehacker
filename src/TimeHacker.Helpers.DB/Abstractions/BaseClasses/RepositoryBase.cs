@@ -54,7 +54,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     public virtual async Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         var entity = Add(model);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
         return entity;
     }
 
@@ -100,7 +100,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     public virtual async Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         var entity = Update(model);
-        await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await SaveChangesAsync(cancellationToken);
         return entity;
     }
 

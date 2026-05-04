@@ -135,7 +135,7 @@ public class ScheduleEntityServiceTests
             await _scheduleEntityService.UpdateLastEntityCreated(
                 _scheduledEntities.First(x => x.UserId != _userId).Id, 
                 DateOnly.FromDateTime(DateTime.Now), 
-                TestContext.Current.CancellationToken).ConfigureAwait(false);
+                TestContext.Current.CancellationToken);
         });
     }
 
@@ -149,7 +149,7 @@ public class ScheduleEntityServiceTests
             await _scheduleEntityService.UpdateLastEntityCreated(
                 _scheduledEntities.First(x => x.UserId == _userId).Id,
                 DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
-                TestContext.Current.CancellationToken).ConfigureAwait(false);
+                TestContext.Current.CancellationToken);
         });
     }
 
@@ -164,7 +164,7 @@ public class ScheduleEntityServiceTests
 
         await Assert.ThrowsAsync<DataIsNotCorrectException>(async () =>
         {
-            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, invalidDate, TestContext.Current.CancellationToken);
         });
     }
 

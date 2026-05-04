@@ -6,7 +6,7 @@ internal sealed class UserAccessorInitMiddleware(RequestDelegate next)
 
     public async Task InvokeAsync(HttpContext context, UserAccessor accessor)
     {
-        await accessor.Init().ConfigureAwait(false);
-        await _next(context).ConfigureAwait(false);
+        await accessor.Init();
+        await _next(context);
     }
 }

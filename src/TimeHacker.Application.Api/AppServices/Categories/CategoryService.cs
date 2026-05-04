@@ -14,7 +14,7 @@ public class CategoryService(ICategoryRepository categoryRepository)
         if (category == null)
             throw new NotProvidedException(nameof(category));
 
-        return (await categoryRepository.AddAndSaveAsync(category.GetEntity(), cancellationToken).ConfigureAwait(false)).Id;
+        return (await categoryRepository.AddAndSaveAsync(category.GetEntity(), cancellationToken)).Id;
     }
 
     public async Task UpdateAsync(CategoryDto category, CancellationToken cancellationToken = default)
@@ -22,8 +22,8 @@ public class CategoryService(ICategoryRepository categoryRepository)
         if (category == null)
             throw new NotProvidedException(nameof(category));
 
-        var entity = await categoryRepository.GetByIdAsync(category.Id!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-        await categoryRepository.UpdateAndSaveAsync(category.GetEntity(entity), cancellationToken).ConfigureAwait(false);
+        var entity = await categoryRepository.GetByIdAsync(category.Id!.Value, cancellationToken: cancellationToken);
+        await categoryRepository.UpdateAndSaveAsync(category.GetEntity(entity), cancellationToken);
     }
 
     public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -33,7 +33,7 @@ public class CategoryService(ICategoryRepository categoryRepository)
 
     public async Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var entity = await categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         return entity != null ? CategoryDto.Create(entity) : null;
     }
 }

@@ -17,7 +17,7 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        return (await dynamicTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken).ConfigureAwait(false)).Id;
+        return (await dynamicTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken)).Id;
     }
 
     public async Task UpdateAsync(DynamicTaskDto task, CancellationToken cancellationToken = default)
@@ -25,18 +25,18 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
         if (task == null)
             throw new NotProvidedException(nameof(task));
 
-        var entity = await dynamicTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
-        await dynamicTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken).ConfigureAwait(false);
+        var entity = await dynamicTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
+        await dynamicTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        await dynamicTaskRepository.DeleteAndSaveAsync(id, cancellationToken).ConfigureAwait(false);
+        await dynamicTaskRepository.DeleteAndSaveAsync(id, cancellationToken);
     }
 
     public async Task<DynamicTaskDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await dynamicTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var entity = await dynamicTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
         return DynamicTaskDto.Create(entity);
     }
 }

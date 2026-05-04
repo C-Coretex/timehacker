@@ -22,7 +22,7 @@ public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : Co
     [HttpGet("{id:guid}")]
     public async Task<Results<Ok<FixedTaskReturnModel>, NotFound>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await fixedTaskAppService.GetByIdAsync(id, cancellationToken).ConfigureAwait(false);
+        var entity = await fixedTaskAppService.GetByIdAsync(id, cancellationToken);
         if (entity == null)
             return TypedResults.NotFound();
 
@@ -35,7 +35,7 @@ public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : Co
     public async Task<Created<Guid>> Add([FromBody] InputFixedTaskModel inputFixedTaskModel, CancellationToken cancellationToken = default)
     {
         var fixedTaskDto = inputFixedTaskModel.CreateDto();
-        var id = await fixedTaskAppService.AddAsync(fixedTaskDto, cancellationToken).ConfigureAwait(false);
+        var id = await fixedTaskAppService.AddAsync(fixedTaskDto, cancellationToken);
 
         return TypedResults.Created($"/api/fixed-tasks/{id}", id);
     }
@@ -46,7 +46,7 @@ public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : Co
     public async Task<Ok> Update(Guid id, [FromBody] InputFixedTaskModel inputFixedTaskModel, CancellationToken cancellationToken = default)
     {
         var fixedTaskDto = inputFixedTaskModel.CreateDto() with { Id = id };
-        await fixedTaskAppService.UpdateAsync(fixedTaskDto, cancellationToken).ConfigureAwait(false);
+        await fixedTaskAppService.UpdateAsync(fixedTaskDto, cancellationToken);
 
         return TypedResults.Ok();
     }
@@ -56,7 +56,7 @@ public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : Co
     [HttpDelete("{id:guid}")]
     public async Task<NoContent> Delete(Guid id, CancellationToken cancellationToken = default)
     {
-        await fixedTaskAppService.DeleteAsync(id, cancellationToken).ConfigureAwait(false);
+        await fixedTaskAppService.DeleteAsync(id, cancellationToken);
 
         return TypedResults.NoContent();
     }
