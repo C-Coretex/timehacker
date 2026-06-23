@@ -9,7 +9,7 @@ namespace TimeHacker.Helpers.Db.Abstractions.BaseClasses;
 /// ExecuteUpdateAsync and ExecuteDeleteAsync should not be available for services. If you need them, extend specific repository with specific business logic method.
 /// If you are using ExecuteUpdateAsync don't forget to manually set UpdatedTimestamp property, since SaveChangesAsync method is not being executed.
 /// </summary>
-public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TModel> dbSet) : IRepositoryBase<TModel>
+public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TModel> dbSet, TimeProvider timeProvider) : IRepositoryBase<TModel>
     where TModel : class, IDbEntity
     where TDbContext : DbContextBase<TDbContext>
 {
@@ -35,7 +35,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
-        ArgumentNullException.ThrowIfNull(queryPipelineSteps, nameof(queryPipelineSteps));
+        ArgumentNullException.ThrowIfNull(queryPipelineSteps);
 
         var query = GetAllBase();
         if (asNoTracking)
@@ -123,7 +123,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return ExecuteUpdateAsync(predicate,
             setPropertyCalls => setPropertyCalls
                 .SetProperty(propertySelector, value)
-                .SetProperty(updatedTimestampSelector, DateTime.UtcNow), 
+                .SetProperty(updatedTimestampSelector, timeProvider.GetUtcNow().UtcDateTime), 
             cancellationToken);
     }
 
@@ -144,7 +144,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         var createdEntries = DbContext.ChangeTracker.Entries<ICreatable>().Where(entry => entry.State == EntityState.Added);
         foreach (var entry in createdEntries)
@@ -158,13 +158,11 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     }
 }
 
-public class RepositoryBase<TDbContext, TModel, TId> : RepositoryBase<TDbContext, TModel>, IRepositoryBase<TModel, TId>
-where TModel : class, IDbEntity<TId>
-where TDbContext : DbContextBase<TDbContext>
+public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet<TModel> dbSet, TimeProvider timeProvider) 
+    : RepositoryBase<TDbContext, TModel>(dbContext, dbSet, timeProvider), IRepositoryBase<TModel, TId>
+    where TModel : class, IDbEntity<TId>
+    where TDbContext : DbContextBase<TDbContext>
 {
-    public RepositoryBase(TDbContext dbContext, DbSet<TModel> dbSet) : base(dbContext, dbSet)
-    { }
-
     public virtual Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default)
     {
         return GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);

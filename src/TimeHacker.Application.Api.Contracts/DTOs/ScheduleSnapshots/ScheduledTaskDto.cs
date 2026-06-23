@@ -19,7 +19,7 @@ public record ScheduledTaskDto(
 {
     public static ScheduledTaskDto Create(ScheduledTask scheduledTask)
     {
-        ArgumentNullException.ThrowIfNull(scheduledTask, nameof(scheduledTask));
+        ArgumentNullException.ThrowIfNull(scheduledTask);
 
         return new ScheduledTaskDto(
             scheduledTask.Id,

@@ -25,7 +25,7 @@ public record ScheduleEntityReturn
 
     public static ScheduleEntityReturn Create(ScheduleEntity scheduleEntity)
     {
-        ArgumentNullException.ThrowIfNull(scheduleEntity, nameof(scheduleEntity));
+        ArgumentNullException.ThrowIfNull(scheduleEntity);
         return new ScheduleEntityReturn()
         {
             Id = scheduleEntity.Id,

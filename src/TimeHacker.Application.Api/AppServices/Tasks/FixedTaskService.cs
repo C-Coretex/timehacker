@@ -1,6 +1,7 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Application.Api.QueryPipelineSteps;
+using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tasks;
 
@@ -14,16 +15,14 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
 
     public async Task<Guid> AddAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {
-        if (task == null)
-            throw new NotProvidedException(nameof(task));
+        NotProvidedException.ThrowIfNull(task);
 
         return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken)).Id;
     }
 
     public async Task UpdateAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {
-        if (task == null)
-            throw new NotProvidedException(nameof(task));
+        NotProvidedException.ThrowIfNull(task);
 
         var entity = await fixedTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
         await fixedTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);

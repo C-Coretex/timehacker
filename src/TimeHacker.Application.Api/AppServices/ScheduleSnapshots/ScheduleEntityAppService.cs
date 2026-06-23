@@ -11,14 +11,13 @@ namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 public class ScheduleEntityAppService(
     IScheduleEntityRepository scheduleEntityRepository,
     IFixedTaskRepository fixedTaskRepository,
-    ICategoryRepository categoryRepository) : IScheduleEntityAppService
+    ICategoryRepository categoryRepository,
+    TimeProvider timeProvider) : IScheduleEntityAppService
 {
     public async Task<ScheduleEntityDto> Save(ScheduleEntityCreateDto scheduleEntityCreateDto, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(scheduleEntityCreateDto, nameof(scheduleEntityCreateDto));
-
-        if (scheduleEntityCreateDto.RepeatingEntityModel == null)
-            throw new NotProvidedException(nameof(scheduleEntityCreateDto.RepeatingEntityModel), nameof(scheduleEntityCreateDto));
+        ArgumentNullException.ThrowIfNull(scheduleEntityCreateDto);
+        NotProvidedException.ThrowIfNull(scheduleEntityCreateDto.RepeatingEntityModel, propertyName: nameof(scheduleEntityCreateDto));
 
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)
         {
@@ -34,7 +33,7 @@ public class ScheduleEntityAppService(
                 throw new NotProvidedException(nameof(scheduleEntityCreateDto));
         }
 
-        var scheduleEntity = ScheduleEntityHelper.GetScheduleEntity(scheduleEntityCreateDto.RepeatingEntityModel, scheduleEntityCreateDto.EndsOnModel);
+        var scheduleEntity = ScheduleEntityHelper.GetScheduleEntity(scheduleEntityCreateDto.RepeatingEntityModel, scheduleEntityCreateDto.EndsOnModel, timeProvider);
         scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(scheduleEntity, cancellationToken);
 
         switch (scheduleEntityCreateDto.ScheduleEntityParentEnum)

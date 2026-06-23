@@ -57,6 +57,7 @@
       <BuildType Solution="NoVariablesDefault|*" Project="Release" />
     </Project>
   </Folder>
+  <Folder Name="/06_Tests/IntegrationTests/" />
   <Folder Name="/06_Tests/UnitTests/">
     <Project Path="TimeHacker.Application.Api.Tests/TimeHacker.Application.Api.Tests.csproj">
       <BuildType Solution="NoVariablesDefault|*" Project="Release" />

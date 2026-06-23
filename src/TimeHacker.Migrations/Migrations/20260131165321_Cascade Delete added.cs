@@ -10,8 +10,6 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
-
             migrationBuilder.DropForeignKey(
                 name: "FK_Category_ScheduleEntity_ScheduleEntityId",
                 table: "Category");
@@ -196,8 +194,6 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
-
             migrationBuilder.DropForeignKey(
                 name: "FK_Category_ScheduleEntity_ScheduleEntityId",
                 table: "Category");

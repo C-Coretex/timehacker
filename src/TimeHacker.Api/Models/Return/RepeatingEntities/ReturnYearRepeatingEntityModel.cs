@@ -10,7 +10,7 @@ public record ReturnYearRepeatingEntityModel : ReturnRepeatingEntityModelBase
 
     public override ReturnRepeatingEntityModelBase CreateFromEntity(RepeatingEntityDto dto)
     {
-        ArgumentNullException.ThrowIfNull(dto, nameof(dto));
+        ArgumentNullException.ThrowIfNull(dto);
 
         var year = (YearRepeatingEntity)dto.RepeatingData;
         return new ReturnYearRepeatingEntityModel { YearDayToRepeat = year.YearDayToRepeat };

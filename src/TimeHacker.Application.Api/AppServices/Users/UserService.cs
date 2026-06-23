@@ -16,7 +16,7 @@ public class UserService(IUserRepository userRepository, UserAccessorBase userAc
 
     public async Task UpdateAsync(UserDto user, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(user, nameof(user));
+        ArgumentNullException.ThrowIfNull(user);
 
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
         var userEntity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken) ?? throw new UserDoesNotExistException();

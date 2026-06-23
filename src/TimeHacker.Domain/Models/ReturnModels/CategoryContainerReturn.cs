@@ -24,7 +24,7 @@ public record CategoryContainerReturn
     //NOT FULLY IMPLEMENTED
     public static CategoryContainerReturn Create(ScheduledCategory scheduledCategory)
     {
-        ArgumentNullException.ThrowIfNull(scheduledCategory, nameof(scheduledCategory));
+        ArgumentNullException.ThrowIfNull(scheduledCategory);
 
         return new CategoryContainerReturn
         {

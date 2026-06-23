@@ -9,7 +9,7 @@ public record CategoryContainerDto
 
     public static CategoryContainerDto Create(CategoryContainerReturn category)
     {
-        ArgumentNullException.ThrowIfNull(category, nameof(category));
+        ArgumentNullException.ThrowIfNull(category);
 
         return new CategoryContainerDto
         {

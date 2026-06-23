@@ -12,7 +12,7 @@ public record TagReturnModel(
 {
     public static TagReturnModel Create(TagDto tag) 
     {
-        ArgumentNullException.ThrowIfNull(tag, nameof(tag));
+        ArgumentNullException.ThrowIfNull(tag);
 
         return new TagReturnModel(tag.Id!.Value, tag.Name, tag.Category, tag.Color);
     }

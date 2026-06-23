@@ -8,8 +8,6 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
-
             migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
@@ -496,8 +494,6 @@ namespace TimeHacker.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            ArgumentNullException.ThrowIfNull(migrationBuilder, nameof(migrationBuilder));
-
             migrationBuilder.DropTable(
                 name: "CategoryDynamicTask");
 

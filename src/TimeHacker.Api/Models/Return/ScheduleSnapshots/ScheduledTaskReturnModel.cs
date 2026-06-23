@@ -18,7 +18,7 @@ public record ScheduledTaskReturnModel(
 {
     public static ScheduledTaskReturnModel Create(ScheduledTaskDto scheduledTask)
     {
-        ArgumentNullException.ThrowIfNull(scheduledTask, nameof(scheduledTask));
+        ArgumentNullException.ThrowIfNull(scheduledTask);
 
         return new ScheduledTaskReturnModel(
             scheduledTask.Id!.Value,

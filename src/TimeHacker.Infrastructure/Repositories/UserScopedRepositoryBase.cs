@@ -6,33 +6,27 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Infrastructure.Repositories;
 
-internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHackerDbContext, TModel, TId>, IUserScopedRepositoryBase<TModel, TId>
+internal class UserScopedRepositoryBase<TModel, TId>(TimeHackerDbContext dbContext, DbSet<TModel> dbSet, UserAccessorBase userAccessor, TimeProvider timeProvider) 
+    : RepositoryBase<TimeHackerDbContext, TModel, TId>(dbContext, dbSet, timeProvider), IUserScopedRepositoryBase<TModel, TId>
     where TModel : class, IDbEntity<TId>, IUserScopedEntity
 {
-    private readonly UserAccessorBase _userAccessor;
-
-    public UserScopedRepositoryBase(TimeHackerDbContext dbContext, DbSet<TModel> dbSet, UserAccessorBase userAccessor) : base(dbContext, dbSet)
-    {
-        _userAccessor = userAccessor;
-    }
-
     protected override IQueryable<TModel> GetAllBase()
     {
-        var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
+        var userId = userAccessor.GetUserIdOrThrowUnauthorized();
         return base.GetAllBase().Where(x => x.UserId == userId);
     }
 
     public override TModel Add(TModel model)
     {
-        ArgumentNullException.ThrowIfNull(model, nameof(model));
+        ArgumentNullException.ThrowIfNull(model);
 
-        model.UserId = _userAccessor.GetUserIdOrThrowUnauthorized();
+        model.UserId = userAccessor.GetUserIdOrThrowUnauthorized();
         return base.Add(model);
     }
 
     public override void AddRange(IEnumerable<TModel> models)
     {
-        ArgumentNullException.ThrowIfNull(models, nameof(models));
+        ArgumentNullException.ThrowIfNull(models);
 
         foreach (var model in models)
             Add(model);
@@ -40,9 +34,9 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
 
     public async Task Delete(TModel model, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(model, nameof(model));
+        ArgumentNullException.ThrowIfNull(model);
 
-        var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
+        var userId = userAccessor.GetUserIdOrThrowUnauthorized();
         if (model.UserId != userId)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
@@ -55,7 +49,7 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
 
     public async Task DeleteRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(models, nameof(models));
+        ArgumentNullException.ThrowIfNull(models);
 
         foreach (var model in models)
             await Delete(model, cancellationToken);
@@ -63,9 +57,9 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
 
     public async Task<TModel> Update(TModel model, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(model, nameof(model));
+        ArgumentNullException.ThrowIfNull(model);
 
-        var userId = _userAccessor.GetUserIdOrThrowUnauthorized();
+        var userId = userAccessor.GetUserIdOrThrowUnauthorized();
         if (model.UserId != userId)
             throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
@@ -78,7 +72,7 @@ internal class UserScopedRepositoryBase<TModel, TId> : RepositoryBase<TimeHacker
 
     public async Task UpdateRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(models, nameof(models));
+        ArgumentNullException.ThrowIfNull(models);
 
         foreach (var model in models)
             await Update(model, cancellationToken);

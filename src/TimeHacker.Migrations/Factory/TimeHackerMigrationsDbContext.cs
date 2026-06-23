@@ -10,7 +10,7 @@ public class TimeHackerMigrationsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+        ArgumentNullException.ThrowIfNull(modelBuilder);
         // Apply all configurations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TimeHackerDbContext).Assembly);
     }

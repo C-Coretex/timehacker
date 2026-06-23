@@ -45,7 +45,7 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
     {
         base.OnModelCreating(modelBuilder);
 
-        ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+        ArgumentNullException.ThrowIfNull(modelBuilder);
 
         // Applies all configurations defined in this assembly
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
@@ -55,7 +55,7 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
     {
         base.ConfigureConventions(configurationBuilder);
 
-        ArgumentNullException.ThrowIfNull(configurationBuilder, nameof(configurationBuilder));
+        ArgumentNullException.ThrowIfNull(configurationBuilder);
 
         configurationBuilder
             .Properties<DateTime>()

@@ -4,7 +4,7 @@ public static class RandomValuesHelper
 {
     public static IEnumerable<TEntry> GetRandomEntries<TEntry>(IEnumerable<(TEntry Entry, float Weight)> entries, int count, Random? random = null)
     {
-        ArgumentNullException.ThrowIfNull(entries, nameof(entries));
+        ArgumentNullException.ThrowIfNull(entries);
         if (count < 0)
             throw new ArgumentOutOfRangeException(nameof(count), "Count must be greater than or equal to 0");
 

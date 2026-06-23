@@ -28,6 +28,8 @@ AddIdentityServices(builder.Services);
 
 AddApplicationServices(builder.Services);
 
+builder.Services.AddSingleton(TimeProvider.System);
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

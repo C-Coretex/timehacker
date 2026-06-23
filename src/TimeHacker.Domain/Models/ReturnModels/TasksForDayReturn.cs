@@ -10,7 +10,7 @@ public record TasksForDayReturn
 
     public static TasksForDayReturn Create(ScheduleSnapshot scheduleSnapshot)
     {
-        ArgumentNullException.ThrowIfNull(scheduleSnapshot, nameof(scheduleSnapshot));
+        ArgumentNullException.ThrowIfNull(scheduleSnapshot);
 
         return new TasksForDayReturn()
         {

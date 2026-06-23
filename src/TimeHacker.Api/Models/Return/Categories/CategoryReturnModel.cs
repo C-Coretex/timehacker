@@ -12,7 +12,7 @@ public record CategoryReturnModel(
 {
     public static CategoryReturnModel Create(CategoryDto category)
     {
-        ArgumentNullException.ThrowIfNull(category, nameof(category));
+        ArgumentNullException.ThrowIfNull(category);
 
         return new CategoryReturnModel(category.Id!.Value, category.Name, category.Description, category.Color);
     }

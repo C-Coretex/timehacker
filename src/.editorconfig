@@ -47,3 +47,11 @@ dotnet_diagnostic.CA1515.severity = none
 # CA1062: Validate arguments of public methods
 [**/Controllers/**]
 dotnet_diagnostic.CA1062.severity = none
+
+#CA1515: Consider making public types internal
+[TimeHacker.Migrations/**]
+dotnet_diagnostic.CA1062.severity = none
+
+#CA1515: Consider making public types internal
+[TimeHacker.Migrations.Identity/**]
+dotnet_diagnostic.CA1062.severity = none

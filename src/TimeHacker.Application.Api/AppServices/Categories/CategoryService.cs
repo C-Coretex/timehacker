@@ -11,16 +11,14 @@ public class CategoryService(ICategoryRepository categoryRepository)
 
     public async Task<Guid> AddAsync(CategoryDto category, CancellationToken cancellationToken = default)
     {
-        if (category == null)
-            throw new NotProvidedException(nameof(category));
+        NotProvidedException.ThrowIfNull(category);
 
         return (await categoryRepository.AddAndSaveAsync(category.GetEntity(), cancellationToken)).Id;
     }
 
     public async Task UpdateAsync(CategoryDto category, CancellationToken cancellationToken = default)
     {
-        if (category == null)
-            throw new NotProvidedException(nameof(category));
+        NotProvidedException.ThrowIfNull(category);
 
         var entity = await categoryRepository.GetByIdAsync(category.Id!.Value, cancellationToken: cancellationToken);
         await categoryRepository.UpdateAndSaveAsync(category.GetEntity(entity), cancellationToken);

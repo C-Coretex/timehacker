@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using Microsoft.Extensions.Time.Testing;
+using System.Drawing;
 
 namespace TimeHacker.Application.Api.Tests.AppServiceTests.ScheduleSnapshots;
 
@@ -25,7 +26,7 @@ public class ScheduleEntityAppServiceTests
     public ScheduleEntityAppServiceTests()
     {
         SetupMocks(_userId);
-        _scheduleEntityAppService = new ScheduleEntityAppService(_scheduleEntityRepository.Object, _fixedTasksRepository.Object, _categoriesRepository.Object);
+        _scheduleEntityAppService = new ScheduleEntityAppService(_scheduleEntityRepository.Object, _fixedTasksRepository.Object, _categoriesRepository.Object, TimeProvider.System);
     }
 
     #endregion

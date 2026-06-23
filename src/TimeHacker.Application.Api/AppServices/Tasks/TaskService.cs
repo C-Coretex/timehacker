@@ -87,7 +87,7 @@ public class TaskService(
 
     public async IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(dates, nameof(dates));
+        ArgumentNullException.ThrowIfNull(dates);
 
         var fixedTasks = await fixedTaskRepository.GetAll()
                                                 .Where(ft => dates.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))

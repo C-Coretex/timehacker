@@ -14,7 +14,7 @@ public class TimeHackerIdentityDbContext : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(builder);
 
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         // Applies all configurations defined in this assembly
         builder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }

@@ -1,4 +1,6 @@
-﻿namespace TimeHacker.Application.Api.Tests.RichModelTests;
+﻿using Microsoft.Extensions.Time.Testing;
+
+namespace TimeHacker.Application.Api.Tests.RichModelTests;
 
 public class InputScheduleEntityModelTests
 {
@@ -8,7 +10,7 @@ public class InputScheduleEntityModelTests
     {
         var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity());
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null, TimeProvider.System);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
         scheduledEntity.EndsOn.Should().BeNull();
     }
@@ -26,7 +28,7 @@ public class InputScheduleEntityModelTests
             MaxOccurrences = null
         };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, TimeProvider.System);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
         scheduledEntity.EndsOn.Should().Be(maxDate);
     }
@@ -44,7 +46,7 @@ public class InputScheduleEntityModelTests
             MaxOccurrences = maxOccurrences
         };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, TimeProvider.System);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
 
         var endsOn = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(maxOccurrences * 2));

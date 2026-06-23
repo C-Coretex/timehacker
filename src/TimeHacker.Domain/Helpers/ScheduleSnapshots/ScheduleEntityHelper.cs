@@ -6,9 +6,10 @@ namespace TimeHacker.Domain.Helpers.ScheduleSnapshots;
 
 public static class ScheduleEntityHelper
 {
-    public static ScheduleEntity GetScheduleEntity(RepeatingEntityDto repeatingEntityModel, EndsOnModel? endsOnModel)
+    public static ScheduleEntity GetScheduleEntity(RepeatingEntityDto repeatingEntityModel, EndsOnModel? endsOnModel, TimeProvider timeProvider)
     {
-        ArgumentNullException.ThrowIfNull(repeatingEntityModel, nameof(repeatingEntityModel));
+        ArgumentNullException.ThrowIfNull(repeatingEntityModel);
+        ArgumentNullException.ThrowIfNull(timeProvider);
 
         var scheduleEntity = new ScheduleEntity
         {
@@ -20,7 +21,7 @@ public static class ScheduleEntityHelper
 
         if (endsOnModel.MaxOccurrences != null)
         {
-            var date = DateOnly.FromDateTime(DateTime.UtcNow);
+            var date = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
             for (var i = 0; (i < endsOnModel.MaxOccurrences && date < endsOnModel.MaxDate.GetValueOrDefault(DateOnly.MaxValue)); i++)
                 date = repeatingEntityModel.RepeatingData.GetNextTaskDate(date);
 

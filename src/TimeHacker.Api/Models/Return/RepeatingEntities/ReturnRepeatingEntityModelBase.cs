@@ -14,7 +14,7 @@ public abstract record ReturnRepeatingEntityModelBase
 
     public static ReturnRepeatingEntityModelBase Create(RepeatingEntityDto dto)
     {
-        ArgumentNullException.ThrowIfNull(dto, nameof(dto));
+        ArgumentNullException.ThrowIfNull(dto);
 
         return dto.RepeatingData switch
         {

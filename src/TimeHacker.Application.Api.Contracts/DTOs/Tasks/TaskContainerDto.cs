@@ -11,7 +11,7 @@ public record TaskContainerDto
 
     public static TaskContainerDto Create(TaskContainerReturn task)
     {
-        ArgumentNullException.ThrowIfNull(task, nameof(task));
+        ArgumentNullException.ThrowIfNull(task);
 
         return new TaskContainerDto
         {

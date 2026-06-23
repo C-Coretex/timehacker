@@ -13,7 +13,7 @@ public record ScheduleEntityReturnModel(
 {
     public static ScheduleEntityReturnModel Create(ScheduleEntityDto scheduleEntity)
     {
-        ArgumentNullException.ThrowIfNull(scheduleEntity, nameof(scheduleEntity));
+        ArgumentNullException.ThrowIfNull(scheduleEntity);
 
         return new ScheduleEntityReturnModel(
             scheduleEntity.Id!.Value,

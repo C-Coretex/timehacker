@@ -3,9 +3,7 @@ using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
 
-internal sealed class ScheduledCategoryRepository : UserScopedRepositoryBase<ScheduledCategory, Guid>, IScheduledCategoryRepository
+internal sealed class ScheduledCategoryRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor, TimeProvider timeProvider) 
+    : UserScopedRepositoryBase<ScheduledCategory, Guid>(dbContext ?? throw new ArgumentNullException(nameof(dbContext)), dbContext.ScheduledCategory, userAccessor, timeProvider), IScheduledCategoryRepository
 {
-    public ScheduledCategoryRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) 
-        : base(dbContext ?? throw new ArgumentNullException(nameof(dbContext)), dbContext.ScheduledCategory, userAccessor)
-    { }
 }

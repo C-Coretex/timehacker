@@ -6,7 +6,7 @@ public class CategoryDynamicTaskConfiguration : IEntityTypeConfiguration<Categor
 {
     public void Configure(EntityTypeBuilder<CategoryDynamicTask> builder)
     {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.HasKey(x => new { x.CategoryId, x.DynamicTaskId });
         builder.HasKey(x => new { x.CategoryId, x.DynamicTaskId });

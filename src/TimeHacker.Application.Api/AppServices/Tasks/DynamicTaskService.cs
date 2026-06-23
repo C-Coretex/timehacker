@@ -1,5 +1,6 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
+using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks;
@@ -14,16 +15,14 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
 
     public async Task<Guid> AddAsync(DynamicTaskDto task, CancellationToken cancellationToken = default)
     {
-        if (task == null)
-            throw new NotProvidedException(nameof(task));
+        NotProvidedException.ThrowIfNull(task);
 
         return (await dynamicTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken)).Id;
     }
 
     public async Task UpdateAsync(DynamicTaskDto task, CancellationToken cancellationToken = default)
     {
-        if (task == null)
-            throw new NotProvidedException(nameof(task));
+        NotProvidedException.ThrowIfNull(task);
 
         var entity = await dynamicTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
         await dynamicTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);

@@ -14,8 +14,7 @@ public class TagService(ITagRepository tagRepository)
 
     public async Task<TagDto> AddAsync(TagDto tag)
     {
-        if (tag == null)
-            throw new NotProvidedException(nameof(tag));
+        NotProvidedException.ThrowIfNull(tag);
 
         var entity = await tagRepository.AddAndSaveAsync(tag.GetEntity());
         return TagDto.Create(entity);
@@ -23,8 +22,7 @@ public class TagService(ITagRepository tagRepository)
 
     public async Task<TagDto> UpdateAsync(TagDto tag)
     {
-        if (tag == null)
-            throw new NotProvidedException(nameof(tag));
+        NotProvidedException.ThrowIfNull(tag);
 
         var entity = await tagRepository.GetByIdAsync(tag.Id!.Value);
         entity = await tagRepository.UpdateAndSaveAsync(tag.GetEntity(entity));

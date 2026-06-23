@@ -1,10 +1,10 @@
 <Project>
   <!-- Override vulnerable transitive dependencies -->
   <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.7.0" />
     <PackageVersion Include="NuGet.Protocol" Version="7.3.1" />
     <PackageVersion Include="NuGet.Packaging" Version="7.3.1" />
   </ItemGroup>
-      
   <!-- Shared packages -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.Build" Version="18.4.0" />

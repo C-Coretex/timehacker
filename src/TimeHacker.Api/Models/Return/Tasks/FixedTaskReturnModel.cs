@@ -18,7 +18,7 @@ public record FixedTaskReturnModel(
 {
     public static FixedTaskReturnModel Create(FixedTaskDto fixedTask)
     {
-        ArgumentNullException.ThrowIfNull(fixedTask, nameof(fixedTask));
+        ArgumentNullException.ThrowIfNull(fixedTask);
 
         return new FixedTaskReturnModel(
             fixedTask.Id!.Value,

@@ -8,7 +8,7 @@ public record TasksForDayDto
 
     public static TasksForDayDto Create(TasksForDayReturn tasksForDay)
     {
-        ArgumentNullException.ThrowIfNull(tasksForDay, nameof(tasksForDay));
+        ArgumentNullException.ThrowIfNull(tasksForDay);
 
         return new TasksForDayDto
         {

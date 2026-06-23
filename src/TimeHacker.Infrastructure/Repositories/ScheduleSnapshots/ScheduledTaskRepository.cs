@@ -3,9 +3,7 @@ using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
 
-internal sealed class ScheduledTaskRepository: UserScopedRepositoryBase<ScheduledTask, Guid>, IScheduledTaskRepository
+internal sealed class ScheduledTaskRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor, TimeProvider timeProvider) 
+    : UserScopedRepositoryBase<ScheduledTask, Guid>(dbContext ?? throw new ArgumentNullException(nameof(dbContext)), dbContext.ScheduledTask, userAccessor, timeProvider), IScheduledTaskRepository
 {
-    public ScheduledTaskRepository(TimeHackerDbContext dbContext, UserAccessorBase userAccessor) 
-        : base(dbContext ?? throw new ArgumentNullException(nameof(dbContext)), dbContext.ScheduledTask, userAccessor)
-    { }
 }

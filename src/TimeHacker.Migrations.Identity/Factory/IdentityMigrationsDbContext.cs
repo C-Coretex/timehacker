@@ -12,7 +12,7 @@ public class IdentityMigrationsDbContext : IdentityDbContext<IdentityUser>
     {
         base.OnModelCreating(builder);
 
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
         // Apply all configurations
         builder.ApplyConfigurationsFromAssembly(typeof(TimeHackerIdentityDbContext).Assembly);
     }

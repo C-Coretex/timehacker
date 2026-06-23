@@ -29,7 +29,7 @@ public record TaskContainerReturn
 
     public static TaskContainerReturn Create(ScheduledTask task)
     {
-        ArgumentNullException.ThrowIfNull(task, nameof(task));
+        ArgumentNullException.ThrowIfNull(task);
 
         var entity = new TaskContainerReturn
         {

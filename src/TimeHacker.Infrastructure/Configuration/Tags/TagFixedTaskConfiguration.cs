@@ -6,7 +6,8 @@ public class TagFixedTaskConfiguration : IEntityTypeConfiguration<TagFixedTask>
 {
     public void Configure(EntityTypeBuilder<TagFixedTask> builder)
     {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.HasKey(x => new { x.TagId, x.TaskId });
 

@@ -10,7 +10,7 @@ public record ReturnWeekRepeatingEntityModel : ReturnRepeatingEntityModelBase
 
     public override ReturnRepeatingEntityModelBase CreateFromEntity(RepeatingEntityDto dto)
     {
-        ArgumentNullException.ThrowIfNull(dto, nameof(dto));
+        ArgumentNullException.ThrowIfNull(dto);
 
         var week = (WeekRepeatingEntity)dto.RepeatingData;
         return new ReturnWeekRepeatingEntityModel { RepeatsOn = week.RepeatsOn };

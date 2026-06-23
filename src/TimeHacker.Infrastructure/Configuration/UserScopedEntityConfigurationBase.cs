@@ -8,7 +8,7 @@ public abstract class UserScopedEntityConfigurationBase<T> : IEntityTypeConfigur
 
     public void ConfigureUserScoped(EntityTypeBuilder<T> builder)
     {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         builder.HasKey(u => u.Id);
         builder.HasIndex(x => x.UserId);

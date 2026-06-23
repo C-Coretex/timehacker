@@ -4,8 +4,8 @@ public static class EnumerableExtensions
 {
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
     {
-        ArgumentNullException.ThrowIfNull(source, nameof(source));
-        ArgumentNullException.ThrowIfNull(action, nameof(action));
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(action);
 
         foreach (var item in source)
             action(item);
