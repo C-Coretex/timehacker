@@ -3,10 +3,10 @@ import { Tabs, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { useIsMobile } from '../../hooks/useIsMobile';
-import FixedTasksTab from './components/FixedTasksTab';
-import DynamicTasksTab from './components/DynamicTasksTab';
+import { FixedTasksTab } from './components/FixedTasksTab';
+import { DynamicTasksTab } from './components/DynamicTasksTab';
 
-const TasksPage: FC = () => {
+export const TasksPage: FC = () => {
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
 
@@ -28,4 +28,3 @@ const TasksPage: FC = () => {
   );
 };
 
-export default TasksPage;

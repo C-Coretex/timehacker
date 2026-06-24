@@ -19,10 +19,12 @@ public class UserService(IUserRepository userRepository, UserAccessorBase userAc
         ArgumentNullException.ThrowIfNull(user);
 
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        var userEntity = await userRepository.GetByIdAsync(userId, cancellationToken: cancellationToken) ?? throw new UserDoesNotExistException();
+
+        var userEntity = await userRepository.GetByIdAsync(userId, asNoTracking: false, cancellationToken: cancellationToken) 
+            ?? throw new UserDoesNotExistException();
         userEntity = user.GetEntity(userEntity);
 
-        await userRepository.UpdateAndSaveAsync(userEntity, cancellationToken);
+        await userRepository.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(CancellationToken cancellationToken = default)

@@ -17,14 +17,17 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 const TIME_FORMAT_KEY = 'time-format';
 const WEEK_START_KEY = 'week-start';
 
-const getStoredValue = <T,>(key: string, defaultValue: T): T => {
+const getStoredValue = <T extends string>(key: string, allowed: readonly T[], defaultValue: T): T => {
   try {
     const stored = localStorage.getItem(key);
-    return (stored as T) || defaultValue;
+    return stored && (allowed as readonly string[]).includes(stored) ? (stored as T) : defaultValue;
   } catch {
     return defaultValue;
   }
 };
+
+const TIME_FORMATS: readonly TimeFormat[] = ['12h', '24h'];
+const WEEK_STARTS: readonly WeekStart[] = ['sunday', 'monday'];
 
 interface SettingsProviderProps {
   children: ReactNode;
@@ -32,10 +35,10 @@ interface SettingsProviderProps {
 
 export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
   const [timeFormat, setTimeFormatState] = useState<TimeFormat>(() =>
-    getStoredValue(TIME_FORMAT_KEY, '12h' as TimeFormat)
+    getStoredValue(TIME_FORMAT_KEY, TIME_FORMATS, '12h')
   );
   const [weekStart, setWeekStartState] = useState<WeekStart>(() =>
-    getStoredValue(WEEK_START_KEY, 'sunday' as WeekStart)
+    getStoredValue(WEEK_START_KEY, WEEK_STARTS, 'sunday')
   );
 
   const setTimeFormat = useCallback((format: TimeFormat) => {

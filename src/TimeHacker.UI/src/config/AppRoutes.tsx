@@ -1,16 +1,16 @@
 import type { RouteObject } from 'react-router-dom';
 
-import Layout from 'components/Layout';
-import PrivateRoute from 'components/PrivateRoute';
-import AboutPage from 'pages/AboutPage';
-import CalendarPage from 'pages/CalendarPage';
-import LoginPage from 'pages/LoginPage';
-import NotFoundPage from 'pages/NotFoundPage';
-import ProfilePage from 'pages/ProfilePage';
-import SettingsPage from 'pages/SettingsPage';
-import TasksPage from 'pages/TasksPage';
+import { Layout } from 'components/Layout';
+import { PrivateRoute } from 'components/PrivateRoute';
+import { AboutPage } from 'pages/AboutPage';
+import { CalendarPage } from 'pages/CalendarPage';
+import { LoginPage } from 'pages/LoginPage';
+import { NotFoundPage } from 'pages/NotFoundPage';
+import { ProfilePage } from 'pages/ProfilePage';
+import { SettingsPage } from 'pages/SettingsPage';
+import { TasksPage } from 'pages/TasksPage';
 
-const AppRoutes: RouteObject[] = [
+export const AppRoutes: RouteObject[] = [
   {
     path: '/',
     element: <Layout />,
@@ -65,4 +65,3 @@ const AppRoutes: RouteObject[] = [
   },
 ];
 
-export default AppRoutes;

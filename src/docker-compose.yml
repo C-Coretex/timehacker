@@ -35,6 +35,8 @@ services:
         condition: service_healthy
     environment:
       - AppSettings__uiUrl=http://localhost:5173
+      - ConnectionStrings__TimeHackerConnectionString=${ConnectionStrings__TimeHackerConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
+      - ConnectionStrings__IdentityConnectionString=${ConnectionStrings__IdentityConnectionString:-Host=timehacker.infrastructure.identity;Database=TimeHackerIdentity;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
 
   #Databases
   timehacker.infrastructure:
@@ -43,7 +45,7 @@ services:
     environment:
       - POSTGRES_DB=TimeHacker
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     volumes:
       - timehacker-db:/var/lib/postgresql
     ports:
@@ -60,7 +62,7 @@ services:
     environment:
       - POSTGRES_DB=TimeHackerIdentity
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${IDENTITY_POSTGRES_PASSWORD:-postgres}
     volumes:
       - timehacker-identity-db:/var/lib/postgresql
     ports:
@@ -75,8 +77,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_LISTEN_PORT: 8001
     ports:
       - "8001:8001"

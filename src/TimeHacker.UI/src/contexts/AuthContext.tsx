@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import api from '../api/api';
+import { api, loadCsrfToken } from '../api/api';
 
 interface User {
     name: string;
@@ -27,8 +27,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const response = await api.get<User>('/api/users/me');
             setUser(response.data);
-        } catch (error) {
-            console.error('Failed to fetch current user:', error);
+            // Authenticated: prime the antiforgery token for subsequent mutations.
+            await loadCsrfToken().catch(() => undefined);
+        } catch {
+            // A 401 here is the normal logged-out state, so don't treat it as an error.
             setUser(null);
         }
     };
@@ -39,12 +41,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = (userData: User) => {
         setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        // Just logged in: prime the antiforgery token for subsequent mutations.
+        void loadCsrfToken().catch(() => undefined);
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('user');
     };
 
     return (

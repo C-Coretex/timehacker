@@ -16,6 +16,9 @@ public class TaskService(
     IScheduleEntityService scheduleEntityService,
     ITaskTimelineProcessor taskTimelineProcessor) : ITaskAppService
 {
+    // Upper bound on how many days a single timeline request may span / generate.
+    private const int MaxTimelineDays = 366;
+
     public async Task<TasksForDayDto> GetTasksForDay(DateOnly date, CancellationToken cancellationToken = default)
     {
         var snapshot = await GetSnapshotForDate(date, cancellationToken);
@@ -41,9 +44,10 @@ public class TaskService(
 
     public async IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        // Handle empty date list
         if (dates == null || dates.Count == 0)
             yield break;
+
+        EnsureDateRangeWithinLimit(dates);
 
         var snapshots = await GetSnapshotsForDates(dates).ToListAsync(cancellationToken);
 
@@ -87,7 +91,10 @@ public class TaskService(
 
     public async IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(dates);
+        if (dates == null || dates.Count == 0)
+            yield break;
+
+        EnsureDateRangeWithinLimit(dates);
 
         var fixedTasks = await fixedTaskRepository.GetAll()
                                                 .Where(ft => dates.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
@@ -97,20 +104,23 @@ public class TaskService(
         var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken);
 
         var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken);
+
+        // Replace existing snapshots: delete them up front in a single committed statement so the
+        // regenerated rows can't collide with the old ones on the (UserId, Date) unique key.
+        // (Mixing a tracked Delete + Add of the same alternate key in one SaveChanges does not
+        // guarantee DELETE-before-INSERT ordering).
+        await scheduleSnapshotRepository.DeleteBy(s => dates.Contains(s.Date), cancellationToken);
+
         foreach (var date in dates)
         {
             if (cancellationToken.IsCancellationRequested)
                 yield break;
 
-            var snapshot = await GetSnapshotForDate(date, cancellationToken);
-            if (snapshot != null)
-                await scheduleSnapshotRepository.Delete(snapshot, cancellationToken);
-
             var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
             var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
             var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
-            snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
+            var snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
             scheduleSnapshotRepository.Add(snapshot);
 
             foreach (var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
@@ -120,6 +130,14 @@ public class TaskService(
         }
 
         await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    // Guard against a single request expanding recurrences over an unbounded span.
+    private static void EnsureDateRangeWithinLimit(ICollection<DateOnly> dates)
+    {
+        var spanDays = (dates.Max().DayNumber - dates.Min().DayNumber) + 1;
+        if (dates.Count > MaxTimelineDays || spanDays > MaxTimelineDays)
+            throw new DataIsNotCorrectException($"A timeline request may span at most {MaxTimelineDays} days.", nameof(dates));
     }
 
     private Task<ScheduleSnapshot?> GetSnapshotForDate(DateOnly date, CancellationToken cancellationToken = default)

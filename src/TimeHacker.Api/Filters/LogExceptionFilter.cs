@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace TimeHacker.Api.Filters;
@@ -71,6 +72,20 @@ internal sealed partial class LogExceptionFilter(ILoggerFactory loggerFactory, I
                 problemDetails.Detail = $"Parameter '{exception.ParamName}' is not correct.";
                 problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(DataIsNotCorrectException);
                 problemDetails.Extensions[ParameterNameExtensionName] = exception.ParamName;
+
+                return true;
+            case UnauthorizedAccessException:
+                problemDetails.Status = StatusCodes.Status401Unauthorized;
+                problemDetails.Title = "Unauthorized.";
+                problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(UnauthorizedAccessException);
+                objectResult = new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status401Unauthorized };
+
+                return true;
+            case DbUpdateConcurrencyException:
+                problemDetails.Status = StatusCodes.Status409Conflict;
+                problemDetails.Title = "The resource was modified concurrently. Please reload and retry.";
+                problemDetails.Extensions[ExceptionTypeExtensionName] = nameof(DbUpdateConcurrencyException);
+                objectResult = new ObjectResult(problemDetails) { StatusCode = StatusCodes.Status409Conflict };
 
                 return true;
             default:

@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from 'contexts/ThemeContext';
 import { useSettings } from 'contexts/SettingsContext';
 import type { TimeFormat, WeekStart } from 'contexts/SettingsContext';
-import SettingItem from './components/SettingItem';
+import { SettingItem } from './components/SettingItem';
 
-const SettingsPage: FC = () => {
+export const SettingsPage: FC = () => {
   const { darkMode, updateDarkMode } = useTheme();
   const { timeFormat, setTimeFormat, weekStart, setWeekStart } = useSettings();
   const { t, i18n } = useTranslation();
@@ -90,4 +90,3 @@ const SettingsPage: FC = () => {
   );
 };
 
-export default SettingsPage;

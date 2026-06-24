@@ -4,13 +4,13 @@ import { App, Button, Table, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import useDynamicTasks from '../../../../hooks/useDynamicTasks';
-import UnifiedTaskFormModal from '../../../../components/UnifiedTaskFormModal';
+import { useDynamicTasks } from '../../../../hooks/useDynamicTasks';
+import { UnifiedTaskFormModal } from '../../../../components/UnifiedTaskFormModal';
 import type { DynamicTaskReturnModel, InputDynamicTask } from '../../../../api/types';
 import { useIsMobile } from '../../../../hooks/useIsMobile';
 import { getDynamicTaskColumns } from './columns';
 
-const DynamicTasksTab: FC = () => {
+export const DynamicTasksTab: FC = () => {
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
   const { tasks, loading, error, createTask, updateTask, deleteTask } = useDynamicTasks();
@@ -101,4 +101,3 @@ const DynamicTasksTab: FC = () => {
   );
 };
 
-export default DynamicTasksTab;

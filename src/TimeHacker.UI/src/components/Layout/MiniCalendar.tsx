@@ -18,7 +18,7 @@ interface Props {
   weekStartDay: number;
 }
 
-const MiniCalendar: FC<Props> = ({ selectedDate, onSelect, currentView, weekStartDay }) => {
+export const MiniCalendar: FC<Props> = ({ selectedDate, onSelect, currentView, weekStartDay }) => {
   const selected = dayjs(selectedDate);
 
   const rangeStart = useMemo(() => {
@@ -118,4 +118,3 @@ const MiniCalendar: FC<Props> = ({ selectedDate, onSelect, currentView, weekStar
   );
 };
 
-export default MiniCalendar;

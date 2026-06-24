@@ -4,13 +4,14 @@ import { Alert, Form, Tabs, Typography, message } from 'antd';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import api from '../../api/api';
+import { api } from '../../api/api';
+import { getApiErrorMessage } from '../../utils/getApiErrorMessage';
 import { useAuth } from '../../contexts/AuthContext';
-import LoginForm from './components/LoginForm';
-import RegisterForm from './components/RegisterForm';
+import { LoginForm } from './components/LoginForm';
+import { RegisterForm } from './components/RegisterForm';
 import type { LoginFormData, RegisterFormData } from './types';
 
-const LoginPage: FC = () => {
+export const LoginPage: FC = () => {
   const { t } = useTranslation();
   const { fetchCurrentUser } = useAuth();
   const navigate = useNavigate();
@@ -37,10 +38,7 @@ const LoginPage: FC = () => {
       await fetchCurrentUser();
       navigate('/');
     } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-        : null;
-      setError(msg ?? t('login.loginFailed'));
+      setError(getApiErrorMessage(err) ?? t('login.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -62,10 +60,7 @@ const LoginPage: FC = () => {
       registerForm.resetFields();
       navigate('/');
     } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-        : null;
-      setError(msg ?? t('login.registrationFailed'));
+      setError(getApiErrorMessage(err) ?? t('login.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -121,4 +116,3 @@ const LoginPage: FC = () => {
   );
 };
 
-export default LoginPage;

@@ -16,6 +16,7 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
             UserId = scheduleEntity.UserId,
             RepeatingEntity = scheduleEntity.RepeatingEntity,
             CreatedTimestamp = scheduleEntity.CreatedTimestamp,
+            FirstEntityCreated = scheduleEntity.FirstEntityCreated,
             LastEntityCreated = scheduleEntity.LastEntityCreated,
             EndsOn = scheduleEntity.EndsOn,
             ScheduledTasks = scheduleEntity.ScheduledTasks,

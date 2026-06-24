@@ -4,6 +4,7 @@ using TimeHacker.Domain.Entities.Tags;
 using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
+using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 using TimeHacker.Infrastructure.Converters;
 
 namespace TimeHacker.Infrastructure;
@@ -49,6 +50,21 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
 
         // Applies all configurations defined in this assembly
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+
+        // Optimistic concurrency: map PostgreSQL's system column `xmin` (a system column) as a concurrency
+        // token for every domain entity. A tracked update whose row changed concurrently throws DbUpdateConcurrencyException.
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (!typeof(IDbEntity).IsAssignableFrom(entityType.ClrType))
+                continue;
+
+            // Equivalent of Npgsql's UseXminAsConcurrencyToken(): map the system column `xmin`
+            // as a row-version concurrency token (shadow property, no schema migration needed).
+            modelBuilder.Entity(entityType.ClrType)
+                .Property<uint>("xmin")
+                .HasColumnType("xid")
+                .IsRowVersion();
+        }
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

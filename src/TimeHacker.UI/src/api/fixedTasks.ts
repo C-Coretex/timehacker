@@ -4,7 +4,7 @@ import type {
     InputFixedTask,
     InputScheduleEntityModel,
 } from './types';
-import api from './api';
+import { api } from './api';
 
 const API_BASE_URL = '/api/fixed-tasks';
 const TASKS_API_URL = '/api/tasks';

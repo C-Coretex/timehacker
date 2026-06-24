@@ -451,5 +451,10 @@ FodyWeavers.xsd
 
 **/TimeHacker.Application.UI/.env
 
+# Environment files with secrets (compose / local dev)
+.env
+**/.env
+!**/.env.example
+
 .claude/
 CLAUDE.md

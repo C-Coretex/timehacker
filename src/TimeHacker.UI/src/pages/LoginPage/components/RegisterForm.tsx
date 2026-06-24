@@ -14,7 +14,7 @@ interface RegisterFormProps {
   onFinish: (values: RegisterFormData) => void;
 }
 
-const RegisterForm: FC<RegisterFormProps> = ({ form, loading, onFinish }) => {
+export const RegisterForm: FC<RegisterFormProps> = ({ form, loading, onFinish }) => {
   const { t } = useTranslation();
 
   return (
@@ -85,4 +85,3 @@ const RegisterForm: FC<RegisterFormProps> = ({ form, loading, onFinish }) => {
   );
 };
 
-export default RegisterForm;

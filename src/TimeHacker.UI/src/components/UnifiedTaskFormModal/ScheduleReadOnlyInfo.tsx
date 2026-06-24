@@ -10,7 +10,7 @@ interface Props {
   scheduleEntity: ScheduleEntityReturnModel;
 }
 
-const ScheduleReadOnlyInfo: FC<Props> = ({ scheduleEntity }) => {
+export const ScheduleReadOnlyInfo: FC<Props> = ({ scheduleEntity }) => {
   const { t } = useTranslation();
   const daysOfWeek = getDaysOfWeek(t);
   const { repeatingEntity } = scheduleEntity;
@@ -64,4 +64,3 @@ const ScheduleReadOnlyInfo: FC<Props> = ({ scheduleEntity }) => {
   );
 };
 
-export default ScheduleReadOnlyInfo;

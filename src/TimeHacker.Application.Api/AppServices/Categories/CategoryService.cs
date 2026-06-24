@@ -20,8 +20,11 @@ public class CategoryService(ICategoryRepository categoryRepository)
     {
         NotProvidedException.ThrowIfNull(category);
 
-        var entity = await categoryRepository.GetByIdAsync(category.Id!.Value, cancellationToken: cancellationToken);
-        await categoryRepository.UpdateAndSaveAsync(category.GetEntity(entity), cancellationToken);
+        var entity = await categoryRepository.GetByIdAsync(category.Id!.Value, asNoTracking: false, cancellationToken)
+                     ?? throw new NotFoundException("Category", category.Id!.Value.ToString());
+        category.GetEntity(entity);
+
+        await categoryRepository.SaveChangesAsync(cancellationToken);
     }
 
     public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

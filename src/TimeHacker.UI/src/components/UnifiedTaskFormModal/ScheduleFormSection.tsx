@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { RepeatingEntityTypeEnum } from '../../api/types';
 import { getRepeatTypes, getDaysOfWeek } from './constants';
 
-const ScheduleFormSection: FC = () => {
+export const ScheduleFormSection: FC = () => {
   const { t } = useTranslation();
   const { token } = theme.useToken();
 
@@ -116,4 +116,3 @@ const ScheduleFormSection: FC = () => {
   );
 };
 
-export default ScheduleFormSection;

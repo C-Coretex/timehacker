@@ -29,7 +29,7 @@ const buildThreeDayRange = (date: Date): Date[] => {
   });
 };
 
-const ThreeDayView: FC<ThreeDayViewProps> & {
+export const ThreeDayView: FC<ThreeDayViewProps> & {
   range: (date: Date) => Date[];
   navigate: (date: Date, action: NavigateAction) => Date;
   title: (date: Date, extra: { localizer: ThreeDayViewProps['localizer'] }) => string;
@@ -85,4 +85,3 @@ ThreeDayView.title = (
   return `${localizer.format(date, 'MMM DD')} – ${localizer.format(end, 'MMM DD')}`;
 };
 
-export default ThreeDayView;

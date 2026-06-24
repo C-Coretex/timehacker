@@ -1,6 +1,5 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.DTOs.Tags;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.Tasks;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks;

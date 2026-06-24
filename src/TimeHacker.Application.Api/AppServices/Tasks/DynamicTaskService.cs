@@ -24,8 +24,11 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
     {
         NotProvidedException.ThrowIfNull(task);
 
-        var entity = await dynamicTaskRepository.GetByIdAsync(task.Id!.Value, cancellationToken: cancellationToken);
-        await dynamicTaskRepository.UpdateAndSaveAsync(task.GetEntity(entity), cancellationToken);
+        var entity = await dynamicTaskRepository.GetByIdAsync(task.Id!.Value, asNoTracking: false, cancellationToken: cancellationToken)
+                     ?? throw new NotFoundException("DynamicTask", task.Id!.Value.ToString());
+        task.GetEntity(entity);
+
+        await dynamicTaskRepository.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

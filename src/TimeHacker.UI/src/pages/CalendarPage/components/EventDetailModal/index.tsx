@@ -2,10 +2,10 @@ import type { FC } from 'react';
 import { Badge, Button, Descriptions, Divider, Modal, Space, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import ScheduleInfo from '../ScheduleInfo';
+import { ScheduleInfo } from '../ScheduleInfo';
 import type { EventDetailModalProps } from './types';
 
-const EventDetailModal: FC<EventDetailModalProps> = ({
+export const EventDetailModal: FC<EventDetailModalProps> = ({
   open,
   onClose,
   event,
@@ -78,4 +78,3 @@ const EventDetailModal: FC<EventDetailModalProps> = ({
   );
 };
 
-export default EventDetailModal;

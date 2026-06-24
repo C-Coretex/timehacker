@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using OpenTelemetry.Logs;
@@ -53,8 +54,19 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
+// The token is exposed to the SPA via GET /api/antiforgery/token and returned back in the X-XSRF-TOKEN header.
+// Required because auth cookies are SameSite=None (cross-site UI/API).
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-XSRF-TOKEN";
+    options.Cookie.Name = "XSRF-TOKEN";
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add<ValidateAntiforgeryFilter>();
     options.Filters.Add<LogExceptionFilter>();
 }).AddJsonOptions(options =>
 {
@@ -123,18 +135,25 @@ app.UseAuthorization();
 
 app.UseMiddleware<UserAccessorInitMiddleware>();
 
+// Issues the antiforgery cookie and returns the request token for the SPA to return
+// back in the X-XSRF-TOKEN header on state-changing requests.
+app.MapGet("/api/antiforgery/token", (IAntiforgery antiforgery, HttpContext httpContext) =>
+{
+    var tokens = antiforgery.GetAndStoreTokens(httpContext);
+    return Results.Ok(new { token = tokens.RequestToken });
+}).RequireAuthorization();
+
 app.MapIdentityApi<IdentityUser>();
 
 app.UseExceptionHandler(new ExceptionHandlerOptions
 {
     StatusCodeSelector = ex => ex switch
     {
+        UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
         ArgumentException => StatusCodes.Status400BadRequest,
         _ => StatusCodes.Status500InternalServerError
     }
 });
-
-app.UseStatusCodePages();
 
 app.MapControllers();
 

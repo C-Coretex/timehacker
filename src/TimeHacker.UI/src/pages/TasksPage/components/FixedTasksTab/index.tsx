@@ -4,14 +4,15 @@ import { App, Button, Table, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import useFixedTasks, { postNewScheduleForTask } from '../../../../hooks/useFixedTasks';
-import UnifiedTaskFormModal from '../../../../components/UnifiedTaskFormModal';
+import { useFixedTasks, postNewScheduleForTask } from '../../../../hooks/useFixedTasks';
+import { UnifiedTaskFormModal } from '../../../../components/UnifiedTaskFormModal';
 import type { ScheduleFormPayload } from '../../../../components/UnifiedTaskFormModal';
 import type { FixedTaskDisplayModel, FixedTaskFormData } from '../../../../api/types';
 import { useIsMobile } from '../../../../hooks/useIsMobile';
+import { toFixedTaskPayload } from '../../../../utils/fixedTaskPayload';
 import { getFixedTaskColumns } from './columns';
 
-const FixedTasksTab: FC = () => {
+export const FixedTasksTab: FC = () => {
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
   const { tasks, loading, error, fetchTasks, createTask, updateTask, deleteTask } = useFixedTasks();
@@ -48,13 +49,7 @@ const FixedTasksTab: FC = () => {
   const handleSave = useCallback(
     async (data: FixedTaskFormData, id?: string, schedule?: ScheduleFormPayload) => {
       try {
-        const payload = {
-          name: data.name,
-          description: data.description,
-          priority: data.priority,
-          startTimestamp: data.startTimestamp?.toISOString() ?? '',
-          endTimestamp: data.endTimestamp?.toISOString() ?? '',
-        };
+        const payload = toFixedTaskPayload(data);
         if (id) {
           await updateTask(id, payload);
           notification.success({ title: t('tasks.success'), description: t('tasks.fixedTaskUpdated') });
@@ -117,4 +112,3 @@ const FixedTasksTab: FC = () => {
   );
 };
 
-export default FixedTasksTab;

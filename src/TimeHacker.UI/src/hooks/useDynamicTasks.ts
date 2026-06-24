@@ -8,7 +8,7 @@ import {
 import type { DynamicTaskReturnModel, InputDynamicTask } from '../api/types';
 import { useEntityCrud } from './useEntityCrud';
 
-const useDynamicTasks = () => {
+export const useDynamicTasks = () => {
   const { items: tasks, loading, error, fetch: fetchTasks, withRefetch } = useEntityCrud<DynamicTaskReturnModel>({
     fetchFn: fetchDynamicTasks,
     fetchErrorMessage: 'Failed to load dynamic tasks. Please check your network or API server connection.',
@@ -36,4 +36,3 @@ const useDynamicTasks = () => {
   return { tasks, loading, error, fetchTasks, createTask, updateTask, deleteTask };
 };
 
-export default useDynamicTasks;

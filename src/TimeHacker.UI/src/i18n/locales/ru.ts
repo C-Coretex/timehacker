@@ -1,4 +1,4 @@
-const ru = {
+export const ru = {
   // Navigation
   nav: {
     calendar: 'Календарь',
@@ -297,6 +297,13 @@ const ru = {
   privateRoute: {
     loginRequired: 'Пожалуйста, войдите в систему для доступа к этой странице',
   },
+
+  // Errors (error boundary + generic notifications)
+  errors: {
+    title: 'Что-то пошло не так',
+    subtitle: 'Произошла непредвиденная ошибка. Попробуйте перезагрузить страницу.',
+    reload: 'Перезагрузить',
+    generic: 'Ошибка',
+  },
 } as const;
 
-export default ru;

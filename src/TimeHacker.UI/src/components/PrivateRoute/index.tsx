@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'contexts/AuthContext';
 import type { PrivateRouteProps } from './types';
 
-const PrivateRoute: FC<PrivateRouteProps> = ({
+export const PrivateRoute: FC<PrivateRouteProps> = ({
   auth = true,
   // roles = [],
   // permissions = [],
@@ -32,4 +32,3 @@ const PrivateRoute: FC<PrivateRouteProps> = ({
   return <Outlet />;
 };
 
-export default PrivateRoute;

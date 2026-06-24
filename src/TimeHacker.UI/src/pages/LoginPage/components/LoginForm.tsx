@@ -17,7 +17,7 @@ interface LoginFormProps {
   onDevLogin: () => void;
 }
 
-const LoginForm: FC<LoginFormProps> = ({ form, loading, rememberMe, onRememberMeChange, onFinish, onDevLogin }) => {
+export const LoginForm: FC<LoginFormProps> = ({ form, loading, rememberMe, onRememberMeChange, onFinish, onDevLogin }) => {
   const { t } = useTranslation();
 
   return (
@@ -67,4 +67,3 @@ const LoginForm: FC<LoginFormProps> = ({ form, loading, rememberMe, onRememberMe
   );
 };
 
-export default LoginForm;

@@ -9,10 +9,10 @@ import type { FixedTaskFormData, InputDynamicTask, InputRepeatingEntityType, End
 import { minutesToTimeSpan, timeSpanToMinutes } from '../../utils/timeUtils';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
-import FixedTaskFields from './FixedTaskFields';
-import DynamicTaskFields from './DynamicTaskFields';
-import ScheduleFormSection from './ScheduleFormSection';
-import ScheduleReadOnlyInfo from './ScheduleReadOnlyInfo';
+import { FixedTaskFields } from './FixedTaskFields';
+import { DynamicTaskFields } from './DynamicTaskFields';
+import { ScheduleFormSection } from './ScheduleFormSection';
+import { ScheduleReadOnlyInfo } from './ScheduleReadOnlyInfo';
 import type { TaskTab, ScheduleFormPayload, UnifiedTaskFormModalProps } from './types';
 
 const TAB_ITEMS = (t: ReturnType<typeof useTranslation>['t']) => [
@@ -20,7 +20,7 @@ const TAB_ITEMS = (t: ReturnType<typeof useTranslation>['t']) => [
   { key: 'dynamic', label: t('taskForm.dynamicTask') },
 ];
 
-const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
+export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
   open,
   onCancel,
   onSaveFixed,
@@ -216,5 +216,5 @@ const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
   );
 };
 
-export default UnifiedTaskFormModal;
+
 export type { ScheduleFormPayload } from './types';

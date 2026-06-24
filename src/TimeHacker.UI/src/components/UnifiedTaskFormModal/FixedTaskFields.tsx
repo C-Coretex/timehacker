@@ -3,7 +3,7 @@ import { Form, Input, Slider, TimePicker, Row, Col } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { getFixedPriorityMarks } from './constants';
 
-const FixedTaskFields: FC = () => {
+export const FixedTaskFields: FC = () => {
   const { t } = useTranslation();
   const priorityMarks = getFixedPriorityMarks(t);
 
@@ -54,4 +54,3 @@ const FixedTaskFields: FC = () => {
   );
 };
 
-export default FixedTaskFields;

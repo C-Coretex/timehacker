@@ -8,7 +8,7 @@ export interface SettingItemProps {
   control: ReactNode;
 }
 
-const SettingItem: FC<SettingItemProps> = ({ icon, label, hint, control }) => (
+export const SettingItem: FC<SettingItemProps> = ({ icon, label, hint, control }) => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
     <Space size={12} align="start">
       <div style={{ fontSize: 20, paddingTop: 2 }}>{icon}</div>
@@ -24,4 +24,3 @@ const SettingItem: FC<SettingItemProps> = ({ icon, label, hint, control }) => (
   </div>
 );
 
-export default SettingItem;

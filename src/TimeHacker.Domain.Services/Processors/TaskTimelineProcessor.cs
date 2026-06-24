@@ -11,10 +11,10 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
             Date = date,
         };
 
-        var fixedTasksTimeline = GetFixedTasksTimeline(fixedTasks);
+        var fixedTasksTimeline = GetFixedTasksTimeline(fixedTasks, date);
         returnData.TasksTimeline.AddRange(fixedTasksTimeline);
 
-        fixedTasksTimeline = GetFixedTasksTimeline(scheduledFixedTasks);
+        fixedTasksTimeline = GetFixedTasksTimeline(scheduledFixedTasks, date);
         returnData.TasksTimeline.AddRange(fixedTasksTimeline);
 
         var timeRanges = returnData.TasksTimeline.Select(tt => tt.TimeRange);
@@ -28,14 +28,25 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
         return returnData;
     }
 
-    private static IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks)
+    private static IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks, DateOnly date)
     {
-        return fixedTasks.Select(fixedTask => new TaskContainerReturn()
+        var dayStart = date.ToDateTime(TimeOnly.MinValue);
+        var dayEnd = date.ToDateTime(TimeOnly.MaxValue);
+
+        return fixedTasks.Select(fixedTask =>
         {
-            Task = fixedTask,
-            IsFixed = true,
-            ScheduleEntityId = fixedTask.ScheduleEntityId,
-            TimeRange = new TimeRange(fixedTask.StartTimestamp.TimeOfDay, fixedTask.EndTimestamp.TimeOfDay)
+            // Clamp multi-day / cross-midnight tasks to the current day so the time range
+            // never inverts (end < start), which would corrupt the dynamic-gap math.
+            var start = fixedTask.StartTimestamp < dayStart ? DaytimeConstants.StartOfDay : fixedTask.StartTimestamp.TimeOfDay;
+            var end = fixedTask.EndTimestamp > dayEnd ? DaytimeConstants.EndOfDay : fixedTask.EndTimestamp.TimeOfDay;
+
+            return new TaskContainerReturn()
+            {
+                Task = fixedTask,
+                IsFixed = true,
+                ScheduleEntityId = fixedTask.ScheduleEntityId,
+                TimeRange = new TimeRange(start, end)
+            };
         });
     }
 
@@ -116,7 +127,8 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
             {
                 var minMinutes = Convert.ToInt32(Math.Round(dynamicTask.Task.MinTimeToFinish.TotalMinutes));
                 var maxMinutes = Convert.ToInt32(Math.Round(dynamicTask.Task.MaxTimeToFinish.TotalMinutes));
-                var chosenMinutes = Random.Shared.Next(minMinutes, maxMinutes);
+                // Random.Next(min, max) requires max > min; guard equal/inverted bounds after rounding.
+                var chosenMinutes = minMinutes >= maxMinutes ? minMinutes : Random.Shared.Next(minMinutes, maxMinutes);
                 taskTime = TimeSpan.FromMinutes(chosenMinutes);
             }
 
@@ -151,9 +163,11 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
             var score = (float)(tasksCountOfUses + prioritySum) / distinctTasks.Count;
 
             var maxTimeRangeEnd = possibleTaskTimeline.Max(tt => tt.TimeRange.End);
-            score += (timeRange.End - maxTimeRangeEnd).Minutes; // penalty for not using the whole time range
+            score += (float)(timeRange.End - maxTimeRangeEnd).TotalMinutes; // penalty for not using the whole time range
 
-            possibleTimelines.Add((possibleTaskTimeline, 1 / score));
+            // Lower score is better; invert into a weight, guarding against division by zero (Infinity).
+            var weight = score <= 0 ? float.MaxValue : 1 / score;
+            possibleTimelines.Add((possibleTaskTimeline, weight));
         }
 
         var randomDynamicTask = RandomValuesHelper.GetRandomEntries(possibleTimelines, 1).First();

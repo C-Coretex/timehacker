@@ -9,13 +9,13 @@ import { useAuth } from 'contexts/AuthContext';
 import { useCalendarDate } from 'contexts/CalendarDateContext';
 import { useSettings } from 'contexts/SettingsContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import SidebarLogo from './SidebarLogo';
-import MiniCalendar from './MiniCalendar';
+import { SidebarLogo } from './SidebarLogo';
+import { MiniCalendar } from './MiniCalendar';
 import { getMainMenuItems } from './utils';
 
 const { Content, Sider } = AntdLayout;
 
-const Layout: FC = () => {
+export const Layout: FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
@@ -127,4 +127,3 @@ const Layout: FC = () => {
   );
 };
 
-export default Layout;

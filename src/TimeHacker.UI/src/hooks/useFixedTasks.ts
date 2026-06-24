@@ -11,7 +11,7 @@ import { useEntityCrud } from './useEntityCrud';
 
 export { postNewScheduleForTask } from '../api/fixedTasks';
 
-const useFixedTasks = () => {
+export const useFixedTasks = () => {
   const { items: tasks, loading, error, fetch: fetchTasks, withRefetch } = useEntityCrud<FixedTaskDisplayModel>({
     fetchFn: async () => {
       const data = await fetchFixedTasks();
@@ -51,4 +51,3 @@ const useFixedTasks = () => {
   return { tasks, loading, error, fetchTasks, createTask, updateTask, deleteTask };
 };
 
-export default useFixedTasks;

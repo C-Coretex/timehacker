@@ -154,7 +154,9 @@ public class CategoryServiceTests
             "Hacked Description",
             Color.Red);
 
-        await _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
+        // Updating another user's category is rejected (the user-scoped fetch finds nothing).
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken));
 
         var unchangedCategory = _categories.First(x => x.Id == otherUserCategory.Id);
         unchangedCategory.Name.Should().Be(originalName);

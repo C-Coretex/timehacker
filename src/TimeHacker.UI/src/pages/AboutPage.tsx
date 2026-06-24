@@ -57,7 +57,7 @@ const developers: Developer[] = [
     },
 ];
 
-const AboutPage: FC = () => {
+export const AboutPage: FC = () => {
     const { t } = useTranslation();
 
     return (
@@ -118,4 +118,3 @@ const AboutPage: FC = () => {
     );
 };
 
-export default AboutPage;

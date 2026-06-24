@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { App } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 interface UseEntityCrudOptions<TDisplay> {
   fetchFn: () => Promise<TDisplay[]>;
@@ -23,6 +24,7 @@ export function useEntityCrud<TDisplay>({
   fetchErrorMessage,
 }: UseEntityCrudOptions<TDisplay>): UseEntityCrudResult<TDisplay> {
   const { notification } = App.useApp();
+  const { t } = useTranslation();
   const [items, setItems] = useState<TDisplay[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +34,8 @@ export function useEntityCrud<TDisplay>({
   fetchFnRef.current = fetchFn;
   const errorMsgRef = useRef(fetchErrorMessage);
   errorMsgRef.current = fetchErrorMessage;
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -41,7 +45,7 @@ export function useEntityCrud<TDisplay>({
     } catch {
       const msg = errorMsgRef.current;
       setError(msg);
-      notification.error({ title: 'Error', description: msg });
+      notification.error({ title: tRef.current('errors.generic'), description: msg });
     } finally {
       setLoading(false);
     }
@@ -53,7 +57,7 @@ export function useEntityCrud<TDisplay>({
         await action();
         await fetch();
       } catch {
-        notification.error({ title: 'Error', description: errorMessage });
+        notification.error({ title: tRef.current('errors.generic'), description: errorMessage });
       }
     },
     [fetch]

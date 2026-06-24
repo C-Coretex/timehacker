@@ -110,6 +110,30 @@ public class ScheduleEntityServiceTests
     }
 
     [Fact]
+    [Trait("GetAllFrom", "Should project FirstEntityCreated")]
+    public void GetAllFrom_ShouldProjectFirstEntityCreated()
+    {
+        var date = DateTime.Now;
+        var firstCreated = DateOnly.FromDateTime(date.AddDays(-3));
+
+        _scheduledEntities.Clear();
+        _scheduledEntities.Add(new()
+        {
+            UserId = _userId,
+            CreatedTimestamp = date.AddDays(-5),
+            FirstEntityCreated = firstCreated,
+            LastEntityCreated = DateOnly.FromDateTime(date),
+            EndsOn = null,
+            FixedTask = new FixedTask() { UserId = _userId }
+        });
+
+        var actual = _scheduleEntityService.GetAllFrom(DateOnly.FromDateTime(date.AddDays(-10))).ToList();
+
+        actual.Should().ContainSingle();
+        actual[0].FirstEntityCreated.Should().Be(firstCreated);
+    }
+
+    [Fact]
     [Trait("UpdateLastEntityCreated", "Should update data")]
     public async Task UpdateLastEntityCreated_ShouldUpdateData()
     {

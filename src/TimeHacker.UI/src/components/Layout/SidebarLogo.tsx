@@ -7,7 +7,7 @@ interface Props {
   onClick: () => void;
 }
 
-const SidebarLogo: FC<Props> = ({ collapsed, onClick }) => (
+export const SidebarLogo: FC<Props> = ({ collapsed, onClick }) => (
   <div
     onClick={onClick}
     style={{
@@ -29,4 +29,3 @@ const SidebarLogo: FC<Props> = ({ collapsed, onClick }) => (
   </div>
 );
 
-export default SidebarLogo;

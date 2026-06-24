@@ -1,5 +1,5 @@
 import type { DynamicTaskReturnModel, InputDynamicTask } from './types';
-import api from './api';
+import { api } from './api';
 
 const API_BASE_URL = '/api/dynamic-tasks';
 

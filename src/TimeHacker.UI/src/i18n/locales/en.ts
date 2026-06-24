@@ -1,4 +1,4 @@
-const en = {
+export const en = {
   // Navigation
   nav: {
     calendar: 'Calendar',
@@ -297,6 +297,13 @@ const en = {
   privateRoute: {
     loginRequired: 'Please log in to access this page',
   },
+
+  // Errors (error boundary + generic notifications)
+  errors: {
+    title: 'Something went wrong',
+    subtitle: 'An unexpected error occurred. Please try reloading the page.',
+    reload: 'Reload',
+    generic: 'Error',
+  },
 } as const;
 
-export default en;

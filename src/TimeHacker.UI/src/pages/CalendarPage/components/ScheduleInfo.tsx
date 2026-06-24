@@ -12,7 +12,7 @@ interface Props {
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
-const ScheduleInfo: FC<Props> = ({ scheduleData, loading }) => {
+export const ScheduleInfo: FC<Props> = ({ scheduleData, loading }) => {
   const { t } = useTranslation();
 
   if (loading) return <Spin size="small" />;
@@ -66,4 +66,3 @@ const ScheduleInfo: FC<Props> = ({ scheduleData, loading }) => {
   );
 };
 
-export default ScheduleInfo;

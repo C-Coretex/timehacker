@@ -3,7 +3,7 @@ import { Form, Input, Slider, InputNumber, Row, Col } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { getDynamicPriorityMarks } from './constants';
 
-const DynamicTaskFields: FC = () => {
+export const DynamicTaskFields: FC = () => {
   const { t } = useTranslation();
   const priorityMarks = getDynamicPriorityMarks(t);
 
@@ -59,4 +59,3 @@ const DynamicTaskFields: FC = () => {
   );
 };
 
-export default DynamicTaskFields;

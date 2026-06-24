@@ -10,8 +10,12 @@ import { AuthProvider } from 'contexts/AuthContext';
 import { ThemeProvider, useTheme } from 'contexts/ThemeContext';
 import { CalendarDateProvider } from 'contexts/CalendarDateContext';
 import { SettingsProvider } from 'contexts/SettingsContext';
-import AppRoutes from 'config/AppRoutes';
+import { AppRoutes } from 'config/AppRoutes';
+import { ErrorBoundary } from 'components/ErrorBoundary';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Created once at module scope so re-renders of <App> don't discard the cache.
+const queryClient = new QueryClient();
 
 const AppRoutesWrapper = () => {
   const element = useRoutes(AppRoutes);
@@ -39,9 +43,7 @@ const ThemedApp = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const App = () => {
-  const queryClient = new QueryClient();
-
+export const App = () => {
   return (
     <Router basename="/app">
       <ThemeProvider>
@@ -50,7 +52,9 @@ const App = () => {
             <AuthProvider>
               <CalendarDateProvider>
                 <QueryClientProvider client={queryClient}>
-                  <AppRoutesWrapper />
+                  <ErrorBoundary>
+                    <AppRoutesWrapper />
+                  </ErrorBoundary>
                 </QueryClientProvider>
               </CalendarDateProvider>
             </AuthProvider>
@@ -61,4 +65,3 @@ const App = () => {
   );
 };
 
-export default App;

@@ -9,10 +9,11 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'contexts/AuthContext';
-import api from '../../api/api';
-import InfoRow from './components/InfoRow';
+import { api } from '../../api/api';
+import { getApiErrorMessage } from '../../utils/getApiErrorMessage';
+import { InfoRow } from './components/InfoRow';
 
-const ProfilePage: FC = () => {
+export const ProfilePage: FC = () => {
   const { user, fetchCurrentUser } = useAuth();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -60,9 +61,7 @@ const ProfilePage: FC = () => {
       setEditing(false);
       message.success(t('profile.profileUpdated'));
     } catch (err: unknown) {
-      const msg = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
-        : null;
+      const msg = getApiErrorMessage(err);
       if (msg) message.error(msg);
     } finally {
       setSaving(false);
@@ -132,4 +131,3 @@ const ProfilePage: FC = () => {
   );
 };
 
-export default ProfilePage;

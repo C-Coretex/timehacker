@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useSettings } from '../../../contexts/SettingsContext';
 import type { CalendarEvent } from '../../../utils/calendarUtils';
 
-const CustomCalendarEvent = memo<{ event: CalendarEvent }>(({ event }) => {
+export const CustomCalendarEvent = memo<{ event: CalendarEvent }>(({ event }) => {
   const { timeDisplayFormat } = useSettings();
   return (
     <div>
@@ -17,4 +17,3 @@ const CustomCalendarEvent = memo<{ event: CalendarEvent }>(({ event }) => {
 
 CustomCalendarEvent.displayName = 'CustomCalendarEvent';
 
-export default CustomCalendarEvent;

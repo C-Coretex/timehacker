@@ -22,11 +22,17 @@ public record InputFixedTaskModel
     [Required]
     public required string EndTimestamp { get; init; }
 
+
+    // Parse as UTC: honour an explicit offset/'Z', and treat a naive timestamp as UTC
+    // (not server-local) so storage is deterministic regardless of the server's timezone.
+    private const DateTimeStyles UtcStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal;
+
     public FixedTaskDto CreateDto()
     {
-        if (!DateTime.TryParse(StartTimestamp, out var start))
+
+        if (!DateTime.TryParse(StartTimestamp, CultureInfo.InvariantCulture, UtcStyles, out var start))
             throw new DataIsNotCorrectException($"'{StartTimestamp}' is not a valid date-time.", nameof(StartTimestamp));
-        if (!DateTime.TryParse(EndTimestamp, out var end))
+        if (!DateTime.TryParse(EndTimestamp, CultureInfo.InvariantCulture, UtcStyles, out var end))
             throw new DataIsNotCorrectException($"'{EndTimestamp}' is not a valid date-time.", nameof(EndTimestamp));
         if (start >= end)
             throw new DataIsNotCorrectException($"{nameof(StartTimestamp)} must be before {nameof(EndTimestamp)}.", nameof(StartTimestamp));
