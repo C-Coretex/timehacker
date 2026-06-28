@@ -33,6 +33,14 @@ AddApplicationServices(builder.Services);
 
 builder.Services.AddSingleton(TimeProvider.System);
 
+// Persist the Data Protection key ring so encrypted cookies (Identity, Session, Antiforgery)
+// survive API/container restarts. Without this the container generates an in-memory key ring on
+// every start and can no longer decrypt previously issued cookies.
+builder.Services.AddDataProtection()
+    .SetApplicationName("TimeHacker")
+    .PersistKeysToFileSystem(new DirectoryInfo(
+        builder.Configuration.GetValue<string>("DataProtection:KeysPath") ?? "/keys"));
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

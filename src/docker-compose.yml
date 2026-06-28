@@ -35,9 +35,12 @@ services:
         condition: service_healthy
     environment:
       - AppSettings__uiUrl=http://localhost:5173
+      - DataProtection__KeysPath=/keys
       - ConnectionStrings__TimeHackerConnectionString=${ConnectionStrings__TimeHackerConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=application_user;Password=application_password;Include Error Detail=true}
       - ConnectionStrings__TimeHackerAdminConnectionString=${ConnectionStrings__TimeHackerAdminConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
       - ConnectionStrings__IdentityConnectionString=${ConnectionStrings__IdentityConnectionString:-Host=timehacker.infrastructure.identity;Database=TimeHackerIdentity;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
+    volumes:
+      - dataprotection-keys:/keys
 
   #Databases
   timehacker.infrastructure:
@@ -95,3 +98,4 @@ volumes:
   timehacker-db:
   timehacker-identity-db:
   pgadmin-data:
+  dataprotection-keys:
