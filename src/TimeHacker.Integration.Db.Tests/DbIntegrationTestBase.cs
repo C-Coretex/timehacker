@@ -12,13 +12,14 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
         AutoFaker.Configure(builder =>
         {
             builder.WithTreeDepth(1); builder.WithRepeatCount(0); 
-            builder.WithBinder(new IgnoreNavigationPropertiesBinder());
+            builder.WithBinder(new AggregateBinder());
         });
     }
 
     protected UserFixture CurrentUser { get; }
     protected IReadOnlyCollection<UserFixture> OtherUsers { get; }
 
+    private readonly TimeHackerDbContext _dbContext;
     private readonly DbContainerFixture _fixture;
 
     protected DbIntegrationTestBase(DbContainerFixture fixture)
@@ -28,14 +29,15 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
         _fixture = fixture;
         CurrentUser = new UserFixture(fixture.ConnectionString);
         OtherUsers = [.. Enumerable.Range(0, 3).Select(_ => new UserFixture(fixture.ConnectionString))];
+
+        _dbContext = new TimeHackerDbContext(fixture.AdminConnectionString);
     }
 
     protected T Resolve<T>() where T : notnull
         => CurrentUser.Resolve<T>();
 
-
     protected TimeHackerDbContext Db 
-        => Resolve<TimeHackerDbContext>();
+        => _dbContext;
 
 
     public virtual async ValueTask InitializeAsync()
@@ -47,6 +49,7 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
     {
         await Task.WhenAll([CurrentUser.DisposeAsync().AsTask(), .. OtherUsers.Select(u => u.DisposeAsync().AsTask())]);
         await _fixture.ResetAsync();
+        await _dbContext.DisposeAsync();
 
         GC.SuppressFinalize(this);
     }

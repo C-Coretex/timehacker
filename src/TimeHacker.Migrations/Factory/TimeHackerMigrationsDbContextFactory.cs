@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using TimeHacker.Migrations.Configuration;
 
 namespace TimeHacker.Migrations.Factory;
 
@@ -14,7 +15,8 @@ public class MigrationsDbContextFactory : IDesignTimeDbContextFactory<TimeHacker
 
         var connectionString = config.GetConnectionString(nameof(TimeHackerMigrationsDbContext));
 
-        var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString);
+        var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString)
+            .ReplaceService<IMigrationsModelDiffer, RlsMigrationsModelDiffer>();
         return new TimeHackerMigrationsDbContext(optionsBuilder.Options);
     }
 }

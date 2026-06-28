@@ -14,5 +14,8 @@ public abstract class UserScopedEntityConfigurationBase<T> : IEntityTypeConfigur
         builder.HasIndex(x => x.UserId);
 
         builder.Property(x => x.UserId).IsRequired();
+
+        builder.HasAnnotation("Rls:Enabled", true);
+        builder.HasAnnotation("Rls:TenantColumn", nameof(UserScopedEntityBase.UserId));
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using OpenTelemetry.Logs;
@@ -21,6 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 #region Services
 
 var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
+var timeHackerAdminConnectionString = builder.Configuration.GetConnectionString("TimeHackerAdminConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerAdminConnectionString' not found.");
 var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
 
 RegisterServices(builder.Services, timeHackerConnectionString, identityConnectionString);
@@ -40,6 +42,11 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("TimeHacker")
+    .PersistKeysToFileSystem(new DirectoryInfo(
+        builder.Configuration.GetValue<string>("DataProtection:KeysPath") ?? "/keys"));
 
 builder.Services.AddProblemDetails(options =>
 {
@@ -111,7 +118,7 @@ if (app.Environment.IsDevelopment())
     app.UseMigrationsEndPoint();
 
     //Apply database migrations
-    TimeHackerMigrationsDbContext.ApplyMigrations(timeHackerConnectionString);
+    TimeHackerMigrationsDbContext.ApplyMigrations(timeHackerAdminConnectionString);
     IdentityMigrationsDbContext.ApplyMigrations(identityConnectionString);
 }
 else

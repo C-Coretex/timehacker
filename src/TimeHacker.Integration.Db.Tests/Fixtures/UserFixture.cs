@@ -27,6 +27,7 @@ public class UserFixture: IAsyncLifetime
         services.AddScoped<UserAccessorBase>(_ => new UserAccessorBaseMock(UserId, isUserValid: true));
 
         services.AddScoped(typeof(SeedDataBuilder<,,>));
+        services.AddScoped<GraphSeeder>();
 
         _provider = services.BuildServiceProvider();
         _scope = _provider.CreateScope();

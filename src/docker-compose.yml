@@ -35,7 +35,8 @@ services:
         condition: service_healthy
     environment:
       - AppSettings__uiUrl=http://localhost:5173
-      - ConnectionStrings__TimeHackerConnectionString=${ConnectionStrings__TimeHackerConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
+      - ConnectionStrings__TimeHackerConnectionString=${ConnectionStrings__TimeHackerConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=application_user;Password=application_password;Include Error Detail=true}
+      - ConnectionStrings__TimeHackerAdminConnectionString=${ConnectionStrings__TimeHackerAdminConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
       - ConnectionStrings__IdentityConnectionString=${ConnectionStrings__IdentityConnectionString:-Host=timehacker.infrastructure.identity;Database=TimeHackerIdentity;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
 
   #Databases
@@ -46,8 +47,10 @@ services:
       - POSTGRES_DB=TimeHacker
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - APP_USER_PASSWORD=${APP_USER_PASSWORD:-application_password}
     volumes:
       - timehacker-db:/var/lib/postgresql
+      - ./postgres/timehacker_infrastructure_init.sql:/docker-entrypoint-initdb.d/timehacker_infrastructure_init.sql
     ports:
       - "5432:5432"
     healthcheck:

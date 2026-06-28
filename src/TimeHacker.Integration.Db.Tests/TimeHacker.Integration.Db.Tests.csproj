@@ -31,4 +31,10 @@
     <Folder Include="AppServicesTests\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Resources\timehacker_infrastructure_init.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

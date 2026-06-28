@@ -4,6 +4,7 @@ using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tags;
 using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IRepositories.Users;
+using TimeHacker.Infrastructure.Interceptors;
 using TimeHacker.Infrastructure.Repositories.Categories;
 using TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
 using TimeHacker.Infrastructure.Repositories.Tags;
@@ -16,8 +17,13 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterRepositories(this IServiceCollection services, string timeHackerConnectionString)
     {
-        services.AddDbContext<TimeHackerDbContext>(options =>
-            options.UseNpgsql(timeHackerConnectionString));
+        services.AddTransient<UserSessionInterceptor>();
+
+        services.AddDbContext<TimeHackerDbContext>((sp, options) =>
+        { 
+            options.UseNpgsql(timeHackerConnectionString);
+            options.AddInterceptors(sp.GetRequiredService<UserSessionInterceptor>());
+        });
 
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 

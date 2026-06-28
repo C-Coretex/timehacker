@@ -1,10 +1,10 @@
-﻿using TimeHacker.Helpers.Domain.Extensions;
+using System.Text.Json.Serialization;
 
 namespace TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 public class WeekRepeatingEntity: IRepeatingEntityType
 {
-    public ICollection<Enums.DayOfWeek> RepeatsOn => field;
+    public ICollection<Enums.DayOfWeek> RepeatsOn { get; }
 
     public WeekRepeatingEntity(IEnumerable<Enums.DayOfWeek> repeatsOn)
     {
@@ -14,6 +14,14 @@ public class WeekRepeatingEntity: IRepeatingEntityType
 
         RepeatsOn = orderedRepeatsOn;
     }
+
+    // System.Text.Json binds this constructor when deserializing the polymorphic RepeatingEntity JSON from
+    // the DB: its ICollection parameter matches the ICollection property (the IEnumerable overload's
+    // parameter would not, which breaks System.Text.Json's parameterized-constructor binding).
+    [JsonConstructor]
+    public WeekRepeatingEntity(ICollection<Enums.DayOfWeek> repeatsOn)
+        :this(repeatsOn.AsEnumerable())
+    { }
 
     public DateOnly GetNextTaskDate(DateOnly startingFrom)
     {

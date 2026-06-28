@@ -1,4 +1,5 @@
-﻿using TimeHacker.Domain.BusinessLogicExceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.IRepositories;
 using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
@@ -10,71 +11,38 @@ internal class UserScopedRepositoryBase<TModel, TId>(TimeHackerDbContext dbConte
     : RepositoryBase<TimeHackerDbContext, TModel, TId>(dbContext, dbSet, timeProvider), IUserScopedRepositoryBase<TModel, TId>
     where TModel : class, IDbEntity<TId>, IUserScopedEntity
 {
-    protected override IQueryable<TModel> GetAllBase()
-    {
-        var userId = userAccessor.GetUserIdOrThrowUnauthorized();
-        return base.GetAllBase().Where(x => x.UserId == userId);
-    }
-
     public override TModel Add(TModel model)
     {
-        ArgumentNullException.ThrowIfNull(model);
+        var userId = userAccessor.GetUserIdOrThrowUnauthorized();
+        model.UserId = userId;
 
-        model.UserId = userAccessor.GetUserIdOrThrowUnauthorized();
         return base.Add(model);
     }
 
-    public override void AddRange(IEnumerable<TModel> models)
+    public override async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(models);
-
-        foreach (var model in models)
-            Add(model);
-    }
-
-    public async Task Delete(TModel model, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(model);
-
         var userId = userAccessor.GetUserIdOrThrowUnauthorized();
-        if (model.UserId != userId)
-            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
 
-        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
-        if (!entityExistsForThisUser)
-            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
+        foreach (var entry in DbContext.ChangeTracker.Entries<IUserScopedEntity>()
+                     .Where(e => e.State == EntityState.Added))
+            entry.Entity.UserId = userId;
 
-        base.Delete(model);
-    }
+        // Update/Delete operations are handled by RLS: a cross-user mutation hits 0 rows because the
+        // row is invisible, which EF (with the xmin token) surfaces as a concurrency conflict. Map it
+        // to NotFound for the current user.
+        try
+        {
+            await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            var entry = ex.Entries.Count > 0 ? ex.Entries[0] : null;
+            var id = entry?.Metadata.FindPrimaryKey() is { } primaryKey
+                ? entry.Property(primaryKey.Properties[0].Name).CurrentValue
+                : null;
 
-    public async Task DeleteRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(models);
-
-        foreach (var model in models)
-            await Delete(model, cancellationToken);
-    }
-
-    public async Task<TModel> Update(TModel model, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(model);
-
-        var userId = userAccessor.GetUserIdOrThrowUnauthorized();
-        if (model.UserId != userId)
-            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
-
-        var entityExistsForThisUser = await ExistsAsync(model.Id, cancellationToken);
-        if (!entityExistsForThisUser)
-            throw new NotFoundException(typeof(TModel).Name, model.Id?.ToString() ?? string.Empty);
-
-        return base.Update(model);
-    }
-
-    public async Task UpdateRange(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(models);
-
-        foreach (var model in models)
-            await Update(model, cancellationToken);
+            throw new NotFoundException(entry?.Metadata.ClrType.Name ?? typeof(TModel).Name,
+                id?.ToString() ?? string.Empty);
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace TimeHacker.Helpers.Tests.Mocks.Extensions;
+﻿using System.Linq.Expressions;
+
+namespace TimeHacker.Helpers.Tests.Mocks.Extensions;
 
 public static class RepositoryMockExtensions
 {
@@ -77,8 +79,8 @@ public static class RepositoryMockExtensions
             })
             .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
 
-        repository.Setup(x => x.Update(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
-            .Callback<TModel, CancellationToken>((entry, _) =>
+        repository.Setup(x => x.Update(It.IsAny<TModel>()))
+            .Callback<TModel>((entry) =>
             {
                 // Only update if user owns the entity
                 if (!currentUserId.HasValue || entry.UserId == currentUserId.Value)
@@ -87,7 +89,7 @@ public static class RepositoryMockExtensions
                     source.Add(entry);
                 }
             })
-            .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
+            .Returns<TModel>((entry) => entry);
 
         repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<CancellationToken>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
             .Returns<TId, bool, CancellationToken, IEnumerable<QueryPipelineStep<TModel>>>((id, _, _, _) =>
@@ -101,12 +103,19 @@ public static class RepositoryMockExtensions
             .Callback<TId, CancellationToken>((id, _) =>
                 source.RemoveAll(x => x.Id!.Equals(id) && (!currentUserId.HasValue || x.UserId == currentUserId.Value)));
 
-        repository.Setup(x => x.Delete(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
-            .Callback<TModel, CancellationToken>((entry, _) =>
+        repository.Setup(x => x.DeleteBy(It.IsAny<Expression<Func<TModel, bool>>>(), It.IsAny<CancellationToken>()))
+            .Returns<Expression<Func<TModel, bool>>, CancellationToken>((predicate, _) =>
+            {
+                var compiled = predicate.Compile();
+                var removed = source.RemoveAll(x => compiled(x) && (!currentUserId.HasValue || x.UserId == currentUserId.Value));
+                return Task.FromResult(removed);
+            });
+
+        repository.Setup(x => x.Delete(It.IsAny<TModel>()))
+            .Callback<TModel>((entry) =>
             {
                 source.RemoveAll(x => x.Id!.Equals(entry.Id) && (!currentUserId.HasValue || x.UserId == currentUserId.Value));
-            })
-            .Returns(Task.CompletedTask);
+            });
 
         repository.Setup(x => x.AddAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
             .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))

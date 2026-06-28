@@ -7,19 +7,34 @@ namespace TimeHacker.Integration.Db.Tests.Fixtures;
 
 public class DbContainerFixture: IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:latest")
-        .WithDatabase("timehacker_test")
-        .Build();
+    private const string AppUser = "application_user";
+    private const string AppUserPassword = "application_password";
 
-    public string ConnectionString => _container.GetConnectionString();
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:latest")
+     .WithDatabase("TimeHacker")
+     .WithResourceMapping(
+         new FileInfo("./Resources/timehacker_infrastructure_init.sql"),
+         new FileInfo("/docker-entrypoint-initdb.d/timehacker_infrastructure_init.sql"))
+     .Build();
+
+    public string AdminConnectionString => _container.GetConnectionString();
+
+    // App connection string (application_user)
+    public string ConnectionString => new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
+    {
+        Username = AppUser,
+        Password = AppUserPassword
+    }.ConnectionString;
+
     public Respawner Respawner { get; private set; } = null!;
 
     public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
-        TimeHackerMigrationsDbContext.ApplyMigrations(ConnectionString);
 
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        TimeHackerMigrationsDbContext.ApplyMigrations(AdminConnectionString);
+
+        await using var connection = new NpgsqlConnection(AdminConnectionString);
         await connection.OpenAsync();
         Respawner = await Respawner.CreateAsync(connection, new RespawnerOptions
         {
@@ -30,7 +45,7 @@ public class DbContainerFixture: IAsyncLifetime
 
     public async ValueTask ResetAsync()
     {
-        await using var connection = new NpgsqlConnection(ConnectionString);
+        await using var connection = new NpgsqlConnection(AdminConnectionString);
         await connection.OpenAsync();
         await Respawner.ResetAsync(connection);
     }

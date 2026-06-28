@@ -33,9 +33,16 @@ HTTP Request → Controller → AppService → Repository/Service/Processor → 
 **Organization:**
 - `Category` & `Tag` - Many-to-many with both task types
 
-**User Scoping:**
-- All entities inherit from `UserScopedEntityBase`
-- Automatic filtering by `userId` at repository level (multi-tenant)
+**User Scoping (multi-tenant):**
+- All entities inherit from `UserScopedEntityBase` (`UserId` column)
+- Isolation is enforced by **PostgreSQL Row-Level Security (RLS)**, not application LINQ filters. Each
+  user-scoped table has a policy `USING (UserId = current_setting('app.user_id')::uuid)`. The
+  `UserSessionInterceptor` sets `app.user_id` on every connection from the authenticated user. The
+  repository layer only stamps `UserId` on insert and acts as a second line of defense.
+- **Two DB roles**: the app runs as `application_user` (RLS-bound); migrations run as `postgres`
+  (table owner, bypasses RLS, and is needed to enable RLS / create policies). RLS policies are generated
+  automatically by `RlsMigrationsModelDiffer` from the `Rls:Enabled` annotation that
+  `UserScopedEntityConfigurationBase` adds to every user-scoped entity.
 
 ## Scheduled Entities System
 
@@ -95,3 +102,19 @@ ScheduleSnapshot (for specific date)
 - PostgreSQL with EF Core
 - ASP.NET Identity for auth
 - Automatic UTC conversion for DateTimes
+- Row-Level Security for per-user data isolation (see User Scoping above)
+
+## Testing
+
+- **Unit tests** — xUnit v3 + Moq + MockQueryable + AutoBogus + AwesomeAssertions. Cover app services,
+  domain services, and domain models (`TimeHacker.*.Tests`).
+- **Integration tests** (`TimeHacker.Integration.Db.Tests`) — run against a **real PostgreSQL** via
+  Testcontainers, with Respawner resetting the DB between tests. They verify RLS user isolation, cascade
+  deletes, JSON columns, value converters, DB constraints, optimistic concurrency, and full
+  app-service-over-real-DB flows. Tests *act* as `application_user` (RLS-bound) and *assert* via an admin
+  connection. **A running Docker daemon is required.**
+
+Run from `src/`:
+```
+dotnet test
+```

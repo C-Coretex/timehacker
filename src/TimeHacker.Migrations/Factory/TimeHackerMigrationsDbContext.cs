@@ -1,4 +1,5 @@
 ﻿using TimeHacker.Infrastructure;
+using TimeHacker.Migrations.Configuration;
 
 namespace TimeHacker.Migrations.Factory;
 
@@ -17,7 +18,8 @@ public class TimeHackerMigrationsDbContext : DbContext
 
     public static void ApplyMigrations(string connectionString)
     {
-        var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString);
+        var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString)
+            .ReplaceService<IMigrationsModelDiffer, RlsMigrationsModelDiffer>();
         using var context = new TimeHackerMigrationsDbContext(optionsBuilder.Options);
         var db = context.Database;
         var pendingMigrations = db.GetPendingMigrations();

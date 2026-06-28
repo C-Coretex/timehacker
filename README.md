@@ -10,7 +10,11 @@ Stack:
 - React
 - Docker
 - PostgreSQL
-  
+
+Per-user data isolation is enforced at the database level with PostgreSQL Row-Level Security (RLS), and
+the backend is covered by unit tests plus Testcontainers-based DB integration tests. See the backend
+readme for details.
+
 ---
 ### Backend readme:
 [./src/README.md](src/README.md)

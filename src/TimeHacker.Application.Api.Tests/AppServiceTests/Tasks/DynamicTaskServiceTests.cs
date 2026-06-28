@@ -53,29 +53,6 @@ public class DynamicTaskAppServiceTests
     }
 
     [Fact]
-    [Trait("UpdateAsync", "Should call update only once")]
-    public async Task UpdateAsync_ShouldCallUpdateOnce()
-    {
-        var taskToUpdate = _dynamicTasks.First(x => x.UserId == _userId);
-        var updateDto = new DynamicTaskDto
-        {
-            Id = taskToUpdate.Id,
-            Name = "Updated Name",
-            Priority = 2,
-            MinTimeToFinish = new TimeSpan(0, 20, 0),
-            MaxTimeToFinish = new TimeSpan(1, 30, 0),
-            OptimalTimeToFinish = new TimeSpan(0, 50, 0)
-        };
-
-        await _dynamicTaskAppService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
-
-        _dynamicTasksRepository.Verify(
-            x => x.UpdateAndSaveAsync(It.IsAny<DynamicTask>(), It.IsAny<CancellationToken>()),
-            Times.Once,
-            "UpdateAndSaveAsync should be called exactly once, but duplicate calls detected (bug at lines 29-30 in DynamicTaskService)");
-    }
-
-    [Fact]
     [Trait("UpdateAsync", "Should not double update entity")]
     public async Task UpdateAsync_ShouldNotDoubleUpdateEntity()
     {
