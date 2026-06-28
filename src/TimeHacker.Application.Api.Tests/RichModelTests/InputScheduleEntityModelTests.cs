@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Time.Testing;
-
-namespace TimeHacker.Application.Api.Tests.RichModelTests;
+﻿namespace TimeHacker.Application.Api.Tests.RichModelTests;
 
 public class InputScheduleEntityModelTests
 {

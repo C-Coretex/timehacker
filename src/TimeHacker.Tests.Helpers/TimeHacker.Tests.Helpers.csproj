@@ -4,6 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoBogus" />
     <PackageReference Include="MockQueryable.Moq" />
     <PackageReference Include="Moq" />
   </ItemGroup>
