@@ -1,5 +1,5 @@
 import type { TaskForDayItem } from '../api/tasks';
-import { parseTimeToMinutes, minutesToDate } from './timeUtils';
+import { parseTimeToMinutes, utcMinutesToDate } from './timeUtils';
 
 export interface CalendarEvent {
   id: string;
@@ -20,8 +20,8 @@ export interface CalendarEvent {
 export function taskForDayToEvent(item: TaskForDayItem, date: Date, index?: number): CalendarEvent {
   const startM = parseTimeToMinutes(item.timeRange.start);
   const endM = parseTimeToMinutes(item.timeRange.end);
-  const start = minutesToDate(date, startM);
-  const end = minutesToDate(date, endM);
+  const start = utcMinutesToDate(date, startM);
+  const end = utcMinutesToDate(date, endM);
   const { task } = item;
   return {
     id: `${task.id}-${date.toISOString()}-${item.timeRange.start}-${index ?? 0}`,

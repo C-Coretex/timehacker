@@ -42,12 +42,18 @@ export function parseTimeToMinutes(value: string): number {
   return 0;
 }
 
-/** Create a Date at the given number of minutes past midnight on the given date */
-export function minutesToDate(date: Date, minutesFromMidnight: number): Date {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  d.setMinutes(d.getMinutes() + minutesFromMidnight);
-  return d;
+/**
+ * Build a Date from a UTC time-of-day (minutes past UTC midnight) on the given calendar date.
+ *
+ * The timeline `timeRange` values arrive from the backend as bare time-of-day strings derived from
+ * the UTC `StartTimestamp`/`EndTimestamp` (`DateTime.TimeOfDay`), so they carry no timezone marker.
+ * We anchor them to UTC midnight of the calendar date and return a Date that renders in the user's
+ * local timezone — otherwise the UTC time-of-day would be shown verbatim as local time, shifting
+ * every event by the local UTC offset.
+ */
+export function utcMinutesToDate(date: Date, minutesFromMidnight: number): Date {
+  const utcMidnight = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  return new Date(utcMidnight + minutesFromMidnight * 60_000);
 }
 
 /** Convert a duration in minutes to an HH:mm:ss TimeSpan string */

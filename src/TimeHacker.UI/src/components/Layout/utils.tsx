@@ -10,6 +10,7 @@ import {
 import type { TFunction } from 'i18next';
 import type { MenuItem, DaySummary } from './types';
 import type { TaskForDayItem } from '../../api/tasks';
+import { parseTimeToMinutes, utcMinutesToDate } from '../../utils/timeUtils';
 
 export const getItem = (
   key: React.Key,
@@ -51,7 +52,6 @@ export const greetingByTime = (t: TFunction): string => {
 
 export const computeSummary = (tasks: TaskForDayItem[]): DaySummary => {
   const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
   let fixed = 0;
   let dynamic = 0;
@@ -60,18 +60,15 @@ export const computeSummary = (tasks: TaskForDayItem[]): DaySummary => {
   let highPriority = 0;
 
   for (const task of tasks) {
-    const endParts = task.timeRange.end.split(/[.:]/).map(Number);
-    const endMinutes =
-      endParts.length >= 4
-        ? (endParts[0] ?? 0) * 1440 + (endParts[1] ?? 0) * 60 + (endParts[2] ?? 0)
-        : (endParts[0] ?? 0) * 60 + (endParts[1] ?? 0);
+    // timeRange.end is a UTC time-of-day; convert to a local instant before comparing to `now`.
+    const endDate = utcMinutesToDate(now, parseTimeToMinutes(task.timeRange.end));
 
     if (task.isFixed) {
       fixed++;
-      if (endMinutes > nowMinutes) fixedLeft++;
+      if (endDate > now) fixedLeft++;
     } else {
       dynamic++;
-      if (endMinutes > nowMinutes) dynamicLeft++;
+      if (endDate > now) dynamicLeft++;
     }
     if (task.task.priority >= 8) highPriority++;
   }
