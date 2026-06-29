@@ -42,12 +42,19 @@ public record ScheduleEntityReturn
         };
     }
 
+    /// <summary>
+    /// Expands the recurrence pattern into the concrete occurrence dates that fall within [from, to].
+    /// Starting point depends on intent: if the range overlaps already-generated dates
+    /// (<see cref="LastEntityCreated"/> > from, i.e. a refresh/recalculation) we replay from
+    /// <see cref="FirstEntityCreated"/>; otherwise we continue forward from the last generated date.
+    /// </summary>
     public IEnumerable<DateOnly> GetNextEntityDatesIn(DateOnly from, DateOnly to)
     {
+        // Hard cap so a malformed pattern that never advances past EndsOn can't loop forever.
         var maxIterations = 10_000;
         //if we are recalculating already calculated data - go from beginning
-        var nextTaskDate = (LastEntityCreated > from ? FirstEntityCreated : LastEntityCreated) ?? DateOnly.FromDateTime(CreatedTimestamp); 
-        
+        var nextTaskDate = (LastEntityCreated > from ? FirstEntityCreated : LastEntityCreated) ?? DateOnly.FromDateTime(CreatedTimestamp);
+
         while (nextTaskDate < to)
         {
             nextTaskDate = RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate);
@@ -59,10 +66,15 @@ public record ScheduleEntityReturn
         }
     }
 
+    /// <returns>
+    /// Whether <paramref name="date"/> is an actual occurrence of this recurrence. There is no
+    /// closed-form check, so it regenerates the series from creation until it reaches or passes the target
+    /// — O(number of occurrences before <paramref name="date"/>). Used to validate generated dates.
+    /// </returns>
     public bool IsEntityDateCorrect(DateOnly date)
     {
         var maxIterations = 10_000;
-        var nextTaskDate = DateOnly.FromDateTime(CreatedTimestamp);
+        var nextTaskDate = LastEntityCreated == null || date < LastEntityCreated ? DateOnly.FromDateTime(CreatedTimestamp) : LastEntityCreated.Value;
 
         while (nextTaskDate <= date)
         {

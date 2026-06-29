@@ -16,6 +16,8 @@ internal sealed class UserAccessor : UserAccessorBase
         _httpContextAccessor = httpContextAccessor;
         _userRepository = userRepository;
 
+        // Restore the cached domain UserId from session (stored as the Guid's 16 raw bytes). The length
+        // check defends against corrupt/legacy session data; on mismatch we drop it so Init() rebuilds it.
         var session = httpContextAccessor.HttpContext?.Session;
         if (session?.TryGetValue(UserIdKey, out var bytes) != true)
             return;
@@ -27,6 +29,10 @@ internal sealed class UserAccessor : UserAccessorBase
     }
 
    
+    /// <summary>
+    /// Resolves the current request's domain UserId once and caches it in session. Bridges ASP.NET Identity
+    /// (the NameIdentifier claim) to the domain User, creating one on first login. No-op once resolved.
+    /// </summary>
     public async Task Init()
     {
         if (IsUserValid)
@@ -49,6 +55,8 @@ internal sealed class UserAccessor : UserAccessorBase
         if (userId.HasValue)
             return userId.Value;
 
+        // First request after registration: provision the domain User with a placeholder name the user
+        // can later edit on their profile.
         var entity = new User
         {
             IdentityId = userIdentityId,

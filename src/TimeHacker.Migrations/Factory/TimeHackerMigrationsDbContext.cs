@@ -18,6 +18,9 @@ public class TimeHackerMigrationsDbContext : DbContext
 
     public static void ApplyMigrations(string connectionString)
     {
+        // Swap in the RLS-aware differ (same as the design-time factory) so applying migrations at startup
+        // produces the same RLS policy DDL that `dotnet ef` would scaffold. Connect as the table owner
+        // (postgres) — enabling RLS / creating policies requires owner privileges.
         var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString)
             .ReplaceService<IMigrationsModelDiffer, RlsMigrationsModelDiffer>();
         using var context = new TimeHackerMigrationsDbContext(optionsBuilder.Options);

@@ -73,6 +73,7 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
 
         ArgumentNullException.ThrowIfNull(configurationBuilder);
 
+        // Model-wide convention: every DateTime is stored/read as UTC via DateTimeUtcConverter.
         configurationBuilder
             .Properties<DateTime>()
             .HaveConversion<DateTimeUtcConverter>();

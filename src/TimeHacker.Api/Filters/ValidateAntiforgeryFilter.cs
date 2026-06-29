@@ -14,6 +14,7 @@ public class ValidateAntiforgeryFilter : IAsyncActionFilter
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
+        // Safe (non-state-changing) verbs don't require an antiforgery token — skip validation for them.
         if (_safeMethods.Contains(context.HttpContext.Request.Method, StringComparer.OrdinalIgnoreCase))
         {
             await next();

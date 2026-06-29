@@ -11,6 +11,9 @@ public class ScheduledTaskConfiguration : UserScopedEntityConfigurationBase<Sche
         builder.HasIndex(x => x.IsCompleted);
         builder.Property(x => x.IsCompleted).IsRequired();
 
+        // FK to the parent snapshot is keyed on the composite (UserId, Date) alternate key rather than the
+        // snapshot's surrogate Id — a snapshot is uniquely identified by user+day, so its generated tasks
+        // attach by user+day too.
         builder.HasOne(x => x.ScheduleSnapshot).WithMany(x => x.ScheduledTasks)
                .HasForeignKey(x => new { x.UserId, x.Date }).HasPrincipalKey(x => new { x.UserId, x.Date })
                .OnDelete(DeleteBehavior.Cascade);

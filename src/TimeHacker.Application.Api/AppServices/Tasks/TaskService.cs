@@ -19,6 +19,12 @@ public class TaskService(
     // Upper bound on how many days a single timeline request may span / generate.
     private const int MaxTimelineDays = 366;
 
+    /// <returns>
+    /// The day's timeline, snapshot-first. If a snapshot already exists it is returned as-is;
+    /// otherwise the three task sources (one-off fixed, recurrence-generated fixed, and dynamic) are run
+    /// through the timeline processor and the result is persisted as a snapshot. The snapshot freezes the
+    /// (randomized) generation so the same day always reads back the same plan.
+    /// </returns>
     public async Task<TasksForDayDto> GetTasksForDay(DateOnly date, CancellationToken cancellationToken = default)
     {
         var snapshot = await GetSnapshotForDate(date, cancellationToken);
@@ -42,6 +48,11 @@ public class TaskService(
         return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
     }
 
+    /// <returns>
+    /// Stream of timelines for many dates. Existing snapshots are reused; only the missing dates trigger task
+    /// loading. Newly generated snapshots are tracked-Added during the loop and committed in a single SaveChanges 
+    /// after the last yield.
+    /// </returns>
     public async IAsyncEnumerable<TasksForDayDto> GetTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (dates == null || dates.Count == 0)
@@ -51,9 +62,10 @@ public class TaskService(
 
         var snapshots = await GetSnapshotsForDates(dates).ToListAsync(cancellationToken);
 
+        // Only the dates without a snapshot need fresh generation; if there are none, skip all task queries.
         var datesWithoutSnapshots = dates.Where(d => !snapshots.Any(s => s.Date == d)).ToList();
 
-        var fixedTasks = datesWithoutSnapshots.Count > 0 
+        var fixedTasks = datesWithoutSnapshots.Count > 0
             ? await fixedTaskRepository.GetAll()
                 .Where(ft => datesWithoutSnapshots.Contains(DateOnly.FromDateTime(ft.StartTimestamp)))
                 .OrderBy(ft => ft.StartTimestamp)
@@ -81,6 +93,7 @@ public class TaskService(
                 var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
                 snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
+                // Add to the change tracker but defer the commit until after all dates are yielded.
                 snapshot = scheduleSnapshotRepository.Add(snapshot);
             }
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
@@ -89,6 +102,10 @@ public class TaskService(
         await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Discards and regenerates the snapshots for the given dates (used when the underlying tasks/schedules
+    /// changed). Unlike <see cref="GetTasksForDays"/>, existing snapshots are not reused.
+    /// </summary>
     public async IAsyncEnumerable<TasksForDayDto> RefreshTasksForDays(ICollection<DateOnly> dates, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         if (dates == null || dates.Count == 0)
@@ -123,6 +140,7 @@ public class TaskService(
             var snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
             scheduleSnapshotRepository.Add(snapshot);
 
+            // Advance each recurrence's progress marker to this date so future generation resumes correctly.
             foreach (var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
                 await scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value, date, cancellationToken);
 
@@ -153,6 +171,11 @@ public class TaskService(
             .AsAsyncEnumerable();
     }
 
+    /// <summary>
+    /// Materializes active recurrences into concrete FixedTask instances for each occurrence date in the range.
+    /// Each occurrence is a shallow copy of the template task with its timestamps shifted onto the target date,
+    /// preserving both the original time-of-day and the original multi-day span (end may land on a later day).
+    /// </summary>
     private async IAsyncEnumerable<FixedTask> GetFixedTasksForScheduledTasks(DateOnly from, DateOnly? to = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var scheduleEntities = scheduleEntityService.GetAllFrom(from).AsAsyncEnumerable();
@@ -165,6 +188,7 @@ public class TaskService(
             {
                 var task = scheduleEntity.FixedTask!.ShallowCopy();
 
+                // Preserve how many days the task originally spanned so the shifted end keeps that duration.
                 var timeDifferenceInDays = task.EndTimestamp.Date - task.StartTimestamp.Date;
 
                 task.StartTimestamp = taskDate.ToDateTime(TimeOnly.FromDateTime(task.StartTimestamp));

@@ -46,15 +46,11 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
+    // SameSite=None (with Secure) lets the cross-origin SPA send the session cookie to the API over HTTPS.
     options.Cookie.SameSite = SameSiteMode.None;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.IsEssential = true;
 });
-
-builder.Services.AddDataProtection()
-    .SetApplicationName("TimeHacker")
-    .PersistKeysToFileSystem(new DirectoryInfo(
-        builder.Configuration.GetValue<string>("DataProtection:KeysPath") ?? "/keys"));
 
 builder.Services.AddProblemDetails(options =>
 {
@@ -148,6 +144,8 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Must come after authentication/authorization: it reads the authenticated principal's claims to resolve
+// (and lazily create) the domain User before any controller runs.
 app.UseMiddleware<UserAccessorInitMiddleware>();
 
 // Issues the antiforgery cookie and returns the request token for the SPA to return
@@ -160,6 +158,8 @@ app.MapGet("/api/antiforgery/token", (IAntiforgery antiforgery, HttpContext http
 
 app.MapIdentityApi<IdentityUser>();
 
+// Status mapping for non-MVC (minimal-API) endpoints such as MapIdentityApi, which don't pass through
+// LogExceptionFilter. The richer domain-exception mapping for controllers lives in LogExceptionFilter.
 app.UseExceptionHandler(new ExceptionHandlerOptions
 {
     StatusCodeSelector = ex => ex switch
@@ -243,8 +243,9 @@ static void AddIdentityServices(IServiceCollection services)
         options.Cookie.SameSite = SameSiteMode.None;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Required if SameSite=None
 
-        // Cookie lifetime
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // default
+        // Cookie lifetime: by default a 60-minute window that slides forward on each request. For a
+        // "remember me" (persistent) sign-in, OnSigningIn instead pins a fixed 14-day absolute expiry.
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
         options.SlidingExpiration = true;
         options.Events.OnSigningIn = context =>
         {
@@ -254,7 +255,8 @@ static void AddIdentityServices(IServiceCollection services)
             return Task.CompletedTask;
         };
 
-        // Prevent automatic redirects
+        // This is an API for a SPA, so suppress Identity's default browser redirects to login/access-denied
+        // pages and return bare 401/403 status codes instead — the SPA owns the auth UI.
         options.Events.OnRedirectToLogin = context =>
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;

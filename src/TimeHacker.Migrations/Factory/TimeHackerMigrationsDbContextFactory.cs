@@ -15,6 +15,8 @@ public class MigrationsDbContextFactory : IDesignTimeDbContextFactory<TimeHacker
 
         var connectionString = config.GetConnectionString(nameof(TimeHackerMigrationsDbContext));
 
+        // Design-time (`dotnet ef migrations add`) must use the RLS-aware differ too, otherwise scaffolded
+        // migrations would omit the ENABLE RLS / CREATE POLICY statements. Mirrors ApplyMigrations.
         var optionsBuilder = new DbContextOptionsBuilder().UseNpgsql(connectionString)
             .ReplaceService<IMigrationsModelDiffer, RlsMigrationsModelDiffer>();
         return new TimeHackerMigrationsDbContext(optionsBuilder.Options);

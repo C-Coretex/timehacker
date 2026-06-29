@@ -1,5 +1,9 @@
 ﻿namespace TimeHacker.Domain.Entities.ScheduleSnapshots;
 
+/// <summary>
+/// A generated task instance for one specific day, belonging to a <see cref="ScheduleSnapshot"/>. It is a
+/// denormalized copy of the originating (<see cref="IsFixed"/>, <see cref="ParentTaskId"/>) task, not the task itself.
+/// </summary>
 public class ScheduledTask : UserScopedEntityBase
 {
     public Guid ParentTaskId { get; init; }

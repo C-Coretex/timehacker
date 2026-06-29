@@ -24,12 +24,19 @@ public record TasksForDayReturn
         };
     }
 
+    /// <summary>
+    /// Materializes this in-memory timeline into a persistable <see cref="ScheduleSnapshot"/> — the captured
+    /// generated state of the day. Pass an existing snapshot to update it in place (the Clear()+repopulate
+    /// supports the refresh path); pass null to create a new one.
+    /// </summary>
     public ScheduleSnapshot CreateOrUpdateScheduleSnapshot(ScheduleSnapshot? entity = null)
     {
         var newEntity = entity ?? new ScheduleSnapshot();
 
         newEntity.Date = Date;
 
+        // Remove existing entries and repopulate with the current timeline. This is a simple way to support replacing existing data with new.
+        // Without Clear, the existing entries would not be removed.
         newEntity.ScheduledTasks.Clear();
         TasksTimeline.Select(x => x.CreateScheduledTask()).ForEach(newEntity.ScheduledTasks.Add);
 

@@ -33,6 +33,8 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
+        // The FK lives on FixedTask.ScheduleEntityId pointing TO ScheduleEntity, so the DB cascade only fires
+        // entity->task, not task->entity. Delete the owning ScheduleEntity explicitly first to avoid orphaning it.
         await scheduleEntityRepository.DeleteBy(x => x.FixedTask != null && x.FixedTask.Id == id, cancellationToken);
         await fixedTaskRepository.DeleteAndSaveAsync(id, cancellationToken);
     }

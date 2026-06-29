@@ -30,6 +30,8 @@ public record FixedTaskDto
             EndTimestamp = x.EndTimestamp,
             CreatedTimestamp = x.CreatedTimestamp,
             Tags = x.TagFixedTasks.Select(tagTask => TagDto.Create(tagTask.Tag)),
+            // ScheduleEntityDto is built inline (rather than via its own factory) so the whole projection
+            // stays a single EF-translatable expression and the schedule is loaded in the same query.
             ScheduleEntity = x.ScheduleEntity != null ? new ScheduleEntityDto(
                 x.ScheduleEntity.Id,
                 x.ScheduleEntity.RepeatingEntity,

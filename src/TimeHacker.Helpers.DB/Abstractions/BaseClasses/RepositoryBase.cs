@@ -13,6 +13,10 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     where TModel : class, IDbEntity
     where TDbContext : DbContextBase<TDbContext>
 {
+    //TODO: WOULD THIS BE FIXED BY AN INTERCEPTOR?
+    // An expression selecting TModel.UpdatedTimestamp, used to stamp the timestamp during ExecuteUpdateAsync
+    // (which bypasses SaveChangesAsync). Built once via reflection and cached; null when TModel isn't
+    // IUpdatable, so callers skip the extra SetProperty entirely.
     private static readonly Lazy<Expression<Func<TModel, DateTime?>>?> UpdatedTimestampSelector = new(() =>
     {
         var isUpdatable = typeof(IUpdatable).IsAssignableFrom(typeof(TModel));
@@ -41,6 +45,8 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         if (asNoTracking)
             query = query.AsNoTracking();
 
+        // Compose the query from caller-supplied steps (each an IQueryable->IQueryable transform, e.g. an
+        // Include or filter), applied in order. Lets callers layer query shape without subclassing.
         foreach (var queryPipelineStep in queryPipelineSteps)
             query = queryPipelineStep(query);
 
@@ -116,6 +122,8 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
 
     public virtual Task UpdateProperty<TKey>(Expression<Func<TModel, bool>> predicate, Expression<Func<TModel, TKey>> propertySelector, TKey value, CancellationToken cancellationToken = default)
     {
+        // ExecuteUpdateAsync runs SQL directly and skips SaveChangesAsync's auto-stamping, so append an
+        // UpdatedTimestamp set here when the entity supports it (selector is null otherwise).
         var updatedTimestampSelector = UpdatedTimestampSelector.Value;
         if (updatedTimestampSelector == null)
             return ExecuteUpdateAsync(predicate, setPropertyCalls => setPropertyCalls.SetProperty(propertySelector, value), cancellationToken);

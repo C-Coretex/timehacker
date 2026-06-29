@@ -35,7 +35,9 @@ internal sealed partial class LogExceptionFilter(ILoggerFactory loggerFactory, I
             StatusCode = StatusCodes.Status400BadRequest
         };
 
-        //we don't want to log internal business logic exceptions
+        // Known business-logic exceptions are expected, safe to surface to the client, and mapped to a
+        // specific status (and NOT logged as errors). Anything unrecognized falls through to the default,
+        // which logs it and returns 500 so internal failures aren't leaked.
         switch (context.Exception)
         {
             case UserAlreadyPresentException:
@@ -96,6 +98,8 @@ internal sealed partial class LogExceptionFilter(ILoggerFactory loggerFactory, I
 
     private void LogException(ExceptionContext context)
     {
+        // Prefer the controller/action from endpoint metadata; fall back to the ActionDescriptor route values
+        // (and this filter's own type) when metadata isn't available, so the log always has a sensible source.
         var descriptor = context.HttpContext
             .GetEndpoint()?
             .Metadata

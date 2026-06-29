@@ -3,6 +3,10 @@ using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
 namespace TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 
+/// <summary>
+/// Deserializes the incoming repeating-entity model by its "EntityType" discriminator into the matching
+/// concrete Input*RepeatingEntityModel.
+/// </summary>
 internal sealed class InputRepeatingEntityTypeConverter : JsonConverter<InputRepeatingEntityModelBase>
 {
     public override InputRepeatingEntityModelBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -15,7 +19,7 @@ internal sealed class InputRepeatingEntityTypeConverter : JsonConverter<InputRep
         var typeString = typeProp.GetRawText();
         var typeEnum = Enum.Parse<RepeatingEntityType>(typeString);
 
-        // Parse as JsonNode and remove the EntityType property to avoid deserializing it
+        // Remove the discriminator before deserializing so it isn't bound onto the concrete subtype.
         var jsonNode = JsonNode.Parse(doc.RootElement.GetRawText())!.AsObject();
         jsonNode.Remove(nameof(InputRepeatingEntityModelBase.EntityType));
         var json = jsonNode.ToJsonString();

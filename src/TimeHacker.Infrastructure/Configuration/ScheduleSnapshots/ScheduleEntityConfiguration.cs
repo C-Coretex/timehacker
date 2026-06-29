@@ -13,6 +13,9 @@ public class ScheduleEntityConfiguration : UserScopedEntityConfigurationBase<Sch
 
         builder.Property(x => x.RepeatingEntity).IsRequired();
 
+        // RepeatingEntity is stored as BSON. The DefaultJsonTypeInfoResolver enables the polymorphic
+        // [JsonDerivedType] discriminators on IRepeatingEntityType, so the concrete recurrence subtype
+        // (day/week/month/year) round-trips correctly.
         var jsonSerializerOptions = new JsonSerializerOptions()
         {
             TypeInfoResolver = new DefaultJsonTypeInfoResolver()

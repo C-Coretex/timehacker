@@ -9,6 +9,8 @@ public class ScheduledCategoryConfiguration : UserScopedEntityConfigurationBase<
     {
         ConfigureUserScoped(builder);
 
+        // FK to the parent snapshot is keyed on the composite (UserId, Date) alternate key rather than the
+        // snapshot's surrogate Id — a snapshot is uniquely identified by user+day.
         builder.HasOne(x => x.ScheduleSnapshot).WithMany(x => x.ScheduledCategories)
                .HasForeignKey(x => new { x.UserId, x.Date }).HasPrincipalKey(x => new { x.UserId, x.Date })
                .OnDelete(DeleteBehavior.Cascade);

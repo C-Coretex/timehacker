@@ -11,8 +11,16 @@ using TimeHacker.Infrastructure.Interceptors;
 namespace TimeHacker.Migrations.Configuration;
 
 
+/// <summary>
+/// Custom EF Core model differ that auto-generates PostgreSQL Row-Level-Security DDL into migrations.
+/// When an entity gains/loses the "Rls:Enabled" annotation (stamped by
+/// <see cref="TimeHacker.Infrastructure.Configuration.UserScopedEntityConfigurationBase{T}"/>), it appends
+/// ENABLE/DISABLE RLS + CREATE/DROP POLICY statements so the user-isolation policy ships with the schema
+/// instead of being maintained by hand. Wired in via .ReplaceService&lt;IMigrationsModelDiffer, ...&gt;().
+/// </summary>
 internal sealed class RlsMigrationsModelDiffer : MigrationsModelDiffer
 {
+    //RLS is configured onlt for provided user. DB owner is not restricted by RLS at all.
     public const string RlsRole = "application_user";
 
     public RlsMigrationsModelDiffer(
@@ -29,6 +37,8 @@ internal sealed class RlsMigrationsModelDiffer : MigrationsModelDiffer
         IRelationalModel? source,
         IRelationalModel? target)
     {
+        // Start from the normal schema diff, then layer RLS changes on top by comparing the RLS annotations
+        // on each table between the source (previous) and target (current) models.
         var operations = base.GetDifferences(source, target).ToList();
 
         var targetEntities = target?.Model.GetEntityTypes() ?? [];
@@ -63,6 +73,8 @@ internal sealed class RlsMigrationsModelDiffer : MigrationsModelDiffer
         return operations;
     }
 
+    // Builds the policy that scopes every row to the current user: the tenant column must equal the
+    // session variable that UserSessionInterceptor sets per connection (app.user_id).
     private static SqlOperation BuildEnableRlsOperation(
         string tableName,
         string tenantColumn) => new()
