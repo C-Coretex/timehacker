@@ -1,4 +1,3 @@
-using System.Drawing;
 using Microsoft.EntityFrameworkCore;
 using Timehacker.Integration.Db.Tests;
 using TimeHacker.Domain.Entities.Categories;
@@ -51,26 +50,8 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "ScheduleEntity->ScheduledChildren")]
     public async Task DeletingScheduleEntity_Should_CascadeDeleteScheduledChildrenButKeepSnapshot()
     {
-        var date = new DateOnly(2026, 6, 2);
-        var userId = CurrentUser.UserId;
-        var scheduleEntity = new ScheduleEntity { UserId = userId, RepeatingEntity = GraphSeeder.DailyRepeat() };
-        Db.Add(scheduleEntity);
-
-        var snapshot = new ScheduleSnapshot
-        {
-            UserId = userId,
-            Date = date,
-            ScheduledTasks =
-            {
-                new ScheduledTask { UserId = userId, Date = date, Name = "t", IsFixed = true, ParentScheduleEntityId = scheduleEntity.Id }
-            },
-            ScheduledCategories =
-            {
-                new ScheduledCategory { UserId = userId, Date = date, Name = "c", Color = Color.Coral, ParentScheduleEntity = scheduleEntity.Id }
-            }
-        };
-        Db.Add(snapshot);
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var (scheduleEntity, snapshot) = await Resolve<GraphSeeder>()
+            .SeedScheduleEntityWithSnapshotChildren(new DateOnly(2026, 6, 2), TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<ScheduleEntity>(scheduleEntity.Id);
 
@@ -83,7 +64,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "FixedTask->Junctions")]
     public async Task DeletingFixedTask_Should_RemoveJunctionsButKeepCategoryAndTag()
     {
-        var (category, tag, task) = await SeedTaskWithJunctions();
+        var (category, tag, task) = await Resolve<GraphSeeder>().SeedFixedTaskWithCategoryAndTagJunctions(TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<FixedTask>(task.Id);
 
@@ -97,35 +78,12 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "Category->Junction")]
     public async Task DeletingCategory_Should_RemoveJunctionButKeepFixedTask()
     {
-        var (category, _, task) = await SeedTaskWithJunctions();
+        var (category, _, task) = await Resolve<GraphSeeder>().SeedFixedTaskWithCategoryAndTagJunctions(TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<Category>(category.Id);
 
         (await CountAsync<CategoryFixedTask>()).Should().Be(0);
         (await ExistsAsync<FixedTask>(task.Id)).Should().BeTrue();
-    }
-
-    private async Task<(Category Category, Tag Tag, FixedTask Task)> SeedTaskWithJunctions()
-    {
-        var userId = CurrentUser.UserId;
-        var category = new Category { UserId = userId, Name = "Cat", Color = Color.Olive };
-        var tag = new Tag { UserId = userId, Name = "Tag", Color = Color.Olive };
-        var task = new FixedTask
-        {
-            UserId = userId,
-            Name = "Task",
-            Priority = 1,
-            StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
-            EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
-        };
-        Db.AddRange(category, tag, task);
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        Db.Add(new CategoryFixedTask { CategoryId = category.Id, FixedTaskId = task.Id });
-        Db.Add(new TagFixedTask { TagId = tag.Id, TaskId = task.Id });
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        return (category, tag, task);
     }
 
     private async Task DeleteByIdAsync<TEntity>(Guid id) where TEntity : class

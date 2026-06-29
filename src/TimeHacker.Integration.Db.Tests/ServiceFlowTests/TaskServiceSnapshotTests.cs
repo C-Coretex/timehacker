@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Timehacker.Integration.Db.Tests;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Infrastructure;
 using TimeHacker.Integration.Db.Tests.Fixtures;
 
@@ -109,13 +107,7 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
     }
 
     private Task SeedFixedTaskOn(DateOnly date, string name)
-        => Resolve<IFixedTaskRepository>().AddAndSaveAsync(new FixedTask
-        {
-            Name = name,
-            Priority = 1,
-            StartTimestamp = date.ToDateTime(new TimeOnly(9, 0), DateTimeKind.Utc),
-            EndTimestamp = date.ToDateTime(new TimeOnly(10, 0), DateTimeKind.Utc)
-        }, TestContext.Current.CancellationToken);
+        => Resolve<GraphSeeder>().SeedFixedTaskOn(date, name, TestContext.Current.CancellationToken);
 
     private async Task<int> CountSnapshotsOn(DateOnly date)
     {

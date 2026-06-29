@@ -16,34 +16,15 @@ public class FixedTaskCascadeDeleteTests(DbContainerFixture fixture) : DbIntegra
     [Trait("DeleteAsync", "CascadesScheduleAndInstances")]
     public async Task DeleteAsync_Should_RemoveTaskScheduleAndScheduledInstances()
     {
-        var userId = CurrentUser.UserId;
-        var task = await Resolve<GraphSeeder>().SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken);
+        var graphSeeder = Resolve<GraphSeeder>();
+        var task = await graphSeeder.SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken);
         var scheduleEntityId = task.ScheduleEntityId!.Value;
 
         // A generated scheduled instance pointing at the schedule entity.
-        var date = new DateOnly(2026, 7, 1);
-        var snapshot = new ScheduleSnapshot
-        {
-            UserId = userId,
-            Date = date,
-            ScheduledTasks =
-            {
-                new ScheduledTask { UserId = userId, Date = date, Name = "instance", IsFixed = true, ParentScheduleEntityId = scheduleEntityId }
-            }
-        };
-        Db.Add(snapshot);
+        var snapshot = await graphSeeder.SeedSnapshotWithScheduledInstanceFor(scheduleEntityId, new DateOnly(2026, 7, 1), TestContext.Current.CancellationToken);
 
         // An unrelated task that must survive.
-        var unrelatedTask = new FixedTask
-        {
-            UserId = userId,
-            Name = "Unrelated",
-            Priority = 1,
-            StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
-            EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
-        };
-        Db.Add(unrelatedTask);
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var unrelatedTask = await graphSeeder.SeedUnrelatedFixedTask(TestContext.Current.CancellationToken);
 
         await Resolve<IFixedTaskAppService>().DeleteAsync(task.Id, TestContext.Current.CancellationToken);
 

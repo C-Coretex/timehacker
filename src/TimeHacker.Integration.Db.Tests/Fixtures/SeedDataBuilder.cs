@@ -5,6 +5,10 @@ using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Integration.Db.Tests.Fixtures;
 
+/// <summary>
+/// Generic single-entity seeder: persists one AutoFaker-generated row of any user-scoped entity through
+/// its repository (so UserId is stamped automatically).
+/// </summary>
 internal sealed class SeedDataBuilder<TRepository, TModel, TId>(TRepository repository)
     where TRepository : IUserScopedRepositoryBase<TModel, TId>
     where TModel : class, IDbEntity<TId>, IUserScopedEntity

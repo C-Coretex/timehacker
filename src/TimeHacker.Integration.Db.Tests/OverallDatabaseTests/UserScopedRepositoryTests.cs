@@ -197,7 +197,7 @@ public class UserScopedRepositoryTests(DbContainerFixture fixture): DbIntegratio
         // A task graph for the current user whose schedule child is a stub pointing at another user's
         // row, marked Modified. The foreign row is invisible under RLS, so the UPDATE affects 0 rows
         // and is mapped to NotFound for the current user.
-        var task = BuildTaskWithForeignScheduleStub(foreignSchedule.Id);
+        var task = GraphSeeder.BuildTaskWithScheduleStub(foreignSchedule.Id, CurrentUser.UserId);
         dbContext.Attach(task);
         dbContext.Entry(task.ScheduleEntity!).State = EntityState.Modified;
 
@@ -217,7 +217,7 @@ public class UserScopedRepositoryTests(DbContainerFixture fixture): DbIntegratio
 
         // Same stub graph, but the foreign schedule child is marked Deleted. Deleting a row owned by
         // another user hits 0 rows under RLS -> NotFound.
-        var task = BuildTaskWithForeignScheduleStub(foreignSchedule.Id);
+        var task = GraphSeeder.BuildTaskWithScheduleStub(foreignSchedule.Id, CurrentUser.UserId);
         dbContext.Attach(task);
         dbContext.Entry(task.ScheduleEntity!).State = EntityState.Deleted;
 
@@ -229,21 +229,6 @@ public class UserScopedRepositoryTests(DbContainerFixture fixture): DbIntegratio
         var stillExists = await Db.Set<ScheduleEntity>().AnyAsync(s => s.Id == foreignSchedule.Id, TestContext.Current.CancellationToken);
         stillExists.Should().BeTrue();
     }
-
-    private FixedTask BuildTaskWithForeignScheduleStub(Guid foreignScheduleId) => new()
-    {
-        UserId = CurrentUser.UserId,
-        Name = "Task",
-        Priority = 1,
-        StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
-        EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc),
-        ScheduleEntity = new ScheduleEntity
-        {
-            Id = foreignScheduleId,
-            UserId = CurrentUser.UserId,
-            RepeatingEntity = GraphSeeder.DailyRepeat()
-        }
-    };
 
     private Task<Category> SeedCategoryForOtherUser()
         => OtherUsers.First().Resolve<SeedDataBuilder<ICategoryRepository, Category, Guid>>().SeedForCurrentUser();
