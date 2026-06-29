@@ -228,6 +228,44 @@ public class ScheduleEntityServiceTests
     }
 
 
+    [Fact]
+    [Trait("UpdateLastEntityCreated", "Should move LastEntityCreated forward but keep FirstEntityCreated")]
+    public async Task UpdateLastEntityCreated_ForwardMove_KeepsFirstEntityCreated()
+    {
+        var entity = _scheduledEntities.First(x => x.UserId == _userId && x.RepeatingEntity != null);
+        var firstCreated = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(2));
+        entity.FirstEntityCreated = firstCreated;
+        entity.LastEntityCreated = firstCreated;
+
+        // Next on-pattern date (Day(2) pattern), strictly after the current marker.
+        var nextOnPattern = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(4));
+
+        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, nextOnPattern, TestContext.Current.CancellationToken);
+
+        var updated = _scheduledEntities.First(x => x.Id == entity.Id);
+        updated.LastEntityCreated.Should().Be(nextOnPattern);
+        updated.FirstEntityCreated.Should().Be(firstCreated);
+    }
+
+    [Fact]
+    [Trait("UpdateLastEntityCreated", "Should not update FirstEntityCreated on an out-of-order date")]
+    public async Task UpdateLastEntityCreated_EarlierDate_LeavesFirstEntityCreatedUntouched()
+    {
+        var entity = _scheduledEntities.First(x => x.UserId == _userId && x.RepeatingEntity != null);
+        var firstCreated = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(8));
+        entity.FirstEntityCreated = firstCreated;
+        entity.LastEntityCreated = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(10));
+
+        // On-pattern but earlier than the current marker -> ignored.
+        var earlierOnPattern = DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(4));
+
+        await _scheduleEntityService.UpdateLastEntityCreated(entity.Id, earlierOnPattern, TestContext.Current.CancellationToken);
+
+        var updated = _scheduledEntities.First(x => x.Id == entity.Id);
+        updated.FirstEntityCreated.Should().Be(firstCreated);
+        updated.LastEntityCreated.Should().Be(DateOnly.FromDateTime(entity.CreatedTimestamp.AddDays(10)));
+    }
+
     #region Mock helpers
 
     private void SetupMocks(Guid userId)

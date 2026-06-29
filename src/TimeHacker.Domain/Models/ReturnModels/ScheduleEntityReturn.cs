@@ -73,8 +73,11 @@ public record ScheduleEntityReturn
     /// </returns>
     public bool IsEntityDateCorrect(DateOnly date)
     {
+        if (date == FirstEntityCreated || date == LastEntityCreated)
+            return true;
+
         var maxIterations = 10_000;
-        var nextTaskDate = LastEntityCreated == null || date < LastEntityCreated ? DateOnly.FromDateTime(CreatedTimestamp) : LastEntityCreated.Value;
+        var nextTaskDate = LastEntityCreated == null || date <= LastEntityCreated ? DateOnly.FromDateTime(CreatedTimestamp) : LastEntityCreated.Value;
 
         while (nextTaskDate <= date)
         {

@@ -1,7 +1,11 @@
-﻿namespace TimeHacker.Application.Api.Tests.RichModelTests;
+﻿using System.Globalization;
+
+namespace TimeHacker.Application.Api.Tests.RichModelTests;
 
 public class ScheduleEntityTests
 {
+    private static DateOnly DateFrom(string value) => DateOnly.Parse(value, CultureInfo.InvariantCulture);
+
     #region DayRepeatingEntity
 
     [Theory, CombinatorialData]
@@ -258,6 +262,223 @@ public class ScheduleEntityTests
                 EndsOn = null
             };
         });
+    }
+
+    #endregion
+
+    #region IsEntityDateCorrect
+
+    // Day(2) pattern from a fixed creation date; occurrences are 2024-01-03, -05, -07, ...
+    private static ScheduleEntityReturn Day2Schedule(DateOnly? endsOn = null, DateOnly? lastEntityCreated = null)
+        => new()
+        {
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2)),
+            CreatedTimestamp = new DateTime(2024, 01, 01),
+            LastEntityCreated = lastEntityCreated,
+            EndsOn = endsOn
+        };
+
+    [Theory]
+    [InlineData("2024-01-03")]
+    [InlineData("2024-01-05")]
+    [InlineData("2024-01-11")]
+    [Trait("IsEntityDateCorrect", "Returns true for an on-pattern date")]
+    public void IsEntityDateCorrect_OnPatternDate_ReturnsTrue(string date)
+    {
+        Day2Schedule().IsEntityDateCorrect(DateFrom(date)).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("2024-01-02")]
+    [InlineData("2024-01-04")]
+    [Trait("IsEntityDateCorrect", "Returns false for an off-pattern date")]
+    public void IsEntityDateCorrect_OffPatternDate_ReturnsFalse(string date)
+    {
+        Day2Schedule().IsEntityDateCorrect(DateFrom(date)).Should().BeFalse();
+    }
+
+    [Fact]
+    [Trait("IsEntityDateCorrect", "Returns false for a date past EndsOn")]
+    public void IsEntityDateCorrect_DatePastEndsOn_ReturnsFalse()
+    {
+        // 2024-01-07 is on-pattern but lies beyond EndsOn.
+        Day2Schedule(endsOn: new DateOnly(2024, 01, 05))
+            .IsEntityDateCorrect(new DateOnly(2024, 01, 07)).Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("2024-01-01")] // equal to the start
+    [InlineData("2023-12-31")] // before the start
+    [Trait("IsEntityDateCorrect", "Returns false for a date at or before the start")]
+    public void IsEntityDateCorrect_DateAtOrBeforeStart_ReturnsFalse(string date)
+    {
+        Day2Schedule().IsEntityDateCorrect(DateFrom(date)).Should().BeFalse();
+    }
+
+    [Fact]
+    [Trait("IsEntityDateCorrect", "Starts from LastEntityCreated when date is at or after it")]
+    public void IsEntityDateCorrect_DateAtOrAfterLastEntityCreated_ValidatesFromLastEntityCreated()
+    {
+        var schedule = Day2Schedule(lastEntityCreated: new DateOnly(2024, 01, 05));
+
+        schedule.IsEntityDateCorrect(new DateOnly(2024, 01, 09)).Should().BeTrue();
+    }
+
+    [Fact]
+    [Trait("IsEntityDateCorrect", "Replays from creation when date precedes LastEntityCreated")]
+    public void IsEntityDateCorrect_DateBeforeLastEntityCreated_ReplaysFromCreation()
+    {
+        var schedule = Day2Schedule(lastEntityCreated: new DateOnly(2024, 01, 05));
+
+        schedule.IsEntityDateCorrect(new DateOnly(2024, 01, 03)).Should().BeTrue();
+    }
+
+    [Fact]
+    [Trait("IsEntityDateCorrect", "Validates weekday patterns")]
+    public void IsEntityDateCorrect_WeekPattern_MatchesWeekday()
+    {
+        // CreatedTimestamp is Monday 2024-09-16; pattern repeats on Mon & Thu.
+        var schedule = new ScheduleEntityReturn()
+        {
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.WeekRepeatingEntity,
+                new WeekRepeatingEntity([Domain.Models.EntityModels.Enums.DayOfWeek.Monday, Domain.Models.EntityModels.Enums.DayOfWeek.Thursday])),
+            CreatedTimestamp = new DateTime(2024, 09, 16)
+        };
+
+        schedule.IsEntityDateCorrect(new DateOnly(2024, 09, 19)).Should().BeTrue();  // Thursday - on pattern
+        schedule.IsEntityDateCorrect(new DateOnly(2024, 09, 23)).Should().BeTrue();  // next Monday - on pattern
+        schedule.IsEntityDateCorrect(new DateOnly(2024, 09, 20)).Should().BeFalse(); // Friday - off pattern
+    }
+
+    [Fact]
+    [Trait("IsEntityDateCorrect", "Returns false for a date equal to LastEntityCreated")]
+    public void IsEntityDateCorrect_DateEqualsLastEntityCreated_ReturnsTrue()
+    {
+        // 2024-01-05 is on-pattern, but validation steps strictly forward from LastEntityCreated,
+        // so the marker date itself is never reported as a (future) occurrence.
+        Day2Schedule(lastEntityCreated: new DateOnly(2024, 01, 05))
+            .IsEntityDateCorrect(new DateOnly(2024, 01, 05)).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData(false, "2024-01-03", true)]  // < LastEntityCreated -> replays from CreatedTimestamp
+    [InlineData(true, "2024-01-03", true)]   // (LastEntityCreated set) still replays from CreatedTimestamp
+    [InlineData(false, "2024-01-09", true)]  // validated from CreatedTimestamp
+    [InlineData(true, "2024-01-09", true)]   // >= LastEntityCreated -> validated from LastEntityCreated
+    [InlineData(false, "2024-01-08", false)] // off-pattern from CreatedTimestamp
+    [InlineData(true, "2024-01-08", false)]  // off-pattern from LastEntityCreated
+    [Trait("IsEntityDateCorrect", "Same answer whether validated from CreatedTimestamp or LastEntityCreated")]
+    public void IsEntityDateCorrect_SameResultFromEitherStartingPoint(bool withLastEntityCreated, string date, bool expected)
+    {
+        // LastEntityCreated (2024-01-05) is on-pattern, so both starting points lie on the same lattice
+        // and must agree for any queried date.
+        var schedule = Day2Schedule(lastEntityCreated: withLastEntityCreated ? new DateOnly(2024, 01, 05) : null);
+
+        schedule.IsEntityDateCorrect(DateFrom(date)).Should().Be(expected);
+    }
+
+    #endregion
+
+    #region GetNextEntityDatesIn corner cases
+
+    [Theory]
+    [InlineData("2024-01-01", "2024-01-01")] // empty range (from == to)
+    [InlineData("2024-01-10", "2024-01-05")] // inverted range (to < from)
+    [Trait("GetNextEntityDatesIn", "Returns nothing for an empty or inverted range")]
+    public void GetNextEntityDatesIn_EmptyOrInvertedRange_ReturnsNothing(string from, string to)
+    {
+        Day2Schedule().GetNextEntityDatesIn(DateFrom(from), DateFrom(to)).Should().BeEmpty();
+    }
+
+    [Fact]
+    [Trait("GetNextEntityDatesIn", "Returns nothing when EndsOn is before the range")]
+    public void GetNextEntityDatesIn_EndsOnBeforeRange_ReturnsNothing()
+    {
+        Day2Schedule(endsOn: new DateOnly(2023, 12, 31))
+            .GetNextEntityDatesIn(new DateOnly(2024, 01, 01), new DateOnly(2024, 02, 01))
+            .Should().BeEmpty();
+    }
+
+    [Fact]
+    [Trait("GetNextEntityDatesIn", "Includes occurrences on the from and to boundaries")]
+    public void GetNextEntityDatesIn_Boundaries_AreInclusive()
+    {
+        // Occurrences: 03, 05, 07, 09. from/to land exactly on occurrences.
+        var result = Day2Schedule()
+            .GetNextEntityDatesIn(new DateOnly(2024, 01, 03), new DateOnly(2024, 01, 09))
+            .ToList();
+
+        result.Should().Equal(
+            new DateOnly(2024, 01, 03),
+            new DateOnly(2024, 01, 05),
+            new DateOnly(2024, 01, 07),
+            new DateOnly(2024, 01, 09));
+    }
+
+    [Fact]
+    [Trait("GetNextEntityDatesIn", "Replays from FirstEntityCreated when LastEntityCreated is past from")]
+    public void GetNextEntityDatesIn_LastEntityCreatedPastFrom_ReplaysFromFirstEntityCreated()
+    {
+        // Refresh/recalculation case: the range overlaps already-generated dates, so generation replays
+        // from FirstEntityCreated rather than continuing from LastEntityCreated.
+        var schedule = new ScheduleEntityReturn()
+        {
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2)),
+            CreatedTimestamp = new DateTime(2024, 01, 01),
+            FirstEntityCreated = new DateOnly(2024, 01, 03),
+            LastEntityCreated = new DateOnly(2024, 01, 11)
+        };
+
+        var result = schedule
+            .GetNextEntityDatesIn(new DateOnly(2024, 01, 05), new DateOnly(2024, 01, 11))
+            .ToList();
+
+        result.Should().Equal(
+            new DateOnly(2024, 01, 05),
+            new DateOnly(2024, 01, 07),
+            new DateOnly(2024, 01, 09),
+            new DateOnly(2024, 01, 11));
+    }
+
+    [Fact]
+    [Trait("GetNextEntityDatesIn", "Stops before the next occurrence when EndsOn falls between occurrences")]
+    public void GetNextEntityDatesIn_EndsOnBetweenOccurrences_KeepsLastDateBelowEndsOn()
+    {
+        // Occurrences: 03, 05, 07, 09. EndsOn = 08 sits strictly between 07 and 09, so the strict
+        // "> EndsOn" cutoff yields up to 07 and excludes 09 (the last date stays below EndsOn).
+        var result = Day2Schedule(endsOn: new DateOnly(2024, 01, 08))
+            .GetNextEntityDatesIn(new DateOnly(2024, 01, 01), new DateOnly(2024, 01, 31))
+            .ToList();
+
+        result.Should().Equal(
+            new DateOnly(2024, 01, 03),
+            new DateOnly(2024, 01, 05),
+            new DateOnly(2024, 01, 07));
+    }
+
+    [Fact]
+    [Trait("GetNextEntityDatesIn", "Continues from LastEntityCreated when it is at or before from")]
+    public void GetNextEntityDatesIn_LastEntityCreatedBeforeFrom_ContinuesFromLastEntityCreated()
+    {
+        // Forward (non-refresh) generation: LastEntityCreated <= from, so generation continues from the
+        // last marker rather than replaying from FirstEntityCreated.
+        var schedule = new ScheduleEntityReturn()
+        {
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2)),
+            CreatedTimestamp = new DateTime(2024, 01, 01),
+            FirstEntityCreated = new DateOnly(2024, 01, 03),
+            LastEntityCreated = new DateOnly(2024, 01, 05)
+        };
+
+        var result = schedule
+            .GetNextEntityDatesIn(new DateOnly(2024, 01, 07), new DateOnly(2024, 01, 13))
+            .ToList();
+
+        result.Should().Equal(
+            new DateOnly(2024, 01, 07),
+            new DateOnly(2024, 01, 09),
+            new DateOnly(2024, 01, 11),
+            new DateOnly(2024, 01, 13));
     }
 
     #endregion
