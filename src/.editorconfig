@@ -46,6 +46,8 @@ dotnet_diagnostic.CA1515.severity = none
 dotnet_diagnostic.CA1515.severity = none
 [TimeHacker.Integration.Db.Tests/**]
 dotnet_diagnostic.CA1515.severity = none
+[TimeHacker.Integration.Api.Tests/**]
+dotnet_diagnostic.CA1515.severity = none
 
 # CA1062: Validate arguments of public methods
 [**/Controllers/**]

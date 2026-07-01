@@ -1,15 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Resources\timehacker_infrastructure_init.sql" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Resources\timehacker_infrastructure_init.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoBogus" />
     <PackageReference Include="AwesomeAssertions" />
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.OpenApi" />
     <PackageReference Include="Respawn" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="xunit.v3" />
@@ -17,20 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TimeHacker.Application.Api\TimeHacker.Application.Api.csproj" />
-    <ProjectReference Include="..\TimeHacker.Domain.Services\TimeHacker.Domain.Services.csproj" />
-    <ProjectReference Include="..\TimeHacker.Migrations\TimeHacker.Migrations.csproj" />
-    <ProjectReference Include="..\TimeHacker.Tests.Helpers\TimeHacker.Tests.Helpers.csproj" />
+    <ProjectReference Include="..\TimeHacker.Api\TimeHacker.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\timehacker_infrastructure_init.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
+  
 </Project>

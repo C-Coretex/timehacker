@@ -17,6 +17,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.OpenApi" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" />
     <PackageReference Include="OpenTelemetry" />
@@ -35,6 +36,10 @@
     <ProjectReference Include="..\TimeHacker.Infrastructure\TimeHacker.Infrastructure.csproj" />
     <ProjectReference Include="..\TimeHacker.Migrations.Identity\TimeHacker.Migrations.Identity.csproj" />
     <ProjectReference Include="..\TimeHacker.Migrations\TimeHacker.Migrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TimeHacker.Integration.Api.Tests" />
   </ItemGroup>
 
 </Project>

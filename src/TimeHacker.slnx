@@ -58,6 +58,9 @@
     </Project>
   </Folder>
   <Folder Name="/06_Tests/IntegrationTests/">
+    <Project Path="TimeHacker.Integration.Api.Tests/TimeHacker.Integration.Api.Tests.csproj">
+      <BuildType Solution="NoVariablesDefault|*" Project="Release" />
+    </Project>
     <Project Path="TimeHacker.Integration.Db.Tests/TimeHacker.Integration.Db.Tests.csproj">
       <BuildType Solution="NoVariablesDefault|*" Project="Release" />
     </Project>
