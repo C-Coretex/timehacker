@@ -12,7 +12,7 @@ Stack:
 - PostgreSQL
 
 Per-user data isolation is enforced at the database level with PostgreSQL Row-Level Security (RLS), and
-the backend is covered by unit tests plus Testcontainers-based DB integration tests. See the backend
+the backend is covered by unit tests plus Testcontainers-based DB and E2E API integration tests. See the backend
 readme for details.
 
 ---
