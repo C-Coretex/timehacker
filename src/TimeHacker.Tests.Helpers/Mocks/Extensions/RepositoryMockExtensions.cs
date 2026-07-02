@@ -27,8 +27,7 @@ public static class RepositoryMockExtensions
             .Callback<TModel, CancellationToken>((entry, _) => source.RemoveAll(x => x.Id!.Equals(entry.Id)));
 
         repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TId>(), It.IsAny<CancellationToken>()))
-            .Callback<TId, CancellationToken>((id, _) => source.RemoveAll(x => x.Id!.Equals(id)))
-            .Returns(Task.CompletedTask);
+            .Returns<TId, CancellationToken>((id, _) => Task.FromResult(source.RemoveAll(x => x.Id!.Equals(id)) > 0));
     }
 
     public static void SetupRepositoryMock<TModel>(this Mock<IRepositoryBase<TModel>> repository, ICollection<TModel> source) where TModel : class, IDbEntity
@@ -100,8 +99,8 @@ public static class RepositoryMockExtensions
                 Task.FromResult(GetUserScopedData().Any(x => x.Id!.Equals(id))));
 
         repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TId>(), It.IsAny<CancellationToken>()))
-            .Callback<TId, CancellationToken>((id, _) =>
-                source.RemoveAll(x => x.Id!.Equals(id) && (!currentUserId.HasValue || x.UserId == currentUserId.Value)));
+            .Returns<TId, CancellationToken>((id, _) =>
+                Task.FromResult(source.RemoveAll(x => x.Id!.Equals(id) && (!currentUserId.HasValue || x.UserId == currentUserId.Value)) > 0));
 
         repository.Setup(x => x.DeleteBy(It.IsAny<Expression<Func<TModel, bool>>>(), It.IsAny<CancellationToken>()))
             .Returns<Expression<Func<TModel, bool>>, CancellationToken>((predicate, _) =>

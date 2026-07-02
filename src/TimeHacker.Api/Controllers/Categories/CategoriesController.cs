@@ -20,11 +20,10 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
     [ProducesResponseType(typeof(CategoryReturnModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id:guid}")]
-    public async Task<Results<Ok<CategoryReturnModel>, NotFound>> GetById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Ok<CategoryReturnModel>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await categoryService.GetByIdAsync(id, cancellationToken);
-        if (entity == null)
-            return TypedResults.NotFound();
+        NotFoundException.ThrowIfNull(entity, "Category", id.ToString());
 
         var data = CategoryReturnModel.Create(entity);
         return TypedResults.Ok(data);

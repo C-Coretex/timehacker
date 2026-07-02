@@ -13,15 +13,20 @@ internal sealed class InputRepeatingEntityTypeConverter : JsonConverter<InputRep
     {
         using var doc = JsonDocument.ParseValue(ref reader);
 
-        if (!doc.RootElement.TryGetProperty(nameof(InputRepeatingEntityModelBase.EntityType), out var typeProp))
-            throw new JsonException("Missing 'EntityType' discriminator");
+        // Honour the configured naming policy so the discriminator matches the rest of the payload's casing.
+        var discriminatorName = options.PropertyNamingPolicy?.ConvertName(nameof(InputRepeatingEntityModelBase.EntityType))
+                                ?? nameof(InputRepeatingEntityModelBase.EntityType);
+
+        if (!doc.RootElement.TryGetProperty(discriminatorName, out var typeProp))
+            throw new JsonException($"Missing '{discriminatorName}' discriminator");
 
         var typeString = typeProp.GetRawText();
         var typeEnum = Enum.Parse<RepeatingEntityType>(typeString);
 
         // Remove the discriminator before deserializing so it isn't bound onto the concrete subtype.
         var jsonNode = JsonNode.Parse(doc.RootElement.GetRawText())!.AsObject();
-        jsonNode.Remove(nameof(InputRepeatingEntityModelBase.EntityType));
+        jsonNode.Remove(discriminatorName);
+
         var json = jsonNode.ToJsonString();
 
         return typeEnum switch

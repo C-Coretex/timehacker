@@ -27,6 +27,7 @@ public interface IRepositoryBase<TModel, in TId>: IRepositoryBase<TModel> where 
     Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default);
     Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps);
 
-    Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default);
+    /// <returns>If entry was found and deleted</returns>
+    Task<bool> DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default);
     Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
 }

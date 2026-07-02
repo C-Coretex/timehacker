@@ -20,11 +20,10 @@ public class FixedTasksController(IFixedTaskAppService fixedTaskAppService) : Co
     [ProducesResponseType(typeof(FixedTaskReturnModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id:guid}")]
-    public async Task<Results<Ok<FixedTaskReturnModel>, NotFound>> GetById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Ok<FixedTaskReturnModel>> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await fixedTaskAppService.GetByIdAsync(id, cancellationToken);
-        if (entity == null)
-            return TypedResults.NotFound();
+        NotFoundException.ThrowIfNull(entity, "FixedTask", id.ToString());
 
         var data = FixedTaskReturnModel.Create(entity);
         return TypedResults.Ok(data);

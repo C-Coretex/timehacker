@@ -147,12 +147,14 @@ public class FixedTaskAppServiceTests
     }
 
     [Fact]
-    [Trait("DeleteAsync", "Should not throw when deleting non-existent task")]
-    public async Task DeleteAsync_WithNonExistentId_ShouldNotThrow()
+    [Trait("DeleteAsync", "Should throw NotFoundException when deleting non-existent task")]
+    public async Task DeleteAsync_WithNonExistentId_ShouldThrowNotFound()
     {
         var nonExistentId = Guid.NewGuid();
 
-        await _fixedTaskAppService.DeleteAsync(nonExistentId, TestContext.Current.CancellationToken);
+        var act = async () => await _fixedTaskAppService.DeleteAsync(nonExistentId, TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<NotFoundException>();
     }
 
     [Fact]

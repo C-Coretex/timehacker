@@ -181,10 +181,14 @@ public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet
         return GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
     }
 
-
-    public virtual Task DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default)
     {
-        return ExecuteDeleteAsync(x => x.Id!.Equals(id), cancellationToken);
+        // Without the check the Delete returns success even if the entity doesn't exist or is filtered out by RLS
+        if (!await ExistsAsync(id, cancellationToken))
+            return false;
+
+        await ExecuteDeleteAsync(x => x.Id!.Equals(id), cancellationToken);
+        return true;
     }
     public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
     {

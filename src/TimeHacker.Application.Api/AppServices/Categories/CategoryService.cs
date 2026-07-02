@@ -27,9 +27,10 @@ public class CategoryService(ICategoryRepository categoryRepository)
         await categoryRepository.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return categoryRepository.DeleteAndSaveAsync(id, cancellationToken);
+        if(!await categoryRepository.DeleteAndSaveAsync(id, cancellationToken))
+            throw new NotFoundException("Category", id.ToString());
     }
 
     public async Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

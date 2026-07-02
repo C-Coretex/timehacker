@@ -45,14 +45,13 @@ public class TasksController(ITaskAppService taskService)
     [ProducesResponseType(typeof(ScheduledTaskReturnModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("scheduled/{id:guid}")]
-    public async Task<Results<Ok<ScheduledTaskReturnModel>, NotFound>> GetScheduledTaskById(
+    public async Task<Ok<ScheduledTaskReturnModel>> GetScheduledTaskById(
         Guid id,
         [FromServices] IScheduledTaskAppService scheduledTaskAppService,
         CancellationToken cancellationToken = default)
     {
         var entity = await scheduledTaskAppService.GetBy(id, cancellationToken);
-        if(entity == null)
-            return TypedResults.NotFound();
+        NotFoundException.ThrowIfNull(entity, "ScheduledTask", id.ToString());
 
         var data = ScheduledTaskReturnModel.Create(entity);
 

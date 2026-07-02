@@ -1,6 +1,7 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Domain.Entities.Tags;
+using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks;
@@ -33,7 +34,8 @@ public class DynamicTaskAppService(IDynamicTaskRepository dynamicTaskRepository)
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        await dynamicTaskRepository.DeleteAndSaveAsync(id, cancellationToken);
+        if (!await dynamicTaskRepository.DeleteAndSaveAsync(id, cancellationToken))
+            throw new NotFoundException("DynamicTask", id.ToString());
     }
 
     public async Task<DynamicTaskDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

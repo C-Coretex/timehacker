@@ -25,6 +25,7 @@ public sealed class ApiTestFixture : IAsyncLifetime
 
     private readonly string _keysPath = Path.Combine(Path.GetTempPath(), "th-keys-" + Guid.NewGuid());
     private TimeHackerApiFactory _factory = null!;
+    private readonly List<TimeHackerApiFactory> _brokenFactories = [];
     private Respawner _mainRespawner = null!, _identityRespawner = null!;
 
     public string MainAdminConnectionString => _mainDb.GetConnectionString();
@@ -47,17 +48,46 @@ public sealed class ApiTestFixture : IAsyncLifetime
         _identityRespawner = await CreateRespawner(IdentityConnectionString);
 
         _factory = new TimeHackerApiFactory(MainAppConnectionString, MainAdminConnectionString, IdentityConnectionString, _keysPath);
+
+        // Force the shared host to build now (reading the good connection-string env vars) so its config
+        // is locked in. CreateBrokenDbApiClient later mutates those process-global env vars to build a
+        // separate broken host; warming up here keeps the shared factory unaffected.
+        using var warmup = _factory.CreateClient();
     }
 
     // Client that stores/sends Secure+SameSite=None cookies and avoids the https-redirect no-op.
     public HttpClient CreateApiClient() => _factory.CreateClient(new WebApplicationFactoryClientOptions
     { 
-        BaseAddress = new Uri("https://localhost"), 
-        HandleCookies = true 
+        BaseAddress = new Uri("https://localhost")
     });
 
     // Admin context for assertions — bypasses RLS, sees every user's rows.
     public TimeHackerDbContext CreateAdminDbContext() => new(MainAdminConnectionString);
+
+    // A client whose API host points its main DB at an unreachable endpoint, so the "TimeHackerDb"
+    // health check reports Unhealthy. Used to assert GET /health -> 503. The shared factory was warmed
+    // in InitializeAsync, so mutating the connection-string env vars here doesn't affect it.
+    public HttpClient CreateBrokenDbApiClient()
+    {
+        const string unreachableMainDb =
+            "Host=localhost;Port=1;Database=nonexistent;Username=none;Password=none;Timeout=1;Command Timeout=1";
+
+        var brokenFactory = new TimeHackerApiFactory(unreachableMainDb, MainAdminConnectionString, IdentityConnectionString, _keysPath);
+        _brokenFactories.Add(brokenFactory);
+
+        var client = brokenFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost"),
+            HandleCookies = true
+        });
+
+        // Restore the good env for anything built afterwards (defensive — the shared factory is already built).
+        Environment.SetEnvironmentVariable("ConnectionStrings__TimeHackerConnectionString", MainAppConnectionString);
+        Environment.SetEnvironmentVariable("ConnectionStrings__TimeHackerAdminConnectionString", MainAdminConnectionString);
+        Environment.SetEnvironmentVariable("ConnectionStrings__IdentityConnectionString", IdentityConnectionString);
+
+        return client;
+    }
 
     public async ValueTask ResetAsync()
     {
@@ -86,6 +116,9 @@ public sealed class ApiTestFixture : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
+        foreach (var brokenFactory in _brokenFactories)
+            await brokenFactory.DisposeAsync();
+
         await _factory.DisposeAsync();
         await _mainDb.DisposeAsync();
         await _identityDb.DisposeAsync();

@@ -12,11 +12,10 @@ public class UsersController(IUserAppService userService) : ControllerBase
     [ProducesResponseType(typeof(UserReturnModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("me")]
-    public async Task<Results<Ok<UserReturnModel>, NotFound>> GetCurrent(CancellationToken cancellationToken = default)
+    public async Task<Ok<UserReturnModel>> GetCurrent(CancellationToken cancellationToken = default)
     {
         var user = await userService.GetCurrent(cancellationToken);
-        if (user == null)
-            return TypedResults.NotFound();
+        NotFoundException.ThrowIfNull(user, "User", string.Empty);
 
         var data = UserReturnModel.Create(user);
         return TypedResults.Ok(data);

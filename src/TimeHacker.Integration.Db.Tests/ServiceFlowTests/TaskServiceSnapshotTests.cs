@@ -36,9 +36,19 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
         var service = Resolve<ITaskAppService>();
 
         await service.GetTasksForDay(date, TestContext.Current.CancellationToken);
+        var afterFirst = await GetSnapshotOn(date);
+        // Let the clock advance so that IF the second call regenerated the snapshot its CreatedTimestamp would
+        // differ — making the "unchanged timestamp" assertion below a real proof that the row was reused.
+        await Task.Delay(10, TestContext.Current.CancellationToken);
+
         await service.GetTasksForDay(date, TestContext.Current.CancellationToken);
+        var afterSecond = await GetSnapshotOn(date);
 
         (await CountSnapshotsOn(date)).Should().Be(1);
+        // Reused, not touched: the same row survives (Id + CreatedTimestamp unchanged) and was never updated.
+        afterSecond!.Id.Should().Be(afterFirst!.Id);
+        afterSecond.CreatedTimestamp.Should().Be(afterFirst.CreatedTimestamp);
+        afterSecond.UpdatedTimestamp.Should().BeNull();
     }
 
     [Fact]
@@ -50,6 +60,10 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
 
         // Pre-create the middle date's snapshot so the call has a mix of present + missing.
         await service.GetTasksForDay(dates[1], TestContext.Current.CancellationToken);
+        var existingMiddle = await GetSnapshotOn(dates[1]);
+        // Advance the clock so a regeneration of the middle snapshot would produce a newer CreatedTimestamp —
+        // making its "unchanged timestamp" assertion below a real proof that it was reused, not rebuilt.
+        await Task.Delay(10, TestContext.Current.CancellationToken);
 
         var results = await service.GetTasksForDays(dates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
@@ -57,6 +71,14 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
         Db.ChangeTracker.Clear();
         var snapshotCount = await Db.Set<ScheduleSnapshot>().CountAsync(s => dates.Contains(s.Date), TestContext.Current.CancellationToken);
         snapshotCount.Should().Be(3);
+
+        // The two missing dates were inserted; the pre-existing middle snapshot was reused, not regenerated.
+        (await GetSnapshotOn(dates[0])).Should().NotBeNull();
+        (await GetSnapshotOn(dates[2])).Should().NotBeNull();
+        var middleAfter = await GetSnapshotOn(dates[1]);
+        middleAfter!.Id.Should().Be(existingMiddle!.Id);
+        middleAfter.CreatedTimestamp.Should().Be(existingMiddle.CreatedTimestamp);
+        middleAfter.UpdatedTimestamp.Should().BeNull();
     }
 
     [Fact]
@@ -69,14 +91,23 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
         var service = Resolve<ITaskAppService>();
 
         await service.GetTasksForDays(dates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        var original = await GetSnapshotOn(date);
+        // Guarantee the regenerated snapshot's CreatedTimestamp is strictly later than the original's so the
+        // "deleted and re-inserted" assertion below can't be satisfied by an unchanged row sharing a timestamp.
+        await Task.Delay(10, TestContext.Current.CancellationToken);
         // Production runs each request in its own DI scope/DbContext; emulate that so the refresh doesn't
         // collide with snapshots still tracked from the previous call. The service uses the current
         // user's scoped context (not the admin Db), so clear that one.
         Resolve<TimeHackerDbContext>().ChangeTracker.Clear();
         await service.RefreshTasksForDays(dates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
-        // Exactly one snapshot for the date, and its single child task was replaced, not duplicated.
+        // Exactly one snapshot for the date, but it was deleted and re-inserted (new Id, strictly newer
+        // CreatedTimestamp) rather than left untouched or duplicated; its single child task was replaced.
         (await CountSnapshotsOn(date)).Should().Be(1);
+        var regenerated = await GetSnapshotOn(date);
+        regenerated!.Id.Should().NotBe(original!.Id);
+        regenerated.CreatedTimestamp.Should().BeAfter(original.CreatedTimestamp);
+        regenerated.UpdatedTimestamp.Should().BeNull();
         var scheduledTaskCount = await Db.Set<ScheduledTask>().CountAsync(t => t.Date == date, TestContext.Current.CancellationToken);
         scheduledTaskCount.Should().Be(1);
     }
@@ -113,5 +144,14 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
     {
         Db.ChangeTracker.Clear();
         return await Db.Set<ScheduleSnapshot>().CountAsync(s => s.Date == date, TestContext.Current.CancellationToken);
+    }
+
+    // Read the snapshot fresh (no tracking) so its Id/CreatedTimestamp/UpdatedTimestamp reflect the DB row and
+    // can be compared across calls to prove insert / delete+reinsert / untouched / updated.
+    private async Task<ScheduleSnapshot?> GetSnapshotOn(DateOnly date)
+    {
+        Db.ChangeTracker.Clear();
+        return await Db.Set<ScheduleSnapshot>().AsNoTracking()
+            .SingleOrDefaultAsync(s => s.Date == date, TestContext.Current.CancellationToken);
     }
 }

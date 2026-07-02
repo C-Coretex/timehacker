@@ -6,6 +6,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using TimeHacker.Api.Converters;
 using TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Filters;
 using TimeHacker.Api.Middleware;
@@ -79,9 +80,18 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidateAntiforgeryFilter>();
     options.Filters.Add<LogExceptionFilter>();
-}).AddJsonOptions(options =>
+}).AddJsonOptions(options => //for MVC controllers functionality (input binding [FromBody], Non-TypedResults return])
 {
     options.JsonSerializerOptions.Converters.Add(new InputRepeatingEntityTypeConverter());
+    AddSharedJsonConverters(options.JsonSerializerOptions);
+});
+
+// Controllers return results via TypedResults (HttpResults), which serialize with the Http.Json options
+// rather than the MVC AddJsonOptions above — so response bodies (e.g. Color) need the converter here too
+// (for Minimal APIs, TypedResults, HttpContext).
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    AddSharedJsonConverters(options.SerializerOptions);
 });
 
 var uiUrl = builder.Configuration.GetValue<string>("AppSettings:uiUrl")!;
@@ -269,6 +279,11 @@ static void AddIdentityServices(IServiceCollection services)
             return Task.CompletedTask;
         };
     });
+}
+
+static void AddSharedJsonConverters(JsonSerializerOptions o)
+{
+    o.Converters.Add(new ColorJsonConverter());
 }
 
 #endregion

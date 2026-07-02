@@ -107,12 +107,14 @@ public class CategoryServiceTests
     }
 
     [Fact]
-    [Trait("DeleteAsync", "Should handle non-existent ID")]
-    public async Task DeleteAsync_ShouldHandleNonExistentId()
+    [Trait("DeleteAsync", "Should throw NotFoundException for non-existent ID")]
+    public async Task DeleteAsync_ShouldThrowNotFound_ForNonExistentId()
     {
         var nonExistentId = Guid.NewGuid();
 
-        await _categoryService.DeleteAsync(nonExistentId, TestContext.Current.CancellationToken);
+        var act = async () => await _categoryService.DeleteAsync(nonExistentId, TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<NotFoundException>();
     }
 
     // Security Tests
@@ -164,13 +166,15 @@ public class CategoryServiceTests
     }
 
     [Fact]
-    [Trait("DeleteAsync", "Should not delete other user categories")]
-    public async Task DeleteAsync_ShouldNotDeleteOtherUserCategories()
+    [Trait("DeleteAsync", "Should reject deleting other user categories")]
+    public async Task DeleteAsync_ShouldRejectOtherUserCategories()
     {
         var otherUserCategory = _categories.First(x => x.UserId != _userId);
         var otherCategoryId = otherUserCategory.Id;
 
-        await _categoryService.DeleteAsync(otherCategoryId, TestContext.Current.CancellationToken);
+        // Cross-user delete is rejected (not a silent no-op), consistent with UpdateAsync.
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            _categoryService.DeleteAsync(otherCategoryId, TestContext.Current.CancellationToken));
 
         _categories.Should().Contain(x => x.Id == otherCategoryId);
     }

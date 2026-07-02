@@ -1,6 +1,6 @@
-using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.AspNetCore.Identity.Data;
+using Refit;
+using TimeHacker.Api.Converters;
 using TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
@@ -12,44 +12,23 @@ internal static class TestUser
         => ($"user-{Guid.NewGuid():N}@test.local", "Passw0rd!");
 }
 
-internal static class ApiClientExtensions
+internal static class RefitConfig
 {
-    // Mirrors the API's own JSON setup (AddControllers().AddJsonOptions) so request bodies — including the
-    // polymorphic RepeatingEntity models — are serialized the way the controllers expect to read them.
-    internal static readonly JsonSerializerOptions JsonOptions = BuildJsonOptions();
+    // Mirror the API's own JSON setup so request bodies — the polymorphic RepeatingEntity models and
+    // System.Drawing.Color — serialize exactly the way the controllers read them. Reads stay
+    // case-insensitive (web defaults), so camelCase responses map back onto the typed models.
+    private static readonly JsonSerializerOptions JsonOptions = BuildJsonOptions();
+
+    public static readonly RefitSettings Settings = new()
+    {
+        ContentSerializer = new SystemTextJsonContentSerializer(JsonOptions)
+    };
+
     private static JsonSerializerOptions BuildJsonOptions()
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
         options.Converters.Add(new InputRepeatingEntityTypeConverter());
+        options.Converters.Add(new ColorJsonConverter());
         return options;
     }
-
-    // TestServer has no real port; requests use relative URIs resolved against the client BaseAddress.
-    // new Uri(string) assumes an absolute URI and throws on a path, so build relative URIs explicitly.
-    internal static Uri GetUri(string relativeUrl) => new(relativeUrl, UriKind.Relative);
-
-    public static Task<HttpResponseMessage> RegisterAsync(this HttpClient client, string email, string password)
-        => client.PostAsJsonAsync(GetUri("/register"), new RegisterRequest { Email = email, Password = password });
-
-    public static Task<HttpResponseMessage> LoginAsync(this HttpClient client, string email, string password)
-        => client.PostAsJsonAsync(GetUri("/login?useCookies=true"), new LoginRequest { Email = email, Password = password });
-
-    public static async Task LoadCsrfTokenAsync(this HttpClient client)
-    {
-        var token = await client.GetFromJsonAsync<CsrfToken>(GetUri("/api/antiforgery/token"));
-        client.DefaultRequestHeaders.Remove("X-XSRF-TOKEN");
-        client.DefaultRequestHeaders.Add("X-XSRF-TOKEN", token!.Token);
-    }
-
-    // Send a real Input DTO (InputCategoryModel, InputFixedTaskModel, ...) using the API's serializer.
-    public static Task<HttpResponseMessage> PostDtoAsync<TDto>(this HttpClient client, string url, TDto dto, CancellationToken cancellationToken = default)
-        => client.PostAsJsonAsync(GetUri(url), dto, JsonOptions, cancellationToken);
-
-    public static Task<HttpResponseMessage> PutDtoAsync<TDto>(this HttpClient client, string url, TDto dto, CancellationToken cancellationToken = default)
-        => client.PutAsJsonAsync(GetUri(url), dto, JsonOptions, cancellationToken);
-
-    public static Task<TValue?> ReadJsonAsync<TValue>(this HttpResponseMessage response, CancellationToken cancellationToken = default)
-        => response.Content.ReadFromJsonAsync<TValue>(JsonOptions, cancellationToken);
-
-    private sealed record CsrfToken(string Token);
 }

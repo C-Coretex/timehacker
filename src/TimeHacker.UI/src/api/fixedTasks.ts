@@ -25,35 +25,11 @@ export const createFixedTask = async (task: InputFixedTask): Promise<string> => 
     return response.data;
 };
 
-/** Build request body with PascalCase keys for API (converter expects EntityType discriminator). */
-function toScheduleRequestBody(body: InputScheduleEntityModel): Record<string, unknown> {
-    const rep = body.repeatingEntityType;
-    const repeatingEntityType =
-        'daysCountToRepeat' in rep
-            ? { EntityType: rep.entityType, DaysCountToRepeat: rep.daysCountToRepeat }
-            : 'repeatsOn' in rep
-              ? { EntityType: rep.entityType, RepeatsOn: rep.repeatsOn }
-              : 'monthDayToRepeat' in rep
-                ? { EntityType: rep.entityType, MonthDayToRepeat: rep.monthDayToRepeat }
-                : { EntityType: rep.entityType, YearDayToRepeat: rep.yearDayToRepeat };
-    return {
-        parentEntityId: body.parentEntityId,
-        repeatingEntityType,
-        endsOnModel: body.endsOnModel
-            ? {
-                  MaxDate: body.endsOnModel.maxDate ?? undefined,
-                  MaxOccurrences: body.endsOnModel.maxOccurrences ?? undefined,
-              }
-            : undefined,
-    };
-}
-
 /** Post new schedule for a fixed task (repeating entity). Call after createFixedTask with the returned id. */
 export const postNewScheduleForTask = async (
     body: InputScheduleEntityModel
 ): Promise<unknown> => {
-    const payload = toScheduleRequestBody(body);
-    const response = await api.post(`${TASKS_API_URL}/schedules`, payload);
+    const response = await api.post(`${TASKS_API_URL}/schedules`, body);
     return response.data;
 };
 

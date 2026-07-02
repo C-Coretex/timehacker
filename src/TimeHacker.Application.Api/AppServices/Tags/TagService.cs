@@ -1,6 +1,7 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tags;
 using TimeHacker.Domain.IRepositories.Tags;
+using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Application.Api.AppServices.Tags;
 
@@ -29,8 +30,9 @@ public class TagService(ITagRepository tagRepository)
         return TagDto.Create(entity);
     }
 
-    public Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        return tagRepository.DeleteAndSaveAsync(id);
+        if (!await tagRepository.DeleteAndSaveAsync(id))
+            throw new NotFoundException("Tag", id.ToString());
     }
 }

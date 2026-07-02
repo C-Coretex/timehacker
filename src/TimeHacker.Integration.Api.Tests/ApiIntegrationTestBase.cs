@@ -1,4 +1,5 @@
-﻿using TimeHacker.Infrastructure;
+using Microsoft.AspNetCore.Identity.Data;
+using TimeHacker.Infrastructure;
 using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests;
@@ -11,30 +12,35 @@ public abstract class ApiIntegrationTestBase(ApiTestFixture fixture) : IAsyncLif
     public virtual ValueTask InitializeAsync()
     {
         AdminDbContext = fixture.CreateAdminDbContext();
-        return ValueTask.CompletedTask; 
+        return ValueTask.CompletedTask;
     }
 
-    protected HttpClient CreateAnonymousClient() => Fixture.CreateApiClient();
+    // Anonymous composite client (no auth cookie) — for 401 checks.
+    protected TimeHackerApi CreateAnonymousApi() => new(fixture.CreateApiClient());
 
-    // TestServer has no port; requests use relative URIs against the client BaseAddress.
-    internal static Uri Url(string relativeUrl) => ApiClientExtensions.GetUri(relativeUrl);
-
-    // Register + login a brand-new user, then load the CSRF token so mutating verbs pass antiforgery.
-    protected async Task<HttpClient> CreateAuthenticatedClientAsync()
+    // Register + login a brand-new user; by default also load the CSRF token so mutating verbs pass
+    // antiforgery. Pass loadCsrf: false to exercise the antiforgery-rejection path.
+    protected async Task<TimeHackerApi> CreateAuthenticatedApiAsync(bool loadCsrf = true)
     {
-        var client = fixture.CreateApiClient();
+        var httpClient = fixture.CreateApiClient();
+        var api = new TimeHackerApi(httpClient);
         var (email, password) = TestUser.New();
 
-        (await client.RegisterAsync(email, password)).EnsureSuccessStatusCode();
-        (await client.LoginAsync(email, password)).EnsureSuccessStatusCode();
-        await client.LoadCsrfTokenAsync();
+        await api.Auth.Register(new RegisterRequest { Email = email, Password = password });
+        await api.Auth.Login(new LoginRequest { Email = email, Password = password });
 
-        return client;
+        if (loadCsrf)
+        {
+            var token = await api.Auth.GetAntiforgeryToken();
+            httpClient.DefaultRequestHeaders.Add("X-XSRF-TOKEN", token.Content!.Token);
+        }
+
+        return api;
     }
 
     public virtual async ValueTask DisposeAsync()
-    { 
-        await AdminDbContext.DisposeAsync(); 
+    {
+        await AdminDbContext.DisposeAsync();
         await Fixture.ResetAsync();
 
         GC.SuppressFinalize(this);

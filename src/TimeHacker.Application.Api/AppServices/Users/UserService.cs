@@ -1,5 +1,6 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
+using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IRepositories.Users;
 
 namespace TimeHacker.Application.Api.AppServices.Users;
@@ -29,7 +30,8 @@ public class UserService(IUserRepository userRepository, UserAccessorBase userAc
 
     public async Task DeleteAsync(CancellationToken cancellationToken = default)
     {
-        var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
-        await userRepository.DeleteAndSaveAsync(userId, cancellationToken);
+        var userId = userAccessorBase.GetUserIdOrThrowUnauthorized(); 
+        if (!await userRepository.DeleteAndSaveAsync(userId, cancellationToken))
+            throw new NotFoundException("User", userId.ToString());
     }
 }

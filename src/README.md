@@ -108,11 +108,16 @@ ScheduleSnapshot (for specific date)
 
 - **Unit tests** — xUnit v3 + Moq + MockQueryable + AutoBogus + AwesomeAssertions. Cover app services,
   domain services, and domain models (`TimeHacker.*.Tests`).
-- **Integration tests** (`TimeHacker.Integration.Db.Tests`) — run against a **real PostgreSQL** via
+- **DB integration tests** (`TimeHacker.Integration.Db.Tests`) — run against a **real PostgreSQL** via
   Testcontainers, with Respawner resetting the DB between tests. They verify RLS user isolation, cascade
   deletes, JSON columns, value converters, DB constraints, optimistic concurrency, and full
   app-service-over-real-DB flows. Tests *act* as `application_user` (RLS-bound) and *assert* via an admin
   connection. **A running Docker daemon is required.**
+- **API (end-to-end) tests** (`TimeHacker.Integration.Api.Tests`) — drive the **real API over HTTP**
+  through `WebApplicationFactory<Program>` against Testcontainers PostgreSQL, exercising the full pipeline
+  (cookie auth, CSRF, RLS, exception filter, EF, business logic). Endpoints are called through a
+  strongly-typed **Refit** client (`ITimeHackerApi`); side effects are asserted via an admin DbContext.
+  **A running Docker daemon is required.** See CLAUDE.md §8 for the fixture/client layout.
 
 Run from `src/`:
 ```
