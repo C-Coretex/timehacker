@@ -1,4 +1,5 @@
 ﻿using AutoBogus;
+using Microsoft.EntityFrameworkCore;
 using TimeHacker.Infrastructure;
 using TimeHacker.Integration.Db.Tests.Fixtures;
 using TimeHacker.Tests.Helpers.AutoFaker;
@@ -36,8 +37,23 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
     protected T Resolve<T>() where T : notnull
         => CurrentUser.Resolve<T>();
 
-    protected TimeHackerDbContext Db 
+    protected TimeHackerDbContext Db
         => _dbContext;
+
+    /// <summary>
+    /// Builds a raw <see cref="TimeHackerDbContext"/> on the RLS-bound <c>application_user</c> connection
+    /// with <c>app.user_id</c> set to <paramref name="userId"/> — no repository, no interceptor, no in-app
+    /// guard. Used to verify PostgreSQL RLS in isolation by calling <c>Set&lt;T&gt;()</c> directly.
+    /// </summary>
+    protected async Task<TimeHackerDbContext> CreateRlsContextAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var context = new TimeHackerDbContext(_fixture.ConnectionString);
+        // Pin one physical connection so set_config and the later Set<T>() calls share the same session.
+        await context.Database.OpenConnectionAsync(cancellationToken);
+        await context.Database.ExecuteSqlRawAsync("SELECT set_config('app.user_id', {0}, false)",
+            [userId.ToString()], cancellationToken);
+        return context;
+    }
 
 
     public virtual async ValueTask InitializeAsync()
