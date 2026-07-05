@@ -31,7 +31,7 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
         CurrentUser = new UserFixture(fixture.ConnectionString);
         OtherUsers = [.. Enumerable.Range(0, 3).Select(_ => new UserFixture(fixture.ConnectionString))];
 
-        _dbContext = new TimeHackerDbContext(fixture.AdminConnectionString);
+        _dbContext = TimeHackerDbContext.Create(fixture.AdminConnectionString);
     }
 
     protected T Resolve<T>() where T : notnull
@@ -47,7 +47,7 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
     /// </summary>
     protected async Task<TimeHackerDbContext> CreateRlsContextAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var context = new TimeHackerDbContext(_fixture.ConnectionString);
+        var context = TimeHackerDbContext.Create(_fixture.ConnectionString);
         // Pin one physical connection so set_config and the later Set<T>() calls share the same session.
         await context.Database.OpenConnectionAsync(cancellationToken);
         await context.Database.ExecuteSqlRawAsync("SELECT set_config('app.user_id', {0}, false)",

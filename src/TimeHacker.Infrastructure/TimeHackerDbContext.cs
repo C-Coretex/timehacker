@@ -12,7 +12,33 @@ namespace TimeHacker.Infrastructure;
 public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
 {
     public TimeHackerDbContext(DbContextOptions<TimeHackerDbContext> options) : base(options) { }
-    public TimeHackerDbContext(string connectionString) : base(connectionString) { }
+    private TimeHackerDbContext(string connectionString) : base(connectionString) { }
+    public static TimeHackerDbContext Create(string connectionString) => new(connectionString);
+
+    // Set per lease by TimeHackerScopedDbContextFactory to the current request/test scope's provider.
+    // UserSessionInterceptor resolves UserAccessorBase from it lazily at connection-open (see that class).
+    // Overwritten on every lease and nulled on dispose/return-to-pool (below), so a pooled context never
+    // holds a reference to a disposed scope.
+    internal IServiceProvider? ScopeServiceProvider { get; set; }
+
+    // For a pooled context, disposing the leased instance at end-of-scope is the "return to pool" event.
+    // Null the captured scope here so a context sitting in the pool can't read a disposed provider; if it is
+    // ever used before the factory re-stamps it.
+    public override void Dispose()
+    {
+        ScopeServiceProvider = null;
+        base.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        ScopeServiceProvider = null;
+        await base.DisposeAsync();
+
+        GC.SuppressFinalize(this);
+    }
 
     #region DbSets
 

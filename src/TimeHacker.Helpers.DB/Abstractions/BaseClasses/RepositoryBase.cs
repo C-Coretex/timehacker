@@ -30,12 +30,10 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     protected TDbContext DbContext { get; set; } = dbContext;
     protected DbSet<TModel> DbSet { get; set; } = dbSet;
 
-    protected virtual IQueryable<TModel> GetAllBase()
-    {
-        return DbSet;
-    }
+    protected virtual IQueryable<TModel> GetAllBase() => DbSet;
 
-    public virtual IQueryable<TModel> GetAll(params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps) => GetAll(true, queryPipelineSteps);
+    public virtual IQueryable<TModel> GetAll(params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps) 
+        => GetAll(true, queryPipelineSteps);
 
     public virtual IQueryable<TModel> GetAll(bool asNoTracking = true, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
@@ -53,10 +51,8 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return query;
     }
 
-    public virtual TModel Add(TModel model)
-    {
-        return DbContextBase<TDbContext>.AddEntity(DbSet, model);
-    }
+    public virtual TModel Add(TModel model) 
+        => DbContextBase<TDbContext>.AddEntity(DbSet, model);
     public virtual async Task<TModel> AddAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         var entity = Add(model);
@@ -64,20 +60,16 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return entity;
     }
 
-    public virtual void AddRange(IEnumerable<TModel> models)
-    {
-        DbContextBase<TDbContext>.AddEntities(DbSet, models);
-    }
+    public virtual void AddRange(IEnumerable<TModel> models) 
+        => DbContextBase<TDbContext>.AddEntities(DbSet, models);
     public virtual Task AddRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
         AddRange(models);
         return SaveChangesAsync(cancellationToken);
     }
 
-    public virtual void Delete(TModel model)
-    {
-        DbContextBase<TDbContext>.RemoveEntity(DbSet, model);
-    }
+    public virtual void Delete(TModel model) 
+        => DbContextBase<TDbContext>.RemoveEntity(DbSet, model);
     public virtual Task DeleteAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         Delete(model);
@@ -85,9 +77,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     }
 
     public virtual void DeleteRange(IEnumerable<TModel> models)
-    {
-        DbContextBase<TDbContext>.RemoveEntities(DbSet, models);
-    }
+        => DbContextBase<TDbContext>.RemoveEntities(DbSet, models);
     public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
         DeleteRange(models);
@@ -95,14 +85,10 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     }
 
     public virtual Task<int> DeleteBy(Expression<Func<TModel, bool>> predicate, CancellationToken cancellationToken = default)
-    {
-        return ExecuteDeleteAsync(predicate, cancellationToken);
-    }
+        => ExecuteDeleteAsync(predicate, cancellationToken);
 
     public virtual TModel Update(TModel model)
-    {
-        return DbContextBase<TDbContext>.UpdateEntity(DbSet, model);
-    }
+        => DbContextBase<TDbContext>.UpdateEntity(DbSet, model);
     public virtual async Task<TModel> UpdateAndSaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
         var entity = Update(model);
@@ -111,9 +97,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     }
 
     public virtual void UpdateRange(IEnumerable<TModel> models)
-    {
-        DbContextBase<TDbContext>.UpdateEntities(DbSet, models);
-    }
+        => DbContextBase<TDbContext>.UpdateEntities(DbSet, models);
     public virtual Task UpdateRangeAndSaveAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
         UpdateRange(models);
@@ -150,6 +134,10 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
         return query.ExecuteDeleteAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Save changes from the whole Unit of Work (scoped DbContext).
+    /// This method will save all the changes tracked in the current DbContext across all the repositories in the scope.
+    /// </summary>
     public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
         => DbContext.SaveChangesAsync(cancellationToken);
 }
@@ -160,14 +148,10 @@ public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet
     where TDbContext : DbContextBase<TDbContext>
 {
     public virtual Task<bool> ExistsAsync(TId id, CancellationToken cancellationToken = default)
-    {
-        return GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
-    }
+        => GetAllBase().AnyAsync(x => x.Id!.Equals(id), cancellationToken);
 
     public virtual Task<TModel?> GetByIdAsync(TId id, bool asNoTracking = true, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
-    {
-        return GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
-    }
+        => GetAll(asNoTracking, queryPipelineSteps).FirstOrDefaultAsync(x => x.Id!.Equals(id), cancellationToken);
 
     public virtual async Task<bool> DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default)
     {
@@ -178,8 +162,7 @@ public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet
         await ExecuteDeleteAsync(x => x.Id!.Equals(id), cancellationToken);
         return true;
     }
+
     public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
-    {
-        return ExecuteDeleteAsync(x => ids.Contains(x.Id), cancellationToken);
-    }
+        => ExecuteDeleteAsync(x => ids.Contains(x.Id), cancellationToken);
 }

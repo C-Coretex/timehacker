@@ -62,7 +62,7 @@ public sealed class ApiTestFixture : IAsyncLifetime
     });
 
     // Admin context for assertions — bypasses RLS, sees every user's rows.
-    public TimeHackerDbContext CreateAdminDbContext() => new(MainAdminConnectionString);
+    public TimeHackerDbContext CreateAdminDbContext() => TimeHackerDbContext.Create(MainAdminConnectionString);
 
     // A client whose API host points its main DB at an unreachable endpoint, so the "TimeHackerDb"
     // health check reports Unhealthy. Used to assert GET /health -> 503. The shared factory was warmed

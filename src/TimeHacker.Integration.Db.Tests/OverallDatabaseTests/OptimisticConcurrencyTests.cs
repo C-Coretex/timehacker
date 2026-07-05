@@ -20,8 +20,8 @@ public class OptimisticConcurrencyTests(DbContainerFixture fixture) : DbIntegrat
             TestContext.Current.CancellationToken);
 
         var connectionString = Db.Database.GetConnectionString()!;
-        await using var context1 = new TimeHackerDbContext(connectionString);
-        await using var context2 = new TimeHackerDbContext(connectionString);
+        await using var context1 = TimeHackerDbContext.Create(connectionString);
+        await using var context2 = TimeHackerDbContext.Create(connectionString);
 
         var entityFromContext1 = await context1.Set<ScheduleEntity>().FirstAsync(x => x.Id == seeded.Id, TestContext.Current.CancellationToken);
         var entityFromContext2 = await context2.Set<ScheduleEntity>().FirstAsync(x => x.Id == seeded.Id, TestContext.Current.CancellationToken);

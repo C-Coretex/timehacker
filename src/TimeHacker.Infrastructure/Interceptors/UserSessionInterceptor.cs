@@ -1,16 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+#pragma warning disable CA1062 // Validate arguments of public methods
+
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
 
 namespace TimeHacker.Infrastructure.Interceptors;
 
-// Resolves UserAccessorBase lazily (at connection-open time) rather than via the constructor.
-// The interceptor is created while TimeHackerDbContext is being built, and UserAccessorBase ->
-// UserAccessor -> IUserRepository -> TimeHackerDbContext, so taking UserAccessorBase as a ctor
-// dependency forms a DI resolution cycle that deadlocks/recurses during DbContext construction.
-// By the time a connection opens, the DbContext already exists in the scope, so resolving the
-// accessor here returns the cached instance without re-entering DbContext construction.
-public class UserSessionInterceptor(IServiceProvider serviceProvider) : DbConnectionInterceptor
+// Sets the PostgreSQL session variable `app.user_id` on every connection open, which the RLS policies use
+// to scope rows to the current user.
+//
+// Registered as a stateless Singleton so it is compatible with DbContext pooling (pooling bakes interceptor
+// instances into the singleton options once, so a scoped/transient interceptor can't be used here).
+// The per-request UserId is resolved lazily from the leased context's scope: TimeHackerScopedDbContextFactory
+// stamps the current scope's IServiceProvider onto the context, and we resolve UserAccessorBase from it at
+// connection-open. Resolving lazily (rather than taking UserAccessorBase as a dependency) avoids a DI cycle
+// — UserAccessorBase -> UserAccessor -> IUserRepository -> TimeHackerDbContext — because by connection-open
+// the context graph is already built and cached in the scope.
+// We can't inject IServiceProvider directly because the UserSessionInterceptor is Singleton and would not be resolved for each scope.
+public class UserSessionInterceptor : DbConnectionInterceptor
 {
     public const string SessionUserIdParameterName = "app.user_id";
 
@@ -18,13 +25,11 @@ public class UserSessionInterceptor(IServiceProvider serviceProvider) : DbConnec
     {
         await base.ConnectionOpenedAsync(connection, eventData, cancellationToken);
 
-        // Set the user_id parameter for the current session
-        var userAccessor = serviceProvider.GetRequiredService<UserAccessorBase>();
-        var userId = userAccessor.UserId ?? Guid.NewGuid(); //new guid to filter out all users if userId not found
+        var userAccessor = (eventData.Context as TimeHackerDbContext)?.ScopeServiceProvider?.GetService<UserAccessorBase>();
+        var userId = userAccessor?.UserId ?? Guid.NewGuid(); //new guid to filter out all users if userId not found (we can't just throw as the table requested can be without RLS)
 
-#pragma warning disable CA1062 // Validate arguments of public methods
+        // Set the user_id parameter for the current session
         using var command = connection.CreateCommand();
-#pragma warning restore CA1062 // Validate arguments of public methods
         command.CommandText = $"SELECT set_config('{SessionUserIdParameterName}', @userId, false);";
 
         var parameter = command.CreateParameter();

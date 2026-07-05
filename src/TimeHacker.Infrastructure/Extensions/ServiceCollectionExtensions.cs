@@ -4,6 +4,7 @@ using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tags;
 using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IRepositories.Users;
+using TimeHacker.Infrastructure.Factories;
 using TimeHacker.Infrastructure.Interceptors;
 using TimeHacker.Infrastructure.Repositories.Categories;
 using TimeHacker.Infrastructure.Repositories.ScheduleSnapshots;
@@ -17,17 +18,26 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection RegisterRepositories(this IServiceCollection services, string timeHackerConnectionString)
     {
-        services.AddTransient<UserSessionInterceptor>();
-        services.AddTransient<TimestampInterceptor>();
+        // Interceptors must be Singletons: DbContext pooling builds the options (and bakes in the
+        // interceptor instances) once from the root provider, so scoped/transient interceptors would throw
+        // "Cannot resolve scoped service from root provider". Both are stateless — the per-request UserId is
+        // carried on the leased context by TimeHackerScopedDbContextFactory (see UserSessionInterceptor).
+        services.AddSingleton<UserSessionInterceptor>();
+        services.AddSingleton<TimestampInterceptor>();
 
-        services.AddDbContext<TimeHackerDbContext>((sp, options) =>
-        { 
+        services.AddPooledDbContextFactory<TimeHackerDbContext>((sp, options) =>
+        {
             options.UseNpgsql(timeHackerConnectionString);
             options.AddInterceptors(
-                sp.GetRequiredService<UserSessionInterceptor>(), 
+                sp.GetRequiredService<UserSessionInterceptor>(),
                 sp.GetRequiredService<TimestampInterceptor>());
         });
 
+        // Hand repositories a scoped, pooled context whose ScopeServiceProvider points at the current scope.
+        services.AddScoped<TimeHackerScopedDbContextFactory>();
+        services.AddScoped(sp => sp.GetRequiredService<TimeHackerScopedDbContextFactory>().CreateDbContext());
+
+        // Same DbContext is shared between repositories in the same scope, so transactions would work out of the box
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         services.AddScoped<IScheduleSnapshotRepository, ScheduleSnapshotRepository>();
