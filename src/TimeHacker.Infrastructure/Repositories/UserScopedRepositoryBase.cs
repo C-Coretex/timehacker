@@ -47,7 +47,7 @@ internal class UserScopedRepositoryBase<TModel, TId>(TimeHackerDbContext dbConte
             var originalUserId = entry.Property(e => e.UserId).OriginalValue;
 
             // OriginalValue could be default if the entity was not loaded, we don't want to throw in that case
-            // (this would limit the developer and RLS would handle such case anyway)
+            // (this would limit the developer and RLS would handle such case anyway + stubs throw with Optimistic Concurrency)
             originalUserId = originalUserId == Guid.Empty ? entry.Entity.UserId : originalUserId;
             if (originalUserId != entry.Entity.UserId || entry.Entity.UserId != userId)
                 ThrowNotFoundException(entry);

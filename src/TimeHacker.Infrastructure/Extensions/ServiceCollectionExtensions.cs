@@ -18,11 +18,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterRepositories(this IServiceCollection services, string timeHackerConnectionString)
     {
         services.AddTransient<UserSessionInterceptor>();
+        services.AddTransient<TimestampInterceptor>();
 
         services.AddDbContext<TimeHackerDbContext>((sp, options) =>
         { 
             options.UseNpgsql(timeHackerConnectionString);
-            options.AddInterceptors(sp.GetRequiredService<UserSessionInterceptor>());
+            options.AddInterceptors(
+                sp.GetRequiredService<UserSessionInterceptor>(), 
+                sp.GetRequiredService<TimestampInterceptor>());
         });
 
         services.AddScoped<ICategoryRepository, CategoryRepository>();

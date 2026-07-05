@@ -25,9 +25,10 @@ public class TimestampPopulationTests(DbContainerFixture fixture) : DbIntegratio
         reloaded.UpdatedTimestamp.Should().BeNull();
     }
 
-    [Fact]
+    [Theory]
+    [InlineData(true), InlineData(false)]
     [Trait("SaveChanges", "UpdatedTimestamp")]
-    public async Task Update_Should_PopulateUpdatedTimestampAndKeepCreated()
+    public async Task Update_Should_PopulateUpdatedTimestampAndKeepCreated(bool executeUpdate)
     {
         var repo = Resolve<ICategoryRepository>();
         var category = new Category { Name = "Original", Color = Color.Teal };
@@ -42,8 +43,13 @@ public class TimestampPopulationTests(DbContainerFixture fixture) : DbIntegratio
             .FirstAsync(TestContext.Current.CancellationToken);
 
         await Task.Delay(10, TestContext.Current.CancellationToken);
-        category.Name = "Updated";
-        await repo.UpdateAndSaveAsync(category, TestContext.Current.CancellationToken);
+        if (executeUpdate)
+            await repo.UpdateProperty(c => c.Id == category.Id, c => c.Name, "Updated", TestContext.Current.CancellationToken);
+        else
+        {
+            category.Name = "Updated";
+            await repo.UpdateAndSaveAsync(category, TestContext.Current.CancellationToken);
+        }
 
         var reloaded = await ReloadAsync(category.Id);
         reloaded.Name.Should().Be("Updated");

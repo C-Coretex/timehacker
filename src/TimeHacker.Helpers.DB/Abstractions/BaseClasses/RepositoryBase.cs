@@ -151,19 +151,7 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     }
 
     public virtual Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        var now = timeProvider.GetUtcNow().UtcDateTime;
-
-        var createdEntries = DbContext.ChangeTracker.Entries<ICreatable>().Where(entry => entry.State == EntityState.Added);
-        foreach (var entry in createdEntries)
-            entry.Entity.CreatedTimestamp = now;
-
-        var updatedEntries = DbContext.ChangeTracker.Entries<IUpdatable>().Where(entry => entry.State == EntityState.Modified);
-        foreach (var entry in updatedEntries)
-            entry.Entity.UpdatedTimestamp = now;
-
-        return DbContext.SaveChangesAsync(cancellationToken);
-    }
+        => DbContext.SaveChangesAsync(cancellationToken);
 }
 
 public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet<TModel> dbSet, TimeProvider timeProvider) 
