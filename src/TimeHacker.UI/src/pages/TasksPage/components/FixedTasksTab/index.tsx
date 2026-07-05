@@ -44,7 +44,7 @@ export const FixedTasksTab: FC = () => {
       okType: 'danger',
       onOk: () => deleteTask(id),
     });
-  }, [deleteTask, t]);
+  }, [deleteTask, modal, t]);
 
   const handleSave = useCallback(
     async (data: FixedTaskFormData, id?: string, schedule?: ScheduleFormPayload) => {
@@ -71,7 +71,7 @@ export const FixedTasksTab: FC = () => {
         closeModal();
       }
     },
-    [createTask, updateTask, fetchTasks, closeModal, t]
+    [createTask, updateTask, fetchTasks, closeModal, notification, t]
   );
 
   const columns = getFixedTaskColumns(isMobile, t, openEditModal, handleDelete);

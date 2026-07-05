@@ -21,6 +21,11 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // react-hooks v7 promoted these two stricter rules to errors. They flag intentional
+      // patterns in our hand-rolled hooks (latest-value refs assigned during render, and
+      // fetch-on-mount effects), not real bugs, so we opt out of them here.
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
       'import/no-default-export': 'error',
       'react-refresh/only-export-components': [
         'warn',
@@ -33,6 +38,15 @@ export default tseslint.config(
     files: ['*.config.ts', 'vite.config.ts'],
     rules: {
       'import/no-default-export': 'off',
+    },
+  },
+  {
+    // Context files intentionally colocate their Provider component with their
+    // matching use<Context> hook, which trips react-refresh's single-export check.
+    // This is a deliberate, project-wide convention, so opt these files out.
+    files: ['src/contexts/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   }
 );

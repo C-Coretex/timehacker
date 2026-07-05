@@ -23,8 +23,18 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    //custom
-    "baseUrl": "src"
+    //custom - path aliases mirror vite.config.ts resolve.alias
+    "paths": {
+      "api/*": ["./src/api/*"],
+      "components/*": ["./src/components/*"],
+      "config/*": ["./src/config/*"],
+      "contexts/*": ["./src/contexts/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "pages/*": ["./src/pages/*"],
+      "types/*": ["./src/types/*"],
+      "utils/*": ["./src/utils/*"],
+      "i18n/*": ["./src/i18n/*"]
+    }
   },
   "include": ["src"]
 }

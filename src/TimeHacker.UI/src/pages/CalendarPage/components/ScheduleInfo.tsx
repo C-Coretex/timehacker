@@ -40,7 +40,7 @@ export const ScheduleInfo: FC<Props> = ({ scheduleData, loading }) => {
 
   return (
     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         <div>
           <span style={{ fontWeight: 600 }}>{t('tasks.recurringSchedule')}</span>
           <div style={{ marginTop: 8 }}>{repeatDescription}</div>
@@ -48,7 +48,7 @@ export const ScheduleInfo: FC<Props> = ({ scheduleData, loading }) => {
 
         <Divider style={{ margin: '8px 0' }} />
 
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="small" style={{ width: '100%' }}>
           <span style={{ fontSize: 13, opacity: 0.7 }}>
             {t('tasks.scheduleCreated')}: {dayjs(scheduleData.scheduleCreated).format('MMM D, YYYY HH:mm')}
           </span>

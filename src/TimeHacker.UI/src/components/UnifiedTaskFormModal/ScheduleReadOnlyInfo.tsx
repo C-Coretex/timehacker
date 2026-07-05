@@ -34,7 +34,7 @@ export const ScheduleReadOnlyInfo: FC<Props> = ({ scheduleEntity }) => {
 
   return (
     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg" style={{ marginTop: 12 }}>
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         <div>
           <Typography.Text strong>{t('tasks.recurringSchedule')}</Typography.Text>
           <div style={{ marginTop: 8 }}>{repeatDescription}</div>
@@ -42,7 +42,7 @@ export const ScheduleReadOnlyInfo: FC<Props> = ({ scheduleEntity }) => {
 
         <Divider style={{ margin: '8px 0' }} />
 
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="small" style={{ width: '100%' }}>
           <Typography.Text type="secondary" style={{ fontSize: 13 }}>
             {t('tasks.scheduleCreated')}: {dayjs(scheduleEntity.scheduleCreated).format('MMM D, YYYY HH:mm')}
           </Typography.Text>

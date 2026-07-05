@@ -2,7 +2,13 @@ import type { FC } from 'react';
 import { Navigate } from 'react-big-calendar';
 import type { NavigateAction } from 'react-big-calendar';
 // @ts-expect-error -- react-big-calendar internal module, no public types
-import TimeGrid from 'react-big-calendar/lib/TimeGrid';
+import TimeGridImport from 'react-big-calendar/lib/TimeGrid';
+
+// react-big-calendar's /lib/* modules are CommonJS. Vite 8's Rolldown bundler uses
+// Node-style default interop (the default import is the whole module.exports object,
+// i.e. { default, __esModule }), so unwrap `.default` when present; the ?? fallback
+// keeps working under esModule-aware interop that hands back the component directly.
+const TimeGrid = TimeGridImport.default ?? TimeGridImport;
 
 interface ThreeDayViewProps {
   date: Date;

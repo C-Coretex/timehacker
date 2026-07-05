@@ -49,7 +49,7 @@ export function useEntityCrud<TDisplay>({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [notification]);
 
   const withRefetch = useCallback(
     async (action: () => Promise<unknown>, errorMessage: string) => {
@@ -60,7 +60,7 @@ export function useEntityCrud<TDisplay>({
         notification.error({ title: tRef.current('errors.generic'), description: errorMessage });
       }
     },
-    [fetch]
+    [fetch, notification]
   );
 
   useEffect(() => {

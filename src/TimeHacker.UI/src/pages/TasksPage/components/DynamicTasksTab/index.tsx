@@ -42,7 +42,7 @@ export const DynamicTasksTab: FC = () => {
       okType: 'danger',
       onOk: () => deleteTask(id),
     });
-  }, [deleteTask, t]);
+  }, [deleteTask, modal, t]);
 
   const handleSave = useCallback(
     async (data: InputDynamicTask, id?: string) => {
@@ -60,7 +60,7 @@ export const DynamicTasksTab: FC = () => {
         closeModal();
       }
     },
-    [createTask, updateTask, closeModal, t]
+    [createTask, updateTask, closeModal, notification, t]
   );
 
   const columns = getDynamicTaskColumns(isMobile, t, openEditModal, handleDelete);
