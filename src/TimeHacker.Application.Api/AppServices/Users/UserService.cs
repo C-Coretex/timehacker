@@ -21,11 +21,9 @@ public class UserService(IUserRepository userRepository, UserAccessorBase userAc
 
         var userId = userAccessorBase.GetUserIdOrThrowUnauthorized();
 
-        var userEntity = await userRepository.GetByIdAsync(userId, asNoTracking: false, cancellationToken: cancellationToken) 
-            ?? throw new UserDoesNotExistException();
-        userEntity = user.GetEntity(userEntity);
-
-        await userRepository.SaveChangesAsync(cancellationToken);
+        var entity = await userRepository.GetAndUpdateAndSaveAsync(userId, userEntity => user.GetEntity(userEntity), cancellationToken);
+        if (entity is null)
+            throw new UserDoesNotExistException();
     }
 
     public async Task DeleteAsync(CancellationToken cancellationToken = default)

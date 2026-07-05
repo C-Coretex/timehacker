@@ -13,7 +13,6 @@ public class RepositoryBase<TDbContext, TModel>(TDbContext dbContext, DbSet<TMod
     where TModel : class, IDbEntity
     where TDbContext : DbContextBase<TDbContext>
 {
-    //TODO: WOULD THIS BE FIXED BY AN INTERCEPTOR?
     // An expression selecting TModel.UpdatedTimestamp, used to stamp the timestamp during ExecuteUpdateAsync
     // (which bypasses SaveChangesAsync). Built once via reflection and cached; null when TModel isn't
     // IUpdatable, so callers skip the extra SetProperty entirely.
@@ -165,4 +164,19 @@ public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet
 
     public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
         => ExecuteDeleteAsync(x => ids.Contains(x.Id), cancellationToken);
+
+    public virtual async Task<TModel?> GetAndUpdateAndSaveAsync(TId id, Action<TModel> updateFunction, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(updateFunction);
+
+        // Fetch tracked so the mutation is persisted by SaveChangesAsync and the original xmin concurrency token is carried.
+        var entity = await GetByIdAsync(id, asNoTracking: false, cancellationToken: cancellationToken);
+        if (entity is null)
+            return null;
+
+        updateFunction(entity);
+        await SaveChangesAsync(cancellationToken);
+
+        return entity;
+    }
 }

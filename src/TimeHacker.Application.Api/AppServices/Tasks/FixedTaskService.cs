@@ -24,11 +24,9 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
     {
         NotProvidedException.ThrowIfNull(task);
 
-        var entity = await fixedTaskRepository.GetByIdAsync(task.Id!.Value, asNoTracking: false, cancellationToken: cancellationToken)
-                     ?? throw new NotFoundException("FixedTask", task.Id!.Value.ToString());
-        task.GetEntity(entity);
-
-        await fixedTaskRepository.SaveChangesAsync(cancellationToken);
+        var entity = await fixedTaskRepository.GetAndUpdateAndSaveAsync(task.Id!.Value, e => task.GetEntity(e), cancellationToken);
+        if (entity is null)
+            throw new NotFoundException("FixedTask", task.Id!.Value.ToString());
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

@@ -30,4 +30,7 @@ public interface IRepositoryBase<TModel, in TId>: IRepositoryBase<TModel> where 
     /// <returns>If entry was found and deleted</returns>
     Task<bool> DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default);
     Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
+
+    /// <returns>The updated entry, or null if it was not found</returns>
+    Task<TModel?> GetAndUpdateAndSaveAsync(TId id, Action<TModel> updateFunction, CancellationToken cancellationToken = default);
 }

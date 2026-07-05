@@ -23,6 +23,17 @@ public static class RepositoryMockExtensions
         repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<CancellationToken>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
             .Returns<TId, bool, CancellationToken, QueryPipelineStep<TModel>[]>((id, _, _, _) => Task.FromResult(source.FirstOrDefault(x => x.Id!.Equals(id))));
 
+        repository.Setup(x => x.GetAndUpdateAndSaveAsync(It.IsAny<TId>(), It.IsAny<Action<TModel>>(), It.IsAny<CancellationToken>()))
+            .Returns<TId, Action<TModel>, CancellationToken>((id, updateFunction, _) =>
+            {
+                var entry = source.FirstOrDefault(x => x.Id!.Equals(id));
+                if (entry is null)
+                    return Task.FromResult<TModel?>(null);
+
+                updateFunction(entry);
+                return Task.FromResult<TModel?>(entry);
+            });
+
         repository.Setup(x => x.DeleteAndSaveAsync(It.IsAny<TModel>(), It.IsAny<CancellationToken>()))
             .Callback<TModel, CancellationToken>((entry, _) => source.RemoveAll(x => x.Id!.Equals(entry.Id)));
 
@@ -93,6 +104,18 @@ public static class RepositoryMockExtensions
         repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<CancellationToken>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
             .Returns<TId, bool, CancellationToken, IEnumerable<QueryPipelineStep<TModel>>>((id, _, _, _) =>
                 Task.FromResult(GetUserScopedData().FirstOrDefault(x => x.Id!.Equals(id))));
+
+        repository.Setup(x => x.GetAndUpdateAndSaveAsync(It.IsAny<TId>(), It.IsAny<Action<TModel>>(), It.IsAny<CancellationToken>()))
+            .Returns<TId, Action<TModel>, CancellationToken>((id, updateFunction, _) =>
+            {
+                // Only found when the current user owns the entity (mirrors RLS visibility).
+                var entry = GetUserScopedData().FirstOrDefault(x => x.Id!.Equals(id));
+                if (entry is null)
+                    return Task.FromResult<TModel?>(null);
+
+                updateFunction(entry);
+                return Task.FromResult<TModel?>(entry);
+            });
 
         repository.Setup(x => x.ExistsAsync(It.IsAny<TId>(),It.IsAny<CancellationToken>()))
             .Returns<TId, CancellationToken>((id, _) =>

@@ -25,8 +25,10 @@ public class TagService(ITagRepository tagRepository)
     {
         NotProvidedException.ThrowIfNull(tag);
 
-        var entity = await tagRepository.GetByIdAsync(tag.Id!.Value);
-        entity = await tagRepository.UpdateAndSaveAsync(tag.GetEntity(entity));
+        var entity = await tagRepository.GetAndUpdateAndSaveAsync(tag.Id!.Value, t => tag.GetEntity(t));
+        if (entity is null)
+            throw new NotFoundException("Tag", tag.Id!.Value.ToString());
+
         return TagDto.Create(entity);
     }
 
