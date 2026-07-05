@@ -9,6 +9,7 @@ export const en = {
     help: 'Help',
     about: 'About',
     settings: 'Settings',
+    logout: 'Log out',
   },
 
   // Greeting

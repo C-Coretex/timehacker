@@ -10,6 +10,7 @@ using TimeHacker.Api.Converters;
 using TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Filters;
 using TimeHacker.Api.Middleware;
+using TimeHacker.Api.Seeding;
 using TimeHacker.Application.Api.Extensions;
 using TimeHacker.Domain.Services.Extensions;
 using TimeHacker.Infrastructure.Extensions;
@@ -134,6 +135,9 @@ if (app.Environment.IsDevelopment())
     //Apply database migrations
     TimeHackerMigrationsDbContext.ApplyMigrations(timeHackerAdminConnectionString);
     IdentityMigrationsDbContext.ApplyMigrations(identityConnectionString);
+
+    // Seed the sample account with sample data (idempotent) so a fresh DB is usable immediately.
+    await DevelopmentDataSeeder.SeedAsync(app.Services, timeHackerAdminConnectionString);
 }
 else
 {
@@ -168,6 +172,16 @@ app.MapGet("/api/antiforgery/token", (IAntiforgery antiforgery, HttpContext http
 
 app.MapIdentityApi<IdentityUser>();
 
+// MapIdentityApi ships register/login/refresh/etc, but no logout. It signs out the
+// Identity cookie and clears the session — the session caches the resolved domain UserId, so clearing it
+// prevents a later login on the same browser session from inheriting the previous user's id.
+app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, HttpContext httpContext) =>
+{
+    await signInManager.SignOutAsync();
+    httpContext.Session.Clear();
+    return Results.Ok();
+}).RequireAuthorization();
+
 // Status mapping for non-MVC (minimal-API) endpoints such as MapIdentityApi, which don't pass through
 // LogExceptionFilter. The richer domain-exception mapping for controllers lives in LogExceptionFilter.
 app.UseExceptionHandler(new ExceptionHandlerOptions
@@ -184,7 +198,7 @@ app.MapControllers();
 
 #endregion
 
-app.Run();
+await app.RunAsync();
 
 
 #region Private static

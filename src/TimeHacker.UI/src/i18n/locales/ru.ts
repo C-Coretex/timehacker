@@ -9,6 +9,7 @@ export const ru = {
     help: 'Помощь',
     about: 'О нас',
     settings: 'Настройки',
+    logout: 'Выйти',
   },
 
   // Greeting

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router';
 import {
   CalendarOutlined,
+  LogoutOutlined,
   ProductOutlined,
   QuestionCircleOutlined,
   SettingOutlined,
@@ -31,6 +32,9 @@ export const getItem = (
   } as MenuItem;
 };
 
+// A menu action rather than a route — handled by the Menu's onClick in Layout, not a NavLink.
+export const LOGOUT_MENU_KEY = 'logout';
+
 export const getMainMenuItems = (isAuthenticated: boolean, t: TFunction): MenuItem[] => [
   getItem('calendar', <CalendarOutlined />, t),
   getItem('tasks', <SnippetsOutlined />, t),
@@ -41,6 +45,9 @@ export const getMainMenuItems = (isAuthenticated: boolean, t: TFunction): MenuIt
   getItem('help', <QuestionCircleOutlined />, t),
   getItem('about', <QuestionCircleOutlined />, t),
   getItem('settings', <SettingOutlined />, t),
+  ...(isAuthenticated
+    ? [{ key: LOGOUT_MENU_KEY, icon: <LogoutOutlined />, label: t('nav.logout') } as MenuItem]
+    : []),
 ];
 
 export const greetingByTime = (t: TFunction): string => {

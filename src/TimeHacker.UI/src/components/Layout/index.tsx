@@ -11,12 +11,12 @@ import { useSettings } from 'contexts/SettingsContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { SidebarLogo } from './SidebarLogo';
 import { MiniCalendar } from './MiniCalendar';
-import { getMainMenuItems } from './utils';
+import { getMainMenuItems, LOGOUT_MENU_KEY } from './utils';
 
 const { Content, Sider } = AntdLayout;
 
 export const Layout: FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
@@ -42,13 +42,21 @@ export const Layout: FC = () => {
     setDrawerOpen(false);
   };
 
+  const handleMenuClick = async ({ key }: { key: string }) => {
+    setDrawerOpen(false);
+    if (key === LOGOUT_MENU_KEY) {
+      await logout();
+      navigate('/login');
+    }
+  };
+
   const menuNode = (
     <Menu
       theme="dark"
       defaultSelectedKeys={['1']}
       mode="inline"
       items={mainMenuItems}
-      onClick={() => setDrawerOpen(false)}
+      onClick={handleMenuClick}
     />
   );
 

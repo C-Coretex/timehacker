@@ -108,10 +108,10 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
         //limit count of iterations (for performance)
         var takeCount = timeToFinish switch
         {
-            { TotalHours: < 2 } => 6,
-            { TotalHours: < 4 } => 5,
-            { TotalHours: < 6 } => 3,
-            { TotalHours: < 8 } => 2,
+            { TotalHours: < 2 } => 4,
+            { TotalHours: < 4 } => 3,
+            { TotalHours: < 6 } => 2,
+            { TotalHours: < 8 } => 1,
             _ => 1
         };
 

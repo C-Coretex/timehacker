@@ -13,7 +13,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     loading: boolean;
     login: (userData: User) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
     fetchCurrentUser: () => Promise<void>;
 }
 
@@ -45,7 +45,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         void loadCsrfToken().catch(() => undefined);
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await api.post('/logout');
+        } catch {
+            // Clear local state regardless — even if the server call fails the user intends to sign out.
+        }
         setUser(null);
     };
 
