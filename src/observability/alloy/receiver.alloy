@@ -1,0 +1,16 @@
+// Shared OTLP entry point. Alloy merges all *.alloy files in this directory into one pipeline, so this
+// receiver forwards each signal to the batch processor defined in its own file (logs/metrics/traces.alloy).
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.metrics.input]
+    logs    = [otelcol.processor.batch.logs.input]
+    traces  = [otelcol.processor.batch.traces.input]
+  }
+}

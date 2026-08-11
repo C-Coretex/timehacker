@@ -104,6 +104,56 @@ ScheduleSnapshot (for specific date)
 - Automatic UTC conversion for DateTimes
 - Row-Level Security for per-user data isolation (see User Scoping above)
 
+## Observability / Telemetry
+
+The API is instrumented with **OpenTelemetry** (logs, traces, metrics). For local development, `docker-compose`
+runs a **Grafana LGTM stack** as the backend:
+
+```
+TimeHacker.Api ──OTLP──▶ Grafana Alloy ─┬─ logs ────▶ Loki
+                                        ├─ traces ──▶ Tempo ──(span/service-graph metrics)──▶ Prometheus
+                                        └─ metrics ─(remote-write, w/ exemplars)─▶ Prometheus
+                                                         │
+                                                   Grafana (UI over all three)
+```
+
+- **View it** at **http://localhost:3000** (Grafana; credentials from `GF_SECURITY_ADMIN_*` in `.env`,
+  default `admin`/`admin`). The Prometheus/Loki/Tempo datasources are auto-provisioned — use **Explore** to
+  query logs (`{service_name="TimeHacker.Api"}`), traces, and metrics. **Grafana Alloy** (Grafana's OTel
+  Collector distribution) has its own live pipeline UI at **http://localhost:12345/graph**.
+- **Config** lives under `src/observability/**` — Alloy's is split per signal under `observability/alloy/`
+  (`receiver.alloy` + `logs.alloy` / `metrics.alloy` / `traces.alloy`; Alloy merges the whole directory),
+  plus Tempo, Prometheus, and Grafana datasources. Loki uses its built-in default config.
+- **Export is env-driven** (`Program.cs` → `AddOpenTelemetry`). OTLP is used only when
+  `OTEL_EXPORTER_OTLP_ENDPOINT` is set (compose sets it to `http://alloy:4317`, `grpc`,
+  `OTEL_SERVICE_NAME=TimeHacker.Api`). Without it (plain `dotnet run`, tests) telemetry **falls back to the
+  console**. In production, override the `OTEL_*` env vars to point at any OTLP-compatible backend — no code change.
+- **Errors show in both places:** routine info/warning logs go to Grafana only, while error-level records
+  (unhandled exceptions from `LogExceptionFilter`) are **also mirrored to the console**.
+- **The three signals are cross-linked** so you can pivot between them:
+  - **span→logs** (`tracesToLogsV2`), **span→metrics** (`tracesToMetrics` over the span RED metrics),
+    **log→trace** (Loki `trace_id` derived field; Tempo's `traceQuery` time-shift keeps the lookup from
+    failing on a zero-width time range), **service map / node graph** (Tempo metrics-generator).
+  - **metric→trace via exemplars** (Prometheus `exemplarTraceIdDestinations` → Tempo): graph a histogram
+    with exemplars enabled (e.g. `db_client_operation_duration_seconds_bucket`, `http_server_request_duration_seconds_bucket`,
+    the business histograms, or Tempo's `traces_spanmetrics_latency`) → click an exemplar dot → the trace opens.
+  - App metrics reach Prometheus via **remote-write** (Alloy `otelcol.exporter.prometheus` → `prometheus.remote_write`
+    with `send_exemplars`), which — unlike Prometheus's native OTLP ingestion — preserves classic-histogram
+    exemplars. Tempo remote-writes its span/service-graph metrics to the same receiver.
+- **Every signal is tagged** with `service.name`, `service.version`, `deployment.environment`, and
+  `service.instance.id`, so you can filter dev vs. prod, versions, and instances.
+- **What's instrumented:**
+  - *Traces* — ASP.NET Core requests, outbound `HttpClient`, **Npgsql database commands** (each SQL command
+    is a span nested inside its request trace), and **business spans**: a `timeline.generate` span wraps each
+    day's timeline generation, tagged with the date, `enduser.id`, and result counts. Every authenticated
+    request span also carries `enduser.id` for tenant attribution under RLS.
+  - *Metrics* — ASP.NET Core + `HttpClient` request duration, **.NET runtime** (GC, thread pool, memory),
+    **Npgsql** DB metrics (query duration `db.client.operation.duration`, connection-pool state), **EF Core**
+    query/compilation counts, and **business metrics**: `timehacker.snapshots.requested` (tagged
+    `outcome = cache_hit | generated` — the snapshot cache-hit ratio), `timehacker.timeline.generation.duration`,
+    and `timehacker.scheduled_tasks.generated`. Both DbContexts use a **named `NpgsqlDataSource`**
+    (`TimeHacker` / `TimeHackerIdentity`) so pool metrics are tagged per database.
+
 ## Testing
 
 - **Unit tests** — xUnit v3 + Moq + MockQueryable + AutoBogus + AwesomeAssertions. Cover app services,

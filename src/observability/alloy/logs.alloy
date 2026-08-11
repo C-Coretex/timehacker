@@ -1,0 +1,14 @@
+// Logs -> Loki's native OTLP endpoint. Using the OTLP endpoint (not loki.write) preserves the OTLP
+// trace id as structured metadata, which the Grafana Loki datasource's derivedFields use for
+// log -> trace correlation.
+otelcol.processor.batch "logs" {
+  output {
+    logs = [otelcol.exporter.otlphttp.loki.input]
+  }
+}
+
+otelcol.exporter.otlphttp "loki" {
+  client {
+    endpoint = "http://loki:3100/otlp"
+  }
+}

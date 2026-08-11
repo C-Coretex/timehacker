@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Application.Api.QueryPipelineSteps;
@@ -6,6 +8,7 @@ using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tasks;
+using TimeHacker.Domain.Observability;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks;
 
@@ -14,7 +17,8 @@ public class TaskService(
     IDynamicTaskRepository dynamicTaskRepository,
     IScheduleSnapshotRepository scheduleSnapshotRepository,
     IScheduleEntityService scheduleEntityService,
-    ITaskTimelineProcessor taskTimelineProcessor) : ITaskAppService
+    ITaskTimelineProcessor taskTimelineProcessor,
+    UserAccessorBase userAccessor) : ITaskAppService
 {
     // Upper bound on how many days a single timeline request may span / generate.
     private const int MaxTimelineDays = 366;
@@ -29,7 +33,10 @@ public class TaskService(
     {
         var snapshot = await GetSnapshotForDate(date, cancellationToken);
         if (snapshot != null)
+        {
+            RecordSnapshotHit();
             return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
+        }
 
         var fixedTasks = await fixedTaskRepository.GetAll()
                                           .Where(ft => DateOnly.FromDateTime(ft.StartTimestamp) == date)
@@ -40,7 +47,7 @@ public class TaskService(
 
         var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date, cancellationToken: cancellationToken).ToListAsync(cancellationToken);
 
-        var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
+        var tasksForDay = GenerateTimeline(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
 
         snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
         snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot, cancellationToken);
@@ -90,12 +97,15 @@ public class TaskService(
             {
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
-                var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
+                var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
                 snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
                 // Add to the change tracker but defer the commit until after all dates are yielded.
                 snapshot = scheduleSnapshotRepository.Add(snapshot);
             }
+            else
+                RecordSnapshotHit();
+
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
         }
 
@@ -135,7 +145,7 @@ public class TaskService(
 
             var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
             var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
-            var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
+            var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
 
             var snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
             scheduleSnapshotRepository.Add(snapshot);
@@ -149,6 +159,42 @@ public class TaskService(
 
         await scheduleSnapshotRepository.SaveChangesAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// Runs the timeline-generation algorithm for a single day inside a business span and records the
+    /// generation metrics (duration, generated-task count, and a <c>generated</c> snapshot-request tally).
+    /// The snapshot-hit path calls <see cref="RecordSnapshotHit"/> instead.
+    /// </summary>
+    private TasksForDayReturn GenerateTimeline(
+        IEnumerable<FixedTask> fixedTasks,
+        IEnumerable<FixedTask> scheduledFixedTasks,
+        IEnumerable<DynamicTask> dynamicTasks,
+        DateOnly date)
+    {
+        using var activity = TimeHackerTelemetry.ActivitySource.StartActivity("timeline.generate");
+
+        activity?.SetTag("timehacker.date", date.ToString("O", CultureInfo.InvariantCulture));
+        if (userAccessor.UserId is { } userId)
+            activity?.SetTag("enduser.id", userId.ToString());
+
+        var startTimestamp = Stopwatch.GetTimestamp();
+        var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
+        var elapsedMs = Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds;
+
+        var taskCount = tasksForDay.TasksTimeline.Count;
+        activity?.SetTag("timehacker.tasks.count", taskCount);
+        activity?.SetTag("timehacker.categories.count", tasksForDay.CategoriesTimeline.Count);
+
+        TimeHackerTelemetry.SnapshotRequests.Add(1, new KeyValuePair<string, object?>("outcome", TimeHackerTelemetry.OutcomeGenerated));
+        TimeHackerTelemetry.TimelineGenerationDuration.Record(elapsedMs);
+        TimeHackerTelemetry.ScheduledTasksGenerated.Add(taskCount);
+
+        return tasksForDay;
+    }
+
+    //TODO: probably we don't need this metric, as Snapshot is not cache. We would be more interested in how many snapshots are generated.
+    private static void RecordSnapshotHit() =>
+        TimeHackerTelemetry.SnapshotRequests.Add(1, new KeyValuePair<string, object?>("outcome", TimeHackerTelemetry.OutcomeSnapshotHit));
 
     // Guard against a single request expanding recurrences over an unbounded span.
     private static void EnsureDateRangeWithinLimit(ICollection<DateOnly> dates)

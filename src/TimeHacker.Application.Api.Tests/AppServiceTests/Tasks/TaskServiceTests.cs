@@ -29,8 +29,9 @@ public class TaskServiceTests
 
         var taskTimelineProcessor = new TaskTimelineProcessor();
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object);
+        var userAccessor = new UserAccessorBaseMock(_userId, true);
 
-        _tasksService = new TaskService(_fixedTasksRepository.Object, _dynamicTasksRepository.Object, _scheduleSnapshotRepository.Object, scheduleEntityService, taskTimelineProcessor);
+        _tasksService = new TaskService(_fixedTasksRepository.Object, _dynamicTasksRepository.Object, _scheduleSnapshotRepository.Object, scheduleEntityService, taskTimelineProcessor, userAccessor);
     }
 
     #endregion

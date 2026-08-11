@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using TimeHacker.Domain.IRepositories.Categories;
 using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tags;
@@ -25,9 +26,22 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<UserSessionInterceptor>();
         services.AddSingleton<TimestampInterceptor>();
 
+        // Build a named NpgsqlDataSource so Npgsql emits OpenTelemetry metrics (connection pool, command
+        // duration, etc.) tagged with a stable pool name. A NpgsqlDataSource owns a connection pool, so it
+        // MUST be disposed or its connections leak. It is registered as a *keyed* singleton built by a
+        // factory (not a pre-built instance): the DI container only disposes IDisposables it creates, so a
+        // bare `AddSingleton(instance)` would never be disposed — each rebuilt provider (e.g. per integration
+        // test) would leak a full pool until PostgreSQL runs out of connection slots. Resolving it from `sp`
+        // below forces the singleton to be created and thus tracked for disposal; the key keeps this pool
+        // distinct from the identity DB's data source when both live in the same container.
+        // Interceptors/RLS are unaffected — UserSessionInterceptor is a DbConnectionInterceptor that runs
+        // regardless of how the connection is sourced.
+        services.AddKeyedSingleton("TimeHacker", (_, _) =>
+            new NpgsqlDataSourceBuilder(timeHackerConnectionString) { Name = "TimeHacker" }.Build());
+
         services.AddPooledDbContextFactory<TimeHackerDbContext>((sp, options) =>
         {
-            options.UseNpgsql(timeHackerConnectionString);
+            options.UseNpgsql(sp.GetRequiredKeyedService<NpgsqlDataSource>("TimeHacker"));
             options.AddInterceptors(
                 sp.GetRequiredService<UserSessionInterceptor>(),
                 sp.GetRequiredService<TimestampInterceptor>());
