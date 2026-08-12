@@ -15,11 +15,17 @@ USER $APP_UID
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+# The shared build config must be present before restore: Directory.Build.props supplies TargetFramework
+# and Directory.Packages.props supplies every package version (central package management). MSBuild's
+# implicit import is case-sensitive on Linux, so both names must match exactly.
+COPY ["Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["TimeHacker.Api/TimeHacker.Api.csproj", "TimeHacker.Api/"]
+COPY ["TimeHacker.Application.Api/TimeHacker.Application.Api.csproj", "TimeHacker.Application.Api/"]
+COPY ["TimeHacker.Application.Api.Contracts/TimeHacker.Application.Api.Contracts.csproj", "TimeHacker.Application.Api.Contracts/"]
 COPY ["TimeHacker.Domain/TimeHacker.Domain.csproj", "TimeHacker.Domain/"]
 COPY ["TimeHacker.Domain.Services/TimeHacker.Domain.Services.csproj", "TimeHacker.Domain.Services/"]
 COPY ["TimeHacker.Helpers.Domain/TimeHacker.Helpers.Domain.csproj", "TimeHacker.Helpers.Domain/"]
-COPY ["TimeHacker.Helpers.Db/TimeHacker.Helpers.Db.csproj", "TimeHacker.Helpers.DB/"]
+COPY ["TimeHacker.Helpers.DB/TimeHacker.Helpers.DB.csproj", "TimeHacker.Helpers.DB/"]
 COPY ["TimeHacker.Infrastructure.Identity/TimeHacker.Infrastructure.Identity.csproj", "TimeHacker.Infrastructure.Identity/"]
 COPY ["TimeHacker.Infrastructure/TimeHacker.Infrastructure.csproj", "TimeHacker.Infrastructure/"]
 COPY ["TimeHacker.Migrations.Identity/TimeHacker.Migrations.Identity.csproj", "TimeHacker.Migrations.Identity/"]

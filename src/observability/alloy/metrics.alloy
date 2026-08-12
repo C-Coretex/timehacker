@@ -32,5 +32,16 @@ prometheus.remote_write "default" {
       replacement   = "external"
       action        = "replace"
     }
+
+    // Mirror `job` onto a `service` label. Tempo's span metrics label the service as `service`, while the
+    // OTLP->Prometheus convention puts service.name on `job`. Copying it means Grafana's trace->metrics
+    // $__tags mapping (service.name -> service) selects BOTH metric families, so one mapping serves the
+    // span-metric queries and the app's own http/db/timehacker queries alike.
+    // Relabel defaults do the copy: regex "(.*)" + replacement "$1".
+    write_relabel_config {
+      source_labels = ["job"]
+      target_label  = "service"
+      action        = "replace"
+    }
   }
 }

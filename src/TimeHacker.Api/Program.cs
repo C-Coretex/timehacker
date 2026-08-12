@@ -29,6 +29,13 @@ var timeHackerConnectionString = builder.Configuration.GetConnectionString("Time
 var timeHackerAdminConnectionString = builder.Configuration.GetConnectionString("TimeHackerAdminConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerAdminConnectionString' not found.");
 var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
 
+if (new NpgsqlConnectionStringBuilder(timeHackerConnectionString).NoResetOnClose)
+{
+    throw new InvalidOperationException(
+        "No Reset On Close=true is incompatible with session-scoped RLS state in UserSessionInterceptor." +
+        "Either set it back to false, or migrate the interceptor to transaction-scoped set_config(..., true) first.");
+}
+
 RegisterServices(builder.Services, timeHackerConnectionString, identityConnectionString);
 
 AddIdentityServices(builder.Services);
@@ -279,7 +286,9 @@ static void AddOpenTelemetry(ILoggingBuilder logging, ConfigurationManager confi
                 .AddRuntimeInstrumentation() // GC, thread pool, memory
                 .AddMeter("Npgsql") // DB command duration + connection-pool metrics
                 .AddMeter("Microsoft.EntityFrameworkCore") // EF query/compilation counts on top of Npgsql
-                .AddMeter(TimeHackerTelemetry.MeterName); // business metrics (snapshot-hit ratio, generation duration)
+                .AddMeter(TimeHackerTelemetry.MeterName); // business + usage metrics (see TimeHackerTelemetry / ActiveUserTracker)
+
+            ActiveUserTracker.EnsureInitialized();
 
             if (useOtlp)
                 metrics.AddOtlpExporter();

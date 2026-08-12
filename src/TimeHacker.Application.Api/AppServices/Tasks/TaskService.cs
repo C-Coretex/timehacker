@@ -149,6 +149,7 @@ public class TaskService(
 
             var snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
             scheduleSnapshotRepository.Add(snapshot);
+            TimeHackerTelemetry.SnapshotsRefreshed.Add(1);
 
             // Advance each recurrence's progress marker to this date so future generation resumes correctly.
             foreach (var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
@@ -228,7 +229,12 @@ public class TaskService(
 
         await foreach (var scheduleEntity in scheduleEntities.WithCancellation(cancellationToken))
         {
-            var taskDates = scheduleEntity.GetNextEntityDatesIn(from, to ?? from);
+            var taskDates = scheduleEntity.GetNextEntityDatesIn(from, to ?? from).ToList();
+
+            // Which recurrence patterns actually drive generation load — a daily blueprint over a year-long
+            // request expands into far more work than a yearly one.
+            TimeHackerTelemetry.ScheduleEntitiesExpanded.Add(taskDates.Count,
+                new KeyValuePair<string, object?>("repeating_type", scheduleEntity.RepeatingEntity.EntityType.ToString()));
 
             foreach (var taskDate in taskDates)
             {

@@ -131,9 +131,13 @@ TimeHacker.Api ──OTLP──▶ Grafana Alloy ─┬─ logs ────▶ 
 - **Errors show in both places:** routine info/warning logs go to Grafana only, while error-level records
   (unhandled exceptions from `LogExceptionFilter`) are **also mirrored to the console**.
 - **The three signals are cross-linked** so you can pivot between them:
-  - **span→logs** (`tracesToLogsV2`), **span→metrics** (`tracesToMetrics` over the span RED metrics),
-    **log→trace** (Loki `trace_id` derived field; Tempo's `traceQuery` time-shift keeps the lookup from
-    failing on a zero-width time range), **service map / node graph** (Tempo metrics-generator).
+  - **span→logs** (`tracesToLogsV2`), **span→metrics** (`tracesToMetrics` — six queries: RED for the
+    clicked operation over the span metrics, plus DB latency, connection pool, and snapshot generation from
+    the app's own metrics), **log→trace** (Loki `trace_id` derived field), **service map / node graph**
+    (Tempo metrics-generator).
+  - **log ↔ metrics** has no click-through link (Grafana correlations need the service as a result *column*,
+    and neither Loki nor Prometheus returns it as one) — use the overview dashboard, which shows the metric
+    and log panels together, or Explore's split view.
   - **metric→trace via exemplars** (Prometheus `exemplarTraceIdDestinations` → Tempo): graph a histogram
     with exemplars enabled (e.g. `db_client_operation_duration_seconds_bucket`, `http_server_request_duration_seconds_bucket`,
     the business histograms, or Tempo's `traces_spanmetrics_latency`) → click an exemplar dot → the trace opens.
@@ -150,9 +154,20 @@ TimeHacker.Api ──OTLP──▶ Grafana Alloy ─┬─ logs ────▶ 
   - *Metrics* — ASP.NET Core + `HttpClient` request duration, **.NET runtime** (GC, thread pool, memory),
     **Npgsql** DB metrics (query duration `db.client.operation.duration`, connection-pool state), **EF Core**
     query/compilation counts, and **business metrics**: `timehacker.snapshots.requested` (tagged
-    `outcome = cache_hit | generated` — the snapshot cache-hit ratio), `timehacker.timeline.generation.duration`,
-    and `timehacker.scheduled_tasks.generated`. Both DbContexts use a **named `NpgsqlDataSource`**
-    (`TimeHacker` / `TimeHackerIdentity`) so pool metrics are tagged per database.
+    `outcome = snapshot_hit | generated` — how many days are served from a stored snapshot vs regenerated),
+    `timehacker.snapshots.refreshed`, `timehacker.timeline.generation.duration`,
+    `timehacker.scheduled_tasks.generated`, `timehacker.schedule_entities.expanded` (by recurrence type),
+    `timehacker.timeline.dynamic_tasks` (`placed | unplaced` — did the scheduler fit the work?),
+    `timehacker.timeline.day_utilization`, and `timehacker.business_exceptions`. Both DbContexts use a
+    **named `NpgsqlDataSource`** (`TimeHacker` / `TimeHackerIdentity`) so pool metrics are tagged per database.
+  - *Usage* — how many people use the app and how much. A user id is **never** a metric tag (unbounded
+    cardinality), so it is answered two ways: `timehacker.users.active` (an in-process gauge of distinct
+    users over 5m/1h/24h — 3 series, resets on restart) plus `timehacker.users.registered` for signups; and,
+    for exact counts and per-user breakdowns, the `enduser_id` structured-metadata field that every log
+    record carries, queried with LogQL.
+- **Dashboard** — a provisioned *TimeHacker → Overview* dashboard ships with the stack (Usage, HTTP,
+  Database, Business, Errors & runtime). It's code, not UI state: edit
+  `observability/grafana/provisioning/dashboards/timehacker-overview.json`.
 
 ## Testing
 
