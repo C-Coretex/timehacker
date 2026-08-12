@@ -1,4 +1,5 @@
 ﻿using TimeHacker.Domain.Entities.Tasks;
+using TimeHacker.Domain.Observability;
 
 namespace TimeHacker.Domain.Services.Processors;
 
@@ -18,14 +19,41 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
         returnData.TasksTimeline.AddRange(fixedTasksTimeline);
 
         var timeRanges = returnData.TasksTimeline.Select(tt => tt.TimeRange);
-        var dynamicTasksTimeline = GetDynamicTasksTimeline(dynamicTasks.ToList(), timeRanges);
+        var dynamicTaskCandidates = dynamicTasks.ToList();
+        var dynamicTasksTimeline = GetDynamicTasksTimeline(dynamicTaskCandidates, timeRanges);
         returnData.TasksTimeline.AddRange(dynamicTasksTimeline);
 
         returnData = returnData with
         {
             TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList()
         };
+
+        RecordSchedulingQuality(dynamicTaskCandidates, returnData);
         return returnData;
+    }
+
+    /// <summary>
+    /// Reports how well the generated day turned out: how many of the offered dynamic tasks actually found a
+    /// gap, and how much of the day ended up occupied. Together these show whether the scheduler is starving
+    /// tasks or leaving the day empty — neither is visible from duration or count metrics alone.
+    /// </summary>
+    private static void RecordSchedulingQuality(IList<DynamicTask> dynamicTaskCandidates, TasksForDayReturn tasksForDay)
+    { // TODO: Probably we will get rid of this metric
+        var placedTaskIds = tasksForDay.TasksTimeline
+            .Where(t => !t.IsFixed)
+            .Select(t => t.Task.Id)
+            .ToHashSet();
+
+        var placed = dynamicTaskCandidates.Count(t => placedTaskIds.Contains(t.Id));
+
+        TimeHackerTelemetry.DynamicTasksScheduled.Add(placed,
+            new KeyValuePair<string, object?>(TimeHackerTelemetry.OutcomeTagName, TimeHackerTelemetry.OutcomePlaced));
+        TimeHackerTelemetry.DynamicTasksScheduled.Add(dynamicTaskCandidates.Count - placed,
+            new KeyValuePair<string, object?>(TimeHackerTelemetry.OutcomeTagName, TimeHackerTelemetry.OutcomeUnplaced));
+
+        var occupied = tasksForDay.TasksTimeline.Sum(t => (t.TimeRange.End - t.TimeRange.Start).TotalMinutes);
+        // Ranges can overlap (a fixed task may sit inside another), so clamp rather than report above 1.
+        TimeHackerTelemetry.DayUtilization.Record(Math.Clamp(occupied / TimeSpan.FromDays(1).TotalMinutes, 0, 1));
     }
 
     private static IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks, DateOnly date)

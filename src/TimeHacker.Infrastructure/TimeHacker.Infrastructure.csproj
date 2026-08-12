@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TimeHacker.Domain\TimeHacker.Domain.csproj" />
-    <ProjectReference Include="..\TimeHacker.Helpers.Db\TimeHacker.Helpers.Db.csproj" />
+    <ProjectReference Include="..\TimeHacker.Helpers.DB\TimeHacker.Helpers.DB.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Npgsql;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -12,6 +13,7 @@ using TimeHacker.Api.Filters;
 using TimeHacker.Api.Middleware;
 using TimeHacker.Api.Seeding;
 using TimeHacker.Application.Api.Extensions;
+using TimeHacker.Domain.Observability;
 using TimeHacker.Domain.Services.Extensions;
 using TimeHacker.Infrastructure.Extensions;
 using TimeHacker.Infrastructure.Identity;
@@ -26,6 +28,13 @@ var builder = WebApplication.CreateBuilder(args);
 var timeHackerConnectionString = builder.Configuration.GetConnectionString("TimeHackerConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerConnectionString' not found.");
 var timeHackerAdminConnectionString = builder.Configuration.GetConnectionString("TimeHackerAdminConnectionString") ?? throw new InvalidOperationException("Connection string 'TimeHackerAdminConnectionString' not found.");
 var identityConnectionString = builder.Configuration.GetConnectionString("IdentityConnectionString") ?? throw new InvalidOperationException("Connection string 'IdentityConnectionString' not found.");
+
+if (new NpgsqlConnectionStringBuilder(timeHackerConnectionString).NoResetOnClose)
+{
+    throw new InvalidOperationException(
+        "No Reset On Close=true is incompatible with session-scoped RLS state in UserSessionInterceptor." +
+        "Either set it back to false, or migrate the interceptor to transaction-scoped set_config(..., true) first.");
+}
 
 RegisterServices(builder.Services, timeHackerConnectionString, identityConnectionString);
 
@@ -111,12 +120,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks()
-    .AddNpgSql(timeHackerConnectionString, name: "TimeHackerDb")
-    .AddNpgSql(identityConnectionString, name: "IdentityDb");
+    // Reuse the app's named NpgsqlDataSources instead of raw connection strings, so health-check DB metrics
+    // carry the clean pool names ("TimeHacker"/"TimeHackerIdentity") rather than the connection string, and
+    // no redundant unnamed data source/pool is created.
+    .AddNpgSql(sp => sp.GetRequiredKeyedService<NpgsqlDataSource>("TimeHacker"), name: "TimeHackerDb")
+    .AddNpgSql(sp => sp.GetRequiredKeyedService<NpgsqlDataSource>("TimeHackerIdentity"), name: "IdentityDb");
 
 builder.Services.AddEndpointsApiExplorer();
 
-AddOpenTelemetry(builder.Logging, builder.Services);
+AddOpenTelemetry(builder.Logging, builder.Configuration, builder.Services, builder.Environment);
 
 #endregion
 
@@ -203,30 +215,86 @@ await app.RunAsync();
 
 #region Private static
 
-static void AddOpenTelemetry(ILoggingBuilder logging, IServiceCollection services)
+static void AddOpenTelemetry(ILoggingBuilder logging, ConfigurationManager configuration, IServiceCollection services, IHostEnvironment environment)
 {
+    const string ServiceName = "TimeHacker.Api";
+
+    // Export over OTLP when an endpoint is configured (Docker/production); otherwise fall back to the
+    // console exporter so unit/integration tests and a bare `dotnet run` don't try to reach a collector.
+    // The plain OtlpExporter reads OTEL_EXPORTER_OTLP_ENDPOINT / OTEL_EXPORTER_OTLP_PROTOCOL itself.
+    var otlpEndpoint = configuration["OTEL:ExporterOtlpEndpoint"] 
+        ?? Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+    var useOtlp = !string.IsNullOrWhiteSpace(otlpEndpoint);
+
+    var serviceVersion = typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown";
+
+    // Identify the service across all three signals so Grafana can filter by version, environment, and
+    // instance. Applied to logs (SetResourceBuilder) and traces/metrics (ConfigureResource) alike.
+    void ConfigureResource(ResourceBuilder resource) => resource
+        .AddService(ServiceName, serviceVersion: serviceVersion, serviceInstanceId: Environment.MachineName)
+        .AddAttributes([new("deployment.environment", environment.EnvironmentName)]);
+
     logging.AddOpenTelemetry(options =>
     {
         options.IncludeFormattedMessage = true;
         options.IncludeScopes = true;
 
-        options
-            .SetResourceBuilder(
-                ResourceBuilder.CreateDefault()
-                    .AddService("TimeHacker.Api"))
-            .AddConsoleExporter();
+        var resource = ResourceBuilder.CreateDefault();
+        ConfigureResource(resource);
+        options.SetResourceBuilder(resource);
+
+        if (useOtlp)
+            options.AddOtlpExporter();
+        else
+            options.AddConsoleExporter();
     });
 
+    // The OTLP log exporter above already ships every record (info -> error) to the backend, so
+    // exceptions are visible in Grafana. Additionally mirror error-level records (which is where
+    // unhandled exceptions are logged, see LogExceptionFilter) to the console so they also stay
+    // visible in the terminal, without console-spamming routine info/warning logs.
+    if (useOtlp)
+    {
+        logging.AddConsole();
+        logging.AddFilter<Microsoft.Extensions.Logging.Console.ConsoleLoggerProvider>(category: null, LogLevel.Error);
+    }
+
     services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService("TimeHacker.Api"))
-        .WithTracing(tracing => 
+        .ConfigureResource(ConfigureResource)
+        .WithTracing(tracing =>
+        {
             tracing
-            .AddHttpClientInstrumentation()
-            .AddAspNetCoreInstrumentation()
-            .AddConsoleExporter())
-        .WithMetrics(metrics => metrics
-            .AddAspNetCoreInstrumentation()
-            .AddConsoleExporter());
+                .AddHttpClientInstrumentation()
+                .AddAspNetCoreInstrumentation()
+                .AddSource("Npgsql") // per-command DB spans (query duration), correlated into the request trace
+                .AddSource(TimeHackerTelemetry.ActivitySourceName); // business spans (e.g. timeline.generate)
+
+            if (useOtlp)
+                tracing.AddOtlpExporter();
+            else
+                tracing.AddConsoleExporter();
+        })
+        .WithMetrics(metrics =>
+        {
+            metrics
+                // Attach the active trace id to metric samples recorded inside a sampled span, so Grafana
+                // can jump metric -> trace via exemplars (needs Prometheus --enable-feature=exemplar-storage
+                // and the Prometheus datasource's exemplarTraceIdDestinations).
+                .SetExemplarFilter(ExemplarFilterType.TraceBased)
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation() // outbound HTTP request metrics
+                .AddRuntimeInstrumentation() // GC, thread pool, memory
+                .AddMeter("Npgsql") // DB command duration + connection-pool metrics
+                .AddMeter("Microsoft.EntityFrameworkCore") // EF query/compilation counts on top of Npgsql
+                .AddMeter(TimeHackerTelemetry.MeterName); // business + usage metrics (see TimeHackerTelemetry / ActiveUserTracker)
+
+            ActiveUserTracker.EnsureInitialized();
+
+            if (useOtlp)
+                metrics.AddOtlpExporter();
+            else
+                metrics.AddConsoleExporter();
+        });
 }
 
 static void RegisterServices(IServiceCollection services, string dbConnectionString, string identityDbConnectionString)

@@ -1,0 +1,47 @@
+// Metrics -> Prometheus via remote-write. This path preserves OTLP exemplars: otelcol.exporter.prometheus
+// forwards them and prometheus.remote_write ships them with send_exemplars. Prometheus's
+// native OTLP ingestion does NOT store exemplars for classic (explicit-bucket) histograms, so remote-write
+// is the correct path for metric->trace exemplars. (Tempo's metrics-generator uses the same remote-write
+// receiver for its span/service-graph metrics.)
+otelcol.processor.batch "metrics" {
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]
+  }
+}
+
+otelcol.exporter.prometheus "default" {
+  // Standard OTLP->Prometheus labeling: service.name -> `job`, service.instance.id -> `instance`; the
+  // remaining resource attributes (service.version, deployment.environment) land on `target_info` (joinable).
+  // We deliberately do NOT set resource_to_telemetry_conversion=true — it duplicates job/instance and adds
+  // telemetry_sdk_* label noise on every series.
+  forward_to = [prometheus.remote_write.default.receiver]
+}
+
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+    send_exemplars = true
+
+    // Belt-and-suspenders: the app's pools are named ("TimeHacker"/"TimeHackerIdentity"), but a startup
+    // migration/seed admin connection can surface db_client_connection_pool_name as a raw connection string.
+    // Rewrite any such value to "external" so a connection string never appears as a metric label.
+    write_relabel_config {
+      source_labels = ["db_client_connection_pool_name"]
+      regex         = "Host=.*"
+      target_label  = "db_client_connection_pool_name"
+      replacement   = "external"
+      action        = "replace"
+    }
+
+    // Mirror `job` onto a `service` label. Tempo's span metrics label the service as `service`, while the
+    // OTLP->Prometheus convention puts service.name on `job`. Copying it means Grafana's trace->metrics
+    // $__tags mapping (service.name -> service) selects BOTH metric families, so one mapping serves the
+    // span-metric queries and the app's own http/db/timehacker queries alike.
+    // Relabel defaults do the copy: regex "(.*)" + replacement "$1".
+    write_relabel_config {
+      source_labels = ["job"]
+      target_label  = "service"
+      action        = "replace"
+    }
+  }
+}

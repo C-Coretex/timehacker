@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.IRepositories.Users;
+using TimeHacker.Domain.Observability;
 
 namespace TimeHacker.Api.Helpers;
 
@@ -63,6 +64,10 @@ internal sealed class UserAccessor : UserAccessorBase
             Name = "New User"
         };
         entity = await _userRepository.AddAndSaveAsync(entity);
+
+        // This branch runs exactly once per person, so it is the signup event.
+        TimeHackerTelemetry.UsersRegistered.Add(1);
+
         return entity.Id;
     }
 

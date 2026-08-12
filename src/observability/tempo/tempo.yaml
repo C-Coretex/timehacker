@@ -1,0 +1,43 @@
+# Minimal single-binary Tempo (local storage). Receives traces over OTLP from the collector.
+server:
+  http_listen_port: 3200
+
+# Local-dev instance: don't send anonymous usage analytics home.
+usage_report:
+  reporting_enabled: false
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /var/tempo/traces
+    wal:
+      path: /var/tempo/wal
+
+# Metrics-generator turns spans into RED span metrics (traces_spanmetrics_*) and service-graph metrics
+# (traces_service_graph_*), remote-written to Prometheus. These back the Grafana trace->metrics link and
+# the Service Graph / node graph. send_exemplars stitches those metrics back to their traces.
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+
+# Processors are opt-in per tenant; enable them for the (single) default tenant.
+overrides:
+  defaults:
+    metrics_generator:
+      processors: [service-graphs, span-metrics]

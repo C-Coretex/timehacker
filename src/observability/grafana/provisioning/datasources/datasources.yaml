@@ -1,0 +1,91 @@
+# Auto-provision the three LGTM datasources so the Grafana UI works with zero manual setup.
+# Stable uids let the datasources cross-link (trace -> logs, trace -> metrics, log -> trace).
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      # POST keeps the longer dashboard queries off the URL length limit.
+      httpMethod: POST
+      # metric -> trace: exemplars on histograms carry a `trace_id`.
+      # Requires Prometheus `--enable-feature=exemplar-storage` and the app emitting
+      # exemplars (SetExemplarFilter(TraceBased)).
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: tempo
+          urlDisplayLabel: "View Trace"
+
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      # Link a log line to its trace. Loki's OTLP ingestion stores the log record's TraceId as
+      # structured metadata keyed `trace_id`.
+      # matcherType `label` matches that structured-metadata field by name and turns its value into a
+      # button that opens the trace in Tempo. (Only appears on logs emitted inside an active span.)
+      derivedFields:
+        - name: trace_id
+          matcherType: label
+          matcherRegex: trace_id
+          datasourceUid: tempo
+          # NOTE: `$$` escapes Grafana provisioning's env-var interpolation so the literal `${__value.raw}`
+          # (the matched trace id) is written to the datasource — a single `$` yields an empty URL.
+          url: "$${__value.raw}"
+          urlDisplayLabel: "View Trace"
+
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    url: http://tempo:3200
+    jsonData:
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      # Jump from a span to the correlated logs in Loki, matched on service name + trace id.
+      tracesToLogsV2:
+        datasourceUid: loki
+        spanStartTimeShift: -2s
+        spanEndTimeShift: 2s
+        filterByTraceID: true
+        filterBySpanID: false
+        tags:
+          - key: service.name
+            value: service_name
+      # Jump from a span to related metrics in Prometheus. `$$` escapes Grafana provisioning's env-var
+      # interpolation so the literal `$__tags` / `$__rate_interval` / `${__span.name}` macros reach the
+      # datasource.
+      tracesToMetrics:
+        datasourceUid: prometheus
+        spanStartTimeShift: -1h
+        spanEndTimeShift: 1h
+        # Tempo's span metrics label the service as `service` (not `service_name`), so map the span's
+        # service.name attribute onto that label for the $__tags substitution below. Alloy mirrors `job`
+        # onto `service` for the app's own metrics, so this one mapping selects both metric families —
+        # queries 1-3 hit Tempo's span metrics, 4-6 hit the app's.
+        tags:
+          - key: service.name
+            value: service
+        queries:
+          # ${__span.name} narrows these to the operation you clicked (span_name is the span-metrics label),
+          # rather than reporting service-wide numbers next to a specific span.
+          - name: 'Request rate by status'
+            query: 'sum by (status_code) (rate(traces_spanmetrics_calls_total{$$__tags}[$$__rate_interval]))'
+          - name: 'This operation: error rate'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$$__tags, span_name="$${__span.name}", status_code="STATUS_CODE_ERROR"}[$$__rate_interval]))'
+          - name: 'This operation: p95 latency'
+            query: 'histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{$$__tags, span_name="$${__span.name}"}[$$__rate_interval])))'
+          - name: 'DB command p95'
+            query: 'histogram_quantile(0.95, sum by (le) (rate(db_client_operation_duration_seconds_bucket{$$__tags}[$$__rate_interval])))'
+          # Pool saturation is the usual explanation for a slow request under pooled DbContexts + per-connection RLS.
+          - name: 'DB connection pool'
+            query: 'sum by (db_client_connection_state) (db_client_connection_count{$$__tags})'
+          - name: 'Snapshots generated vs reused'
+            query: 'sum by (outcome) (rate(timehacker_snapshots_requested_total{$$__tags}[$$__rate_interval]))'

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using TimeHacker.Domain.Observability;
 
 namespace TimeHacker.Api.Filters;
 
@@ -13,12 +14,19 @@ internal sealed partial class LogExceptionFilter(ILoggerFactory loggerFactory, I
     public void OnException(ExceptionContext context)
     {
         var exceptionProcessed = ProcessException(context, out var objectResult);
-        if (!exceptionProcessed) 
+        if (!exceptionProcessed)
             return;
+
+        RecordBusinessException(context.Exception, objectResult.StatusCode);
 
         context.Result = objectResult;
         context.ExceptionHandled = true;
     }
+
+    private static void RecordBusinessException(Exception exception, int? statusCode) =>
+        TimeHackerTelemetry.BusinessExceptions.Add(1,
+            new KeyValuePair<string, object?>("exception.type", exception.GetType().Name),
+            new KeyValuePair<string, object?>("http.status_code", statusCode ?? StatusCodes.Status400BadRequest));
 
     /// <returns>true - if exception should be handled with output parameter</returns>
     private bool ProcessException(ExceptionContext context, out ObjectResult objectResult)

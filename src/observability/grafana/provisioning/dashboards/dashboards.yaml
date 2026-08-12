@@ -1,0 +1,16 @@
+# Auto-provision dashboards from this same directory, so the whole Grafana setup stays inside the one
+# bind-mounted provisioning folder (no extra docker-compose volume needed).
+apiVersion: 1
+providers:
+  - name: TimeHacker
+    orgId: 1
+    folder: TimeHacker
+    type: file
+    # Dashboards are code here: the JSON file is the single source of truth. Edit freely, then
+    # Export / JSON Model -> paste back into the .json file, which reloads within updateIntervalSeconds.
+    allowUiUpdates: true
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

@@ -1,0 +1,17 @@
+# Metrics arrive via remote-write (--web.enable-remote-write-receiver): Alloy forwards the app's OTLP
+# metrics (converted by otelcol.exporter.prometheus, exemplars included), and Tempo's metrics-generator
+# writes span/service-graph metrics. Exemplars are stored via --enable-feature=exemplar-storage. A
+# self-scrape is kept for basic Prometheus health.
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Scrape Alloy's own metrics so the collector pipeline is observable (OTLP receiver, batch, and
+  # remote-write queue/exemplar counters) — useful for spotting dropped/lagging exemplars.
+  - job_name: alloy
+    static_configs:
+      - targets: ["alloy:12345"]
