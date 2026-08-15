@@ -1,6 +1,5 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
-using TimeHacker.Domain.IRepositories.Categories;
 
 namespace TimeHacker.Application.Api.AppServices.Categories;
 

@@ -1,8 +1,4 @@
-using TimeHacker.Api.Models.Input.Tasks;
-using TimeHacker.Api.Models.Return.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 
 namespace TimeHacker.Api.Controllers.Tasks;
 
@@ -65,7 +61,7 @@ public class TasksController(ITaskAppService taskService)
         [FromServices] IScheduleEntityAppService scheduleEntityAppService,
         CancellationToken cancellationToken = default)
     {
-        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(), cancellationToken);
+        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(ScheduleEntityParentType.FixedTask), cancellationToken);
         var data = ScheduleEntityReturnModel.Create(entity);
 
         return TypedResults.Created("", data);

@@ -1,5 +1,4 @@
 using TimeHacker.Api.Models.Return.RepeatingEntities;
-using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 
 namespace TimeHacker.Api.Models.Return.ScheduleSnapshots;
 

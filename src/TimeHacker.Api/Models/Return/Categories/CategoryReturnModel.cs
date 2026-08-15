@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Return.Categories;
 

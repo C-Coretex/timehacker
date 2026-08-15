@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿namespace TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 /// <summary>
 /// A generated category instance for one specific day, belonging to a <see cref="ScheduleSnapshot"/>. It is a
@@ -10,7 +8,6 @@ public class ScheduledCategory : UserScopedEntityBase
 {
     public Guid ParentCategoryId { get; init; }
     public Guid? ParentScheduleEntity { get; init; }
-
 
     public DateOnly Date { get; set; }
 

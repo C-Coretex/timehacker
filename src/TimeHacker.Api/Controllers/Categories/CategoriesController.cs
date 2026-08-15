@@ -1,6 +1,7 @@
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Return.Categories;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
+using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 
 namespace TimeHacker.Api.Controllers.Categories;
 
@@ -58,5 +59,18 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
         await categoryService.DeleteAsync(id, cancellationToken);
 
         return TypedResults.NoContent();
+    }
+
+    [ProducesResponseType(typeof(ScheduleEntityReturnModel), StatusCodes.Status201Created)]
+    [HttpPost("schedules")]
+    public async Task<Created<ScheduleEntityReturnModel>> PostNewScheduleForTask(
+        [FromBody] InputScheduleEntityModel inputScheduleEntityModel,
+        [FromServices] IScheduleEntityAppService scheduleEntityAppService,
+        CancellationToken cancellationToken = default)
+    {
+        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(ScheduleEntityParentType.Category), cancellationToken);
+        var data = ScheduleEntityReturnModel.Create(entity);
+
+        return TypedResults.Created("", data);
     }
 }

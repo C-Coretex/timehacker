@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Categories;
-
-namespace TimeHacker.Infrastructure.Configuration.Categories;
+﻿namespace TimeHacker.Infrastructure.Configuration.Categories;
 
 public class CategoryFixedTaskConfiguration : IEntityTypeConfiguration<CategoryFixedTask>
 {

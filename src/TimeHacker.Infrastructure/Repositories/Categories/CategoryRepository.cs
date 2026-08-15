@@ -1,5 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.IRepositories.Categories;
+﻿using TimeHacker.Domain.IRepositories.Categories;
 
 namespace TimeHacker.Infrastructure.Repositories.Categories;
 

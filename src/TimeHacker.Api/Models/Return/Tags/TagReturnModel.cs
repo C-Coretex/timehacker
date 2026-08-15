@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using TimeHacker.Application.Api.Contracts.DTOs.Tags;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 
 namespace TimeHacker.Api.Models.Return.Tags;
 

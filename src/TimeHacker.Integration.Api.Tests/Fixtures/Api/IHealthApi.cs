@@ -1,5 +1,3 @@
-using Refit;
-
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
 
 /// <summary>The infrastructure health endpoint.</summary>

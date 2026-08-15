@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Tags;
-
-namespace TimeHacker.Infrastructure.Configuration.Tags;
+﻿namespace TimeHacker.Infrastructure.Configuration.Tags;
 
 public class TagFixedTaskConfiguration : IEntityTypeConfiguration<TagFixedTask>
 {

@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-
-namespace TimeHacker.Domain.Models.ReturnModels;
+﻿namespace TimeHacker.Domain.Models.ReturnModels;
 
 public record TasksForDayReturn
 {

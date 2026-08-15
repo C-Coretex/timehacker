@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.EntityBase;
-
-namespace TimeHacker.Infrastructure.Configuration;
+﻿namespace TimeHacker.Infrastructure.Configuration;
 
 public abstract class UserScopedEntityConfigurationBase<T> : IEntityTypeConfiguration<T> where T : UserScopedEntityBase
 {

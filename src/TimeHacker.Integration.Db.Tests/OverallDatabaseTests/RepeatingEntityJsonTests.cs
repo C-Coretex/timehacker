@@ -1,11 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.Models.EntityModels.Enums;
 using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Integration.Db.Tests.Fixtures;
 using DayOfWeekEnum = TimeHacker.Domain.Models.EntityModels.Enums.DayOfWeek;
 
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;

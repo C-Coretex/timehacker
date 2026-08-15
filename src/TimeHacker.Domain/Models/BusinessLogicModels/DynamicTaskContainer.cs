@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Domain.Models.BusinessLogicModels;
+﻿namespace TimeHacker.Domain.Models.BusinessLogicModels;
 
 public readonly record struct DynamicTaskContainer
 {

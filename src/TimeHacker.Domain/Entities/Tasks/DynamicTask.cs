@@ -1,7 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.Tags;
-
-namespace TimeHacker.Domain.Entities.Tasks;
+﻿namespace TimeHacker.Domain.Entities.Tasks;
 
 public class DynamicTask : UserScopedEntityBase, ITask
 {

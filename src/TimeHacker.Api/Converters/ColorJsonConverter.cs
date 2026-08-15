@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace TimeHacker.Api.Converters;
 
 /// <summary>

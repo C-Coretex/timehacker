@@ -13,7 +13,6 @@ using TimeHacker.Api.Filters;
 using TimeHacker.Api.Middleware;
 using TimeHacker.Api.Seeding;
 using TimeHacker.Application.Api.Extensions;
-using TimeHacker.Domain.Observability;
 using TimeHacker.Domain.Services.Extensions;
 using TimeHacker.Infrastructure.Extensions;
 using TimeHacker.Infrastructure.Identity;
@@ -211,7 +210,6 @@ app.MapControllers();
 #endregion
 
 await app.RunAsync();
-
 
 #region Private static
 

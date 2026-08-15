@@ -1,10 +1,5 @@
-using System.Net;
-using AwesomeAssertions;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests.Users;
 

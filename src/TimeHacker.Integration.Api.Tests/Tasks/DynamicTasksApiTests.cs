@@ -1,7 +1,3 @@
-using System.Net;
-using AwesomeAssertions;
-using TimeHacker.Integration.Api.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Api.Tests.Tasks;
 
 public sealed class DynamicTasksApiTests(ApiTestFixture fixture) : ApiIntegrationTestBase(fixture)

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity.Data;
 using TimeHacker.Infrastructure;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests;
 

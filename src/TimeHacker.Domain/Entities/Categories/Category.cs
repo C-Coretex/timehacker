@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-
-namespace TimeHacker.Domain.Entities.Categories;
+﻿namespace TimeHacker.Domain.Entities.Categories;
 
 public class Category : UserScopedEntityBase
 {
@@ -10,7 +7,6 @@ public class Category : UserScopedEntityBase
     public string Name { get; set; } = "";
     public string? Description { get; set; }
     public Color Color { get; set; }
-
 
     public virtual ScheduleEntity? ScheduleEntity { get; set; }
     public virtual ICollection<CategoryFixedTask> CategoryFixedTasks { get; init; } = [];

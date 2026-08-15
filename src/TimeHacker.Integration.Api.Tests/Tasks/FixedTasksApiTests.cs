@@ -1,9 +1,4 @@
-using System.Net;
-using AwesomeAssertions;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests.Tasks;
 
@@ -97,7 +92,6 @@ public sealed class FixedTasksApiTests(ApiTestFixture fixture) : ApiIntegrationT
     {
         var api = await CreateAuthenticatedApiAsync();
         var cancellationToken = TestContext.Current.CancellationToken;
-
 
         var anotherTaskId = (await api.FixedTasks.Create(TestRequests.NewFixedTask("Recurring", Start, End))).Content;
         var schedule = await api.Tasks.CreateSchedule(TestRequests.NewSchedule(anotherTaskId, TestRequests.EveryNDays(1)));

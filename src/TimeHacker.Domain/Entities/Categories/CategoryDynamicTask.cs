@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Domain.Entities.Categories;
+﻿namespace TimeHacker.Domain.Entities.Categories;
 
 public class CategoryDynamicTask
 {

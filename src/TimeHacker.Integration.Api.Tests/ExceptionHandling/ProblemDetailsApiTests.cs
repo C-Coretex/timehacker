@@ -1,8 +1,4 @@
-using System.Net;
 using System.Text.Json;
-using AwesomeAssertions;
-using Refit;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests.ExceptionHandling;
 

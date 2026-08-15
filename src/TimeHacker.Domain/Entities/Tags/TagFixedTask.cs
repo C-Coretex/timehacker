@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Domain.Entities.Tags;
+﻿namespace TimeHacker.Domain.Entities.Tags;
 
 public class TagFixedTask
 {

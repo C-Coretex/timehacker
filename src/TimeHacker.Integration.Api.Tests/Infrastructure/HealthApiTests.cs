@@ -1,7 +1,3 @@
-using System.Net;
-using AwesomeAssertions;
-using TimeHacker.Integration.Api.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Api.Tests.Infrastructure;
 
 public sealed class HealthApiTests(ApiTestFixture fixture) : ApiIntegrationTestBase(fixture)

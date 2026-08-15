@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Refit;
 using TimeHacker.Api.Converters;
 using TimeHacker.Api.Converters.Input.Tasks.RepeatingEntities;
 

@@ -1,7 +1,6 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Tags;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tags;
 using TimeHacker.Domain.IRepositories.Tags;
-using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Application.Api.AppServices.Tags;
 

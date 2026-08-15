@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Models.BusinessLogicModels;
+﻿using TimeHacker.Domain.Models.BusinessLogicModels;
 
 namespace TimeHacker.Domain.Models.ReturnModels;
 

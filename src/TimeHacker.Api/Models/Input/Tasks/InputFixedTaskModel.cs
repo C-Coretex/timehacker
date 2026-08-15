@@ -1,5 +1,3 @@
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
-
 namespace TimeHacker.Api.Models.Input.Tasks;
 
 public record InputFixedTaskModel
@@ -21,7 +19,6 @@ public record InputFixedTaskModel
 
     [Required]
     public required string EndTimestamp { get; init; }
-
 
     // Parse as UTC: honour an explicit offset/'Z', and treat a naive timestamp as UTC
     // (not server-local) so storage is deterministic regardless of the server's timezone.

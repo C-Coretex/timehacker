@@ -1,14 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
 using TimeHacker.Domain.BusinessLogicExceptions;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.Tasks;
-using TimeHacker.Infrastructure;
-using TimeHacker.Integration.Db.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 

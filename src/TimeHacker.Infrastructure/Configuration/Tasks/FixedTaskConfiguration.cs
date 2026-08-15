@@ -1,7 +1,4 @@
-﻿using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Infrastructure.Configuration.Tasks;
+﻿namespace TimeHacker.Infrastructure.Configuration.Tasks;
 
 public class FixedTaskConfiguration : UserScopedEntityConfigurationBase<FixedTask>
 {

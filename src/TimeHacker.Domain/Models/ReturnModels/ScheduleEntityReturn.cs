@@ -1,9 +1,4 @@
-﻿using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Domain.Models.ReturnModels;
+﻿namespace TimeHacker.Domain.Models.ReturnModels;
 
 public record ScheduleEntityReturn
 {

@@ -1,7 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-
-namespace TimeHacker.Infrastructure.Configuration.Categories;
+﻿namespace TimeHacker.Infrastructure.Configuration.Categories;
 
 public class CategoryConfiguration : UserScopedEntityConfigurationBase<Category>
 {

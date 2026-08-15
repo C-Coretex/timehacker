@@ -1,5 +1,4 @@
 ﻿using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots;
 

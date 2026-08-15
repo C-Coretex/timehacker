@@ -1,9 +1,5 @@
 using System.Globalization;
-using System.Net;
-using AwesomeAssertions;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests.Tasks;
 

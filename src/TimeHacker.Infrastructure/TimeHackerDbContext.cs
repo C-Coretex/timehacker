@@ -1,11 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
-using TimeHacker.Infrastructure.Converters;
+﻿using TimeHacker.Infrastructure.Converters;
 
 namespace TimeHacker.Infrastructure;
 
@@ -66,7 +59,6 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
     internal DbSet<User> User { get; set; }
 
     #endregion
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

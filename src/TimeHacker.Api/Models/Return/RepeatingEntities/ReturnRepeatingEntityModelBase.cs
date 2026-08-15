@@ -1,6 +1,3 @@
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-
 namespace TimeHacker.Api.Models.Return.RepeatingEntities;
 
 [JsonDerivedType(typeof(ReturnDayRepeatingEntityModel), "day")]

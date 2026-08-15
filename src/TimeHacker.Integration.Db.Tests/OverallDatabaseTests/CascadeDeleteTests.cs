@@ -1,11 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Integration.Db.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 
 // Cascade-delete behavior is declared in EF config and enforced by PostgreSQL; only a real database

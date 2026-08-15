@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Users;
-
-namespace TimeHacker.Infrastructure.Configuration.Users;
+﻿namespace TimeHacker.Infrastructure.Configuration.Users;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

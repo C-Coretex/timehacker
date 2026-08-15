@@ -1,6 +1,4 @@
-﻿using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
-
-namespace TimeHacker.Domain.Entities.Tasks;
+﻿namespace TimeHacker.Domain.Entities.Tasks;
 
 public interface ITask : IDbEntity<Guid>, IUserScopedEntity
 {

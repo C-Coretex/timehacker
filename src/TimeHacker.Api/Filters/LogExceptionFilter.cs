@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using TimeHacker.Domain.Observability;
 
 namespace TimeHacker.Api.Filters;
 

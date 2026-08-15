@@ -1,5 +1,3 @@
-using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
-
 namespace TimeHacker.Api.Models.Input.Tasks;
 
 public record InputDynamicTaskModel

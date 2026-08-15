@@ -1,8 +1,4 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.Tasks;
+﻿using TimeHacker.Domain.Entities.Tags;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks;
 

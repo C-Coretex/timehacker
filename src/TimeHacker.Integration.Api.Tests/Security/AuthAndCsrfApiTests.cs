@@ -1,7 +1,3 @@
-using System.Net;
-using AwesomeAssertions;
-using TimeHacker.Integration.Api.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Api.Tests.Security;
 
 public sealed class AuthAndCsrfApiTests(ApiTestFixture fixture) : ApiIntegrationTestBase(fixture)

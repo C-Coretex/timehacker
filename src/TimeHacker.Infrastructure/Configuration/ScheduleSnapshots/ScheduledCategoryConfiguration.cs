@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Infrastructure.Configuration.ScheduleSnapshots;
 

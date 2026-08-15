@@ -1,6 +1,4 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
-
-namespace TimeHacker.Api.Models.Return.ScheduleSnapshots;
+﻿namespace TimeHacker.Api.Models.Return.ScheduleSnapshots;
 
 public record ScheduledTaskReturnModel(
     Guid Id,

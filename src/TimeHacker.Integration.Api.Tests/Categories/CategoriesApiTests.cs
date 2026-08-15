@@ -1,9 +1,5 @@
 using System.Drawing;
-using System.Net;
-using AwesomeAssertions;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Api.Tests.Categories;
 

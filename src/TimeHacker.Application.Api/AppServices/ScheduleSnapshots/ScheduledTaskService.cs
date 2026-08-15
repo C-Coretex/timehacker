@@ -1,6 +1,4 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 
 namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 

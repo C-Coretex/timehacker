@@ -1,9 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
 using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Infrastructure;
-using TimeHacker.Integration.Db.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Db.Tests.ServiceFlowTests;
 

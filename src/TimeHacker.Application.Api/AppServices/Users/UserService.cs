@@ -1,6 +1,5 @@
 ﻿using TimeHacker.Application.Api.Contracts.DTOs.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
-using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IRepositories.Users;
 
 namespace TimeHacker.Application.Api.AppServices.Users;

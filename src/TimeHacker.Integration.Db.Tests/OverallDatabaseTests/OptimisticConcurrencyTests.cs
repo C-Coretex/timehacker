@@ -1,10 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Infrastructure;
-using TimeHacker.Integration.Db.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 
 // Every IDbEntity maps PostgreSQL's xmin system column as a concurrency token (no migration). A second

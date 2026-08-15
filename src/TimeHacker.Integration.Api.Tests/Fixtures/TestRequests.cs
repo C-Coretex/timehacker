@@ -1,7 +1,6 @@
 using System.Drawing;
 using System.Globalization;
 using TimeHacker.Api.Models.Input.Categories;
-using TimeHacker.Api.Models.Input.Tasks;
 using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Models.Input.Users;
 using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;

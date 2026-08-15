@@ -1,10 +1,5 @@
-using System.Net;
-using AwesomeAssertions;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Models.Return.RepeatingEntities;
-using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Integration.Api.Tests.Fixtures;
 using DomainDayOfWeek = TimeHacker.Domain.Models.EntityModels.Enums.DayOfWeek;
 
 namespace TimeHacker.Integration.Api.Tests.Tasks;

@@ -1,6 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
-import eslintPluginImport from 'eslint-plugin-import';
+import eslintPluginImportX from 'eslint-plugin-import-x';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
@@ -15,7 +15,7 @@ export default tseslint.config(
       globals: globals.browser,
     },
     plugins: {
-      import: eslintPluginImport,
+      'import-x': eslintPluginImportX,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
@@ -26,7 +26,7 @@ export default tseslint.config(
       // fetch-on-mount effects), not real bugs, so we opt out of them here.
       'react-hooks/refs': 'off',
       'react-hooks/set-state-in-effect': 'off',
-      'import/no-default-export': 'error',
+      'import-x/no-default-export': 'error',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
@@ -37,7 +37,7 @@ export default tseslint.config(
     // Tooling config files must use a default export (required by Vite / tooling).
     files: ['*.config.ts', 'vite.config.ts'],
     rules: {
-      'import/no-default-export': 'off',
+      'import-x/no-default-export': 'off',
     },
   },
   {

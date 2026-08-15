@@ -1,8 +1,4 @@
-﻿using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Domain.Entities.ScheduleSnapshots;
+﻿namespace TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 /// <summary>
 /// The recurrence *blueprint* attached to a FixedTask or Category: the repeating pattern plus the bounds

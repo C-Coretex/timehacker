@@ -1,5 +1,3 @@
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-
 namespace TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 
 public record InputDayRepeatingEntityModel : InputRepeatingEntityModelBase

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using TimeHacker.Api.Seeding.Steps;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Infrastructure;

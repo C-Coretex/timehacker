@@ -1,8 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
 using TimeHacker.Domain.Entities.Users;
 using TimeHacker.Domain.IRepositories.Users;
-using TimeHacker.Integration.Db.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 

@@ -1,7 +1,4 @@
-﻿using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-
-namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
+﻿namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 
 public class ScheduledCategoryService: IScheduledCategoryAppService
 {

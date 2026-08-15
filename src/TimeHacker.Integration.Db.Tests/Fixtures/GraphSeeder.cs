@@ -1,16 +1,7 @@
-using System.Drawing;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.IModels;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.Models.EntityModels.Enums;
 using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
-using TimeHacker.Infrastructure;
 
 namespace TimeHacker.Integration.Db.Tests.Fixtures;
 

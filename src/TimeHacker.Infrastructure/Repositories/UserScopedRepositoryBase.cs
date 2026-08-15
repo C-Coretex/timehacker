@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using TimeHacker.Domain.BusinessLogicExceptions;
-using TimeHacker.Domain.Entities.EntityBase;
 using TimeHacker.Domain.IRepositories;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Infrastructure.Repositories;
 

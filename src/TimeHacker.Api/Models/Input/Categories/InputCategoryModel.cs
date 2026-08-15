@@ -1,4 +1,3 @@
-using System.Drawing;
 using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Input.Categories;

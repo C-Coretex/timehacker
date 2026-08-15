@@ -1,4 +1,3 @@
-using Refit;
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Return.Categories;
 

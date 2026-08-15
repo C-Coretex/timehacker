@@ -1,10 +1,7 @@
 ﻿using AutoBogus;
-using Microsoft.EntityFrameworkCore;
-using TimeHacker.Infrastructure;
-using TimeHacker.Integration.Db.Tests.Fixtures;
 using TimeHacker.Tests.Helpers.AutoFaker;
 
-namespace Timehacker.Integration.Db.Tests;
+namespace TimeHacker.Integration.Db.Tests;
 
 public abstract class DbIntegrationTestBase: IAsyncLifetime
 {
@@ -54,7 +51,6 @@ public abstract class DbIntegrationTestBase: IAsyncLifetime
             [userId.ToString()], cancellationToken);
         return context;
     }
-
 
     public virtual async ValueTask InitializeAsync()
     {

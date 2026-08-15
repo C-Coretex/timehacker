@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Tasks;
-
-namespace TimeHacker.Domain.IProcessors;
+﻿namespace TimeHacker.Domain.IProcessors;
 
 public interface ITaskTimelineProcessor
 {

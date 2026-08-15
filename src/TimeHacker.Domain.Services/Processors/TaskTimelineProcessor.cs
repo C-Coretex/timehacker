@@ -197,6 +197,8 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
             var weight = score <= 0 ? float.MaxValue : 1 / score;
             possibleTimelines.Add((possibleTaskTimeline, weight));
         }
+        if(possibleTimelines.Count == 0)
+            return [];
 
         var randomDynamicTask = RandomValuesHelper.GetRandomEntries(possibleTimelines, 1).First();
         return randomDynamicTask;

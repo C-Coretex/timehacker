@@ -1,15 +1,7 @@
-using System.Drawing;
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
 using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Domain.BusinessLogicExceptions;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
-using TimeHacker.Integration.Db.Tests.Fixtures;
 
 namespace TimeHacker.Integration.Db.Tests.ServiceFlowTests;
 

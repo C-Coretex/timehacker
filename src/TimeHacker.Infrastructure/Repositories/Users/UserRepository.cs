@@ -1,6 +1,4 @@
-﻿using TimeHacker.Domain.Entities.Users;
-using TimeHacker.Domain.IRepositories.Users;
-using TimeHacker.Helpers.Db.Abstractions.BaseClasses;
+﻿using TimeHacker.Domain.IRepositories.Users;
 
 namespace TimeHacker.Infrastructure.Repositories.Users;
 

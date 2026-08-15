@@ -1,9 +1,5 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.Tasks;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
-using TimeHacker.Application.Api.QueryPipelineSteps;
+﻿using TimeHacker.Application.Api.QueryPipelineSteps;
 using TimeHacker.Domain.Entities.Tags;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
-using TimeHacker.Domain.IRepositories.Tasks;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks;
 

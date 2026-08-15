@@ -1,10 +1,3 @@
-using System.Drawing;
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
-using TimeHacker.Domain.Entities.Categories;
-using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Integration.Db.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 
 // DeleteBy/UpdateProperty run as ExecuteDelete/ExecuteUpdate SQL: they bypass the change tracker, stay

@@ -1,7 +1,6 @@
 ﻿#pragma warning disable CA1062 // Validate arguments of public methods
 
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Infrastructure.Interceptors;
 

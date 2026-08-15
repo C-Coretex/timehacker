@@ -1,8 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Timehacker.Integration.Db.Tests;
-using TimeHacker.Domain.Entities.ScheduleSnapshots;
-using TimeHacker.Integration.Db.Tests.Fixtures;
-
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 
 // ScheduleSnapshot carries an alternate key on (UserId, Date); ScheduledTask/ScheduledCategory FK into

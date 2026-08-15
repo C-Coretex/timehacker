@@ -44,7 +44,7 @@ export const EventDetailModal: FC<EventDetailModalProps> = ({
             column={1}
             bordered
             size="small"
-            labelStyle={{ fontWeight: 600, width: '30%' }}
+            styles={{ label: { fontWeight: 600, width: '30%' } }}
           >
             {event.description && (
               <Descriptions.Item label={t('calendar.descriptionLabel')}>

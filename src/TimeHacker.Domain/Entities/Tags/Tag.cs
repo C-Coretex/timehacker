@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace TimeHacker.Domain.Entities.Tags;
+﻿namespace TimeHacker.Domain.Entities.Tags;
 
 public class Tag : UserScopedEntityBase
 {

@@ -24,22 +24,22 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), spaFallbackForApp()],
   resolve: {
     alias: {
-      api: path.resolve(__dirname, 'src/api'),
-      components: path.resolve(__dirname, 'src/components'),
-      config: path.resolve(__dirname, 'src/config'),
-      contexts: path.resolve(__dirname, 'src/contexts'),
-      hooks: path.resolve(__dirname, 'src/hooks'),
-      pages: path.resolve(__dirname, 'src/pages'),
-      types: path.resolve(__dirname, 'src/types'),
-      utils: path.resolve(__dirname, 'src/utils'),
-      i18n: path.resolve(__dirname, 'src/i18n'),
+      api: path.resolve(import.meta.dirname, 'src/api'),
+      components: path.resolve(import.meta.dirname, 'src/components'),
+      config: path.resolve(import.meta.dirname, 'src/config'),
+      contexts: path.resolve(import.meta.dirname, 'src/contexts'),
+      hooks: path.resolve(import.meta.dirname, 'src/hooks'),
+      pages: path.resolve(import.meta.dirname, 'src/pages'),
+      types: path.resolve(import.meta.dirname, 'src/types'),
+      utils: path.resolve(import.meta.dirname, 'src/utils'),
+      i18n: path.resolve(import.meta.dirname, 'src/i18n'),
     },
   },
   build: {
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html'),
-        app: path.resolve(__dirname, 'app/index.html'),
+        main: path.resolve(import.meta.dirname, 'index.html'),
+        app: path.resolve(import.meta.dirname, 'app/index.html'),
       },
     },
   },

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using TimeHacker.Domain.Observability;
 
 namespace TimeHacker.Api.Middleware;
 

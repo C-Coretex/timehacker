@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using TimeHacker.Domain.IRepositories.Categories;
-using TimeHacker.Domain.IRepositories.ScheduleSnapshots;
 using TimeHacker.Domain.IRepositories.Tags;
-using TimeHacker.Domain.IRepositories.Tasks;
 using TimeHacker.Domain.IRepositories.Users;
 using TimeHacker.Infrastructure.Factories;
 using TimeHacker.Infrastructure.Interceptors;

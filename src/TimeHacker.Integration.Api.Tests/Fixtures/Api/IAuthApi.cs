@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity.Data;
-using Refit;
 
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
 

@@ -1,7 +1,4 @@
 ﻿using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
-using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
-using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
 
 namespace TimeHacker.Api.Models.Input.Tasks;
 
@@ -13,9 +10,9 @@ public record InputScheduleEntityModel
     public required InputRepeatingEntityModelBase RepeatingEntityType { get; set; }
     public EndsOnModel? EndsOnModel { get; set; }
 
-    public ScheduleEntityCreateDto CreateDto()
+    public ScheduleEntityCreateDto CreateDto(ScheduleEntityParentType parentType)
     {
         var repeatingEntityDto = new RepeatingEntityDto(RepeatingEntityType.EntityType, RepeatingEntityType.CreateEntity());
-        return new ScheduleEntityCreateDto(ScheduleEntityParentType.FixedTask, ParentEntityId, repeatingEntityDto, EndsOnModel);
+        return new ScheduleEntityCreateDto(parentType, ParentEntityId, repeatingEntityDto, EndsOnModel);
     }
 }

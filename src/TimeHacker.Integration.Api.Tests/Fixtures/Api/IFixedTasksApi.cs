@@ -1,7 +1,3 @@
-using Refit;
-using TimeHacker.Api.Models.Input.Tasks;
-using TimeHacker.Api.Models.Return.Tasks;
-
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
 
 /// <summary>Typed surface over <c>FixedTasksController</c> (/api/fixed-tasks).</summary>

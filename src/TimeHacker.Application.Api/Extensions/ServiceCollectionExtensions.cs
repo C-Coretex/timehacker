@@ -4,8 +4,6 @@ using TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 using TimeHacker.Application.Api.AppServices.Tasks;
 using TimeHacker.Application.Api.AppServices.Users;
 using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
-using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 using TimeHacker.Application.Api.Contracts.IAppServices.Users;
 
 namespace TimeHacker.Application.Api.Extensions;

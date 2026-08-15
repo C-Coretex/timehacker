@@ -1,8 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
-using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
 
 namespace TimeHacker.Api.Seeding.Steps;
 
