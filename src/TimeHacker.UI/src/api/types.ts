@@ -76,6 +76,7 @@ export const RepeatingEntityTypeEnum = {
     WeekRepeatingEntity: 2,
     MonthRepeatingEntity: 3,
     YearRepeatingEntity: 4,
+    OnceRepeatingEntity: 5,
 } as const;
 export type RepeatingEntityTypeEnum = (typeof RepeatingEntityTypeEnum)[keyof typeof RepeatingEntityTypeEnum];
 
@@ -110,11 +111,18 @@ export interface InputYearRepeatingEntityModel {
     yearDayToRepeat: number; // 1-366
 }
 
+/** Applies only on an explicit list of dates rather than on a repeating pattern. */
+export interface InputOnceRepeatingEntityModel {
+    entityType: typeof RepeatingEntityTypeEnum.OnceRepeatingEntity;
+    dates: string[]; // YYYY-MM-DD
+}
+
 export type InputRepeatingEntityType =
     | InputDayRepeatingEntityModel
     | InputWeekRepeatingEntityModel
     | InputMonthRepeatingEntityModel
-    | InputYearRepeatingEntityModel;
+    | InputYearRepeatingEntityModel
+    | InputOnceRepeatingEntityModel;
 
 // --- Return repeating entity models (from API) ---
 
@@ -138,11 +146,17 @@ export interface ReturnYearRepeatingEntityModel {
     yearDayToRepeat: number;
 }
 
+export interface ReturnOnceRepeatingEntityModel {
+    entityType: typeof RepeatingEntityTypeEnum.OnceRepeatingEntity;
+    dates: string[]; // YYYY-MM-DD
+}
+
 export type ReturnRepeatingEntityModel =
     | ReturnDayRepeatingEntityModel
     | ReturnWeekRepeatingEntityModel
     | ReturnMonthRepeatingEntityModel
-    | ReturnYearRepeatingEntityModel;
+    | ReturnYearRepeatingEntityModel
+    | ReturnOnceRepeatingEntityModel;
 
 export interface EndsOnModel {
     maxDate?: string; // YYYY-MM-DD
@@ -153,4 +167,44 @@ export interface InputScheduleEntityModel {
     parentEntityId: string; // Guid
     repeatingEntityType: InputRepeatingEntityType;
     endsOnModel?: EndsOnModel | null;
+}
+
+// --- Categories ---
+// A category is a daily time window (startTime/endTime); which day(s) it lands on is decided by its
+// scheduleEntity. Colors travel as a signed ARGB int32 — see utils/colorArgb.
+
+export interface CategoryReturnModel {
+    id: string;
+    name: string;
+    description: string | null;
+    color: number;
+    startTime: string; // HH:mm:ss
+    endTime: string; // HH:mm:ss
+    scheduleEntity: ScheduleEntityReturnModel | null;
+}
+
+export interface InputCategory {
+    name: string;
+    description?: string;
+    color: number;
+    startTime: string; // HH:mm:ss
+    endTime: string; // HH:mm:ss
+}
+
+export interface CategoryFormData {
+    name: string;
+    description: string;
+    color: number;
+    startTime: Dayjs;
+    endTime: Dayjs;
+}
+
+export interface CategoryDisplayModel {
+    id: string;
+    name: string;
+    description: string | null;
+    color: number;
+    startTime: Dayjs;
+    endTime: Dayjs;
+    scheduleEntity: ScheduleEntityReturnModel | null;
 }

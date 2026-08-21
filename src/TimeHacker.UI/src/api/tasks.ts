@@ -16,10 +16,25 @@ export interface TaskForDayItem {
   };
 }
 
+/** A category's time window generated for one day — the backdrop tasks sit on top of. */
+export interface CategoryForDayItem {
+  scheduleEntityId: string | null;
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+    color: number;
+  };
+  timeRange: {
+    start: string;
+    end: string;
+  };
+}
+
 export interface TasksForDayResponse {
   date: string;
   tasksTimeline: TaskForDayItem[];
-  categoriesTimeline: unknown[];
+  categoriesTimeline: CategoryForDayItem[];
 }
 
 export async function fetchTasksForDay(date: Date): Promise<TasksForDayResponse> {

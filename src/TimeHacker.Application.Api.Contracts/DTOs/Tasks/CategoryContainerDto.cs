@@ -1,10 +1,11 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 public record CategoryContainerDto
 {
-    public CategoryDto? Category { get; init; }
+    public Guid? ScheduleEntityId { get; init; }
+    public required CategoryDto Category { get; init; }
     public TimeRange TimeRange { get; init; }
 
     public static CategoryContainerDto Create(CategoryContainerReturn category)
@@ -13,7 +14,8 @@ public record CategoryContainerDto
 
         return new CategoryContainerDto
         {
-            Category = category.Category != null ? CategoryDto.Create(category.Category) : null,
+            ScheduleEntityId = category.ScheduleEntityId,
+            Category = CategoryDto.Create(category.Category),
             TimeRange = category.TimeRange
         };
     }

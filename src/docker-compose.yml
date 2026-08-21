@@ -1,9 +1,18 @@
 version: "1.1"
 
+# Profiles — pick how much of the stack to run:
+#   docker compose --profile minimal up    ui + api + db
+#   docker compose --profile dev up        + pgAdmin
+#   docker compose --profile full up       + observability (Alloy/Loki/Tempo/Prometheus/Grafana)
+# `timehacker.infrastructure` has no `profiles:` key, so it starts in all of them —
+# which also means a bare `docker compose up` starts the database and nothing else. Set
+# COMPOSE_PROFILES in .env to pick a default tier.
+
 services:
   #Frontend
   vite-app:
     container_name: timehacker.ui
+    profiles: ["minimal", "dev", "full"]
     build:
       context: ./TimeHacker.UI/
       target: development-dependencies-env
@@ -13,7 +22,13 @@ services:
       - ./TimeHacker.UI:/app
       - /app/node_modules
     environment:
+      # vite.config.ts reads this to decide
+      # whether to poll, and sets the (much cheaper than default) poll interval.
       - CHOKIDAR_USEPOLLING=true
+      # Bounds V8's heap, which otherwise sizes itself off the host's total RAM (a 4288MB limit
+      # here) and grows unchecked over a long session.
+      - NODE_OPTIONS=--max-old-space-size=768
+    mem_limit: 2g
     command: sh -c "npm install && npm run dev -- --host"
     stdin_open: true
     tty: true
@@ -22,19 +37,18 @@ services:
   timehacker.api:
     image: ${DOCKER_REGISTRY-}timehackerapi
     container_name: timehacker.api
+    profiles: ["minimal", "dev", "full"]
     build:
       context: .
       dockerfile: TimeHacker.Api/Dockerfile
     ports:
       - "8080:8080"
       - "8081:8081"
+    # Deliberately no depends_on for alloy: it only exists in the `full` profile, and Compose errors
+    # out when an enabled service depends on a profile-excluded one.
     depends_on:
       timehacker.infrastructure:
         condition: service_healthy
-      timehacker.infrastructure.identity:
-        condition: service_healthy
-      alloy:
-        condition: service_started
     environment:
       - AppSettings__uiUrl=http://localhost:5173
       - DataProtection__KeysPath=/keys
@@ -43,11 +57,12 @@ services:
       - OTEL_SERVICE_NAME=TimeHacker.Api
       - ConnectionStrings__TimeHackerConnectionString=${ConnectionStrings__TimeHackerConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=application_user;Password=application_password;Include Error Detail=true}
       - ConnectionStrings__TimeHackerAdminConnectionString=${ConnectionStrings__TimeHackerAdminConnectionString:-Host=timehacker.infrastructure;Database=TimeHacker;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
-      - ConnectionStrings__IdentityConnectionString=${ConnectionStrings__IdentityConnectionString:-Host=timehacker.infrastructure.identity;Database=TimeHackerIdentity;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
+      - ConnectionStrings__IdentityConnectionString=${ConnectionStrings__IdentityConnectionString:-Host=timehacker.infrastructure;Database=TimeHackerIdentity;Port=5432;Username=postgres;Password=postgres;Include Error Detail=true}
     volumes:
       - dataprotection-keys:/keys
 
   #Databases
+  # Intentionally has no `profiles:` key, so it starts in every profile (all of them need it).
   timehacker.infrastructure:
     image: postgres:latest
     container_name: timehacker.infrastructure
@@ -67,26 +82,10 @@ services:
       timeout: 5s
       retries: 10
 
-  timehacker.infrastructure.identity:
-    image: postgres:latest
-    container_name: timehacker.infrastructure.identity
-    environment:
-      - POSTGRES_DB=TimeHackerIdentity
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${IDENTITY_POSTGRES_PASSWORD:-postgres}
-    volumes:
-      - timehacker-identity-db:/var/lib/postgresql
-    ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   #pgAdmin
   pgadmin:
     image: dpage/pgadmin4:latest
+    profiles: ["dev", "full"]
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
@@ -97,13 +96,13 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - timehacker.infrastructure
-      - timehacker.infrastructure.identity
 
   #Observability (Grafana LGTM stack). Receives OTLP and fans out to Loki/Tempo/Prometheus.
   # Live pipeline UI at http://localhost:12345/graph.
   alloy:
     image: grafana/alloy:latest
     container_name: timehacker.alloy
+    profiles: ["full"]
     # Alloy loads and merges every *.alloy file in the config directory, so the pipeline is split
     # per signal (receiver.alloy / logs.alloy / metrics.alloy / traces.alloy).
     command:
@@ -124,6 +123,7 @@ services:
   loki:
     image: grafana/loki:latest
     container_name: timehacker.loki
+    profiles: ["full"]
     command: ["-config.file=/etc/loki/local-config.yaml"]
     volumes:
       - loki-data:/loki
@@ -133,6 +133,7 @@ services:
   tempo:
     image: grafana/tempo:latest
     container_name: timehacker.tempo
+    profiles: ["full"]
     command: ["-config.file=/etc/tempo/tempo.yaml"]
     volumes:
       - ./observability/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
@@ -143,6 +144,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: timehacker.prometheus
+    profiles: ["full"]
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-remote-write-receiver"   # Alloy (app metrics) + Tempo (span/service-graph metrics) remote-write here
@@ -157,6 +159,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: timehacker.grafana
+    profiles: ["full"]
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:-admin}
@@ -172,7 +175,6 @@ services:
 
 volumes:
   timehacker-db:
-  timehacker-identity-db:
   pgadmin-data:
   dataprotection-keys:
   loki-data:

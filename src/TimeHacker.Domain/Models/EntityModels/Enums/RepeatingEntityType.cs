@@ -6,5 +6,6 @@ public enum RepeatingEntityType
     DayRepeatingEntity = 1,
     WeekRepeatingEntity = 2,
     MonthRepeatingEntity = 3,
-    YearRepeatingEntity = 4
+    YearRepeatingEntity = 4,
+    OnceRepeatingEntity = 5
 }

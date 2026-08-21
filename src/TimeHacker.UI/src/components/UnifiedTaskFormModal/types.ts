@@ -1,11 +1,10 @@
-import type { EndsOnModel, InputRepeatingEntityType, ScheduleEntityReturnModel, FixedTaskFormData, InputDynamicTask, DynamicTaskReturnModel } from '../../api/types';
+import type { ScheduleEntityReturnModel, FixedTaskFormData, InputDynamicTask, DynamicTaskReturnModel } from '../../api/types';
+import type { SchedulePayload } from '../../utils/buildSchedulePayload';
 
 export type TaskTab = 'fixed' | 'dynamic';
 
-export type ScheduleFormPayload = {
-  repeatingEntityType: InputRepeatingEntityType;
-  endsOnModel?: EndsOnModel | null;
-};
+/** Kept as the task modal's public name for the shared schedule payload. */
+export type ScheduleFormPayload = SchedulePayload;
 
 export interface UnifiedTaskFormModalProps {
   open: boolean;

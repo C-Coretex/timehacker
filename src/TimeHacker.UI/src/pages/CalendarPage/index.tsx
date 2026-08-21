@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import type { FC } from 'react';
+import type { CSSProperties, FC } from 'react';
 import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
 import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { createFixedTask, postNewScheduleForTask, fetchFixedTaskById } from 'api/fixedTasks';
 import { createDynamicTask } from 'api/dynamicTasks';
 import type { CalendarEvent } from 'utils/calendarUtils';
+import { argbToHex } from 'utils/colorArgb';
 import { toFixedTaskPayload } from 'utils/fixedTaskPayload';
 import type { ScheduleEntityReturnModel } from 'api/types';
 import { useTheme } from 'contexts/ThemeContext';
@@ -59,7 +60,7 @@ export const CalendarPage: FC = () => {
   }, [weekStartDay]);
 
   const { getDatesForView } = useCalendarDateRanges(selectedDate, weekStartDay);
-  const { events, loading, error, fetchTasks, refresh } = useCalendarTasks();
+  const { events, backgroundEvents, loading, error, fetchTasks, refresh } = useCalendarTasks();
 
   useEffect(() => {
     if (!initialViewSet.current && screens.md !== undefined) {
@@ -82,7 +83,7 @@ export const CalendarPage: FC = () => {
     setIsModalVisible(true);
     setScheduleData(null);
 
-    if (event.resource?.isFixed && event.resource.task.id) {
+    if (event.resource?.type === 'fixed' && event.resource.task.id) {
       setLoadingSchedule(true);
       try {
         const taskData = await fetchFixedTaskById(event.resource.task.id);
@@ -132,6 +133,17 @@ export const CalendarPage: FC = () => {
 
   const eventStyleGetter = useCallback(
     (event: CalendarEvent) => {
+      // Category bands take their colour from the category itself. Geometry has to come from CSS
+      // (react-big-calendar overwrites top/height/width/left from its own layout), so only the colour
+      // and a depth class are passed here; calendar-theme.css does the rest.
+      if (event.resource?.type === 'category') {
+        const depth = Math.min(event.resource.depth, 3);
+        return {
+          className: `th-category-band th-category-depth-${depth}`,
+          style: { '--th-category-color': argbToHex(event.resource.category.color) } as CSSProperties,
+        };
+      }
+
       const colors = darkMode
         ? { default: '#177ddc', fixed: '#49aa19', dynamic: '#d89614' }
         : { default: '#1890ff', fixed: '#52c41a', dynamic: '#faad14' };
@@ -194,6 +206,7 @@ export const CalendarPage: FC = () => {
         <Calendar
           localizer={localizer}
           events={events}
+          backgroundEvents={backgroundEvents}
           startAccessor="start"
           endAccessor="end"
           style={{ flex: 1 }}

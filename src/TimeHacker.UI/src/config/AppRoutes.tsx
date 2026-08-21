@@ -4,6 +4,7 @@ import { Layout } from 'components/Layout';
 import { PrivateRoute } from 'components/PrivateRoute';
 import { AboutPage } from 'pages/AboutPage';
 import { CalendarPage } from 'pages/CalendarPage';
+import { CategoriesPage } from 'pages/CategoriesPage';
 import { LoginPage } from 'pages/LoginPage';
 import { NotFoundPage } from 'pages/NotFoundPage';
 import { ProfilePage } from 'pages/ProfilePage';
@@ -33,6 +34,10 @@ export const AppRoutes: RouteObject[] = [
           {
             path: 'tasks',
             element: <TasksPage />,
+          },
+          {
+            path: 'categories',
+            element: <CategoriesPage />,
           },
           {
             path: 'profile',

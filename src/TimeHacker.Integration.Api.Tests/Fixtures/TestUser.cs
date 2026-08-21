@@ -28,6 +28,7 @@ internal static class RefitConfig
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
         options.Converters.Add(new InputRepeatingEntityTypeConverter());
         options.Converters.Add(new ColorJsonConverter());
+        options.Converters.Add(new DateTimeUtcJsonConverter());
         return options;
     }
 }

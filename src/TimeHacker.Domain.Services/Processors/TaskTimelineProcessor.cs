@@ -5,12 +5,16 @@ namespace TimeHacker.Domain.Services.Processors;
 
 public class TaskTimelineProcessor: ITaskTimelineProcessor
 {
-    public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, DateOnly date)
+    public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, IEnumerable<Category> categories, DateOnly date)
     {
         var returnData = new TasksForDayReturn()
         {
             Date = date,
         };
+
+        // Categories are a passive backdrop: they are laid out independently and never consume time, so
+        // dynamic-task gap-filling below still sees only the task timeline.
+        returnData.CategoriesTimeline.AddRange(GetCategoriesTimeline(categories));
 
         var fixedTasksTimeline = GetFixedTasksTimeline(fixedTasks, date);
         returnData.TasksTimeline.AddRange(fixedTasksTimeline);
@@ -25,7 +29,8 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
 
         returnData = returnData with
         {
-            TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList()
+            TasksTimeline = returnData.TasksTimeline.OrderBy(t => t.TimeRange.Start).ToList(),
+            CategoriesTimeline = returnData.CategoriesTimeline.OrderBy(c => c.TimeRange.Start).ToList()
         };
 
         RecordSchedulingQuality(dynamicTaskCandidates, returnData);
@@ -54,6 +59,20 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
         var occupied = tasksForDay.TasksTimeline.Sum(t => (t.TimeRange.End - t.TimeRange.Start).TotalMinutes);
         // Ranges can overlap (a fixed task may sit inside another), so clamp rather than report above 1.
         TimeHackerTelemetry.DayUtilization.Record(Math.Clamp(occupied / TimeSpan.FromDays(1).TotalMinutes, 0, 1));
+    }
+
+    /// <summary>
+    /// Turns each category into the time window it occupies on this day. Categories may freely overlap each
+    /// other — several can cover the same hour — so no de-duplication or conflict resolution happens here.
+    /// </summary>
+    private static IEnumerable<CategoryContainerReturn> GetCategoriesTimeline(IEnumerable<Category> categories)
+    {
+        return categories.Select(category => new CategoryContainerReturn()
+        {
+            Category = category,
+            ScheduleEntityId = category.ScheduleEntityId,
+            TimeRange = new TimeRange(category.StartTime.ToTimeSpan(), category.EndTime.ToTimeSpan())
+        });
     }
 
     private static IEnumerable<TaskContainerReturn> GetFixedTasksTimeline(IEnumerable<FixedTask> fixedTasks, DateOnly date)
@@ -103,7 +122,9 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
             dynamicTasksTimeline.AddRange(tasks);
         }
 
-        return dynamicTasksTimeline;
+        //for now hard limit count of tasks for easier debugging
+        //TODO: remove it (replace with external solver)
+        return dynamicTasksTimeline.Shuffle().Take(10).OrderBy(t => t.TimeRange.Start);
     }
 
     private static IEnumerable<TaskContainerReturn> GetDynamicTasksForTimeRange(IEnumerable<DynamicTask> dynamicTasks, TimeRange timeRange)

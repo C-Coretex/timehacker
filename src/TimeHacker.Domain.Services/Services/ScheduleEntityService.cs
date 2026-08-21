@@ -5,12 +5,20 @@ namespace TimeHacker.Domain.Services.Services;
 
 public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepository) : IScheduleEntityService
 {
-    public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from)
-    {
-        var query = scheduleEntityRepository.GetAll().Where(x => x.FixedTask != null)
-            .Where(x => x.EndsOn == null || x.EndsOn >= from);
+    public IQueryable<ScheduleEntityReturn> GetAllFrom(DateOnly from) =>
+        Project(ActiveFrom(from).Where(x => x.FixedTask != null));
 
-        return query.Select(scheduleEntity => new ScheduleEntityReturn()
+    public IQueryable<ScheduleEntityReturn> GetAllCategoriesFrom(DateOnly from) =>
+        Project(ActiveFrom(from).Where(x => x.Category != null));
+
+    // A recurrence is still live if it has no end, or its end has not passed the requested start.
+    private IQueryable<ScheduleEntity> ActiveFrom(DateOnly from) =>
+        scheduleEntityRepository.GetAll().Where(x => x.EndsOn == null || x.EndsOn >= from);
+
+    // Both parents are projected in one shape so the two entry points stay identical apart from their filter;
+    // the unrelated navigation is simply null for any given row.
+    private static IQueryable<ScheduleEntityReturn> Project(IQueryable<ScheduleEntity> query) =>
+        query.Select(scheduleEntity => new ScheduleEntityReturn()
         {
             Id = scheduleEntity.Id,
             UserId = scheduleEntity.UserId,
@@ -21,9 +29,9 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
             EndsOn = scheduleEntity.EndsOn,
             ScheduledTasks = scheduleEntity.ScheduledTasks,
             ScheduledCategories = scheduleEntity.ScheduledCategories,
-            FixedTask = scheduleEntity.FixedTask
+            FixedTask = scheduleEntity.FixedTask,
+            Category = scheduleEntity.Category
         });
-    }
 
     /// <summary>
     /// Advances a schedule's recurrence-progress marker after a task has been generated for

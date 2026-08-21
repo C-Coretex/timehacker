@@ -5,10 +5,10 @@ namespace TimeHacker.Application.Api.Contracts.DTOs.Users;
 public record UserDto
 {
     public Guid? Id { get; init; }
-    public required string Name { get; set; }
-    public string? PhoneNumberForNotifications { get; set; }
-    public string? EmailForNotifications { get; set; }
-    public DateOnly? Birthday { get; set; }
+    public required string Name { get; init; }
+    public string? PhoneNumberForNotifications { get; init; }
+    public string? EmailForNotifications { get; init; }
+    public DateOnly? Birthday { get; init; }
 
     public static UserDto? Create(User? user)
     {

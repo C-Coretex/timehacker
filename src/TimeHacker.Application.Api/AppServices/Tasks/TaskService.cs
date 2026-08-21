@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using TimeHacker.Application.Api.QueryPipelineSteps;
+using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Tasks;
 using TimeHacker.Domain.Observability;
@@ -43,7 +44,12 @@ public class TaskService(
 
         var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date, cancellationToken: cancellationToken).ToListAsync(cancellationToken);
 
-        var tasksForDay = GenerateTimeline(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
+        //for now we discard dates, but when we use categories for scheduling we would use the dates too
+        var categories = await GetCategoriesForScheduledCategories(date, cancellationToken: cancellationToken)
+            .Select(x => x.Category)
+            .ToListAsync(cancellationToken);
+
+        var tasksForDay = GenerateTimeline(fixedTasks, scheduledFixedTasks, dynamicTasks, categories, date);
 
         snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
         snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot, cancellationToken);
@@ -79,8 +85,12 @@ public class TaskService(
             ? await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken)
             : [];
 
-        var scheduledFixedTasks = datesWithoutSnapshots.Count > 0 
+        var scheduledFixedTasks = datesWithoutSnapshots.Count > 0
             ? await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken)
+            : [];
+
+        var scheduledCategories = datesWithoutSnapshots.Count > 0
+            ? await GetCategoriesForScheduledCategories(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken)
             : [];
 
         foreach (var date in dates)
@@ -93,7 +103,8 @@ public class TaskService(
             {
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
-                var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
+                var categoriesForDay = scheduledCategories.Where(c => c.Date == date).Select(c => c.Category);
+                var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, categoriesForDay, date);
 
                 snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
                 // Add to the change tracker but defer the commit until after all dates are yielded.
@@ -128,6 +139,8 @@ public class TaskService(
 
         var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken);
 
+        var scheduledCategories = await GetCategoriesForScheduledCategories(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken);
+
         // Replace existing snapshots: delete them up front in a single committed statement so the
         // regenerated rows can't collide with the old ones on the (UserId, Date) unique key.
         // (Mixing a tracked Delete + Add of the same alternate key in one SaveChanges does not
@@ -141,7 +154,8 @@ public class TaskService(
 
             var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
             var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
-            var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, date);
+            var scheduledCategoriesForDay = scheduledCategories.Where(c => c.Date == date).Select(c => c.Category).ToList();
+            var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, scheduledCategoriesForDay, date);
 
             var snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
             scheduleSnapshotRepository.Add(snapshot);
@@ -150,6 +164,9 @@ public class TaskService(
             // Advance each recurrence's progress marker to this date so future generation resumes correctly.
             foreach (var scheduledFixedTasksForDayEntry in scheduledFixedTasksForDay)
                 await scheduleEntityService.UpdateLastEntityCreated(scheduledFixedTasksForDayEntry.ScheduleEntityId!.Value, date, cancellationToken);
+
+            foreach (var scheduledCategoryForDay in scheduledCategoriesForDay)
+                await scheduleEntityService.UpdateLastEntityCreated(scheduledCategoryForDay.ScheduleEntityId!.Value, date, cancellationToken);
 
             yield return TasksForDayDto.Create(TasksForDayReturn.Create(snapshot));
         }
@@ -166,6 +183,7 @@ public class TaskService(
         IEnumerable<FixedTask> fixedTasks,
         IEnumerable<FixedTask> scheduledFixedTasks,
         IEnumerable<DynamicTask> dynamicTasks,
+        IEnumerable<Category> categories,
         DateOnly date)
     {
         using var activity = TimeHackerTelemetry.ActivitySource.StartActivity("timeline.generate");
@@ -175,7 +193,7 @@ public class TaskService(
             activity?.SetTag("enduser.id", userId.ToString());
 
         var startTimestamp = Stopwatch.GetTimestamp();
-        var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, date);
+        var tasksForDay = taskTimelineProcessor.GetTasksForDay(fixedTasks, scheduledFixedTasks, dynamicTasks, categories, date);
         var elapsedMs = Stopwatch.GetElapsedTime(startTimestamp).TotalMilliseconds;
 
         var taskCount = tasksForDay.TasksTimeline.Count;
@@ -212,6 +230,28 @@ public class TaskService(
         return scheduleSnapshotRepository.GetAll(QueryPipelineScheduleSnapshots.IncludeScheduledData)
             .Where(x => dates.Contains(x.Date))
             .AsAsyncEnumerable();
+    }
+
+    /// <summary>
+    /// Materializes active category recurrences into the concrete <see cref="Category"/> instances that apply
+    /// on each occurrence date in the range, paired with that date. A category carries a time-of-day window
+    /// rather than a timestamp, so unlike the fixed-task expansion nothing needs shifting — only the set of
+    /// days it lands on is computed here.
+    /// </summary>
+    private async IAsyncEnumerable<(DateOnly Date, Category Category)> GetCategoriesForScheduledCategories(DateOnly from, DateOnly? to = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var scheduleEntities = scheduleEntityService.GetAllCategoriesFrom(from).AsAsyncEnumerable();
+
+        await foreach (var scheduleEntity in scheduleEntities.WithCancellation(cancellationToken))
+        {
+            var categoryDates = scheduleEntity.GetNextEntityDatesIn(from, to ?? from).ToList();
+
+            TimeHackerTelemetry.ScheduleEntitiesExpanded.Add(categoryDates.Count,
+                new KeyValuePair<string, object?>("repeating_type", scheduleEntity.RepeatingEntity.EntityType.ToString()));
+
+            foreach (var categoryDate in categoryDates)
+                yield return (categoryDate, scheduleEntity.Category!);
+        }
     }
 
     /// <summary>

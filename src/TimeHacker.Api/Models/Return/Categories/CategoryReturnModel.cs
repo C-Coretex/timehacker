@@ -1,4 +1,4 @@
-﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Return.Categories;
 
@@ -6,13 +6,23 @@ public record CategoryReturnModel(
     Guid Id,
     string Name,
     string? Description,
-    Color Color
+    Color Color,
+    TimeOnly StartTime,
+    TimeOnly EndTime,
+    ScheduleEntityReturnModel? ScheduleEntity
 )
 {
     public static CategoryReturnModel Create(CategoryDto category)
     {
         ArgumentNullException.ThrowIfNull(category);
 
-        return new CategoryReturnModel(category.Id!.Value, category.Name, category.Description, category.Color);
+        return new CategoryReturnModel(
+            category.Id!.Value,
+            category.Name,
+            category.Description,
+            category.Color,
+            category.StartTime,
+            category.EndTime,
+            category.ScheduleEntity != null ? ScheduleEntityReturnModel.Create(category.ScheduleEntity) : null);
     }
 }

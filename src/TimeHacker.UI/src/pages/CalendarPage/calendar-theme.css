@@ -146,6 +146,75 @@
   display: none;
 }
 
+/* ===== Category background bands =====
+   Categories are time windows that tasks sit on top of. react-big-calendar renders backgroundEvents
+   underneath normal events, where a busy day would bury them completely — so the band is lifted ABOVE
+   the tasks and kept at a very low alpha instead. At that opacity the tint reads as "this hour belongs
+   to Work" without obscuring anything, and pointer-events stay off so tasks underneath remain clickable.
+
+   Geometry must be forced from here: rbc writes top/height/width/left as inline styles from its own
+   layout pass, so eventPropGetter can only contribute the colour (via --th-category-color) and the
+   depth class. Only week/day/3-day (TimeGrid) views render background events; month view has none. */
+.rbc-day-slot .rbc-background-event.th-category-band {
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 1;
+  min-height: 0;
+  overflow: visible;
+  border: none;
+  border-left: 3px solid var(--th-category-color, #1890ff);
+  border-radius: 0;
+  background-color: color-mix(in srgb, var(--th-category-color, #1890ff) 12%, transparent);
+  box-shadow: none;
+}
+
+/* Overlapping categories are expected — inset each successive one so every window keeps a visible
+   rail and label instead of the outermost hiding the rest. */
+.rbc-day-slot .rbc-background-event.th-category-depth-1 {
+  left: 10px !important;
+  width: calc(100% - 10px) !important;
+}
+
+.rbc-day-slot .rbc-background-event.th-category-depth-2 {
+  left: 20px !important;
+  width: calc(100% - 20px) !important;
+}
+
+.rbc-day-slot .rbc-background-event.th-category-depth-3 {
+  left: 30px !important;
+  width: calc(100% - 30px) !important;
+}
+
+/* The name pill is the part that must survive a day full of tasks, so it is opaque and re-enables
+   pointer events for hover/click while the band itself stays transparent to clicks. */
+.th-category-label {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  max-width: 100%;
+  margin: 1px 0 0 4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+  background-color: var(--th-category-color, #1890ff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.th-category-label-time {
+  font-weight: 400;
+  font-size: 10px;
+  opacity: 0.85;
+}
+
 /* ===== Dark theme ===== */
 .dark .rbc-calendar {
   color: #e0e0e0;
@@ -176,6 +245,11 @@
 
 .dark .rbc-off-range-bg {
   background-color: #1a1a1a;
+}
+
+/* The tint needs more weight on a dark ground to stay perceptible at the same low alpha. */
+.dark .rbc-day-slot .rbc-background-event.th-category-band {
+  background-color: color-mix(in srgb, var(--th-category-color, #177ddc) 20%, transparent);
 }
 
 .dark .rbc-off-range a {

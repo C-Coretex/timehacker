@@ -17,7 +17,7 @@ namespace TimeHacker.Migrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -38,6 +38,9 @@ namespace TimeHacker.Migrations.Migrations
                         .HasMaxLength(516)
                         .HasColumnType("character varying(516)");
 
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -45,6 +48,9 @@ namespace TimeHacker.Migrations.Migrations
 
                     b.Property<Guid?>("ScheduleEntityId")
                         .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
 
                     b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");

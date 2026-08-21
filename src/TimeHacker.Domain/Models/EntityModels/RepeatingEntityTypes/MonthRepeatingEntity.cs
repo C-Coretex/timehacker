@@ -34,7 +34,7 @@ public class MonthRepeatingEntity: IRepeatingEntityType
     /// Months vary in length, so a target like day 31 doesn't exist every month: the loop skips forward month
     /// by month (at most a year) until it finds one long enough to contain the target day.
     /// </returns>
-    public DateOnly GetNextTaskDate(DateOnly startingFrom)
+    public DateOnly? GetNextTaskDate(DateOnly startingFrom)
     {
         const int maxIterations = 12;
         var startingDay = startingFrom.Day;

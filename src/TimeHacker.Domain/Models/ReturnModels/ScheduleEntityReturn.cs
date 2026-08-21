@@ -21,6 +21,7 @@ public record ScheduleEntityReturn
     public static ScheduleEntityReturn Create(ScheduleEntity scheduleEntity)
     {
         ArgumentNullException.ThrowIfNull(scheduleEntity);
+
         return new ScheduleEntityReturn()
         {
             Id = scheduleEntity.Id,
@@ -50,9 +51,13 @@ public record ScheduleEntityReturn
         //if we are recalculating already calculated data - go from beginning
         var nextTaskDate = (LastEntityCreated > from ? FirstEntityCreated : LastEntityCreated) ?? DateOnly.FromDateTime(CreatedTimestamp);
 
-        while (nextTaskDate < to)
+        while (nextTaskDate <= to)
         {
-            nextTaskDate = RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate);
+            // A null means a finite recurrence has no dates left, so the series is over.
+            if (RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate) is not { } next)
+                yield break;
+
+            nextTaskDate = next;
             if (nextTaskDate > EndsOn || maxIterations-- == 0)
                 yield break;
 
@@ -76,7 +81,11 @@ public record ScheduleEntityReturn
 
         while (nextTaskDate <= date)
         {
-            nextTaskDate = RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate);
+            // A null means a finite recurrence has no dates left, so date is not an occurrence.
+            if (RepeatingEntity.RepeatingData.GetNextTaskDate(nextTaskDate) is not { } next)
+                return false;
+
+            nextTaskDate = next;
             if (nextTaskDate > EndsOn || maxIterations-- == 0)
                 return false;
 

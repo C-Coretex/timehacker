@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Globalization;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
@@ -138,5 +139,62 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content!.Name.Should().Be("Morning");
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_Should_IncludeScheduledCategories()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        var categoryId = (await api.Categories.Create(
+            TestRequests.NewCategory("Work", Color.Teal, "desc", new TimeOnly(09, 00), new TimeOnly(18, 00)))).Content;
+        await api.Categories.CreateSchedule(TestRequests.NewSchedule(categoryId, TestRequests.OnDates(Today.AddDays(1))));
+
+        var day = await api.Tasks.GetForDay(D(Today.AddDays(1)));
+
+        day.StatusCode.Should().Be(HttpStatusCode.OK);
+        var category = day.Content!.CategoriesTimeline.Should().ContainSingle().Subject;
+        category.Category.Name.Should().Be("Work");
+        category.Category.Id.Should().Be(categoryId);
+        category.Category.Color.ToArgb().Should().Be(Color.Teal.ToArgb());
+        category.TimeRange.Start.Should().Be(new TimeSpan(09, 00, 00));
+        category.TimeRange.End.Should().Be(new TimeSpan(18, 00, 00));
+
+        // The generated instance is snapshotted alongside the tasks, so the day reads back identically.
+        (await AdminDbContext.Set<ScheduledCategory>().CountAsync(cancellationToken)).Should().Be(1);
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_Should_KeepOverlappingCategories()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var workId = (await api.Categories.Create(
+            TestRequests.NewCategory("Work", startTime: new TimeOnly(09, 00), endTime: new TimeOnly(18, 00)))).Content;
+        await api.Categories.CreateSchedule(TestRequests.NewSchedule(workId, TestRequests.OnDates(Today.AddDays(1))));
+
+        var meetingsId = (await api.Categories.Create(
+            TestRequests.NewCategory("Meetings", startTime: new TimeOnly(12, 00), endTime: new TimeOnly(14, 00)))).Content;
+        await api.Categories.CreateSchedule(TestRequests.NewSchedule(meetingsId, TestRequests.OnDates(Today.AddDays(1))));
+
+        var day = await api.Tasks.GetForDay(D(Today.AddDays(1)));
+
+        // Categories are a backdrop, not a schedule — one sitting inside another must not displace it.
+        day.Content!.CategoriesTimeline.Select(c => c.Category.Name).Should().BeEquivalentTo("Work", "Meetings");
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_Should_NotIncludeCategoryOnUnscheduledDay()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work"))).Content;
+        await api.Categories.CreateSchedule(
+            TestRequests.NewSchedule(categoryId, TestRequests.OnDates(Today.AddDays(3))));
+
+        var day = await api.Tasks.GetForDay(D(Today));
+
+        day.Content!.CategoriesTimeline.Should().BeEmpty();
     }
 }

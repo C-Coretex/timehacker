@@ -364,6 +364,7 @@ static void AddIdentityServices(IServiceCollection services)
 static void AddSharedJsonConverters(JsonSerializerOptions o)
 {
     o.Converters.Add(new ColorJsonConverter());
+    o.Converters.Add(new DateTimeUtcJsonConverter());
 }
 
 #endregion

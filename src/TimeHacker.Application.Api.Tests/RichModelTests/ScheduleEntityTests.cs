@@ -482,4 +482,74 @@ public class ScheduleEntityTests
     }
 
     #endregion
+
+    #region OnceRepeatingEntity
+
+    // EndsOn mirrors what ScheduleEntityHelper derives for a finite series — the last chosen date.
+    // CreatedTimestamp sits well before any of them so the walk starts ahead of the first occurrence.
+    private static ScheduleEntityReturn OnceSchedule(params DateOnly[] dates)
+        => new()
+        {
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.OnceRepeatingEntity, new OnceRepeatingEntity(dates)),
+            CreatedTimestamp = new DateTime(2024, 01, 01),
+            EndsOn = dates.Max()
+        };
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Yields exactly the chosen dates inside the range")]
+    public void OnceRepeatingEntity_GetNextEntityDatesIn_YieldsChosenDates()
+    {
+        var schedule = OnceSchedule(DateFrom("2026-08-15"), DateFrom("2026-08-20"), DateFrom("2026-09-01"));
+
+        var result = schedule.GetNextEntityDatesIn(DateFrom("2026-08-01"), DateFrom("2026-08-31")).ToList();
+
+        result.Should().Equal(DateFrom("2026-08-15"), DateFrom("2026-08-20"));
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Yields the first chosen date even when it is the range start")]
+    public void OnceRepeatingEntity_GetNextEntityDatesIn_IncludesTheEarliestDate()
+    {
+        var today = DateFrom("2026-08-15");
+        var schedule = OnceSchedule(today);
+
+        schedule.GetNextEntityDatesIn(today, today.AddDays(6)).Should().Equal(today);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Terminates when the range starts")]
+    public void OnceRepeatingEntity_GetNextEntityDatesIn_TerminatesOnReplay()
+    {
+        var schedule = OnceSchedule(DateFrom("2026-08-15"));
+
+        var result = schedule.GetNextEntityDatesIn(DateFrom("2026-08-01"), DateFrom("2026-08-31")).ToList();
+
+        result.Should().Equal(DateFrom("2026-08-15"));
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Terminates with no EndsOn set")]
+    public void OnceRepeatingEntity_GetNextEntityDatesIn_TerminatesWithoutEndsOn()
+    {
+        var schedule = OnceSchedule(DateFrom("2026-08-15")) with { EndsOn = null };
+
+        var act = () => schedule.GetNextEntityDatesIn(DateFrom("2026-08-01"), DateFrom("2026-12-31")).ToList();
+
+        act.Should().NotThrow();
+        act().Should().Equal(DateFrom("2026-08-15"));
+    }
+
+    [Theory]
+    [InlineData("2026-08-15", true)]
+    [InlineData("2026-09-01", true)]
+    [InlineData("2026-08-16", false)]
+    [Trait("OnceRepeatingEntity", "IsEntityDateCorrect only accepts chosen dates")]
+    public void OnceRepeatingEntity_IsEntityDateCorrect(string date, bool expected)
+    {
+        var schedule = OnceSchedule(DateFrom("2026-08-15"), DateFrom("2026-09-01"));
+
+        schedule.IsEntityDateCorrect(DateFrom(date)).Should().Be(expected);
+    }
+
+    #endregion
 }

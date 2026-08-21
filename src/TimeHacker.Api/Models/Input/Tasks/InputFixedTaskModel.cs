@@ -14,24 +14,16 @@ public record InputFixedTaskModel
     [Required]
     public required byte Priority { get; init; }
 
+    // Normalised to UTC by DateTimeUtcJsonConverter as the body is read, so no parsing is needed here.
     [Required]
-    public required string StartTimestamp { get; init; }
+    public required DateTime StartTimestamp { get; init; }
 
     [Required]
-    public required string EndTimestamp { get; init; }
-
-    // Parse as UTC: honour an explicit offset/'Z', and treat a naive timestamp as UTC
-    // (not server-local) so storage is deterministic regardless of the server's timezone.
-    private const DateTimeStyles UtcStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal;
+    public required DateTime EndTimestamp { get; init; }
 
     public FixedTaskDto CreateDto()
     {
-
-        if (!DateTime.TryParse(StartTimestamp, CultureInfo.InvariantCulture, UtcStyles, out var start))
-            throw new DataIsNotCorrectException($"'{StartTimestamp}' is not a valid date-time.", nameof(StartTimestamp));
-        if (!DateTime.TryParse(EndTimestamp, CultureInfo.InvariantCulture, UtcStyles, out var end))
-            throw new DataIsNotCorrectException($"'{EndTimestamp}' is not a valid date-time.", nameof(EndTimestamp));
-        if (start >= end)
+        if (StartTimestamp >= EndTimestamp)
             throw new DataIsNotCorrectException($"{nameof(StartTimestamp)} must be before {nameof(EndTimestamp)}.", nameof(StartTimestamp));
 
         return new FixedTaskDto
@@ -39,8 +31,8 @@ public record InputFixedTaskModel
             Name = Name,
             Description = Description,
             Priority = Priority,
-            StartTimestamp = start,
-            EndTimestamp = end
+            StartTimestamp = StartTimestamp,
+            EndTimestamp = EndTimestamp
         };
     }
 }

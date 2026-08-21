@@ -1,3 +1,4 @@
+using System.Drawing;
 using TimeHacker.Domain.Models.BusinessLogicModels;
 
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
@@ -28,5 +29,15 @@ public sealed record TimelineTaskInfo
 
 public sealed record TimelineCategoryResponse
 {
+    public Guid? ScheduleEntityId { get; init; }
+    public required TimelineCategoryInfo Category { get; init; }
     public TimeRange TimeRange { get; init; }
+}
+
+public sealed record TimelineCategoryInfo
+{
+    public Guid? Id { get; init; }
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public Color Color { get; init; }
 }

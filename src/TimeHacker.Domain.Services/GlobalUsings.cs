@@ -9,3 +9,5 @@ global using TimeHacker.Domain.Services.Processors;
 global using TimeHacker.Domain.Services.Services;
 global using TimeHacker.Domain.Models.BusinessLogicModels;
 global using TimeHacker.Domain.Models.ReturnModels;
+global using TimeHacker.Domain.Entities.Categories;
+global using TimeHacker.Domain.Entities.ScheduleSnapshots;

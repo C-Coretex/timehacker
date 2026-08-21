@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import { RepeatingEntityTypeEnum } from '../../api/types';
 
 export const getRepeatTypes = (t: TFunction) => [
+  { value: RepeatingEntityTypeEnum.OnceRepeatingEntity, label: t('taskForm.onSpecificDates') },
   { value: RepeatingEntityTypeEnum.DayRepeatingEntity, label: t('taskForm.everyNDays') },
   { value: RepeatingEntityTypeEnum.WeekRepeatingEntity, label: t('taskForm.weekly') },
   { value: RepeatingEntityTypeEnum.MonthRepeatingEntity, label: t('taskForm.monthly') },

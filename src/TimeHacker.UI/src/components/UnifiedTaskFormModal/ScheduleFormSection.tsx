@@ -39,6 +39,26 @@ export const ScheduleFormSection: FC = () => {
             <Select options={repeatTypes} placeholder={t('taskForm.selectType')} size="small" />
           </Form.Item>
 
+          {scheduleType === RepeatingEntityTypeEnum.OnceRepeatingEntity && (
+            <Form.Item
+              name="onceDates"
+              label={t('taskForm.specificDates')}
+              rules={[
+                { required: true, message: t('taskForm.selectAtLeastOneDate') },
+                { type: 'array', min: 1, message: t('taskForm.selectAtLeastOneDate') },
+              ]}
+              style={{ marginBottom: 8 }}
+            >
+              <DatePicker
+                multiple
+                format="YYYY-MM-DD"
+                style={{ width: '100%' }}
+                size="small"
+                placeholder={t('taskForm.selectDates')}
+              />
+            </Form.Item>
+          )}
+
           {scheduleType === RepeatingEntityTypeEnum.DayRepeatingEntity && (
             <Form.Item
               name="daysCountToRepeat"
@@ -98,18 +118,23 @@ export const ScheduleFormSection: FC = () => {
             </Form.Item>
           )}
 
-          <Form.Item name="endsOnMaxDate" label={t('taskForm.endsOnDate')} style={{ marginBottom: 8 }}>
-            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} size="small" />
-          </Form.Item>
+          {/* An explicit list of dates is already bounded, so the server derives its own end date. */}
+          {scheduleType !== RepeatingEntityTypeEnum.OnceRepeatingEntity && (
+            <>
+              <Form.Item name="endsOnMaxDate" label={t('taskForm.endsOnDate')} style={{ marginBottom: 8 }}>
+                <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} size="small" />
+              </Form.Item>
 
-          <Form.Item name="endsOnMaxOccurrences" label={t('taskForm.endsAfterOccurrences')} style={{ marginBottom: 8 }}>
-            <InputNumber
-              min={1}
-              placeholder={t('taskForm.noLimitPlaceholder')}
-              style={{ width: '100%' }}
-              size="small"
-            />
-          </Form.Item>
+              <Form.Item name="endsOnMaxOccurrences" label={t('taskForm.endsAfterOccurrences')} style={{ marginBottom: 8 }}>
+                <InputNumber
+                  min={1}
+                  placeholder={t('taskForm.noLimitPlaceholder')}
+                  style={{ width: '100%' }}
+                  size="small"
+                />
+              </Form.Item>
+            </>
+          )}
         </div>
       )}
     </div>

@@ -6,18 +6,18 @@ namespace TimeHacker.Application.Api.Contracts.DTOs.Tasks;
 
 public record FixedTaskDto
 {
-    public Guid? Id { get; set; }
+    public Guid? Id { get; init; }
 
-    public required string Name { get; set; }
-    public string? Description { get; set; }
-    public byte Priority { get; set; }
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public byte Priority { get; init; }
 
-    public DateTime StartTimestamp { get; set; }
-    public DateTime EndTimestamp { get; set; }
+    public DateTime StartTimestamp { get; init; }
+    public DateTime EndTimestamp { get; init; }
 
-    public DateTime CreatedTimestamp { get; set; }
+    public DateTime CreatedTimestamp { get; init; }
     public IEnumerable<TagDto> Tags { get; init; } = [];
-    public ScheduleEntityDto? ScheduleEntity { get; set; }
+    public ScheduleEntityDto? ScheduleEntity { get; init; }
 
     public static Expression<Func<FixedTask, FixedTaskDto>> Selector =>
         x => new FixedTaskDto

@@ -2,20 +2,20 @@
 
 ## Tech Stack
 
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Framework | React | 19.2 |
-| Language | TypeScript | 5.9 (strict mode) |
-| Build Tool | Vite | 7.3 |
-| Routing | React Router | 7.13 |
-| HTTP Client | Axios | 1.13 |
-| Data Fetching | TanStack Query (React Query) | 5.90 |
-| UI Components | Ant Design | 6.3 |
-| Styling | Tailwind CSS | 4.1 |
-| Internationalization | i18next + react-i18next | 25.1 + 15.5 |
-| Date Handling | dayjs | 1.11 |
-| Calendar | react-big-calendar | 1.19 |
-| Docker Base | Node | 24 Alpine |
+| Category | Technology |
+|----------|-----------|
+| Framework | React |
+| Language | TypeScript (strict mode) |
+| Build Tool | Vite |
+| Routing | React Router |
+| HTTP Client | Axios |
+| Data Fetching | TanStack Query (React Query) |
+| UI Components | Ant Design |
+| Styling | Tailwind CSS |
+| Internationalization | i18next + react-i18next |
+| Date Handling | dayjs |
+| Calendar | react-big-calendar |
+| Docker Base | Node Alpine |
 
 ## Structure
 
@@ -263,7 +263,7 @@ docker compose up
 
 ## Docker Build
 
-**Multi-stage Node 24 Alpine build:**
+**Multi-stage Node Alpine build:**
 
 1. **Install all dependencies:** `npm ci`
 2. **Install production dependencies only:** `npm ci --omit=dev`

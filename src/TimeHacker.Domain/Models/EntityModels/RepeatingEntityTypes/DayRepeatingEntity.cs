@@ -23,7 +23,7 @@ public class DayRepeatingEntity: IRepeatingEntityType
         DaysCountToRepeat = daysCountToRepeat;
     }
 
-    public DateOnly GetNextTaskDate(DateOnly startingFrom)
+    public DateOnly? GetNextTaskDate(DateOnly startingFrom)
     {
         return startingFrom.AddDays(DaysCountToRepeat);
     }

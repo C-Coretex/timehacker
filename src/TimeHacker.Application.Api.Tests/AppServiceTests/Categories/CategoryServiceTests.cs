@@ -28,7 +28,14 @@ public class CategoryServiceTests
     [Trait("AddAndSaveAsync", "Should add entry with correct userId")]
     public async Task AddAsync_ShouldAddEntry()
     {
-        var newEntry = new CategoryDto(null, null, "TestCategory1000", "", Color.AliceBlue);
+        var newEntry = new CategoryDto
+        {
+            Name = "TestCategory1000",
+            Description = "",
+            Color = Color.AliceBlue,
+            StartTime = new TimeOnly(09, 00),
+            EndTime = new TimeOnly(18, 00)
+        };
         await _categoryService.AddAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Name == newEntry.Name);
         result.Should().NotBeNull();
@@ -39,11 +46,66 @@ public class CategoryServiceTests
     [Trait("UpdateAndSaveAsync", "Should update entry")]
     public async Task UpdateAsync_ShouldUpdateEntry()
     {
-        var newEntry = new CategoryDto(_categories.First(x => x.UserId == _userId).Id, null, "TestCategory1000", "", Color.AliceBlue);
+        var newEntry = new CategoryDto
+        {
+            Id = _categories.First(x => x.UserId == _userId).Id,
+            Name = "TestCategory1000",
+            Description = "",
+            Color = Color.AliceBlue,
+            StartTime = new TimeOnly(09, 00),
+            EndTime = new TimeOnly(18, 00)
+        };
         await _categoryService.UpdateAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
         result.Should().NotBeNull();
         result!.Name.Should().Be(newEntry.Name);
+    }
+
+    [Fact]
+    [Trait("UpdateAndSaveAsync", "Should keep the attached schedule")]
+    public async Task UpdateAsync_ShouldPreserveScheduleEntityId()
+    {
+        var existing = _categories.First(x => x.UserId == _userId && x.ScheduleEntityId != null);
+        var scheduleEntityId = existing.ScheduleEntityId;
+
+        var updateDto = new CategoryDto
+        {
+            Id = existing.Id,
+            Name = "Renamed",
+            Description = "",
+            Color = Color.AliceBlue,
+            StartTime = new TimeOnly(09, 00),
+            EndTime = new TimeOnly(18, 00)
+        };
+
+        await _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
+
+        var result = _categories.First(x => x.Id == existing.Id);
+        result.Name.Should().Be("Renamed");
+        result.ScheduleEntityId.Should().Be(scheduleEntityId);
+    }
+
+    [Fact]
+    [Trait("UpdateAndSaveAsync", "Should update the time window")]
+    public async Task UpdateAsync_ShouldUpdateTimeWindow()
+    {
+        var existing = _categories.First(x => x.UserId == _userId);
+
+        var updateDto = new CategoryDto
+        {
+            Id = existing.Id,
+            Name = existing.Name,
+            Description = existing.Description,
+            Color = existing.Color,
+            StartTime = new TimeOnly(07, 30),
+            EndTime = new TimeOnly(12, 45)
+        };
+
+        await _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
+
+        var result = _categories.First(x => x.Id == existing.Id);
+        result.StartTime.Should().Be(new TimeOnly(07, 30));
+        result.EndTime.Should().Be(new TimeOnly(12, 45));
     }
 
     [Fact]
@@ -149,12 +211,15 @@ public class CategoryServiceTests
         var otherUserCategory = _categories.First(x => x.UserId != _userId);
         var originalName = otherUserCategory.Name;
 
-        var updateDto = new CategoryDto(
-            otherUserCategory.Id,
-            null,
-            "Hacked Name",
-            "Hacked Description",
-            Color.Red);
+        var updateDto = new CategoryDto
+        {
+            Id = otherUserCategory.Id,
+            Name = "Hacked Name",
+            Description = "Hacked Description",
+            Color = Color.Red,
+            StartTime = new TimeOnly(09, 00),
+            EndTime = new TimeOnly(18, 00)
+        };
 
         // Updating another user's category is rejected (the user-scoped fetch finds nothing).
         await Assert.ThrowsAsync<NotFoundException>(() =>
@@ -192,6 +257,9 @@ public class CategoryServiceTests
                 Name = "TestCategory1",
                 Color = Color.AliceBlue,
                 Description = "Test description",
+                StartTime = new TimeOnly(09, 00),
+                EndTime = new TimeOnly(18, 00),
+                ScheduleEntityId = Guid.NewGuid(),
                 ScheduleEntity = new ScheduleEntity()
             },
 
@@ -201,6 +269,8 @@ public class CategoryServiceTests
                 UserId = userId,
                 Name = "TestCategory2",
                 Description = "Test description",
+                StartTime = new TimeOnly(12, 00),
+                EndTime = new TimeOnly(14, 00),
             },
 
             new()

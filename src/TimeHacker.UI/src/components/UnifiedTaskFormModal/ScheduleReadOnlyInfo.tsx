@@ -3,8 +3,7 @@ import { Divider, Space, Typography } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import type { ScheduleEntityReturnModel } from '../../api/types';
-import { RepeatingEntityTypeEnum } from '../../api/types';
-import { getDaysOfWeek } from './constants';
+import { describeRecurrence } from '../../utils/describeRecurrence';
 
 interface Props {
   scheduleEntity: ScheduleEntityReturnModel;
@@ -12,25 +11,7 @@ interface Props {
 
 export const ScheduleReadOnlyInfo: FC<Props> = ({ scheduleEntity }) => {
   const { t } = useTranslation();
-  const daysOfWeek = getDaysOfWeek(t);
-  const { repeatingEntity } = scheduleEntity;
-
-  const repeatDescription = (() => {
-    switch (repeatingEntity.entityType) {
-      case RepeatingEntityTypeEnum.DayRepeatingEntity:
-        return t('taskForm.repeatsEveryNDays', { count: repeatingEntity.daysCountToRepeat });
-      case RepeatingEntityTypeEnum.WeekRepeatingEntity:
-        return t('taskForm.repeatsWeeklyOn', {
-          days: repeatingEntity.repeatsOn
-            .map((d) => daysOfWeek.find((dw) => dw.value === d)?.label ?? String(d))
-            .join(', '),
-        });
-      case RepeatingEntityTypeEnum.MonthRepeatingEntity:
-        return t('taskForm.repeatsMonthlyOnDay', { day: repeatingEntity.monthDayToRepeat });
-      case RepeatingEntityTypeEnum.YearRepeatingEntity:
-        return t('taskForm.repeatsYearlyOnDay', { day: repeatingEntity.yearDayToRepeat });
-    }
-  })();
+  const repeatDescription = describeRecurrence(scheduleEntity.repeatingEntity, t);
 
   return (
     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg" style={{ marginTop: 12 }}>

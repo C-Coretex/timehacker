@@ -1,5 +1,6 @@
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Return.Categories;
+using TimeHacker.Api.Models.Return.ScheduleSnapshots;
 
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
 
@@ -20,4 +21,7 @@ public interface ICategoriesApi
 
     [Delete("/api/categories/{id}")]
     Task<IApiResponse> Delete(Guid id);
+
+    [Post("/api/categories/schedules")]
+    Task<IApiResponse<ScheduleEntityReturnModel>> CreateSchedule([Body] InputScheduleEntityModel model);
 }

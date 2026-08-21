@@ -1,39 +1,54 @@
-﻿using System.Drawing;
+using System.Drawing;
+using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
-public record CategoryDto(
-    Guid? Id,
-    Guid? ScheduleEntityId,
-    string Name,
-    string? Description,
-    Color Color)
+public record CategoryDto
 {
-    public CategoryDto(
-        Guid? ScheduleEntityId,
-        string Name,
-        string? Description,
-        Color Color) : this(Guid.Empty, ScheduleEntityId, Name, Description, Color)
-    {
-    }
+    public Guid? Id { get; init; }
 
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public Color Color { get; init; }
+
+    public TimeOnly StartTime { get; init; }
+    public TimeOnly EndTime { get; init; }
+
+    public ScheduleEntityDto? ScheduleEntity { get; init; }
+
+    public static Expression<Func<Category, CategoryDto>> Selector =>
+        category => new CategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+            Color = category.Color,
+            StartTime = category.StartTime,
+            EndTime = category.EndTime,
+            ScheduleEntity = category.ScheduleEntity != null ? new ScheduleEntityDto(
+                category.ScheduleEntity.Id,
+                category.ScheduleEntity.RepeatingEntity,
+                category.ScheduleEntity.CreatedTimestamp,
+                category.ScheduleEntity.LastEntityCreated,
+                category.ScheduleEntity.EndsOn
+            ) : null
+        };
+
+    private static readonly Func<Category, CategoryDto> CreateFunc = Selector.Compile();
+    public static CategoryDto Create(Category category) => CreateFunc(category);
+
+    //TODO: should it assign its navigation property (ScheduledEntity)?
     public Category GetEntity(Category? category = null)
     {
         category ??= new Category();
 
-        category.ScheduleEntityId = ScheduleEntityId;
         category.Name = Name;
         category.Description = Description;
         category.Color = Color;
+        category.StartTime = StartTime;
+        category.EndTime = EndTime;
 
         return category;
     }
-
-
-    public static Expression<Func<Category, CategoryDto>> Selector =>
-        category => new CategoryDto(category.Id, category.ScheduleEntityId, category.Name, category.Description, category.Color);
-
-    private static readonly Func<Category, CategoryDto> CreateFunc = Selector.Compile();
-    public static CategoryDto Create(Category category) => CreateFunc(category);
 }

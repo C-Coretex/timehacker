@@ -134,6 +134,68 @@ public class ScheduleEntityServiceTests
     }
 
     [Fact]
+    [Trait("GetAllCategoriesFrom", "Should return only category-parented schedules")]
+    public void GetAllCategoriesFrom_ShouldReturnOnlyCategorySchedules()
+    {
+        var date = DateTime.Now;
+        var from = DateOnly.FromDateTime(date.AddDays(-1));
+
+        _scheduledEntities.Clear();
+        _scheduledEntities.AddRange(
+        [
+            new()
+            {
+                UserId = _userId,
+                CreatedTimestamp = date,
+                EndsOn = null,
+                Category = new Category { UserId = _userId, Name = "Work" }
+            },
+
+            new()
+            {
+                UserId = _userId,
+                CreatedTimestamp = date,
+                EndsOn = null,
+                FixedTask = new FixedTask { UserId = _userId }
+            },
+
+            // Already finished before the requested start — must be filtered out.
+            new()
+            {
+                UserId = _userId,
+                CreatedTimestamp = date.AddDays(-5),
+                EndsOn = DateOnly.FromDateTime(date.AddDays(-3)),
+                Category = new Category { UserId = _userId, Name = "Expired" }
+            }
+        ]);
+
+        var actual = _scheduleEntityService.GetAllCategoriesFrom(from).ToList();
+
+        actual.Should().ContainSingle();
+        actual[0].Category.Should().NotBeNull();
+        actual[0].Category!.Name.Should().Be("Work");
+        actual[0].FixedTask.Should().BeNull();
+    }
+
+    [Fact]
+    [Trait("GetAllFrom", "Should not return category-parented schedules")]
+    public void GetAllFrom_ShouldNotReturnCategorySchedules()
+    {
+        var date = DateTime.Now;
+
+        _scheduledEntities.Clear();
+        _scheduledEntities.Add(new()
+        {
+            UserId = _userId,
+            CreatedTimestamp = date,
+            EndsOn = null,
+            Category = new Category { UserId = _userId, Name = "Work" }
+        });
+
+        _scheduleEntityService.GetAllFrom(DateOnly.FromDateTime(date.AddDays(-1))).Should().BeEmpty();
+    }
+
+    [Fact]
     [Trait("UpdateLastEntityCreated", "Should update data")]
     public async Task UpdateLastEntityCreated_ShouldUpdateData()
     {

@@ -56,6 +56,19 @@ export function utcMinutesToDate(date: Date, minutesFromMidnight: number): Date 
   return new Date(utcMidnight + minutesFromMidnight * 60_000);
 }
 
+/**
+ * Build a Date from a local time-of-day (minutes past local midnight) on the given calendar date.
+ *
+ * Category windows are stored as a bare `TimeOnly` — wall-clock time the user typed ("I work 09:00–18:00"),
+ * never converted to UTC. So unlike task timelines (see `utcMinutesToDate`) they anchor to LOCAL midnight.
+ * Both end up in the same frame on screen: a task at local 09:00 is stored as its UTC instant and rendered
+ * back at local 09:00, so it lines up with a category window that starts at local 09:00.
+ */
+export function localMinutesToDate(date: Date, minutesFromMidnight: number): Date {
+  const localMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  return new Date(localMidnight.getTime() + minutesFromMidnight * 60_000);
+}
+
 /** Convert a duration in minutes to an HH:mm:ss TimeSpan string */
 export function minutesToTimeSpan(minutes: number): string {
   const h = Math.floor(minutes / 60);

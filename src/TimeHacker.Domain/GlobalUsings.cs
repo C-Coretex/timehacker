@@ -1,5 +1,6 @@
 global using System.Drawing;
 
+global using TimeHacker.Helpers.Domain.Helpers;
 global using TimeHacker.Helpers.Domain.Extensions;
 global using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 

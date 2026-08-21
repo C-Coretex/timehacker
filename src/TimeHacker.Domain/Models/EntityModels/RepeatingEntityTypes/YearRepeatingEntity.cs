@@ -36,7 +36,7 @@ public class YearRepeatingEntity: IRepeatingEntityType
     /// <paramref name="startingFrom"/>. Day 366 only exists in leap years, so the loop skips non-leap years
     /// (at most 4, the leap cycle) until it finds one long enough to contain the target day-of-year.
     /// </returns>
-    public DateOnly GetNextTaskDate(DateOnly startingFrom)
+    public DateOnly? GetNextTaskDate(DateOnly startingFrom)
     {
         const int maxIterations = 4;
         var startingDay = startingFrom.DayOfYear;

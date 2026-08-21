@@ -143,7 +143,7 @@ public class RepeatingEntityTypeTests
         // Jan 31 -> Mar 31 (Feb skipped) -> May 31 (Apr skipped).
         var first = entity.GetNextTaskDate(new DateOnly(2023, 01, 31));
         first.Should().Be(new DateOnly(2023, 03, 31));
-        entity.GetNextTaskDate(first).Should().Be(new DateOnly(2023, 05, 31));
+        entity.GetNextTaskDate(first!.Value).Should().Be(new DateOnly(2023, 05, 31));
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public class RepeatingEntityTypeTests
         first.Should().Be(new DateOnly(2024, 01, 01).AddDays(199));
 
         // From that occurrence -> day 200 of the next year.
-        entity.GetNextTaskDate(first).Should().Be(new DateOnly(2025, 01, 01).AddDays(199));
+        entity.GetNextTaskDate(first!.Value).Should().Be(new DateOnly(2025, 01, 01).AddDays(199));
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public class RepeatingEntityTypeTests
         // Day 366 of leap 2024 is Dec 31; the next occurrence skips 2025/26/27 to leap 2028.
         var first = entity.GetNextTaskDate(new DateOnly(2024, 01, 01));
         first.Should().Be(new DateOnly(2024, 12, 31));
-        entity.GetNextTaskDate(first).Should().Be(new DateOnly(2028, 12, 31));
+        entity.GetNextTaskDate(first!.Value).Should().Be(new DateOnly(2028, 12, 31));
     }
 
     [Theory]
@@ -219,6 +219,56 @@ public class RepeatingEntityTypeTests
     public void YearRepeatingEntity_ShouldThrowOnInvalidDay(int day)
     {
         Assert.Throws<ArgumentException>(() => new YearRepeatingEntity(day));
+    }
+
+    #endregion
+
+    #region OnceRepeatingEntity
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Walks the chosen dates in order")]
+    public void OnceRepeatingEntity_GetNextTaskDate_WalksDatesInOrder()
+    {
+        var first = new DateOnly(2026, 08, 15);
+        var second = new DateOnly(2026, 08, 20);
+        var third = new DateOnly(2026, 09, 01);
+
+        // Deliberately unsorted: the constructor is responsible for ordering.
+        var entity = new OnceRepeatingEntity([third, first, second]);
+
+        entity.GetNextTaskDate(first.AddDays(-1)).Should().Be(first);
+        entity.GetNextTaskDate(first).Should().Be(second);
+        entity.GetNextTaskDate(second).Should().Be(third);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Sorts and de-duplicates the chosen dates")]
+    public void OnceRepeatingEntity_ShouldSortAndDeduplicateDates()
+    {
+        var duplicate = new DateOnly(2026, 08, 20);
+        var earlier = new DateOnly(2026, 08, 15);
+
+        var entity = new OnceRepeatingEntity([duplicate, earlier, duplicate]);
+
+        entity.Dates.Should().Equal(earlier, duplicate);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Returns null once the dates are exhausted")]
+    public void OnceRepeatingEntity_GetNextTaskDate_ReturnsNullValueWhenExhausted()
+    {
+        var only = new DateOnly(2026, 08, 15);
+        var entity = new OnceRepeatingEntity([only]);
+
+        entity.GetNextTaskDate(only).Should().BeNull();
+        entity.GetNextTaskDate(only.AddYears(10)).Should().BeNull();
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Throws when no date is chosen")]
+    public void OnceRepeatingEntity_ShouldThrowOnEmptyDates()
+    {
+        Assert.Throws<ArgumentException>(() => new OnceRepeatingEntity([]));
     }
 
     #endregion

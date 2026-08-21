@@ -10,6 +10,9 @@ public class CategoryConfiguration : UserScopedEntityConfigurationBase<Category>
         builder.Property(x => x.Description).HasMaxLength(516);
         builder.Property(x => x.Color).IsRequired().HasConversion<Converters.ColorConverter>();
 
+        builder.Property(x => x.StartTime).IsRequired();
+        builder.Property(x => x.EndTime).IsRequired();
+
         builder.HasOne(x => x.ScheduleEntity).WithOne(x => x.Category)
             .HasForeignKey<Category>(x => x.ScheduleEntityId).HasPrincipalKey<ScheduleEntity>(x => x.Id)
             .OnDelete(DeleteBehavior.Cascade);

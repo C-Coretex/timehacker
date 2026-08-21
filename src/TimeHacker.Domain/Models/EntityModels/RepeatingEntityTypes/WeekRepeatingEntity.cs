@@ -28,7 +28,7 @@ public class WeekRepeatingEntity: IRepeatingEntityType
     /// selected day later this week, or wraps to the first selected day of next week. Note the calendar
     /// uses .NET's DayOfWeek (Sunday=0) while the enum uses Sunday=7, so Sunday is normalized below.
     /// </returns>
-    public DateOnly GetNextTaskDate(DateOnly startingFrom)
+    public DateOnly? GetNextTaskDate(DateOnly startingFrom)
     {
         var currentDayOfWeek = (int)startingFrom.DayOfWeek;
 

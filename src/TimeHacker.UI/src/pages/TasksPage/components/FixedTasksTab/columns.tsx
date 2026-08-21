@@ -6,20 +6,14 @@ import type { Dayjs } from 'dayjs';
 import type { TFunction } from 'i18next';
 import type { ColumnType } from 'antd/es/table';
 import type { FixedTaskDisplayModel, ScheduleEntityReturnModel } from '../../../../api/types';
+import { recurrenceTypeLabel } from '../../../../utils/describeRecurrence';
 
 const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunction) => {
   if (!scheduleEntity) return <Tag>{t('tasks.oneTime')}</Tag>;
 
-  const typeLabels: Record<number, string> = {
-    1: t('tasks.daily'),
-    2: t('tasks.weekly'),
-    3: t('tasks.monthly'),
-    4: t('tasks.yearly'),
-  };
-
   return (
     <Space orientation="vertical" size={0}>
-      <Tag color="blue">{typeLabels[scheduleEntity.repeatingEntity.entityType]}</Tag>
+      <Tag color="blue">{recurrenceTypeLabel(scheduleEntity.repeatingEntity.entityType, t)}</Tag>
       {scheduleEntity.endsOn && (
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
           {t('tasks.endsShort')}: {dayjs(scheduleEntity.endsOn).format('MMM D, YYYY')}

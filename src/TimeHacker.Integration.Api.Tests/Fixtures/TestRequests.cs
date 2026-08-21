@@ -1,5 +1,4 @@
 using System.Drawing;
-using System.Globalization;
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Models.Input.Users;
@@ -11,8 +10,20 @@ namespace TimeHacker.Integration.Api.Tests.Fixtures;
 // Central factories for API request bodies so the test files stay short and consistent.
 internal static class TestRequests
 {
-    public static InputCategoryModel NewCategory(string name = "Work", Color? color = null, string? description = "work stuff")
-        => new() { Name = name, Description = description, Color = color ?? Color.Blue };
+    public static InputCategoryModel NewCategory(
+        string name = "Work",
+        Color? color = null,
+        string? description = "work stuff",
+        TimeOnly? startTime = null,
+        TimeOnly? endTime = null)
+        => new()
+        {
+            Name = name,
+            Description = description,
+            Color = color ?? Color.Blue,
+            StartTime = startTime ?? new TimeOnly(09, 00),
+            EndTime = endTime ?? new TimeOnly(18, 00)
+        };
 
     public static InputFixedTaskModel NewFixedTask(
         string name = "Standup",
@@ -31,8 +42,8 @@ internal static class TestRequests
             Description = description,
             Priority = priority,
             CategoryIds = categoryIds ?? [],
-            StartTimestamp = Iso(startValue),
-            EndTimestamp = Iso(endValue)
+            StartTimestamp = startValue,
+            EndTimestamp = endValue
         };
     }
 
@@ -80,7 +91,5 @@ internal static class TestRequests
     public static InputMonthRepeatingEntityModel EveryMonthOnDay(byte day) => new() { MonthDayToRepeat = day };
 
     public static InputYearRepeatingEntityModel EveryYearOnDay(int day) => new() { YearDayToRepeat = day };
-
-    // Naive ISO string; the API's model parses it as UTC (AssumeUniversal).
-    private static string Iso(DateTime value) => value.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+    public static InputOnceRepeatingEntityModel OnDates(params DateOnly[] dates) => new() { Dates = dates };
 }

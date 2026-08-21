@@ -35,6 +35,7 @@ internal sealed class InputRepeatingEntityTypeConverter : JsonConverter<InputRep
             RepeatingEntityType.WeekRepeatingEntity => JsonSerializer.Deserialize<InputWeekRepeatingEntityModel>(json, options),
             RepeatingEntityType.MonthRepeatingEntity => JsonSerializer.Deserialize<InputMonthRepeatingEntityModel>(json, options),
             RepeatingEntityType.YearRepeatingEntity => JsonSerializer.Deserialize<InputYearRepeatingEntityModel>(json, options),
+            RepeatingEntityType.OnceRepeatingEntity => JsonSerializer.Deserialize<InputOnceRepeatingEntityModel>(json, options),
             _ => throw new JsonException($"Unknown type: {typeEnum}")
         };
     }

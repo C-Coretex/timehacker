@@ -30,9 +30,11 @@ public class CategoryService(ICategoryRepository categoryRepository)
             throw new NotFoundException("Category", id.ToString());
     }
 
-    public async Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var entity = await categoryRepository.GetAll(true).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        return entity != null ? CategoryDto.Create(entity) : null;
-    }
+    // Projects through the Selector rather than loading the entity and mapping it, so the linked
+    // ScheduleEntity comes back in the same query instead of as a silent null.
+    public Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
+        categoryRepository.GetAll()
+            .Where(x => x.Id == id)
+            .Select(CategoryDto.Selector)
+            .FirstOrDefaultAsync(cancellationToken);
 }

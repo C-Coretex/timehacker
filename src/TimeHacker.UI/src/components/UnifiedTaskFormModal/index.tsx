@@ -4,16 +4,16 @@ import { Modal, Form, Tabs, Calendar, Button, Row, Col } from 'antd';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { RepeatingEntityTypeEnum } from '../../api/types';
-import type { FixedTaskFormData, InputDynamicTask, InputRepeatingEntityType, EndsOnModel } from '../../api/types';
+import type { FixedTaskFormData, InputDynamicTask } from '../../api/types';
 import { minutesToTimeSpan, timeSpanToMinutes } from '../../utils/timeUtils';
+import { buildSchedulePayload } from '../../utils/buildSchedulePayload';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
 import { FixedTaskFields } from './FixedTaskFields';
 import { DynamicTaskFields } from './DynamicTaskFields';
 import { ScheduleFormSection } from './ScheduleFormSection';
 import { ScheduleReadOnlyInfo } from './ScheduleReadOnlyInfo';
-import type { TaskTab, ScheduleFormPayload, UnifiedTaskFormModalProps } from './types';
+import type { TaskTab, UnifiedTaskFormModalProps } from './types';
 
 const TAB_ITEMS = (t: ReturnType<typeof useTranslation>['t']) => [
   { key: 'fixed', label: t('taskForm.fixedTask') },
@@ -42,9 +42,6 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
   const [selectedDate, setSelectedDate] = useState<Dayjs>(
     defaultDate ? dayjs(defaultDate) : dayjs()
   );
-
-  const addSchedule = Form.useWatch('addSchedule', form);
-  const scheduleType = Form.useWatch('scheduleType', form);
 
   useEffect(() => {
     if (isEditFixed) setActiveTab('fixed');
@@ -83,36 +80,6 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
     }
   }, [initialFixedData, initialDynamicData, open, form, defaultDate]);
 
-  const buildSchedulePayload = (): ScheduleFormPayload | undefined => {
-    if (!addSchedule || scheduleType == null) return undefined;
-    const values = form.getFieldsValue();
-    let repeatingEntityType: InputRepeatingEntityType;
-    switch (scheduleType as RepeatingEntityTypeEnum) {
-      case RepeatingEntityTypeEnum.DayRepeatingEntity:
-        repeatingEntityType = { entityType: RepeatingEntityTypeEnum.DayRepeatingEntity, daysCountToRepeat: values.daysCountToRepeat ?? 1 };
-        break;
-      case RepeatingEntityTypeEnum.WeekRepeatingEntity:
-        repeatingEntityType = { entityType: RepeatingEntityTypeEnum.WeekRepeatingEntity, repeatsOn: values.repeatsOn ?? [] };
-        break;
-      case RepeatingEntityTypeEnum.MonthRepeatingEntity:
-        repeatingEntityType = { entityType: RepeatingEntityTypeEnum.MonthRepeatingEntity, monthDayToRepeat: values.monthDayToRepeat ?? 1 };
-        break;
-      case RepeatingEntityTypeEnum.YearRepeatingEntity:
-        repeatingEntityType = { entityType: RepeatingEntityTypeEnum.YearRepeatingEntity, yearDayToRepeat: values.yearDayToRepeat ?? 1 };
-        break;
-      default:
-        return undefined;
-    }
-    const endsOnModel: EndsOnModel | undefined =
-      values.endsOnMaxDate || values.endsOnMaxOccurrences != null
-        ? {
-            maxDate: values.endsOnMaxDate ? dayjs(values.endsOnMaxDate).format('YYYY-MM-DD') : undefined,
-            maxOccurrences: values.endsOnMaxOccurrences > 0 ? values.endsOnMaxOccurrences : undefined,
-          }
-        : undefined;
-    return { repeatingEntityType, endsOnModel: endsOnModel ?? null };
-  };
-
   const handleFinish = (values: Record<string, unknown>) => {
     if (activeTab === 'fixed') {
       const startTime = values.startTime as Dayjs;
@@ -126,7 +93,7 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
         startTimestamp,
         endTimestamp,
       };
-      const schedule = !isEdit ? buildSchedulePayload() : undefined;
+      const schedule = !isEdit ? buildSchedulePayload(values) : undefined;
       onSaveFixed(taskData, initialFixedData?.id, schedule);
     } else {
       const payload: InputDynamicTask = {

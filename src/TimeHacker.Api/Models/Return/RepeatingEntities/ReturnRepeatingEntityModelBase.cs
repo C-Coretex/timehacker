@@ -4,6 +4,7 @@ namespace TimeHacker.Api.Models.Return.RepeatingEntities;
 [JsonDerivedType(typeof(ReturnWeekRepeatingEntityModel), "week")]
 [JsonDerivedType(typeof(ReturnMonthRepeatingEntityModel), "month")]
 [JsonDerivedType(typeof(ReturnYearRepeatingEntityModel), "year")]
+[JsonDerivedType(typeof(ReturnOnceRepeatingEntityModel), "once")]
 public abstract record ReturnRepeatingEntityModelBase
 {
     public abstract RepeatingEntityType EntityType { get; }
@@ -19,6 +20,7 @@ public abstract record ReturnRepeatingEntityModelBase
             WeekRepeatingEntity => new ReturnWeekRepeatingEntityModel().CreateFromEntity(dto),
             MonthRepeatingEntity => new ReturnMonthRepeatingEntityModel().CreateFromEntity(dto),
             YearRepeatingEntity => new ReturnYearRepeatingEntityModel().CreateFromEntity(dto),
+            OnceRepeatingEntity => new ReturnOnceRepeatingEntityModel().CreateFromEntity(dto),
             _ => throw new ArgumentOutOfRangeException(nameof(dto), $"Unknown repeating entity type: {dto.RepeatingData.GetType().Name}")
         };
     }

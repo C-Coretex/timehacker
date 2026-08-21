@@ -6,12 +6,10 @@
       "composeLaunchAction": "LaunchBrowser",
       "composeLaunchServiceName": "timehacker.api",
       "composeLaunchUrl": "http://localhost:5173/app",
-      "serviceActions": {
-        "timehacker.api": "StartDebugging",
-        "pgadmin": "StartWithoutDebugging",
-        "timehacker.infrastructure": "StartWithoutDebugging",
-        "timehacker.infrastructure.identity": "StartWithoutDebugging",
-        "vite-app": "StartWithoutDebugging"
+      "composeProfile": {
+        "includes": [
+          "full"
+        ]
       }
     }
   }

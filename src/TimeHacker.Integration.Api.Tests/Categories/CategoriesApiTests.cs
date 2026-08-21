@@ -100,4 +100,98 @@ public sealed class CategoriesApiTests(ApiTestFixture fixture) : ApiIntegrationT
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound); // RLS hides A's row from B on reads too
     }
+
+    [Fact, Trait("Endpoint", "POST+GET /api/categories")]
+    public async Task Create_Should_RoundTripTimeWindow()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var create = await api.Categories.Create(
+            TestRequests.NewCategory(startTime: new TimeOnly(09, 30), endTime: new TimeOnly(17, 45)));
+        create.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var get = await api.Categories.Get(create.Content);
+        get.Content!.StartTime.Should().Be(new TimeOnly(09, 30));
+        get.Content.EndTime.Should().Be(new TimeOnly(17, 45));
+    }
+
+    [Fact, Trait("Endpoint", "Validation")]
+    public async Task Create_Should_Return400_WhenEndTimeNotAfterStartTime()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var response = await api.Categories.Create(
+            TestRequests.NewCategory(startTime: new TimeOnly(18, 00), endTime: new TimeOnly(09, 00)));
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact, Trait("Endpoint", "POST /api/categories/schedules")]
+    public async Task CreateSchedule_Should_LinkScheduleToCategory()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work"))).Content;
+
+        var schedule = await api.Categories.CreateSchedule(
+            TestRequests.NewSchedule(categoryId, TestRequests.EveryNDays(1)));
+
+        schedule.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var stored = await AdminDbContext.Set<Category>().SingleAsync(cancellationToken);
+        stored.ScheduleEntityId.Should().Be(schedule.Content!.Id);
+
+        // The schedule must also come back on the category itself, which is what the edit form reads.
+        var get = await api.Categories.Get(categoryId);
+        get.Content!.ScheduleEntity.Should().NotBeNull();
+        get.Content.ScheduleEntity!.Id.Should().Be(schedule.Content.Id);
+    }
+
+    [Fact, Trait("Endpoint", "POST /api/categories/schedules")]
+    public async Task CreateSchedule_OnSpecificDates_Should_DeriveEndsOnFromLastDate()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Workshop"))).Content;
+        var first = new DateOnly(2026, 08, 15);
+        var last = new DateOnly(2026, 09, 01);
+
+        var schedule = await api.Categories.CreateSchedule(
+            TestRequests.NewSchedule(categoryId, TestRequests.OnDates(last, first)));
+
+        schedule.StatusCode.Should().Be(HttpStatusCode.Created);
+        // A finite list of dates is self-bounding, so the server derives EndsOn instead of taking it.
+        schedule.Content!.EndsOn.Should().Be(last);
+    }
+
+    [Fact, Trait("Endpoint", "PUT /api/categories/{id}")]
+    public async Task Update_Should_KeepAttachedSchedule()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work"))).Content;
+        var scheduleId = (await api.Categories.CreateSchedule(
+            TestRequests.NewSchedule(categoryId, TestRequests.EveryNDays(1)))).Content!.Id;
+
+        // The edit payload carries no schedule link, so writing it back would silently unlink the recurrence.
+        await api.Categories.Update(categoryId, TestRequests.NewCategory("Work renamed"));
+
+        var get = await api.Categories.Get(categoryId);
+        get.Content!.Name.Should().Be("Work renamed");
+        get.Content.ScheduleEntity!.Id.Should().Be(scheduleId);
+    }
+
+    [Fact, Trait("Security", "RLS isolation")]
+    public async Task CreateSchedule_ForAnotherUsersCategory_Should_Return404()
+    {
+        var userA = await CreateAuthenticatedApiAsync();
+        var categoryId = (await userA.Categories.Create(TestRequests.NewCategory("A-only"))).Content;
+
+        var userB = await CreateAuthenticatedApiAsync();
+        var response = await userB.Categories.CreateSchedule(
+            TestRequests.NewSchedule(categoryId, TestRequests.EveryNDays(1)));
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }

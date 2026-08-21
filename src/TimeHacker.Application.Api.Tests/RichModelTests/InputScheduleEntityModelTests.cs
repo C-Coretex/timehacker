@@ -126,4 +126,103 @@ public class InputScheduleEntityModelTests
 
         scheduledEntity.EndsOn.Should().Be(FixedToday);
     }
+
+    #region OnceRepeatingEntity
+
+    private static readonly DateOnly OnceFirst = new(2026, 08, 15);
+    private static readonly DateOnly OnceLast = new(2026, 09, 01);
+
+    private static RepeatingEntityDto OnceModel() =>
+        new(RepeatingEntityType.OnceRepeatingEntity, new OnceRepeatingEntity([OnceLast, OnceFirst]));
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Derives EndsOn from the last chosen date")]
+    public void GetScheduleEntity_Once_DerivesEndsOnFromLastDate()
+    {
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), null, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(OnceLast);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "Ignores a supplied EndsOnModel")]
+    public void GetScheduleEntity_Once_IgnoresSuppliedEndsOnModel()
+    {
+        // A finite series defines its own end; walking it MaxOccurrences times would just run it dry.
+        var endsOnModel = new EndsOnModel { MaxOccurrences = 99, MaxDate = new DateOnly(2027, 01, 01) };
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(OnceLast);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "A single chosen date becomes EndsOn")]
+    public void GetScheduleEntity_Once_SingleDate_UsesThatDate()
+    {
+        var single = new DateOnly(2026, 08, 20);
+        var model = new RepeatingEntityDto(RepeatingEntityType.OnceRepeatingEntity, new OnceRepeatingEntity([single]));
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(model, null, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(single);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "A more restrictive MaxDate overrides the derived EndsOn")]
+    public void GetScheduleEntity_Once_MoreRestrictiveMaxDate_OverridesEndsOn()
+    {
+        // Earlier than OnceLast, so the caller's bound is the tighter one and must win.
+        var maxDate = OnceFirst.AddDays(2);
+        var endsOnModel = new EndsOnModel { MaxDate = maxDate };
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(maxDate);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "A less restrictive MaxDate leaves the derived EndsOn alone")]
+    public void GetScheduleEntity_Once_LessRestrictiveMaxDate_KeepsLastDate()
+    {
+        // Later than OnceLast: the series still ends when its dates run out, not at the caller's bound.
+        var endsOnModel = new EndsOnModel { MaxDate = OnceLast.AddYears(1) };
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(OnceLast);
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "A MaxOccurrences shorter than the list clamps EndsOn")]
+    public void GetScheduleEntity_Once_MaxOccurrencesShorterThanList_ClampsToNthDate()
+    {
+        // Stopping after one occurrence lands on the first chosen date, ahead of the series' own end.
+        var endsOnModel = new EndsOnModel { MaxOccurrences = 1 };
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(OnceFirst);
+    }
+
+    #endregion
+
+    #region EndsOnModel restrictiveness
+
+    [Fact]
+    [Trait("GetScheduleEntity", "A MaxDate later than the occurrence date does not override it")]
+    public void GetScheduleEntity_MaxDateLaterThanOccurrence_KeepsOccurrenceDate()
+    {
+        // Mirror of GetScheduleEntity_MaxDateEarlierThanOccurrence_ClampsToMaxDate: the clamp is a Min,
+        // so a looser MaxDate must be a no-op rather than pushing EndsOn out.
+        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
+        var endsOnModel = new EndsOnModel { MaxOccurrences = 3, MaxDate = FixedToday.AddMonths(6) };
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedClock);
+
+        // Day(2) stepped 3 times from 2024-01-01.
+        scheduledEntity.EndsOn.Should().Be(new DateOnly(2024, 01, 07));
+    }
+
+    #endregion
 }

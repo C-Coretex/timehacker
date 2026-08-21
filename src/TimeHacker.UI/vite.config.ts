@@ -22,6 +22,18 @@ function spaFallbackForApp(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), spaFallbackForApp()],
+  server: {
+    watch: {
+      // Polling stays opt-in via the env var docker-compose sets, which keeps a native
+      // `npm run dev` on real fs events.
+      usePolling: !!process.env.CHOKIDAR_USEPOLLING,
+      interval: 1000,
+      binaryInterval: 2000,
+      // Vite already ignores .git, node_modules, test-results and the cache dir — these are the ones
+      // it does not cover.
+      ignored: ['**/obj/**', '**/.react-router/**', '**/dist/**'],
+    },
+  },
   resolve: {
     alias: {
       api: path.resolve(import.meta.dirname, 'src/api'),
