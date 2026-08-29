@@ -1,3 +1,5 @@
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
+using TimeHacker.Domain.Helpers.ScheduleSnapshots;
 using TimeHacker.Infrastructure;
 
 namespace TimeHacker.Api.Seeding;
@@ -14,4 +16,13 @@ internal record DevelopmentSeedContext
     public required Guid UserId { get; init; }
     public required DateOnly Today { get; init; }
     public required DateTime Now { get; init; }
+
+    public ScheduleEntity NewSchedule(RepeatingEntityDto repeatingEntity, DateOnly anchorDate)
+    {
+        var schedule = ScheduleEntityHelper.GetScheduleEntity(repeatingEntity, endsOnModel: null, anchorDate, TimeProvider.System);
+        schedule.UserId = UserId;
+        schedule.CreatedTimestamp = Now;
+
+        return schedule;
+    }
 }

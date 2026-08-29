@@ -1,11 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
-import { Modal, Form, Input, TimePicker, ColorPicker, Button, Row, Col, Alert } from 'antd';
+import { Modal, Form, Input, TimePicker, ColorPicker, Button, Row, Col, Alert, Calendar } from 'antd';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-import { RepeatingEntityTypeEnum } from '../../api/types';
 import type { CategoryFormData } from '../../api/types';
 import { argbToHex, hexToArgb } from '../../utils/colorArgb';
 import { buildSchedulePayload } from '../../utils/buildSchedulePayload';
@@ -28,6 +27,9 @@ export const CategoryFormModal: FC<CategoryFormModalProps> = ({
   const { isMobile } = useIsMobile();
 
   const isEdit = !!initialData;
+  // The day the category lands on. Held outside the Form so the inline Calendar drives it directly,
+  // matching how UnifiedTaskFormModal anchors a fixed task.
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
 
   useEffect(() => {
     if (!open) return;
@@ -40,15 +42,10 @@ export const CategoryFormModal: FC<CategoryFormModalProps> = ({
         startTime: initialData.startTime,
         endTime: initialData.endTime,
       });
+      setSelectedDate(initialData.date);
     } else {
       form.resetFields();
-      // A category with no schedule never lands on a day, so default to "applies on the day being
-      // viewed" rather than leaving the section switched off and the category invisible.
-      form.setFieldsValue({
-        addSchedule: true,
-        scheduleType: RepeatingEntityTypeEnum.OnceRepeatingEntity,
-        onceDates: [defaultDate ? dayjs(defaultDate) : dayjs()],
-      });
+      setSelectedDate(defaultDate ? dayjs(defaultDate) : dayjs());
     }
   }, [initialData, open, form, defaultDate]);
 
@@ -63,6 +60,7 @@ export const CategoryFormModal: FC<CategoryFormModalProps> = ({
       name: values.name as string,
       description: (values.description as string) ?? '',
       color: hexToArgb(hex),
+      date: selectedDate,
       startTime: values.startTime as Dayjs,
       endTime: values.endTime as Dayjs,
     };
@@ -149,6 +147,14 @@ export const CategoryFormModal: FC<CategoryFormModalProps> = ({
           </Col>
 
           <Col span={isMobile ? 24 : 10}>
+            <div style={{ marginBottom: 16 }}>
+              <Calendar
+                fullscreen={false}
+                value={selectedDate}
+                onSelect={(date) => setSelectedDate(date)}
+              />
+            </div>
+
             {isEdit ? (
               initialData?.scheduleEntity && (
                 <ScheduleReadOnlyInfo scheduleEntity={initialData.scheduleEntity} />
@@ -158,10 +164,10 @@ export const CategoryFormModal: FC<CategoryFormModalProps> = ({
                 <Alert
                   type="info"
                   showIcon
-                  message={t('categoryForm.scheduleHint')}
+                  title={t('categoryForm.scheduleHint')}
                   style={{ marginBottom: 8 }}
                 />
-                <ScheduleFormSection />
+                <ScheduleFormSection anchorDate={selectedDate} />
               </>
             )}
           </Col>

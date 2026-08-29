@@ -1,5 +1,6 @@
 using System.Drawing;
 using TimeHacker.Domain.Entities.Categories;
+using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Integration.Api.Tests.Categories;
 
@@ -115,6 +116,19 @@ public sealed class CategoriesApiTests(ApiTestFixture fixture) : ApiIntegrationT
         get.Content.EndTime.Should().Be(new TimeOnly(17, 45));
     }
 
+    [Fact, Trait("Endpoint", "POST+GET /api/categories")]
+    public async Task Create_Should_RoundTripDate()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var date = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(3);
+
+        var create = await api.Categories.Create(TestRequests.NewCategory(date: date));
+        create.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var get = await api.Categories.Get(create.Content);
+        get.Content!.Date.Should().Be(date);
+    }
+
     [Fact, Trait("Endpoint", "Validation")]
     public async Task Create_Should_Return400_WhenEndTimeNotAfterStartTime()
     {
@@ -154,8 +168,9 @@ public sealed class CategoriesApiTests(ApiTestFixture fixture) : ApiIntegrationT
         var api = await CreateAuthenticatedApiAsync();
 
         var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Workshop"))).Content;
-        var first = new DateOnly(2026, 08, 15);
-        var last = new DateOnly(2026, 09, 01);
+        // Relative to today: chosen dates must fall after the category's own date, which is today.
+        var first = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(7);
+        var last = first.AddDays(17);
 
         var schedule = await api.Categories.CreateSchedule(
             TestRequests.NewSchedule(categoryId, TestRequests.OnDates(last, first)));
@@ -163,6 +178,41 @@ public sealed class CategoriesApiTests(ApiTestFixture fixture) : ApiIntegrationT
         schedule.StatusCode.Should().Be(HttpStatusCode.Created);
         // A finite list of dates is self-bounding, so the server derives EndsOn instead of taking it.
         schedule.Content!.EndsOn.Should().Be(last);
+    }
+
+    [Theory]
+    [InlineData(0)]   // the category's own date (today)
+    [InlineData(-1)]  // yesterday
+    [Trait("Endpoint", "Validation")]
+    public async Task CreateSchedule_OnSpecificDates_Should_Return400_WhenDateNotAfterAnchor(int offsetFromToday)
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        // The category is anchored to today and the series only walks forward, so these dates could
+        // never produce an occurrence.
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Workshop"))).Content;
+        var unreachable = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(offsetFromToday);
+
+        var schedule = await api.Categories.CreateSchedule(
+            TestRequests.NewSchedule(categoryId, TestRequests.OnDates(unreachable)));
+
+        schedule.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact, Trait("Endpoint", "POST /api/categories/schedules")]
+    public async Task CreateSchedule_Should_AnchorProgressMarkersToCategoryDate()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var date = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(5);
+
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: date))).Content;
+        await api.Categories.CreateSchedule(TestRequests.NewSchedule(categoryId, TestRequests.EveryNDays(1)));
+
+        // The category already occupies its own date, so the recurrence must resume after it.
+        var stored = await AdminDbContext.Set<ScheduleEntity>().AsNoTracking().SingleAsync(cancellationToken);
+        stored.FirstEntityCreated.Should().Be(date);
+        stored.LastEntityCreated.Should().Be(date);
     }
 
     [Fact, Trait("Endpoint", "PUT /api/categories/{id}")]

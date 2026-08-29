@@ -11,6 +11,7 @@ namespace TimeHacker.Application.Api.AppServices.Tasks;
 
 public class TaskService(
     IFixedTaskRepository fixedTaskRepository,
+    ICategoryRepository categoryRepository,
     IDynamicTaskRepository dynamicTaskRepository,
     IScheduleSnapshotRepository scheduleSnapshotRepository,
     IScheduleEntityService scheduleEntityService,
@@ -22,9 +23,10 @@ public class TaskService(
 
     /// <returns>
     /// The day's timeline, snapshot-first. If a snapshot already exists it is returned as-is;
-    /// otherwise the three task sources (one-off fixed, recurrence-generated fixed, and dynamic) are run
-    /// through the timeline processor and the result is persisted as a snapshot. The snapshot freezes the
-    /// (randomized) generation so the same day always reads back the same plan.
+    /// otherwise the task sources (one-off fixed, recurrence-generated fixed, and dynamic) and the category
+    /// sources (one-off and recurrence-generated) are run through the timeline processor and the result is
+    /// persisted as a snapshot. The snapshot freezes the (randomized) generation so the same day always
+    /// reads back the same plan.
     /// </returns>
     public async Task<TasksForDayDto> GetTasksForDay(DateOnly date, CancellationToken cancellationToken = default)
     {
@@ -40,16 +42,22 @@ public class TaskService(
                                           .OrderBy(ft => ft.StartTimestamp)
                                           .ToListAsync(cancellationToken);
 
+        // A category lands on its own Date exactly as a fixed task lands on its own StartTimestamp.
+        var categories = await categoryRepository.GetAll()
+                                          .Where(c => c.Date == date)
+                                          .OrderBy(c => c.StartTime)
+                                          .ToListAsync(cancellationToken);
+
         var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken);
 
         var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(date, cancellationToken: cancellationToken).ToListAsync(cancellationToken);
 
         //for now we discard dates, but when we use categories for scheduling we would use the dates too
-        var categories = await GetCategoriesForScheduledCategories(date, cancellationToken: cancellationToken)
+        var scheduledCategories = await GetCategoriesForScheduledCategories(date, cancellationToken: cancellationToken)
             .Select(x => x.Category)
             .ToListAsync(cancellationToken);
 
-        var tasksForDay = GenerateTimeline(fixedTasks, scheduledFixedTasks, dynamicTasks, categories, date);
+        var tasksForDay = GenerateTimeline(fixedTasks, scheduledFixedTasks, dynamicTasks, [.. categories, .. scheduledCategories], date);
 
         snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
         snapshot = await scheduleSnapshotRepository.AddAndSaveAsync(snapshot, cancellationToken);
@@ -81,7 +89,14 @@ public class TaskService(
                 .ToListAsync(cancellationToken)
             : [];
 
-        var dynamicTasks = datesWithoutSnapshots.Count > 0 
+        var categories = datesWithoutSnapshots.Count > 0
+            ? await categoryRepository.GetAll()
+                .Where(c => datesWithoutSnapshots.Contains(c.Date))
+                .OrderBy(c => c.StartTime)
+                .ToListAsync(cancellationToken)
+            : [];
+
+        var dynamicTasks = datesWithoutSnapshots.Count > 0
             ? await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken)
             : [];
 
@@ -103,7 +118,8 @@ public class TaskService(
             {
                 var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
                 var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
-                var categoriesForDay = scheduledCategories.Where(c => c.Date == date).Select(c => c.Category);
+                var categoriesForDay = categories.Where(c => c.Date == date)
+                    .Concat(scheduledCategories.Where(c => c.Date == date).Select(c => c.Category));
                 var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, categoriesForDay, date);
 
                 snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
@@ -135,6 +151,11 @@ public class TaskService(
                                                 .OrderBy(ft => ft.StartTimestamp)
                                                 .ToListAsync(cancellationToken);
 
+        var categories = await categoryRepository.GetAll()
+                                                .Where(c => dates.Contains(c.Date))
+                                                .OrderBy(c => c.StartTime)
+                                                .ToListAsync(cancellationToken);
+
         var dynamicTasks = await dynamicTaskRepository.GetAll().ToListAsync(cancellationToken);
 
         var scheduledFixedTasks = await GetFixedTasksForScheduledTasks(dates.Min(), dates.Max(), cancellationToken).ToListAsync(cancellationToken);
@@ -153,9 +174,12 @@ public class TaskService(
                 yield break;
 
             var fixedTasksForDay = fixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date);
+            var categoriesForDay = categories.Where(c => c.Date == date);
             var scheduledFixedTasksForDay = scheduledFixedTasks.Where(ft => DateOnly.FromDateTime(ft.StartTimestamp.Date) == date).ToList();
+            // Kept separate from categoriesForDay: only recurrence-generated occurrences carry a
+            // ScheduleEntityId, and only they advance a progress marker below.
             var scheduledCategoriesForDay = scheduledCategories.Where(c => c.Date == date).Select(c => c.Category).ToList();
-            var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, scheduledCategoriesForDay, date);
+            var tasksForDay = GenerateTimeline(fixedTasksForDay, scheduledFixedTasksForDay, dynamicTasks, [.. categoriesForDay, .. scheduledCategoriesForDay], date);
 
             var snapshot = tasksForDay.CreateOrUpdateScheduleSnapshot();
             scheduleSnapshotRepository.Add(snapshot);

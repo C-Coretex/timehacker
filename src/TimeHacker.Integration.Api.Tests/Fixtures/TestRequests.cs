@@ -14,6 +14,7 @@ internal static class TestRequests
         string name = "Work",
         Color? color = null,
         string? description = "work stuff",
+        DateOnly? date = null,
         TimeOnly? startTime = null,
         TimeOnly? endTime = null)
         => new()
@@ -21,6 +22,8 @@ internal static class TestRequests
             Name = name,
             Description = description,
             Color = color ?? Color.Blue,
+            // Relative to today, so an attached "on specific dates" schedule always has a live anchor.
+            Date = date ?? DateOnly.FromDateTime(DateTime.UtcNow),
             StartTime = startTime ?? new TimeOnly(09, 00),
             EndTime = endTime ?? new TimeOnly(18, 00)
         };

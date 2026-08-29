@@ -126,7 +126,7 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
           onSelect={(date) => setSelectedDate(date)}
         />
       </div>
-      {!isEdit && activeTab === 'fixed' && <ScheduleFormSection />}
+      {!isEdit && activeTab === 'fixed' && <ScheduleFormSection anchorDate={selectedDate} />}
       {isEditFixed && initialFixedData?.scheduleEntity && (
         <ScheduleReadOnlyInfo scheduleEntity={initialFixedData.scheduleEntity} />
       )}

@@ -14,6 +14,10 @@ public sealed record InputCategoryModel
     [Required]
     public required Color Color { get; init; }
 
+    /// <summary>The day this category applies to; a schedule, if attached later, repeats it after that day.</summary>
+    [Required]
+    public required DateOnly Date { get; init; }
+
     [Required]
     public required TimeOnly StartTime { get; init; }
 
@@ -30,6 +34,7 @@ public sealed record InputCategoryModel
             Name = Name,
             Description = Description,
             Color = Color,
+            Date = Date,
             StartTime = StartTime,
             EndTime = EndTime
         };

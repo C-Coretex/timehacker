@@ -7,6 +7,7 @@ public record CategoryReturnModel(
     string Name,
     string? Description,
     Color Color,
+    DateOnly Date,
     TimeOnly StartTime,
     TimeOnly EndTime,
     ScheduleEntityReturnModel? ScheduleEntity
@@ -21,6 +22,7 @@ public record CategoryReturnModel(
             category.Name,
             category.Description,
             category.Color,
+            category.Date,
             category.StartTime,
             category.EndTime,
             category.ScheduleEntity != null ? ScheduleEntityReturnModel.Create(category.ScheduleEntity) : null);

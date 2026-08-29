@@ -6,6 +6,7 @@ public class TaskServiceTests
 
     private readonly Mock<IDynamicTaskRepository> _dynamicTasksRepository = new();
     private readonly Mock<IFixedTaskRepository> _fixedTasksRepository = new();
+    private readonly Mock<ICategoryRepository> _categoriesRepository = new();
     private readonly Mock<IScheduleSnapshotRepository> _scheduleSnapshotRepository = new();
 
     private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
@@ -15,6 +16,7 @@ public class TaskServiceTests
     #region Properties & constructor
 
     private List<FixedTask> _fixedTasks = null!;
+    private List<Category> _categories = null!;
     private List<DynamicTask> _dynamicTasks = null!;
     private List<ScheduleSnapshot> _scheduleSnapshots = null!;
     private List<ScheduleEntity> _scheduleEntities = null!;
@@ -31,7 +33,7 @@ public class TaskServiceTests
         var scheduleEntityService = new ScheduleEntityService(_scheduleEntityRepository.Object);
         var userAccessor = new UserAccessorBaseMock(_userId, true);
 
-        _tasksService = new TaskService(_fixedTasksRepository.Object, _dynamicTasksRepository.Object, _scheduleSnapshotRepository.Object, scheduleEntityService, taskTimelineProcessor, userAccessor);
+        _tasksService = new TaskService(_fixedTasksRepository.Object, _categoriesRepository.Object, _dynamicTasksRepository.Object, _scheduleSnapshotRepository.Object, scheduleEntityService, taskTimelineProcessor, userAccessor);
     }
 
     #endregion
@@ -135,6 +137,58 @@ public class TaskServiceTests
         result1.Should().Contain(x => x.TasksTimeline.Any(y => y.Task.Id == fixedTask.Id));
 
         result1.Should().BeEquivalentTo(result2, o => o.Excluding(x => x.Path.EndsWith("Task.CreatedTimestamp")));
+    }
+
+    [Fact]
+    [Trait("GetTasksForDay", "Should place a category with no schedule on its own date")]
+    public async Task GetTasksForDay_ShouldPlaceUnscheduledCategoryOnItsOwnDate()
+    {
+        var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(_date), TestContext.Current.CancellationToken);
+
+        result.CategoriesTimeline.Should().Contain(c => c.Category.Name == "TestCategory1");
+    }
+
+    [Fact]
+    [Trait("GetTasksForDay", "Should not place a category on a date other than its own")]
+    public async Task GetTasksForDay_ShouldNotPlaceCategoryOnAnotherDate()
+    {
+        var result = await _tasksService.GetTasksForDay(DateOnly.FromDateTime(_date.AddDays(1)), TestContext.Current.CancellationToken);
+
+        result.CategoriesTimeline.Should().BeEmpty();
+    }
+
+    [Fact]
+    [Trait("GetTasksForDay", "Should not duplicate a scheduled category on its anchor date")]
+    public async Task GetTasksForDay_ShouldNotDuplicateScheduledCategoryOnAnchorDate()
+    {
+        var anchorDate = DateOnly.FromDateTime(_date);
+        var category = new Category
+        {
+            UserId = _userId,
+            Name = "ScheduledCategory",
+            Date = anchorDate,
+            StartTime = new TimeOnly(10, 00),
+            EndTime = new TimeOnly(11, 00),
+            ScheduleEntityId = Guid.NewGuid()
+        };
+        _categories.Add(category);
+
+        // Anchored to the category's own day, exactly as ScheduleEntityHelper seeds it on creation.
+        _scheduleEntities.Add(new ScheduleEntity
+        {
+            UserId = _userId,
+            CreatedTimestamp = _date,
+            FirstEntityCreated = anchorDate,
+            LastEntityCreated = anchorDate,
+            RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1)),
+            Category = category
+        });
+
+        var onAnchor = await _tasksService.GetTasksForDay(anchorDate, TestContext.Current.CancellationToken);
+        var onNextDay = await _tasksService.GetTasksForDay(anchorDate.AddDays(1), TestContext.Current.CancellationToken);
+
+        onAnchor.CategoriesTimeline.Should().ContainSingle(c => c.Category.Name == "ScheduledCategory");
+        onNextDay.CategoriesTimeline.Should().ContainSingle(c => c.Category.Name == "ScheduledCategory");
     }
 
     [Fact]
@@ -275,6 +329,28 @@ public class TaskServiceTests
             }
         ];
         _fixedTasksRepository.As<IUserScopedRepositoryBase<FixedTask, Guid>>().SetupRepositoryMock(_fixedTasks);
+
+        _categories =
+        [
+            new()
+            {
+                UserId = userId,
+                Name = "TestCategory1",
+                Date = DateOnly.FromDateTime(date),
+                StartTime = new TimeOnly(09, 00),
+                EndTime = new TimeOnly(18, 00)
+            },
+
+            new()
+            {
+                UserId = Guid.NewGuid(),
+                Name = "TestCategory2",
+                Date = DateOnly.FromDateTime(date),
+                StartTime = new TimeOnly(09, 00),
+                EndTime = new TimeOnly(18, 00)
+            }
+        ];
+        _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories);
 
         _scheduleSnapshots = new List<ScheduleSnapshot>();
         _scheduleSnapshotRepository.As<IUserScopedRepositoryBase<ScheduleSnapshot, Guid>>()

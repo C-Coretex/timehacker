@@ -26,6 +26,7 @@ export const useCategories = () => {
         name: category.name,
         description: category.description,
         color: category.color,
+        date: dayjs(category.date),
         startTime: dayjs(category.startTime, 'HH:mm:ss'),
         endTime: dayjs(category.endTime, 'HH:mm:ss'),
         scheduleEntity: category.scheduleEntity ?? null,

@@ -10,7 +10,7 @@ import { argbToHex } from '../../utils/colorArgb';
 import { recurrenceTypeLabel } from '../../utils/describeRecurrence';
 
 const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunction) => {
-  // Without a schedule a category has no day to land on, so it never reaches the calendar.
+  // Without a schedule the category still lands on its own date — it just never repeats.
   if (!scheduleEntity) return <Tag>{t('categories.notScheduled')}</Tag>;
 
   return (
@@ -56,6 +56,13 @@ export const getCategoryColumns = (
     dataIndex: 'description',
     key: 'description',
     responsive: ['md'] as Breakpoint[],
+  },
+  {
+    title: t('categories.date'),
+    dataIndex: 'date',
+    key: 'date',
+    responsive: ['md'] as Breakpoint[],
+    render: (date: Dayjs) => date.format('MMM D, YYYY'),
   },
   {
     title: t('categories.timeWindow'),

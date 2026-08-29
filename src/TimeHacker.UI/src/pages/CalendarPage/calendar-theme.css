@@ -147,10 +147,12 @@
 }
 
 /* ===== Category background bands =====
-   Categories are time windows that tasks sit on top of. react-big-calendar renders backgroundEvents
-   underneath normal events, where a busy day would bury them completely — so the band is lifted ABOVE
-   the tasks and kept at a very low alpha instead. At that opacity the tint reads as "this hour belongs
-   to Work" without obscuring anything, and pointer-events stay off so tasks underneath remain clickable.
+   Categories are time windows that tasks sit on top of, so the band stays BEHIND the tasks: rbc renders
+   backgroundEvents before .rbc-events-container and gives neither a z-index, so DOM order alone puts
+   events in front. z-index: 0 pins that explicitly — anything above 2 would lift the band (and its name
+   pill) over the tasks, and 3 would also fight .rbc-current-time-indicator.
+   The trade-off is that a day packed with tasks covers most of the tint; the left rail and any
+   task-free gap are what keep the category readable. Raise the alpha below if it needs more presence.
 
    Geometry must be forced from here: rbc writes top/height/width/left as inline styles from its own
    layout pass, so eventPropGetter can only contribute the colour (via --th-category-color) and the
@@ -158,7 +160,7 @@
 .rbc-day-slot .rbc-background-event.th-category-band {
   left: 0 !important;
   width: 100% !important;
-  z-index: 3;
+  z-index: 0;
   pointer-events: none;
   opacity: 1;
   min-height: 0;
@@ -187,8 +189,9 @@
   width: calc(100% - 30px) !important;
 }
 
-/* The name pill is the part that must survive a day full of tasks, so it is opaque and re-enables
-   pointer events for hover/click while the band itself stays transparent to clicks. */
+/* The name pill is opaque so it stays readable against the faint tint, and re-enables pointer events
+   for hover/click while the band itself stays transparent to clicks. It sits inside the band, so it is
+   behind the tasks too — a task starting at the same time will cover it. */
 .th-category-label {
   pointer-events: auto;
   display: inline-flex;

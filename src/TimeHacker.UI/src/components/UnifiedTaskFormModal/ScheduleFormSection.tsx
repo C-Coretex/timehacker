@@ -1,10 +1,21 @@
 import type { FC } from 'react';
 import { Form, Checkbox, Select, InputNumber, DatePicker, theme } from 'antd';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { RepeatingEntityTypeEnum } from '../../api/types';
 import { getRepeatTypes, getDaysOfWeek } from './constants';
 
-export const ScheduleFormSection: FC = () => {
+interface ScheduleFormSectionProps {
+  /**
+   * The day the entity being created already occupies. The server anchors the recurrence there and
+   * only ever walks forward, so specific dates at or before it (or before today) can never produce an
+   * occurrence and are greyed out.
+   */
+  anchorDate?: Dayjs;
+}
+
+export const ScheduleFormSection: FC<ScheduleFormSectionProps> = ({ anchorDate }) => {
   const { t } = useTranslation();
   const { token } = theme.useToken();
 
@@ -13,6 +24,8 @@ export const ScheduleFormSection: FC = () => {
 
   const repeatTypes = getRepeatTypes(t);
   const daysOfWeek = getDaysOfWeek(t);
+
+  const onceFloor = anchorDate?.isAfter(dayjs(), 'day') ? anchorDate : dayjs();
 
   return (
     <div style={{ marginTop: 8 }}>
@@ -46,6 +59,17 @@ export const ScheduleFormSection: FC = () => {
               rules={[
                 { required: true, message: t('taskForm.selectAtLeastOneDate') },
                 { type: 'array', min: 1, message: t('taskForm.selectAtLeastOneDate') },
+                // disabledDate stops new picks, but the anchor can move after dates were chosen.
+                {
+                  validator: (_, value: Dayjs[] | undefined) =>
+                    value?.some((date) => !date.isAfter(onceFloor, 'day'))
+                      ? Promise.reject(
+                          new Error(
+                            t('taskForm.datesMustBeAfter', { date: onceFloor.format('YYYY-MM-DD') })
+                          )
+                        )
+                      : Promise.resolve(),
+                },
               ]}
               style={{ marginBottom: 8 }}
             >
@@ -55,6 +79,7 @@ export const ScheduleFormSection: FC = () => {
                 style={{ width: '100%' }}
                 size="small"
                 placeholder={t('taskForm.selectDates')}
+                disabledDate={(current) => !current.isAfter(onceFloor, 'day')}
               />
             </Form.Item>
           )}

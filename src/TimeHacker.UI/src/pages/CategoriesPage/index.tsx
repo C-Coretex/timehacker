@@ -15,6 +15,7 @@ const toPayload = (data: CategoryFormData): InputCategory => ({
   name: data.name,
   description: data.description || undefined,
   color: data.color,
+  date: data.date.format('YYYY-MM-DD'),
   startTime: data.startTime.format('HH:mm:ss'),
   endTime: data.endTime.format('HH:mm:ss'),
 });

@@ -170,14 +170,16 @@ export interface InputScheduleEntityModel {
 }
 
 // --- Categories ---
-// A category is a daily time window (startTime/endTime); which day(s) it lands on is decided by its
-// scheduleEntity. Colors travel as a signed ARGB int32 — see utils/colorArgb.
+// A category is a daily time window (startTime/endTime) anchored to a `date`, exactly as a fixed task is
+// anchored to its startTimestamp. It always lands on that date; a scheduleEntity, if present, repeats it
+// on later days. Colors travel as a signed ARGB int32 — see utils/colorArgb.
 
 export interface CategoryReturnModel {
     id: string;
     name: string;
     description: string | null;
     color: number;
+    date: string; // YYYY-MM-DD
     startTime: string; // HH:mm:ss
     endTime: string; // HH:mm:ss
     scheduleEntity: ScheduleEntityReturnModel | null;
@@ -187,6 +189,7 @@ export interface InputCategory {
     name: string;
     description?: string;
     color: number;
+    date: string; // YYYY-MM-DD
     startTime: string; // HH:mm:ss
     endTime: string; // HH:mm:ss
 }
@@ -195,6 +198,7 @@ export interface CategoryFormData {
     name: string;
     description: string;
     color: number;
+    date: Dayjs;
     startTime: Dayjs;
     endTime: Dayjs;
 }
@@ -204,6 +208,7 @@ export interface CategoryDisplayModel {
     name: string;
     description: string | null;
     color: number;
+    date: Dayjs;
     startTime: Dayjs;
     endTime: Dayjs;
     scheduleEntity: ScheduleEntityReturnModel | null;

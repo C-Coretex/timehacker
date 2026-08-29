@@ -1,7 +1,11 @@
+using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.IModels;
 using TimeHacker.Domain.Models.EntityModels.Enums;
 using TimeHacker.Domain.Models.EntityModels.RepeatingEntityTypes;
+using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
+using TimeHacker.Domain.IRepositories.Tags;
 
 namespace TimeHacker.Integration.Db.Tests.Fixtures;
 
@@ -14,8 +18,9 @@ namespace TimeHacker.Integration.Db.Tests.Fixtures;
 internal sealed class GraphSeeder(
     IFixedTaskRepository fixedTaskRepository,
     ICategoryRepository categoryRepository,
-    IScheduleEntityRepository scheduleEntityRepository,
+    ITagRepository tagRepository,
     IScheduleSnapshotRepository scheduleSnapshotRepository,
+    IScheduleEntityAppService scheduleEntityAppService,
     TimeHackerDbContext dbContext,
     UserAccessorBase userAccessor)
 {
@@ -24,32 +29,43 @@ internal sealed class GraphSeeder(
     public static RepeatingEntityDto DailyRepeat()
         => new(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1));
 
-    public async Task<FixedTask> SeedFixedTaskWithSchedule(CancellationToken cancellationToken)
+    private async Task<TParent> AttachDailySchedule<TParent>(ScheduleEntityParentType parentType, Guid parentId, CancellationToken cancellationToken)
+        where TParent : class
     {
-        var scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(
-            new ScheduleEntity { RepeatingEntity = DailyRepeat() }, cancellationToken);
+        await scheduleEntityAppService.Save(new ScheduleEntityCreateDto(parentType, parentId, DailyRepeat()), cancellationToken);
 
-        return await fixedTaskRepository.AddAndSaveAsync(new FixedTask
+        dbContext.ChangeTracker.Clear();
+        return await dbContext.Set<TParent>().FindAsync([parentId], cancellationToken)
+               ?? throw new InvalidOperationException($"Seeded {typeof(TParent).Name} {parentId} disappeared.");
+    }
+
+    public async Task<FixedTask> SeedFixedTaskWithSchedule(CancellationToken cancellationToken, DateOnly? on = null)
+    {
+        var date = on ?? DateOnly.FromDateTime(DateTime.UtcNow);
+        var task = await fixedTaskRepository.AddAndSaveAsync(new FixedTask
         {
             Name = "Scheduled fixed task",
             Priority = 1,
-            StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
-            EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc),
-            ScheduleEntityId = scheduleEntity.Id
+            StartTimestamp = date.ToDateTime(new TimeOnly(9, 0), DateTimeKind.Utc),
+            EndTimestamp = date.ToDateTime(new TimeOnly(10, 0), DateTimeKind.Utc)
         }, cancellationToken);
+
+        return await AttachDailySchedule<FixedTask>(ScheduleEntityParentType.FixedTask, task.Id, cancellationToken);
     }
 
-    public async Task<Category> SeedCategoryWithSchedule(CancellationToken cancellationToken)
+    public async Task<Category> SeedCategoryWithSchedule(CancellationToken cancellationToken, DateOnly? on = null)
     {
-        var scheduleEntity = await scheduleEntityRepository.AddAndSaveAsync(
-            new ScheduleEntity { RepeatingEntity = DailyRepeat() }, cancellationToken);
-
-        return await categoryRepository.AddAndSaveAsync(new Category
+        var date = on ?? DateOnly.FromDateTime(DateTime.UtcNow);
+        var category = await categoryRepository.AddAndSaveAsync(new Category
         {
             Name = "Scheduled category",
             Color = Color.SteelBlue,
-            ScheduleEntityId = scheduleEntity.Id
+            Date = date,
+            StartTime = new TimeOnly(9, 0),
+            EndTime = new TimeOnly(10, 0)
         }, cancellationToken);
+
+        return await AttachDailySchedule<Category>(ScheduleEntityParentType.Category, category.Id, cancellationToken);
     }
 
     public Task<ScheduleSnapshot> SeedSnapshotWithChildren(DateOnly date, CancellationToken cancellationToken)
@@ -72,23 +88,24 @@ internal sealed class GraphSeeder(
 
     /// <summary>
     /// A FixedTask linked to a Category and a Tag through their junction rows (Category/Tag survive a
-    /// task delete; the junctions do not).
+    /// task delete; the junctions do not). The three entities go through their repositories so UserId is
+    /// stamped for them; the junctions are written directly because nothing above the DbContext creates
+    /// them — <c>FixedTaskDto.GetEntity</c> maps only scalars.
     /// </summary>
     public async Task<(Category Category, Tag Tag, FixedTask Task)> SeedFixedTaskWithCategoryAndTagJunctions(CancellationToken cancellationToken)
     {
-        var userId = UserId;
-        var category = new Category { UserId = userId, Name = "Cat", Color = Color.Olive };
-        var tag = new Tag { UserId = userId, Name = "Tag", Color = Color.Olive };
-        var task = new FixedTask
+        var date = new DateOnly(2026, 6, 1);
+        var category = await categoryRepository.AddAndSaveAsync(
+            new Category { Name = "Cat", Color = Color.Olive, Date = date, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(10, 0) },
+            cancellationToken);
+        var tag = await tagRepository.AddAndSaveAsync(new Tag { Name = "Tag", Color = Color.Olive }, cancellationToken);
+        var task = await fixedTaskRepository.AddAndSaveAsync(new FixedTask
         {
-            UserId = userId,
             Name = "Task",
             Priority = 1,
-            StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
-            EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
-        };
-        dbContext.AddRange(category, tag, task);
-        await dbContext.SaveChangesAsync(cancellationToken);
+            StartTimestamp = date.ToDateTime(new TimeOnly(9, 0), DateTimeKind.Utc),
+            EndTimestamp = date.ToDateTime(new TimeOnly(10, 0), DateTimeKind.Utc)
+        }, cancellationToken);
 
         dbContext.Add(new CategoryFixedTask { CategoryId = category.Id, FixedTaskId = task.Id });
         dbContext.Add(new TagFixedTask { TagId = tag.Id, TaskId = task.Id });
@@ -104,6 +121,7 @@ internal sealed class GraphSeeder(
     public async Task<(ScheduleEntity Schedule, ScheduleSnapshot Snapshot)> SeedScheduleEntityWithSnapshotChildren(DateOnly date, CancellationToken cancellationToken)
     {
         var userId = UserId;
+        // A bare FK target: this graph is only ever deleted, never expanded, so it needs no anchor.
         var scheduleEntity = new ScheduleEntity { UserId = userId, RepeatingEntity = DailyRepeat() };
         var snapshot = new ScheduleSnapshot
         {
@@ -177,6 +195,8 @@ internal sealed class GraphSeeder(
         Priority = 1,
         StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
         EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc),
+        // A stub carrying a caller-chosen Id, never expanded — so no anchor, and the app service can't
+        // build it anyway (it assigns its own Id).
         ScheduleEntity = new ScheduleEntity
         {
             Id = scheduleEntityId,

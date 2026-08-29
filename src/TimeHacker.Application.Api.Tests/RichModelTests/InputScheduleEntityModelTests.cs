@@ -16,7 +16,7 @@ public class InputScheduleEntityModelTests
     {
         var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity());
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null, TimeProvider.System);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null, DateOnly.FromDateTime(DateTime.UtcNow), TimeProvider.System);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
         scheduledEntity.EndsOn.Should().BeNull();
     }
@@ -34,7 +34,7 @@ public class InputScheduleEntityModelTests
             MaxOccurrences = null
         };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, TimeProvider.System);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, DateOnly.FromDateTime(DateTime.UtcNow), TimeProvider.System);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
         scheduledEntity.EndsOn.Should().Be(maxDate);
     }
@@ -52,7 +52,7 @@ public class InputScheduleEntityModelTests
             MaxOccurrences = maxOccurrences
         };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, TimeProvider.System);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, DateOnly.FromDateTime(DateTime.UtcNow), TimeProvider.System);
         scheduledEntity.RepeatingEntity.Should().Be(repeatingEntityModel);
 
         var endsOn = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(maxOccurrences * 2));
@@ -84,7 +84,7 @@ public class InputScheduleEntityModelTests
 
         var endsOnModel = new EndsOnModel { MaxOccurrences = 3 };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(expectedEndsOn);
     }
@@ -97,7 +97,7 @@ public class InputScheduleEntityModelTests
         var maxDate = FixedToday.AddDays(5);
         var endsOnModel = new EndsOnModel { MaxOccurrences = 10, MaxDate = maxDate };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(maxDate);
     }
@@ -110,7 +110,7 @@ public class InputScheduleEntityModelTests
         var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
         var endsOnModel = includeEndsOnModel ? new EndsOnModel { MaxOccurrences = null, MaxDate = null } : null;
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().BeNull();
     }
@@ -122,7 +122,7 @@ public class InputScheduleEntityModelTests
         var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
         var endsOnModel = new EndsOnModel { MaxOccurrences = 0 };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(FixedToday);
     }
@@ -139,7 +139,7 @@ public class InputScheduleEntityModelTests
     [Trait("OnceRepeatingEntity", "Derives EndsOn from the last chosen date")]
     public void GetScheduleEntity_Once_DerivesEndsOnFromLastDate()
     {
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), null, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), null, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(OnceLast);
     }
@@ -151,7 +151,7 @@ public class InputScheduleEntityModelTests
         // A finite series defines its own end; walking it MaxOccurrences times would just run it dry.
         var endsOnModel = new EndsOnModel { MaxOccurrences = 99, MaxDate = new DateOnly(2027, 01, 01) };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(OnceLast);
     }
@@ -163,7 +163,7 @@ public class InputScheduleEntityModelTests
         var single = new DateOnly(2026, 08, 20);
         var model = new RepeatingEntityDto(RepeatingEntityType.OnceRepeatingEntity, new OnceRepeatingEntity([single]));
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(model, null, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(model, null, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(single);
     }
@@ -176,7 +176,7 @@ public class InputScheduleEntityModelTests
         var maxDate = OnceFirst.AddDays(2);
         var endsOnModel = new EndsOnModel { MaxDate = maxDate };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(maxDate);
     }
@@ -188,7 +188,7 @@ public class InputScheduleEntityModelTests
         // Later than OnceLast: the series still ends when its dates run out, not at the caller's bound.
         var endsOnModel = new EndsOnModel { MaxDate = OnceLast.AddYears(1) };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(OnceLast);
     }
@@ -200,9 +200,73 @@ public class InputScheduleEntityModelTests
         // Stopping after one occurrence lands on the first chosen date, ahead of the series' own end.
         var endsOnModel = new EndsOnModel { MaxOccurrences = 1 };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(OnceModel(), endsOnModel, FixedToday, FixedClock);
 
         scheduledEntity.EndsOn.Should().Be(OnceFirst);
+    }
+
+    [Theory]
+    [InlineData(0)]   // the anchor day itself
+    [InlineData(-1)]  // before the anchor
+    [Trait("OnceRepeatingEntity", "A date at or before the anchor is rejected")]
+    public void GetScheduleEntity_Once_DateNotAfterAnchor_Throws(int offsetFromAnchor)
+    {
+        var anchor = FixedToday.AddYears(2);
+        var model = new RepeatingEntityDto(RepeatingEntityType.OnceRepeatingEntity, new OnceRepeatingEntity([anchor.AddDays(offsetFromAnchor), anchor.AddDays(10)]));
+
+        var act = () => ScheduleEntityHelper.GetScheduleEntity(model, null, anchor, FixedClock);
+
+        act.Should().Throw<DataIsNotCorrectException>();
+    }
+
+    [Fact]
+    [Trait("OnceRepeatingEntity", "A date after the anchor but not after today is rejected")]
+    public void GetScheduleEntity_Once_DateNotAfterToday_Throws()
+    {
+        // The anchor is in the past, so "today" is the binding floor: a date between them could never
+        // be generated either.
+        var anchor = FixedToday.AddDays(-30);
+        var model = new RepeatingEntityDto(RepeatingEntityType.OnceRepeatingEntity, new OnceRepeatingEntity([FixedToday]));
+
+        var act = () => ScheduleEntityHelper.GetScheduleEntity(model, null, anchor, FixedClock);
+
+        act.Should().Throw<DataIsNotCorrectException>();
+    }
+
+    #endregion
+
+    #region Anchoring
+
+    [Fact]
+    [Trait("GetScheduleEntity", "Both progress markers are seeded from the anchor date")]
+    public void GetScheduleEntity_SeedsProgressMarkersFromAnchor()
+    {
+        // The parent entity already occupies the anchor day, so the series must resume strictly after it
+        // rather than regenerating that day on top of the entity itself.
+        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1));
+        var anchor = FixedToday.AddDays(7);
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, null, anchor, FixedClock);
+
+        scheduledEntity.FirstEntityCreated.Should().Be(anchor);
+        scheduledEntity.LastEntityCreated.Should().Be(anchor);
+
+        ScheduleEntityReturn.Create(scheduledEntity)
+            .GetNextEntityDatesIn(FixedToday, anchor.AddDays(2))
+            .Should().Equal(anchor.AddDays(1), anchor.AddDays(2));
+    }
+
+    [Fact]
+    [Trait("GetScheduleEntity", "MaxOccurrences counts forward from the anchor, not from today")]
+    public void GetScheduleEntity_MaxOccurrences_CountsFromAnchor()
+    {
+        var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
+        var anchor = FixedToday.AddDays(10);
+        var endsOnModel = new EndsOnModel { MaxOccurrences = 3 };
+
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, anchor, FixedClock);
+
+        scheduledEntity.EndsOn.Should().Be(anchor.AddDays(6));
     }
 
     #endregion
@@ -218,7 +282,7 @@ public class InputScheduleEntityModelTests
         var repeatingEntityModel = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
         var endsOnModel = new EndsOnModel { MaxOccurrences = 3, MaxDate = FixedToday.AddMonths(6) };
 
-        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedClock);
+        var scheduledEntity = ScheduleEntityHelper.GetScheduleEntity(repeatingEntityModel, endsOnModel, FixedToday, FixedClock);
 
         // Day(2) stepped 3 times from 2024-01-01.
         scheduledEntity.EndsOn.Should().Be(new DateOnly(2024, 01, 07));

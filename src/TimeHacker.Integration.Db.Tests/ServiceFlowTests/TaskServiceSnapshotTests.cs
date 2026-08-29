@@ -112,10 +112,11 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
     [Trait("RefreshTasksForDays", "ExpandsRecurrence")]
     public async Task RefreshTasksForDays_Should_ExpandRecurrenceAndTrackLastEntityCreated(int numberOfDays)
     {
-        var task = await Resolve<GraphSeeder>().SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken);
+        var anchorDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var task = await Resolve<GraphSeeder>().SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken, anchorDate);
         var scheduleEntityId = task.ScheduleEntityId!.Value;
-        // A date a few days out: the daily recurrence (anchored at the schedule's creation = now) will hit it.
-        var date = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(3);
+        // A date a few days out: the daily recurrence (anchored at the task's own day) will hit it.
+        var date = anchorDate.AddDays(3);
 
         // Start from a clean tracker, as a fresh request scope would.
         Db.ChangeTracker.Clear();
@@ -129,7 +130,9 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
         Db.ChangeTracker.Clear();
         var scheduleEntity = await Db.Set<ScheduleEntity>().FirstAsync(x => x.Id == scheduleEntityId, TestContext.Current.CancellationToken);
         scheduleEntity.LastEntityCreated.Should().Be(date.AddDays(numberOfDays - 1));
-        scheduleEntity.FirstEntityCreated.Should().Be(date);
+        // Seeded from the task's own day at creation and never re-seeded, so generating a later range
+        // does not move the lower bound forward onto the first refreshed day.
+        scheduleEntity.FirstEntityCreated.Should().Be(anchorDate);
     }
 
     private Task SeedFixedTaskOn(DateOnly date, string name)

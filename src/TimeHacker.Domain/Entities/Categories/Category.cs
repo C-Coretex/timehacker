@@ -8,10 +8,8 @@ public class Category : UserScopedEntityBase
     public string? Description { get; set; }
     public Color Color { get; set; }
 
-    /// <summary>
-    /// The daily time window this category occupies. Which day(s) it applies to is decided entirely by
-    /// <see cref="ScheduleEntity"/> — a category with no schedule is never placed on the calendar.
-    /// </summary>
+    public DateOnly Date { get; set; }
+
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
 

@@ -12,6 +12,7 @@ public record CategoryDto
     public string? Description { get; init; }
     public Color Color { get; init; }
 
+    public DateOnly Date { get; init; }
     public TimeOnly StartTime { get; init; }
     public TimeOnly EndTime { get; init; }
 
@@ -24,6 +25,7 @@ public record CategoryDto
             Name = category.Name,
             Description = category.Description,
             Color = category.Color,
+            Date = category.Date,
             StartTime = category.StartTime,
             EndTime = category.EndTime,
             ScheduleEntity = category.ScheduleEntity != null ? new ScheduleEntityDto(
@@ -46,6 +48,7 @@ public record CategoryDto
         category.Name = Name;
         category.Description = Description;
         category.Color = Color;
+        category.Date = Date;
         category.StartTime = StartTime;
         category.EndTime = EndTime;
 

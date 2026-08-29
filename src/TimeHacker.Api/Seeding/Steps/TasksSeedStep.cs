@@ -28,13 +28,15 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
         var dayAfter = today.AddDays(2);
 
         // Recurring blueprints are inserted first so their generated ids can be attached to the tasks below.
-        var dailyStandup = NewSchedule(
-            context,
-            new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1))
+        // Each is anchored to its task's own day, so the recurrence resumes after it instead of
+        // regenerating that day on top of the task itself.
+        var dailyStandup = context.NewSchedule(
+            new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1)),
+            today
         );
-        var weeklySync = NewSchedule(
-            context,
-            new RepeatingEntityDto(RepeatingEntityType.WeekRepeatingEntity, new WeekRepeatingEntity([dayAfter.DayOfWeek.ToDayOfWeek()]))
+        var weeklySync = context.NewSchedule(
+            new RepeatingEntityDto(RepeatingEntityType.WeekRepeatingEntity, new WeekRepeatingEntity([dayAfter.DayOfWeek.ToDayOfWeek()])),
+            dayAfter
         );
 
         context.Db.Set<ScheduleEntity>().AddRange(dailyStandup, weeklySync);
@@ -65,14 +67,6 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
 
         await context.Db.SaveChangesAsync(cancellationToken);
     }
-
-    private static ScheduleEntity NewSchedule(DevelopmentSeedContext context, RepeatingEntityDto repeatingEntity)
-        => new()
-        {
-            UserId = context.UserId,
-            CreatedTimestamp = context.Now,
-            RepeatingEntity = repeatingEntity
-        };
 
     private static FixedTask NewFixedTask(
         DevelopmentSeedContext context,

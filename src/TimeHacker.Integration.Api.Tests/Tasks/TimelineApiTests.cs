@@ -142,13 +142,46 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
     }
 
     [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_Should_PlaceCategoryWithNoSchedule_OnItsOwnDate()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        // No schedule at all: the category lands on its own date, exactly as a fixed task lands on its
+        // own StartTimestamp.
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: Today))).Content;
+
+        var day = await api.Tasks.GetForDay(D(Today));
+        var otherDay = await api.Tasks.GetForDay(D(Today.AddDays(1)));
+
+        day.StatusCode.Should().Be(HttpStatusCode.OK);
+        day.Content!.CategoriesTimeline.Should().ContainSingle().Which.Category.Id.Should().Be(categoryId);
+        otherDay.Content!.CategoriesTimeline.Should().BeEmpty();
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_ScheduledCategory_Should_NotDuplicateOnItsAnchorDate()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: Today))).Content;
+        await api.Categories.CreateSchedule(TestRequests.NewSchedule(categoryId, TestRequests.EveryNDays(1)));
+
+        var anchorDay = await api.Tasks.GetForDay(D(Today));
+        var nextDay = await api.Tasks.GetForDay(D(Today.AddDays(1)));
+
+        // The anchor day comes from the category itself, later days from the recurrence — never both.
+        anchorDay.Content!.CategoriesTimeline.Should().ContainSingle().Which.Category.Id.Should().Be(categoryId);
+        nextDay.Content!.CategoriesTimeline.Should().ContainSingle().Which.Category.Id.Should().Be(categoryId);
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
     public async Task GetTasksForDay_Should_IncludeScheduledCategories()
     {
         var api = await CreateAuthenticatedApiAsync();
         var cancellationToken = TestContext.Current.CancellationToken;
 
         var categoryId = (await api.Categories.Create(
-            TestRequests.NewCategory("Work", Color.Teal, "desc", new TimeOnly(09, 00), new TimeOnly(18, 00)))).Content;
+            TestRequests.NewCategory("Work", Color.Teal, "desc", startTime: new TimeOnly(09, 00), endTime: new TimeOnly(18, 00)))).Content;
         await api.Categories.CreateSchedule(TestRequests.NewSchedule(categoryId, TestRequests.OnDates(Today.AddDays(1))));
 
         var day = await api.Tasks.GetForDay(D(Today.AddDays(1)));
@@ -189,12 +222,15 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
     {
         var api = await CreateAuthenticatedApiAsync();
 
-        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work"))).Content;
+        // Anchored to tomorrow and scheduled for Today+3, so neither today nor Today+2 is covered.
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: Today.AddDays(1)))).Content;
         await api.Categories.CreateSchedule(
             TestRequests.NewSchedule(categoryId, TestRequests.OnDates(Today.AddDays(3))));
 
-        var day = await api.Tasks.GetForDay(D(Today));
+        var today = await api.Tasks.GetForDay(D(Today));
+        var uncoveredDay = await api.Tasks.GetForDay(D(Today.AddDays(2)));
 
-        day.Content!.CategoriesTimeline.Should().BeEmpty();
+        today.Content!.CategoriesTimeline.Should().BeEmpty();
+        uncoveredDay.Content!.CategoriesTimeline.Should().BeEmpty();
     }
 }

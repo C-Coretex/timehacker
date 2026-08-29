@@ -25,6 +25,7 @@ internal static class DevelopmentDataSeeder
 
     private static readonly IReadOnlyList<IDevelopmentSeedStep> Steps =
     [
+        new CategoriesSeedStep(),
         new TasksSeedStep()
     ];
 

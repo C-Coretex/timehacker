@@ -13,12 +13,13 @@ public class ScheduleEntityAppServiceTests(DbContainerFixture fixture) : DbInteg
     [Trait("Save", "FixedTaskParent")]
     public async Task Save_Should_CreateScheduleAndLinkFixedTask()
     {
+        var anchorDate = new DateOnly(2026, 6, 1);
         var task = new FixedTask
         {
             Name = "Task",
             Priority = 1,
-            StartTimestamp = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Utc),
-            EndTimestamp = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
+            StartTimestamp = anchorDate.ToDateTime(new TimeOnly(9, 0), DateTimeKind.Utc),
+            EndTimestamp = anchorDate.ToDateTime(new TimeOnly(10, 0), DateTimeKind.Utc)
         };
         await Resolve<IFixedTaskRepository>().AddAndSaveAsync(task, TestContext.Current.CancellationToken);
 
@@ -29,13 +30,26 @@ public class ScheduleEntityAppServiceTests(DbContainerFixture fixture) : DbInteg
         Db.ChangeTracker.Clear();
         var reloaded = await Db.Set<FixedTask>().FirstAsync(x => x.Id == task.Id, TestContext.Current.CancellationToken);
         reloaded.ScheduleEntityId.Should().Be(result.Id);
+
+        // The task already occupies its StartTimestamp's day, so the series is anchored there.
+        var schedule = await Db.Set<ScheduleEntity>().FirstAsync(x => x.Id == result.Id, TestContext.Current.CancellationToken);
+        schedule.FirstEntityCreated.Should().Be(anchorDate);
+        schedule.LastEntityCreated.Should().Be(anchorDate);
     }
 
     [Fact]
     [Trait("Save", "CategoryParent")]
     public async Task Save_Should_CreateScheduleAndLinkCategory()
     {
-        var category = new Category { Name = "Cat", Color = Color.SeaGreen };
+        var anchorDate = new DateOnly(2026, 6, 1);
+        var category = new Category
+        {
+            Name = "Cat",
+            Color = Color.SeaGreen,
+            Date = anchorDate,
+            StartTime = new TimeOnly(9, 0),
+            EndTime = new TimeOnly(10, 0)
+        };
         await Resolve<ICategoryRepository>().AddAndSaveAsync(category, TestContext.Current.CancellationToken);
 
         var dto = new ScheduleEntityCreateDto(ScheduleEntityParentType.Category, category.Id, GraphSeeder.DailyRepeat());
@@ -45,6 +59,11 @@ public class ScheduleEntityAppServiceTests(DbContainerFixture fixture) : DbInteg
         Db.ChangeTracker.Clear();
         var reloaded = await Db.Set<Category>().FirstAsync(x => x.Id == category.Id, TestContext.Current.CancellationToken);
         reloaded.ScheduleEntityId.Should().Be(result.Id);
+
+        // A category is anchored to its own Date, exactly as a task is to its StartTimestamp.
+        var schedule = await Db.Set<ScheduleEntity>().FirstAsync(x => x.Id == result.Id, TestContext.Current.CancellationToken);
+        schedule.FirstEntityCreated.Should().Be(anchorDate);
+        schedule.LastEntityCreated.Should().Be(anchorDate);
     }
 
     [Fact]
