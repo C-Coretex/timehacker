@@ -11,7 +11,11 @@ export interface TaskEventResource {
 
 export interface CategoryEventResource {
   type: 'category';
+  /** The parent category — its colour drives the band, and it is what tasks link to. */
   category: { id: string; name: string; description: string | null; color: number };
+  /** The window this band came from, and its own optional note. */
+  categoryScheduleId: string;
+  scheduleDescription: string | null;
   scheduleEntityId: string | null;
   /**
    * How many other category windows already overlap this one on the same day. Drives the left inset of
@@ -90,15 +94,20 @@ export function categoriesForDayToEvents(items: CategoryForDayItem[], date: Date
     const end = localMinutesToDate(date, endM);
 
     return {
-      id: `category-${item.category.id}-${date.toISOString()}-${item.timeRange.start}-${index}`,
+      // Keyed on the window, not the category: one category may contribute several bands to a day,
+      // and two of them can share a start time.
+      id: `category-schedule-${item.categoryScheduleId}-${date.toISOString()}-${index}`,
       title: item.category.name,
       start,
       end,
       allDay: false,
+      // The category's description; the window's own note is surfaced separately by the detail modal.
       description: item.category.description ?? undefined,
       resource: {
         type: 'category' as const,
         category: item.category,
+        categoryScheduleId: item.categoryScheduleId,
+        scheduleDescription: item.scheduleDescription,
         scheduleEntityId: item.scheduleEntityId,
         depth,
         start,

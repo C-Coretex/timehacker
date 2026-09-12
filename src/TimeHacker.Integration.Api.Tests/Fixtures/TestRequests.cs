@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using TimeHacker.Api.Models.Input.Categories;
 using TimeHacker.Api.Models.Input.Tasks.RepeatingEntities;
 using TimeHacker.Api.Models.Input.Users;
@@ -13,16 +13,23 @@ internal static class TestRequests
     public static InputCategoryModel NewCategory(
         string name = "Work",
         Color? color = null,
-        string? description = "work stuff",
+        string? description = "work stuff")
+        => new()
+        {
+            Name = name,
+            Description = description,
+            Color = color ?? Color.Blue
+        };
+
+    public static InputCategoryScheduleModel NewCategorySchedule(
+        string? description = "Working hours",
         DateOnly? date = null,
         TimeOnly? startTime = null,
         TimeOnly? endTime = null)
         => new()
         {
-            Name = name,
             Description = description,
-            Color = color ?? Color.Blue,
-            // Relative to today, so an attached "on specific dates" schedule always has a live anchor.
+            // Relative to today, so an attached "on specific dates" recurrence always has a live anchor.
             Date = date ?? DateOnly.FromDateTime(DateTime.UtcNow),
             StartTime = startTime ?? new TimeOnly(09, 00),
             EndTime = endTime ?? new TimeOnly(18, 00)
@@ -80,11 +87,12 @@ internal static class TestRequests
             Birthday = birthday
         };
 
+    /// <param name="parentEntityId">A FixedTask id or a CategorySchedule id, depending on the endpoint.</param>
     public static InputScheduleEntityModel NewSchedule(
-        Guid parentFixedTaskId,
+        Guid parentEntityId,
         InputRepeatingEntityModelBase repeating,
         EndsOnModel? endsOn = null)
-        => new() { ParentEntityId = parentFixedTaskId, RepeatingEntityType = repeating, EndsOnModel = endsOn };
+        => new() { ParentEntityId = parentEntityId, RepeatingEntityType = repeating, EndsOnModel = endsOn };
 
     // --- Repeating-entity builders ---
     public static InputDayRepeatingEntityModel EveryNDays(int days = 1) => new() { DaysCountToRepeat = days };

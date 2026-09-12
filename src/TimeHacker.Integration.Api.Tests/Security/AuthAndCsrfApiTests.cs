@@ -13,6 +13,13 @@ public sealed class AuthAndCsrfApiTests(ApiTestFixture fixture) : ApiIntegration
         (await api.Users.GetCurrent()).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         (await api.Tasks.GetForDay("2026-07-01")).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         (await api.Categories.Create(TestRequests.NewCategory())).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var someCategoryId = Guid.CreateVersion7();
+        (await api.Categories.GetSchedules(someCategoryId)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await api.Categories.CreateSchedule(someCategoryId, TestRequests.NewCategorySchedule())).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await api.Categories.UpdateSchedule(someCategoryId, Guid.CreateVersion7(), TestRequests.NewCategorySchedule())).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await api.Categories.DeleteSchedule(someCategoryId, Guid.CreateVersion7())).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        (await api.Categories.CreateRecurrence(TestRequests.NewSchedule(someCategoryId, TestRequests.EveryNDays(1)))).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact, Trait("Security", "CSRF")]

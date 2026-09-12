@@ -9,7 +9,7 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
         Project(ActiveFrom(from).Where(x => x.FixedTask != null));
 
     public IQueryable<ScheduleEntityReturn> GetAllCategoriesFrom(DateOnly from) =>
-        Project(ActiveFrom(from).Where(x => x.Category != null));
+        Project(ActiveFrom(from).Where(x => x.CategorySchedule != null));
 
     // A recurrence is still live if it has no end, or its end has not passed the requested start.
     private IQueryable<ScheduleEntity> ActiveFrom(DateOnly from) =>
@@ -30,7 +30,10 @@ public class ScheduleEntityService(IScheduleEntityRepository scheduleEntityRepos
             ScheduledTasks = scheduleEntity.ScheduledTasks,
             ScheduledCategories = scheduleEntity.ScheduledCategories,
             FixedTask = scheduleEntity.FixedTask,
-            Category = scheduleEntity.Category
+            CategorySchedule = scheduleEntity.CategorySchedule,
+            // An Include is ignored once a query ends in a projection, so the owning category has to be
+            // pulled explicitly — the timeline reads its colour and description for the calendar band.
+            Category = scheduleEntity.CategorySchedule != null ? scheduleEntity.CategorySchedule.Category : null
         });
 
     /// <summary>

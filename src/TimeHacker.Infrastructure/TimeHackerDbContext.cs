@@ -37,6 +37,7 @@ public class TimeHackerDbContext : DbContextBase<TimeHackerDbContext>
 
     //Categories
     internal DbSet<Category> Category { get; set; }
+    internal DbSet<CategorySchedule> CategorySchedule { get; set; }
     internal DbSet<CategoryFixedTask> CategoryFixedTask { get; set; }
     internal DbSet<CategoryDynamicTask> CategoryDynamicTask { get; set; }
 

@@ -7,19 +7,21 @@ public class CategoryServiceTests
     #region Mocks
 
     private readonly Mock<ICategoryRepository> _categoriesRepository = new();
+    private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
 
     #endregion
 
     #region Properties & constructor
 
     private List<Category> _categories = null!;
+    private List<ScheduleEntity> _scheduleEntities = null!;
 
     private readonly ICategoryAppService _categoryService;
     private readonly Guid _userId = Guid.NewGuid();
     public CategoryServiceTests()
     {
         SetupMocks(_userId);
-        _categoryService = new CategoryService(_categoriesRepository.Object);
+        _categoryService = new CategoryService(_categoriesRepository.Object, _scheduleEntityRepository.Object);
     }
 
     #endregion
@@ -32,9 +34,7 @@ public class CategoryServiceTests
         {
             Name = "TestCategory1000",
             Description = "",
-            Color = Color.AliceBlue,
-            StartTime = new TimeOnly(09, 00),
-            EndTime = new TimeOnly(18, 00)
+            Color = Color.AliceBlue
         };
         await _categoryService.AddAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Name == newEntry.Name);
@@ -51,9 +51,7 @@ public class CategoryServiceTests
             Id = _categories.First(x => x.UserId == _userId).Id,
             Name = "TestCategory1000",
             Description = "",
-            Color = Color.AliceBlue,
-            StartTime = new TimeOnly(09, 00),
-            EndTime = new TimeOnly(18, 00)
+            Color = Color.AliceBlue
         };
         await _categoryService.UpdateAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Id == newEntry.Id);
@@ -62,50 +60,26 @@ public class CategoryServiceTests
     }
 
     [Fact]
-    [Trait("UpdateAndSaveAsync", "Should keep the attached schedule")]
-    public async Task UpdateAsync_ShouldPreserveScheduleEntityId()
+    [Trait("UpdateAndSaveAsync", "Should leave the category's schedules untouched")]
+    public async Task UpdateAsync_ShouldPreserveSchedules()
     {
-        var existing = _categories.First(x => x.UserId == _userId && x.ScheduleEntityId != null);
-        var scheduleEntityId = existing.ScheduleEntityId;
+        var existing = _categories.First(x => x.UserId == _userId && x.Schedules.Count > 0);
+        var scheduleIds = existing.Schedules.Select(x => x.Id).ToList();
 
         var updateDto = new CategoryDto
         {
             Id = existing.Id,
             Name = "Renamed",
             Description = "",
-            Color = Color.AliceBlue,
-            StartTime = new TimeOnly(09, 00),
-            EndTime = new TimeOnly(18, 00)
+            Color = Color.AliceBlue
         };
 
         await _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
 
         var result = _categories.First(x => x.Id == existing.Id);
         result.Name.Should().Be("Renamed");
-        result.ScheduleEntityId.Should().Be(scheduleEntityId);
-    }
-
-    [Fact]
-    [Trait("UpdateAndSaveAsync", "Should update the time window")]
-    public async Task UpdateAsync_ShouldUpdateTimeWindow()
-    {
-        var existing = _categories.First(x => x.UserId == _userId);
-
-        var updateDto = new CategoryDto
-        {
-            Id = existing.Id,
-            Name = existing.Name,
-            Description = existing.Description,
-            Color = existing.Color,
-            StartTime = new TimeOnly(07, 30),
-            EndTime = new TimeOnly(12, 45)
-        };
-
-        await _categoryService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
-
-        var result = _categories.First(x => x.Id == existing.Id);
-        result.StartTime.Should().Be(new TimeOnly(07, 30));
-        result.EndTime.Should().Be(new TimeOnly(12, 45));
+        // Schedules are managed by their own endpoints; saving a category must never drop them.
+        result.Schedules.Select(x => x.Id).Should().BeEquivalentTo(scheduleIds);
     }
 
     [Fact]
@@ -116,6 +90,20 @@ public class CategoryServiceTests
         await _categoryService.DeleteAsync(idToDelete, TestContext.Current.CancellationToken);
         var result = _categories.FirstOrDefault(x => x.Id == idToDelete);
         result.Should().BeNull();
+    }
+
+    [Fact]
+    [Trait("DeleteAndSaveAsync", "Should delete the recurrences behind the category's schedules")]
+    public async Task DeleteAsync_ShouldCascadeScheduleEntitiesOfItsSchedules()
+    {
+        var existing = _categories.First(x => x.UserId == _userId && x.Schedules.Any(s => s.ScheduleEntityId != null));
+
+        await _categoryService.DeleteAsync(existing.Id, TestContext.Current.CancellationToken);
+
+        // The DB cascades Category -> CategorySchedule, but each window's FK points TO its ScheduleEntity,
+        // so those rows would be orphaned unless the service removes them.
+        _scheduleEntities.Should().NotContain(x => x.CategorySchedule != null && x.CategorySchedule.CategoryId == existing.Id);
+        _categories.Should().NotContain(x => x.Id == existing.Id);
     }
 
     [Fact]
@@ -131,6 +119,20 @@ public class CategoryServiceTests
     }
 
     [Fact]
+    [Trait("GetAll", "Should include each category's schedules")]
+    public void GetAll_ShouldIncludeSchedules()
+    {
+        var expected = _categories.First(x => x.UserId == _userId && x.Schedules.Count > 0);
+
+        var result = _categoryService.GetAll(TestContext.Current.CancellationToken)
+            .ToBlockingEnumerable(TestContext.Current.CancellationToken)
+            .Single(x => x.Id == expected.Id);
+
+        result.Schedules.Should().HaveCount(expected.Schedules.Count);
+        result.Schedules.Select(x => x.Description).Should().BeEquivalentTo(expected.Schedules.Select(x => x.Description));
+    }
+
+    [Fact]
     [Trait("GetByIdAsync", "Should return correct data")]
     public async Task GetByIdAsync_ShouldUpdateEntry()
     {
@@ -138,6 +140,21 @@ public class CategoryServiceTests
         var result = await _categoryService.GetByIdAsync(id, TestContext.Current.CancellationToken);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
+    }
+
+    [Fact]
+    [Trait("GetByIdAsync", "Should return every window a category owns on the same day")]
+    public async Task GetByIdAsync_ShouldReturnAllSchedulesIncludingSameDayWindows()
+    {
+        var expected = _categories.First(x => x.UserId == _userId && x.Schedules.Count > 1);
+
+        var result = await _categoryService.GetByIdAsync(expected.Id, TestContext.Current.CancellationToken);
+
+        result.Should().NotBeNull();
+        // Two windows on one date is exactly what a single category could not express before the split.
+        result!.Schedules.Should().HaveCount(2);
+        result.Schedules.Select(x => x.Date).Distinct().Should().ContainSingle();
+        result.Schedules.Select(x => x.Description).Should().BeEquivalentTo(["Working hours", "Overtime"]);
     }
 
     // Validation Tests
@@ -182,7 +199,7 @@ public class CategoryServiceTests
     // Security Tests
     [Fact]
     [Trait("GetAll", "Should only return user owned categories")]
-    public async Task GetAll_ShouldOnlyReturnUserOwnedCategories()
+    public void GetAll_ShouldOnlyReturnUserOwnedCategories()
     {
         var userCategoryIds = _categories.Where(c => c.UserId == _userId).Select(c => c.Id).ToHashSet();
 
@@ -216,9 +233,7 @@ public class CategoryServiceTests
             Id = otherUserCategory.Id,
             Name = "Hacked Name",
             Description = "Hacked Description",
-            Color = Color.Red,
-            StartTime = new TimeOnly(09, 00),
-            EndTime = new TimeOnly(18, 00)
+            Color = Color.Red
         };
 
         // Updating another user's category is rejected (the user-scoped fetch finds nothing).
@@ -248,29 +263,32 @@ public class CategoryServiceTests
 
     private void SetupMocks(Guid userId)
     {
+        var withSchedules = new Category
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Name = "TestCategory1",
+            Color = Color.AliceBlue,
+            Description = "Test description"
+        };
+
+        // Two windows on one day — the case the Category/CategorySchedule split exists for.
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var recurringWindow = NewSchedule(withSchedules, "Working hours", today, new TimeOnly(09, 00), new TimeOnly(12, 00), Guid.NewGuid());
+        var oneOffWindow = NewSchedule(withSchedules, "Overtime", today, new TimeOnly(18, 00), new TimeOnly(20, 00));
+        withSchedules.Schedules.Add(recurringWindow);
+        withSchedules.Schedules.Add(oneOffWindow);
+
         _categories =
         [
-            new()
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Name = "TestCategory1",
-                Color = Color.AliceBlue,
-                Description = "Test description",
-                StartTime = new TimeOnly(09, 00),
-                EndTime = new TimeOnly(18, 00),
-                ScheduleEntityId = Guid.NewGuid(),
-                ScheduleEntity = new ScheduleEntity()
-            },
+            withSchedules,
 
             new()
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = "TestCategory2",
-                Description = "Test description",
-                StartTime = new TimeOnly(12, 00),
-                EndTime = new TimeOnly(14, 00),
+                Description = "Test description"
             },
 
             new()
@@ -278,8 +296,7 @@ public class CategoryServiceTests
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Name = "TestCategory3",
-                Description = "Test description",
-                ScheduleEntity = new ScheduleEntity()
+                Description = "Test description"
             },
 
             new()
@@ -287,12 +304,38 @@ public class CategoryServiceTests
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Name = "TestCategory4",
-                Description = "Test description",
+                Description = "Test description"
+            }
+        ];
+
+        _scheduleEntities =
+        [
+            new()
+            {
+                Id = recurringWindow.ScheduleEntityId!.Value,
+                UserId = userId,
+                RepeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1)),
+                CategorySchedule = recurringWindow
             }
         ];
 
         _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories, userId);
+        _scheduleEntityRepository.As<IUserScopedRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduleEntities, userId);
     }
+
+    private static CategorySchedule NewSchedule(Category category, string? description, DateOnly date, TimeOnly start, TimeOnly end, Guid? scheduleEntityId = null) =>
+        new()
+        {
+            Id = Guid.NewGuid(),
+            UserId = category.UserId,
+            CategoryId = category.Id,
+            Category = category,
+            Description = description,
+            Date = date,
+            StartTime = start,
+            EndTime = end,
+            ScheduleEntityId = scheduleEntityId
+        };
 
     #endregion
 }

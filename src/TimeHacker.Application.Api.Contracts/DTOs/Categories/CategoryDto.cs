@@ -12,12 +12,11 @@ public record CategoryDto
     public string? Description { get; init; }
     public Color Color { get; init; }
 
-    public DateOnly Date { get; init; }
-    public TimeOnly StartTime { get; init; }
-    public TimeOnly EndTime { get; init; }
+    /// <summary>The dated time windows this category occupies. Managed through ICategoryScheduleAppService.</summary>
+    public IReadOnlyCollection<CategoryScheduleDto> Schedules { get; init; } = [];
 
-    public ScheduleEntityDto? ScheduleEntity { get; init; }
-
+    // Schedules are projected inline rather than through CategoryScheduleDto.Selector so the whole
+    // graph stays a single EF-translatable expression.
     public static Expression<Func<Category, CategoryDto>> Selector =>
         category => new CategoryDto
         {
@@ -25,22 +24,31 @@ public record CategoryDto
             Name = category.Name,
             Description = category.Description,
             Color = category.Color,
-            Date = category.Date,
-            StartTime = category.StartTime,
-            EndTime = category.EndTime,
-            ScheduleEntity = category.ScheduleEntity != null ? new ScheduleEntityDto(
-                category.ScheduleEntity.Id,
-                category.ScheduleEntity.RepeatingEntity,
-                category.ScheduleEntity.CreatedTimestamp,
-                category.ScheduleEntity.LastEntityCreated,
-                category.ScheduleEntity.EndsOn
-            ) : null
+            Schedules = category.Schedules.Select(schedule => new CategoryScheduleDto
+            {
+                Id = schedule.Id,
+                CategoryId = schedule.CategoryId,
+                Description = schedule.Description,
+                Date = schedule.Date,
+                StartTime = schedule.StartTime,
+                EndTime = schedule.EndTime,
+                ScheduleEntity = schedule.ScheduleEntity != null ? new ScheduleEntityDto(
+                    schedule.ScheduleEntity.Id,
+                    schedule.ScheduleEntity.RepeatingEntity,
+                    schedule.ScheduleEntity.CreatedTimestamp,
+                    schedule.ScheduleEntity.LastEntityCreated,
+                    schedule.ScheduleEntity.EndsOn
+                ) : null
+            }).ToList()
         };
 
     private static readonly Func<Category, CategoryDto> CreateFunc = Selector.Compile();
     public static CategoryDto Create(Category category) => CreateFunc(category);
 
-    //TODO: should it assign its navigation property (ScheduledEntity)?
+    /// <summary>
+    /// Writes the category's own fields only. <see cref="Schedules"/> is a read projection — schedules are
+    /// created, updated and deleted through their own endpoints, never as a side effect of saving a category.
+    /// </summary>
     public Category GetEntity(Category? category = null)
     {
         category ??= new Category();
@@ -48,9 +56,6 @@ public record CategoryDto
         category.Name = Name;
         category.Description = Description;
         category.Color = Color;
-        category.Date = Date;
-        category.StartTime = StartTime;
-        category.EndTime = EndTime;
 
         return category;
     }

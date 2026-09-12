@@ -170,37 +170,31 @@ export interface InputScheduleEntityModel {
 }
 
 // --- Categories ---
-// A category is a daily time window (startTime/endTime) anchored to a `date`, exactly as a fixed task is
-// anchored to its startTimestamp. It always lands on that date; a scheduleEntity, if present, repeats it
-// on later days. Colors travel as a signed ARGB int32 — see utils/colorArgb.
+// A category is a label (name/description/color) that tasks link to, and is what names its calendar bands.
+// It owns many schedules, each of which is one dated time window (startTime/endTime on a `date`), exactly
+// as a fixed task is anchored to its startTimestamp. A window always lands on its own date; its
+// scheduleEntity, if present, repeats it on later days. One category may own several windows on the same
+// day and they may overlap, so each window carries an optional `description` to tell them apart.
+// Colors live on the category and travel as a signed ARGB int32 — see utils/colorArgb.
 
 export interface CategoryReturnModel {
     id: string;
     name: string;
     description: string | null;
     color: number;
-    date: string; // YYYY-MM-DD
-    startTime: string; // HH:mm:ss
-    endTime: string; // HH:mm:ss
-    scheduleEntity: ScheduleEntityReturnModel | null;
+    schedules: CategoryScheduleReturnModel[];
 }
 
 export interface InputCategory {
     name: string;
     description?: string;
     color: number;
-    date: string; // YYYY-MM-DD
-    startTime: string; // HH:mm:ss
-    endTime: string; // HH:mm:ss
 }
 
 export interface CategoryFormData {
     name: string;
     description: string;
     color: number;
-    date: Dayjs;
-    startTime: Dayjs;
-    endTime: Dayjs;
 }
 
 export interface CategoryDisplayModel {
@@ -208,6 +202,40 @@ export interface CategoryDisplayModel {
     name: string;
     description: string | null;
     color: number;
+    schedules: CategoryScheduleDisplayModel[];
+}
+
+// --- Category schedules ---
+
+export interface CategoryScheduleReturnModel {
+    id: string;
+    categoryId: string;
+    /** Optional note distinguishing this window from the category's others. */
+    description: string | null;
+    date: string; // YYYY-MM-DD
+    startTime: string; // HH:mm:ss
+    endTime: string; // HH:mm:ss
+    scheduleEntity: ScheduleEntityReturnModel | null;
+}
+
+export interface InputCategorySchedule {
+    description?: string;
+    date: string; // YYYY-MM-DD
+    startTime: string; // HH:mm:ss
+    endTime: string; // HH:mm:ss
+}
+
+export interface CategoryScheduleFormData {
+    description: string;
+    date: Dayjs;
+    startTime: Dayjs;
+    endTime: Dayjs;
+}
+
+export interface CategoryScheduleDisplayModel {
+    id: string;
+    categoryId: string;
+    description: string | null;
     date: Dayjs;
     startTime: Dayjs;
     endTime: Dayjs;

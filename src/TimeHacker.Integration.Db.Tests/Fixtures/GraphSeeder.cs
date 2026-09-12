@@ -1,4 +1,4 @@
-using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Domain.DTOs.RepeatingEntity;
 using TimeHacker.Domain.IModels;
@@ -18,6 +18,7 @@ namespace TimeHacker.Integration.Db.Tests.Fixtures;
 internal sealed class GraphSeeder(
     IFixedTaskRepository fixedTaskRepository,
     ICategoryRepository categoryRepository,
+    ICategoryScheduleRepository categoryScheduleRepository,
     ITagRepository tagRepository,
     IScheduleSnapshotRepository scheduleSnapshotRepository,
     IScheduleEntityAppService scheduleEntityAppService,
@@ -53,19 +54,74 @@ internal sealed class GraphSeeder(
         return await AttachDailySchedule<FixedTask>(ScheduleEntityParentType.FixedTask, task.Id, cancellationToken);
     }
 
-    public async Task<Category> SeedCategoryWithSchedule(CancellationToken cancellationToken, DateOnly? on = null)
+    /// <summary>A Category owning one window, with a daily recurrence attached to that window.</summary>
+    public async Task<CategorySchedule> SeedCategoryScheduleWithSchedule(CancellationToken cancellationToken, DateOnly? on = null)
     {
         var date = on ?? DateOnly.FromDateTime(DateTime.UtcNow);
         var category = await categoryRepository.AddAndSaveAsync(new Category
         {
             Name = "Scheduled category",
-            Color = Color.SteelBlue,
+            Color = Color.SteelBlue
+        }, cancellationToken);
+
+        var schedule = await categoryScheduleRepository.AddAndSaveAsync(new CategorySchedule
+        {
+            CategoryId = category.Id,
+            Description = "Scheduled window",
             Date = date,
             StartTime = new TimeOnly(9, 0),
             EndTime = new TimeOnly(10, 0)
         }, cancellationToken);
 
-        return await AttachDailySchedule<Category>(ScheduleEntityParentType.Category, category.Id, cancellationToken);
+        return await AttachDailySchedule<CategorySchedule>(ScheduleEntityParentType.CategorySchedule, schedule.Id, cancellationToken);
+    }
+
+    /// <summary>
+    /// One category plus one window, both owned by whichever user's scope resolved this seeder. Used where
+    /// <see cref="SeedDataBuilder{TRepository,TModel,TId}"/> cannot help: AutoFaker's navigation binder skips
+    /// <c>CategoryId</c> (it matches the <c>Category</c> navigation), which would violate the foreign key.
+    /// </summary>
+    public async Task<CategorySchedule> SeedCategoryScheduleForCurrentUser(string? windowDescription = "Working hours", DateOnly? on = null)
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var category = await categoryRepository.AddAndSaveAsync(
+            new Category { Name = "Work", Color = Color.SteelBlue }, cancellationToken);
+
+        return await categoryScheduleRepository.AddAndSaveAsync(new CategorySchedule
+        {
+            CategoryId = category.Id,
+            Description = windowDescription,
+            Date = on ?? DateOnly.FromDateTime(DateTime.UtcNow),
+            StartTime = new TimeOnly(9, 0),
+            EndTime = new TimeOnly(10, 0)
+        }, cancellationToken);
+    }
+
+    /// <summary>Two windows on the same day under one category — allowed, and free to overlap.</summary>
+    public async Task<(Category Category, CategorySchedule Morning, CategorySchedule Evening)> SeedCategoryWithTwoWindowsOn(DateOnly date, CancellationToken cancellationToken)
+    {
+        var category = await categoryRepository.AddAndSaveAsync(
+            new Category { Name = "Work", Color = Color.SteelBlue }, cancellationToken);
+
+        var morning = await categoryScheduleRepository.AddAndSaveAsync(new CategorySchedule
+        {
+            CategoryId = category.Id,
+            Description = "Working hours",
+            Date = date,
+            StartTime = new TimeOnly(9, 0),
+            EndTime = new TimeOnly(12, 0)
+        }, cancellationToken);
+
+        var evening = await categoryScheduleRepository.AddAndSaveAsync(new CategorySchedule
+        {
+            CategoryId = category.Id,
+            Description = "Overtime",
+            Date = date,
+            StartTime = new TimeOnly(18, 0),
+            EndTime = new TimeOnly(20, 0)
+        }, cancellationToken);
+
+        return (category, morning, evening);
     }
 
     public Task<ScheduleSnapshot> SeedSnapshotWithChildren(DateOnly date, CancellationToken cancellationToken)
@@ -79,7 +135,7 @@ internal sealed class GraphSeeder(
             },
             ScheduledCategories =
             {
-                new ScheduledCategory { Date = date, Name = "Scheduled category", Color = Color.Coral }
+                new ScheduledCategory { Date = date, Name = "Scheduled category", ScheduleDescription = "Scheduled window", Color = Color.Coral }
             }
         };
 
@@ -96,7 +152,7 @@ internal sealed class GraphSeeder(
     {
         var date = new DateOnly(2026, 6, 1);
         var category = await categoryRepository.AddAndSaveAsync(
-            new Category { Name = "Cat", Color = Color.Olive, Date = date, StartTime = new TimeOnly(9, 0), EndTime = new TimeOnly(10, 0) },
+            new Category { Name = "Cat", Color = Color.Olive },
             cancellationToken);
         var tag = await tagRepository.AddAndSaveAsync(new Tag { Name = "Tag", Color = Color.Olive }, cancellationToken);
         var task = await fixedTaskRepository.AddAndSaveAsync(new FixedTask

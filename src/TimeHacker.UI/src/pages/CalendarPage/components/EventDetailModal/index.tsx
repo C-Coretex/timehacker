@@ -39,6 +39,12 @@ export const EventDetailModal: FC<EventDetailModalProps> = ({
             size="small"
             styles={{ label: { fontWeight: 600, width: '30%' } }}
           >
+            {/* A category can contribute several bands to one day; this says which window this is. */}
+            {resource.scheduleDescription && (
+              <Descriptions.Item label={t('calendar.scheduleDescriptionLabel')}>
+                {resource.scheduleDescription}
+              </Descriptions.Item>
+            )}
             {event.description && (
               <Descriptions.Item label={t('calendar.descriptionLabel')}>
                 {event.description}

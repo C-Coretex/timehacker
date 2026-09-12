@@ -16,5 +16,5 @@ public class ScheduleEntity : UserScopedEntityBase
     public virtual ICollection<ScheduledCategory> ScheduledCategories { get; init; } = [];
 
     public virtual FixedTask? FixedTask { get; set; }
-    public virtual Category? Category { get; set; }
+    public virtual CategorySchedule? CategorySchedule { get; set; }
 }

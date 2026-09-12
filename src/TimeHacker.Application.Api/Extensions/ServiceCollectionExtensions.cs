@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterAppServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<ICategoryAppService, CategoryService>();
+        serviceCollection.AddScoped<ICategoryScheduleAppService, CategoryScheduleAppService>();
 
         serviceCollection.AddScoped<IScheduledTaskAppService, ScheduledTaskAppService>();
         serviceCollection.AddScoped<IScheduleEntityAppService, ScheduleEntityAppService>();

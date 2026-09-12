@@ -5,7 +5,7 @@ namespace TimeHacker.Domain.Services.Processors;
 
 public class TaskTimelineProcessor: ITaskTimelineProcessor
 {
-    public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, IEnumerable<Category> categories, DateOnly date)
+    public TasksForDayReturn GetTasksForDay(IEnumerable<FixedTask> fixedTasks, IEnumerable<FixedTask> scheduledFixedTasks, IEnumerable<DynamicTask> dynamicTasks, IEnumerable<CategorySchedule> categorySchedules, DateOnly date)
     {
         var returnData = new TasksForDayReturn()
         {
@@ -14,7 +14,7 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
 
         // Categories are a passive backdrop: they are laid out independently and never consume time, so
         // dynamic-task gap-filling below still sees only the task timeline.
-        returnData.CategoriesTimeline.AddRange(GetCategoriesTimeline(categories));
+        returnData.CategoriesTimeline.AddRange(GetCategoriesTimeline(categorySchedules));
 
         var fixedTasksTimeline = GetFixedTasksTimeline(fixedTasks, date);
         returnData.TasksTimeline.AddRange(fixedTasksTimeline);
@@ -62,16 +62,19 @@ public class TaskTimelineProcessor: ITaskTimelineProcessor
     }
 
     /// <summary>
-    /// Turns each category into the time window it occupies on this day. Categories may freely overlap each
-    /// other — several can cover the same hour — so no de-duplication or conflict resolution happens here.
+    /// Turns each category schedule into the time window it occupies on this day. Windows may freely overlap
+    /// — several can cover the same hour, including two belonging to the same category — so no de-duplication
+    /// or conflict resolution happens here.
     /// </summary>
-    private static IEnumerable<CategoryContainerReturn> GetCategoriesTimeline(IEnumerable<Category> categories)
+    private static IEnumerable<CategoryContainerReturn> GetCategoriesTimeline(IEnumerable<CategorySchedule> categorySchedules)
     {
-        return categories.Select(category => new CategoryContainerReturn()
+        return categorySchedules.Select(schedule => new CategoryContainerReturn()
         {
-            Category = category,
-            ScheduleEntityId = category.ScheduleEntityId,
-            TimeRange = new TimeRange(category.StartTime.ToTimeSpan(), category.EndTime.ToTimeSpan())
+            Category = schedule.Category,
+            CategoryScheduleId = schedule.Id,
+            ScheduleDescription = schedule.Description,
+            ScheduleEntityId = schedule.ScheduleEntityId,
+            TimeRange = new TimeRange(schedule.StartTime.ToTimeSpan(), schedule.EndTime.ToTimeSpan())
         });
     }
 

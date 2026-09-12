@@ -31,7 +31,10 @@ HTTP Request → Controller → AppService → Repository/Service/Processor → 
 - `DynamicTask` - Flexible tasks (min/max/optimal duration)
 
 **Organization:**
-- `Category` & `Tag` - Many-to-many with both task types
+- `Category` & `Tag` - Many-to-many with both task types. A category is a label only (name/description/colour)
+- `CategorySchedule` - One dated wall-clock window of a category (`Date` + `StartTime`/`EndTime`), and the
+  thing a recurrence attaches to. A category may own several, including several on the same day; each
+  carries an optional `Description` to tell siblings apart, since the category is what names them
 
 **User Scoping (multi-tenant):**
 - All entities inherit from `UserScopedEntityBase` (`UserId` column)
@@ -51,7 +54,7 @@ Handles recurring tasks and categories.
 **Key Entities:**
 
 1. **ScheduleEntity** - Defines recurring schedule
-   - Links to parent `FixedTask` or `Category`
+   - Links to parent `FixedTask` or `CategorySchedule`
    - Contains `RepeatingEntityDto` (daily/weekly/monthly/yearly patterns)
    - Tracks creation history and optional end date
 
@@ -68,7 +71,8 @@ Handles recurring tasks and categories.
 **Relationships:**
 ```
 ScheduleEntity (recurring definition)
-    └─ Parent: FixedTask or Category
+    └─ Parent: FixedTask or CategorySchedule
+                             └─ Category (the label tasks link to)
 
 When day is generated:
     ↓
@@ -181,8 +185,8 @@ TimeHacker.Api ──OTLP──▶ Grafana Alloy ─┬─ logs ────▶ 
 - **API (end-to-end) tests** (`TimeHacker.Integration.Api.Tests`) — drive the **real API over HTTP**
   through `WebApplicationFactory<Program>` against Testcontainers PostgreSQL, exercising the full pipeline
   (cookie auth, CSRF, RLS, exception filter, EF, business logic). Endpoints are called through a
-  strongly-typed **Refit** client (`ITimeHackerApi`); side effects are asserted via an admin DbContext.
-  **A running Docker daemon is required.** See CLAUDE.md §8 for the fixture/client layout.
+  strongly-typed **Refit** client (`TimeHackerApi`, one sub-interface per controller); side effects are
+  asserted via an admin DbContext. **A running Docker daemon is required.**
 
 Run from `src/`:
 ```

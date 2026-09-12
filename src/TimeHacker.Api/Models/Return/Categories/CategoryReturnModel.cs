@@ -7,10 +7,7 @@ public record CategoryReturnModel(
     string Name,
     string? Description,
     Color Color,
-    DateOnly Date,
-    TimeOnly StartTime,
-    TimeOnly EndTime,
-    ScheduleEntityReturnModel? ScheduleEntity
+    IReadOnlyList<CategoryScheduleReturnModel> Schedules
 )
 {
     public static CategoryReturnModel Create(CategoryDto category)
@@ -22,9 +19,6 @@ public record CategoryReturnModel(
             category.Name,
             category.Description,
             category.Color,
-            category.Date,
-            category.StartTime,
-            category.EndTime,
-            category.ScheduleEntity != null ? ScheduleEntityReturnModel.Create(category.ScheduleEntity) : null);
+            [.. category.Schedules.Select(CategoryScheduleReturnModel.Create)]);
     }
 }

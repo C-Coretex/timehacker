@@ -19,6 +19,11 @@ export interface TaskForDayItem {
 /** A category's time window generated for one day — the backdrop tasks sit on top of. */
 export interface CategoryForDayItem {
   scheduleEntityId: string | null;
+  /** The window this band came from; a category may contribute several on one day. */
+  categoryScheduleId: string;
+  /** The window's own optional note; the band is labelled by the category's name. */
+  scheduleDescription: string | null;
+  /** The parent category, which is what tasks link to. */
   category: {
     id: string;
     name: string;

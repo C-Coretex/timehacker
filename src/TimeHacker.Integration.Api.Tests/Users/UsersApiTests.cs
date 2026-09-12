@@ -50,7 +50,8 @@ public sealed class UsersApiTests(ApiTestFixture fixture) : ApiIntegrationTestBa
         var api = await CreateAuthenticatedApiAsync();
         var cancellationToken = TestContext.Current.CancellationToken;
 
-        await api.Categories.Create(TestRequests.NewCategory("Cat"));
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Cat"))).Content;
+        await api.Categories.CreateSchedule(categoryId, TestRequests.NewCategorySchedule("Working hours"));
         await api.FixedTasks.Create(TestRequests.NewFixedTask("Task"));
 
         var delete = await api.Users.DeleteCurrent();
@@ -58,6 +59,7 @@ public sealed class UsersApiTests(ApiTestFixture fixture) : ApiIntegrationTestBa
 
         (await AdminDbContext.Set<User>().CountAsync(cancellationToken)).Should().Be(0);
         (await AdminDbContext.Set<Category>().CountAsync(cancellationToken)).Should().Be(0);
+        (await AdminDbContext.Set<CategorySchedule>().CountAsync(cancellationToken)).Should().Be(0);
         (await AdminDbContext.Set<FixedTask>().CountAsync(cancellationToken)).Should().Be(0);
     }
 }

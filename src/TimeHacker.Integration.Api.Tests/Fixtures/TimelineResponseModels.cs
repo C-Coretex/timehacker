@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using TimeHacker.Domain.Models.BusinessLogicModels;
 
 namespace TimeHacker.Integration.Api.Tests.Fixtures;
@@ -30,6 +30,11 @@ public sealed record TimelineTaskInfo
 public sealed record TimelineCategoryResponse
 {
     public Guid? ScheduleEntityId { get; init; }
+    public Guid CategoryScheduleId { get; init; }
+
+    /// <summary>The window's own optional note; the band is labelled by the category's name.</summary>
+    public string? ScheduleDescription { get; init; }
+
     public required TimelineCategoryInfo Category { get; init; }
     public TimeRange TimeRange { get; init; }
 }

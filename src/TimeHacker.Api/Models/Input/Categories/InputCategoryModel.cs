@@ -14,29 +14,11 @@ public sealed record InputCategoryModel
     [Required]
     public required Color Color { get; init; }
 
-    /// <summary>The day this category applies to; a schedule, if attached later, repeats it after that day.</summary>
-    [Required]
-    public required DateOnly Date { get; init; }
-
-    [Required]
-    public required TimeOnly StartTime { get; init; }
-
-    [Required]
-    public required TimeOnly EndTime { get; init; }
-
-    public CategoryDto CreateDto()
-    {
-        if (StartTime >= EndTime)
-            throw new DataIsNotCorrectException($"{nameof(StartTime)} must be before {nameof(EndTime)}.", nameof(StartTime));
-
-        return new CategoryDto
+    public CategoryDto CreateDto() =>
+        new()
         {
             Name = Name,
             Description = Description,
-            Color = Color,
-            Date = Date,
-            StartTime = StartTime,
-            EndTime = EndTime
+            Color = Color
         };
-    }
 }

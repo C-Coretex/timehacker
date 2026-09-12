@@ -6,10 +6,22 @@ import {
   updateCategory,
   deleteCategory,
 } from '../api/categories';
-import type { CategoryDisplayModel, InputCategory } from '../api/types';
+import type {
+  CategoryDisplayModel,
+  CategoryScheduleReturnModel,
+  InputCategory,
+} from '../api/types';
 import { useEntityCrud } from './useEntityCrud';
 
-export { postNewScheduleForCategory } from '../api/categories';
+export const toCategoryScheduleDisplay = (schedule: CategoryScheduleReturnModel) => ({
+  id: schedule.id,
+  categoryId: schedule.categoryId,
+  description: schedule.description,
+  date: dayjs(schedule.date),
+  startTime: dayjs(schedule.startTime, 'HH:mm:ss'),
+  endTime: dayjs(schedule.endTime, 'HH:mm:ss'),
+  scheduleEntity: schedule.scheduleEntity ?? null,
+});
 
 export const useCategories = () => {
   const {
@@ -26,21 +38,19 @@ export const useCategories = () => {
         name: category.name,
         description: category.description,
         color: category.color,
-        date: dayjs(category.date),
-        startTime: dayjs(category.startTime, 'HH:mm:ss'),
-        endTime: dayjs(category.endTime, 'HH:mm:ss'),
-        scheduleEntity: category.scheduleEntity ?? null,
+        // Schedules ride along on the category GET, so the list needs no extra request.
+        schedules: (category.schedules ?? []).map(toCategoryScheduleDisplay),
       }));
     },
     fetchErrorMessage:
       'Failed to load categories. Please check your network or API server connection.',
   });
 
-  // Deliberately skips withRefetch: the caller needs the returned Guid to attach a schedule, and
-  // refetches once both calls have completed (same contract as useFixedTasks.createTask).
   const create = useCallback(
-    async (category: InputCategory): Promise<string> => createCategory(category),
-    []
+    async (category: InputCategory) => {
+      await withRefetch(() => createCategory(category), 'Failed to create category.');
+    },
+    [withRefetch]
   );
 
   const update = useCallback(

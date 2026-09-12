@@ -9,14 +9,14 @@ public class ScheduleEntityAppServiceTests
 
     private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
     private readonly Mock<IFixedTaskRepository> _fixedTasksRepository = new();
-    private readonly Mock<ICategoryRepository> _categoriesRepository = new();
+    private readonly Mock<ICategoryScheduleRepository> _categorySchedulesRepository = new();
 
     #endregion
 
     #region Properties & constructor
 
     private List<FixedTask> _fixedTasks = null!;
-    private List<Category> _categories = null!;
+    private List<CategorySchedule> _categorySchedules = null!;
     private List<ScheduleEntity> _scheduledEntities = null!;
 
     private readonly Guid _userId = Guid.NewGuid();
@@ -26,7 +26,7 @@ public class ScheduleEntityAppServiceTests
     public ScheduleEntityAppServiceTests()
     {
         SetupMocks(_userId);
-        _scheduleEntityAppService = new ScheduleEntityAppService(_scheduleEntityRepository.Object, _fixedTasksRepository.Object, _categoriesRepository.Object, TimeProvider.System);
+        _scheduleEntityAppService = new ScheduleEntityAppService(_scheduleEntityRepository.Object, _fixedTasksRepository.Object, _categorySchedulesRepository.Object, TimeProvider.System);
     }
 
     #endregion
@@ -38,16 +38,16 @@ public class ScheduleEntityAppServiceTests
         var repeatingEntity = new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(2));
 
         var inputData = new ScheduleEntityCreateDto(
-            isCategory ? ScheduleEntityParentType.Category : ScheduleEntityParentType.FixedTask,
+            isCategory ? ScheduleEntityParentType.CategorySchedule : ScheduleEntityParentType.FixedTask,
             isCategory
-                ? _categories.First(x => x.UserId == _userId).Id
+                ? _categorySchedules.First(x => x.UserId == _userId).Id
                 : _fixedTasks.First(x => x.UserId == _userId).Id,
             repeatingEntity
             );
         var expected = await _scheduleEntityAppService.Save(inputData, TestContext.Current.CancellationToken);
 
         var actual2 = isCategory
-            ? _categories.First(x => x.Id == inputData.ParentEntityId).ScheduleEntityId
+            ? _categorySchedules.First(x => x.Id == inputData.ParentEntityId).ScheduleEntityId
             : _fixedTasks.First(x => x.Id == inputData.ParentEntityId).ScheduleEntityId;
 
         expected.Id.Should().Be(actual2!.Value);
@@ -64,7 +64,7 @@ public class ScheduleEntityAppServiceTests
         await Assert.ThrowsAnyAsync<Exception>(async () =>
         {
             var actual = await _scheduleEntityAppService.Save(new ScheduleEntityCreateDto(
-                isCategory ? ScheduleEntityParentType.Category : ScheduleEntityParentType.FixedTask,
+                isCategory ? ScheduleEntityParentType.CategorySchedule : ScheduleEntityParentType.FixedTask,
                 existingEntry ? _scheduledEntities.First(x => x.UserId != _userId).Id : Guid.NewGuid(),
                 new RepeatingEntityDto(RepeatingEntityType.DayRepeatingEntity, new DayRepeatingEntity(1))), TestContext.Current.CancellationToken);
         });
@@ -213,49 +213,42 @@ public class ScheduleEntityAppServiceTests
                     item.ScheduleEntityId = value;
             });
 
-        _categories =
+        // A recurrence anchors on its window's own Date, so these are relative to today — a hardcoded
+        // date would eventually fall behind the "Once" floor and change what these tests exercise.
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var category = new Category { UserId = userId, Name = "TestCategory1", Color = Color.AliceBlue };
+        var otherUsersCategory = new Category { UserId = Guid.NewGuid(), Name = "TestCategory3" };
+
+        _categorySchedules =
         [
-            new()
-            {
-                UserId = userId,
-                Name = "TestFixedTask1",
-                Color = Color.AliceBlue,
-                Description = "Test description",
-                ScheduleEntity = new ScheduleEntity()
-            },
-
-            new()
-            {
-                UserId = userId,
-                Name = "TestFixedTask2",
-                Description = "Test description",
-            },
-
-            new()
-            {
-                UserId = Guid.NewGuid(),
-                Name = "TestFixedTask3",
-                Description = "Test description",
-                ScheduleEntity = new ScheduleEntity()
-            },
-
-            new()
-            {
-                UserId = Guid.NewGuid(),
-                Name = "TestFixedTask4",
-                Description = "Test description",
-            }
+            NewCategorySchedule(category, "Working hours", today, new ScheduleEntity()),
+            NewCategorySchedule(category, "Overtime", today),
+            NewCategorySchedule(otherUsersCategory, "Their window", today, new ScheduleEntity()),
+            NewCategorySchedule(otherUsersCategory, "Their other window", today)
         ];
 
-        _categoriesRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories, userId);
-        _categoriesRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<Expression<Func<Category, Guid?>>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
-            .Callback<Expression<Func<Category, bool>>, Expression<Func<Category, Guid?>>, Guid?, CancellationToken>((predicate, _, value, _) =>
+        _categorySchedulesRepository.As<IUserScopedRepositoryBase<CategorySchedule, Guid>>().SetupRepositoryMock(_categorySchedules, userId);
+        _categorySchedulesRepository.Setup(x => x.UpdateProperty(It.IsAny<Expression<Func<CategorySchedule, bool>>>(), It.IsAny<Expression<Func<CategorySchedule, Guid?>>>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+            .Callback<Expression<Func<CategorySchedule, bool>>, Expression<Func<CategorySchedule, Guid?>>, Guid?, CancellationToken>((predicate, _, value, _) =>
             {
-                var items = _categories.Where(predicate.Compile());
+                var items = _categorySchedules.Where(predicate.Compile());
                 foreach (var item in items)
                     item.ScheduleEntityId = value;
             });
     }
+
+    private static CategorySchedule NewCategorySchedule(Category category, string? description, DateOnly date, ScheduleEntity? scheduleEntity = null) =>
+        new()
+        {
+            UserId = category.UserId,
+            CategoryId = category.Id,
+            Category = category,
+            Description = description,
+            Date = date,
+            StartTime = new TimeOnly(09, 00),
+            EndTime = new TimeOnly(18, 00),
+            ScheduleEntity = scheduleEntity
+        };
 
     #endregion
 }

@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { CategoryReturnModel, InputCategory, InputScheduleEntityModel, ScheduleEntityReturnModel } from './types';
+import type { CategoryReturnModel, InputCategory } from './types';
 
 const API_BASE_URL = '/api/categories';
 
@@ -17,17 +17,6 @@ export const fetchCategoryById = async (id: string): Promise<CategoryReturnModel
 /** Add category. Returns the new category's Id (Guid). */
 export const createCategory = async (category: InputCategory): Promise<string> => {
   const response = await api.post<string>(`${API_BASE_URL}`, category);
-  return response.data;
-};
-
-/**
- * Attach a recurrence to a category. Call after createCategory with the returned id — a category with no
- * schedule never lands on a day, so this is what puts it on the calendar.
- */
-export const postNewScheduleForCategory = async (
-  body: InputScheduleEntityModel
-): Promise<ScheduleEntityReturnModel> => {
-  const response = await api.post<ScheduleEntityReturnModel>(`${API_BASE_URL}/schedules`, body);
   return response.data;
 };
 

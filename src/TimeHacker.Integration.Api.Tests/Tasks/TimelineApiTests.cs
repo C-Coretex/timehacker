@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Globalization;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
@@ -141,14 +141,30 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
         response.Content!.Name.Should().Be("Morning");
     }
 
+    /// <summary>Creates a category with one window on <paramref name="date"/> and returns both ids.</summary>
+    private static async Task<(Guid CategoryId, Guid ScheduleId)> CreateCategoryWithWindowAsync(
+        TimeHackerApi api,
+        string name,
+        DateOnly date,
+        TimeOnly? start = null,
+        TimeOnly? end = null,
+        Color? color = null)
+    {
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory(name, color))).Content;
+        var scheduleId = (await api.Categories.CreateSchedule(categoryId,
+            TestRequests.NewCategorySchedule(name, date, start, end))).Content;
+
+        return (categoryId, scheduleId);
+    }
+
     [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
     public async Task GetTasksForDay_Should_PlaceCategoryWithNoSchedule_OnItsOwnDate()
     {
         var api = await CreateAuthenticatedApiAsync();
 
-        // No schedule at all: the category lands on its own date, exactly as a fixed task lands on its
+        // No recurrence at all: the window lands on its own date, exactly as a fixed task lands on its
         // own StartTimestamp.
-        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: Today))).Content;
+        var (categoryId, _) = await CreateCategoryWithWindowAsync(api, "Work", Today);
 
         var day = await api.Tasks.GetForDay(D(Today));
         var otherDay = await api.Tasks.GetForDay(D(Today.AddDays(1)));
@@ -163,13 +179,13 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
     {
         var api = await CreateAuthenticatedApiAsync();
 
-        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: Today))).Content;
-        await api.Categories.CreateSchedule(TestRequests.NewSchedule(categoryId, TestRequests.EveryNDays(1)));
+        var (categoryId, scheduleId) = await CreateCategoryWithWindowAsync(api, "Work", Today);
+        await api.Categories.CreateRecurrence(TestRequests.NewSchedule(scheduleId, TestRequests.EveryNDays(1)));
 
         var anchorDay = await api.Tasks.GetForDay(D(Today));
         var nextDay = await api.Tasks.GetForDay(D(Today.AddDays(1)));
 
-        // The anchor day comes from the category itself, later days from the recurrence — never both.
+        // The anchor day comes from the window itself, later days from the recurrence — never both.
         anchorDay.Content!.CategoriesTimeline.Should().ContainSingle().Which.Category.Id.Should().Be(categoryId);
         nextDay.Content!.CategoriesTimeline.Should().ContainSingle().Which.Category.Id.Should().Be(categoryId);
     }
@@ -180,16 +196,18 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
         var api = await CreateAuthenticatedApiAsync();
         var cancellationToken = TestContext.Current.CancellationToken;
 
-        var categoryId = (await api.Categories.Create(
-            TestRequests.NewCategory("Work", Color.Teal, "desc", startTime: new TimeOnly(09, 00), endTime: new TimeOnly(18, 00)))).Content;
-        await api.Categories.CreateSchedule(TestRequests.NewSchedule(categoryId, TestRequests.OnDates(Today.AddDays(1))));
+        var (categoryId, scheduleId) = await CreateCategoryWithWindowAsync(
+            api, "Work", Today, new TimeOnly(09, 00), new TimeOnly(18, 00), Color.Teal);
+        await api.Categories.CreateRecurrence(TestRequests.NewSchedule(scheduleId, TestRequests.OnDates(Today.AddDays(1))));
 
         var day = await api.Tasks.GetForDay(D(Today.AddDays(1)));
 
         day.StatusCode.Should().Be(HttpStatusCode.OK);
         var category = day.Content!.CategoriesTimeline.Should().ContainSingle().Subject;
-        category.Category.Name.Should().Be("Work");
+        // Tasks link to the parent category, so the band must carry the parent's id, name and colour.
+        category.CategoryScheduleId.Should().Be(scheduleId);
         category.Category.Id.Should().Be(categoryId);
+        category.Category.Name.Should().Be("Work");
         category.Category.Color.ToArgb().Should().Be(Color.Teal.ToArgb());
         category.TimeRange.Start.Should().Be(new TimeSpan(09, 00, 00));
         category.TimeRange.End.Should().Be(new TimeSpan(18, 00, 00));
@@ -203,13 +221,11 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
     {
         var api = await CreateAuthenticatedApiAsync();
 
-        var workId = (await api.Categories.Create(
-            TestRequests.NewCategory("Work", startTime: new TimeOnly(09, 00), endTime: new TimeOnly(18, 00)))).Content;
-        await api.Categories.CreateSchedule(TestRequests.NewSchedule(workId, TestRequests.OnDates(Today.AddDays(1))));
+        var (_, workScheduleId) = await CreateCategoryWithWindowAsync(api, "Work", Today, new TimeOnly(09, 00), new TimeOnly(18, 00));
+        await api.Categories.CreateRecurrence(TestRequests.NewSchedule(workScheduleId, TestRequests.OnDates(Today.AddDays(1))));
 
-        var meetingsId = (await api.Categories.Create(
-            TestRequests.NewCategory("Meetings", startTime: new TimeOnly(12, 00), endTime: new TimeOnly(14, 00)))).Content;
-        await api.Categories.CreateSchedule(TestRequests.NewSchedule(meetingsId, TestRequests.OnDates(Today.AddDays(1))));
+        var (_, meetingsScheduleId) = await CreateCategoryWithWindowAsync(api, "Meetings", Today, new TimeOnly(12, 00), new TimeOnly(14, 00));
+        await api.Categories.CreateRecurrence(TestRequests.NewSchedule(meetingsScheduleId, TestRequests.OnDates(Today.AddDays(1))));
 
         var day = await api.Tasks.GetForDay(D(Today.AddDays(1)));
 
@@ -218,14 +234,36 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
     }
 
     [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_Should_PlaceEveryWindowOfTheSameCategory()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        // One category, two windows on one day — the case the Category/CategorySchedule split exists for.
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", Color.Teal))).Content;
+        await api.Categories.CreateSchedule(categoryId,
+            TestRequests.NewCategorySchedule("Working hours", Today, new TimeOnly(09, 00), new TimeOnly(12, 00)));
+        await api.Categories.CreateSchedule(categoryId,
+            TestRequests.NewCategorySchedule("Overtime", Today, new TimeOnly(18, 00), new TimeOnly(20, 00)));
+
+        var day = await api.Tasks.GetForDay(D(Today));
+
+        var bands = day.Content!.CategoriesTimeline;
+        bands.Should().HaveCount(2);
+        bands.Select(c => c.ScheduleDescription).Should().BeEquivalentTo("Working hours", "Overtime");
+        // Both bands still resolve to the one parent category, which is what tasks link to.
+        bands.Should().AllSatisfy(c => c.Category.Id.Should().Be(categoryId));
+        bands.Select(c => c.CategoryScheduleId).Should().OnlyHaveUniqueItems();
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
     public async Task GetTasksForDay_Should_NotIncludeCategoryOnUnscheduledDay()
     {
         var api = await CreateAuthenticatedApiAsync();
 
         // Anchored to tomorrow and scheduled for Today+3, so neither today nor Today+2 is covered.
-        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Work", date: Today.AddDays(1)))).Content;
-        await api.Categories.CreateSchedule(
-            TestRequests.NewSchedule(categoryId, TestRequests.OnDates(Today.AddDays(3))));
+        var (_, scheduleId) = await CreateCategoryWithWindowAsync(api, "Work", Today.AddDays(1));
+        await api.Categories.CreateRecurrence(
+            TestRequests.NewSchedule(scheduleId, TestRequests.OnDates(Today.AddDays(3))));
 
         var today = await api.Tasks.GetForDay(D(Today));
         var uncoveredDay = await api.Tasks.GetForDay(D(Today.AddDays(2)));

@@ -148,7 +148,7 @@ public class ScheduleEntityServiceTests
                 UserId = _userId,
                 CreatedTimestamp = date,
                 EndsOn = null,
-                Category = new Category { UserId = _userId, Name = "Work" }
+                CategorySchedule = NewCategorySchedule("Working hours", "Work")
             },
 
             new()
@@ -165,16 +165,31 @@ public class ScheduleEntityServiceTests
                 UserId = _userId,
                 CreatedTimestamp = date.AddDays(-5),
                 EndsOn = DateOnly.FromDateTime(date.AddDays(-3)),
-                Category = new Category { UserId = _userId, Name = "Expired" }
+                CategorySchedule = NewCategorySchedule("Expired", "Old")
             }
         ]);
 
         var actual = _scheduleEntityService.GetAllCategoriesFrom(from).ToList();
 
         actual.Should().ContainSingle();
+        actual[0].CategorySchedule.Should().NotBeNull();
+        actual[0].CategorySchedule!.Description.Should().Be("Working hours");
+        actual[0].FixedTask.Should().BeNull();
+        // The owning category is carried alongside, because a projection cannot fill a nested navigation.
         actual[0].Category.Should().NotBeNull();
         actual[0].Category!.Name.Should().Be("Work");
-        actual[0].FixedTask.Should().BeNull();
+    }
+
+    private CategorySchedule NewCategorySchedule(string windowDescription, string categoryName)
+    {
+        var category = new Category { UserId = _userId, Name = categoryName };
+        return new CategorySchedule
+        {
+            UserId = _userId,
+            Description = windowDescription,
+            CategoryId = category.Id,
+            Category = category
+        };
     }
 
     [Fact]
@@ -189,7 +204,7 @@ public class ScheduleEntityServiceTests
             UserId = _userId,
             CreatedTimestamp = date,
             EndsOn = null,
-            Category = new Category { UserId = _userId, Name = "Work" }
+            CategorySchedule = NewCategorySchedule("Working hours", "Work")
         });
 
         _scheduleEntityService.GetAllFrom(DateOnly.FromDateTime(date.AddDays(-1))).Should().BeEmpty();

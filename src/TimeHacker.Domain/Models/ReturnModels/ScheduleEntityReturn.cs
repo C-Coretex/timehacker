@@ -16,6 +16,12 @@ public record ScheduleEntityReturn
     public virtual ICollection<ScheduledCategory> ScheduledCategories { get; init; } = [];
 
     public virtual FixedTask? FixedTask { get; init; }
+    public virtual CategorySchedule? CategorySchedule { get; init; }
+
+    /// <summary>
+    /// The category owning <see cref="CategorySchedule"/>. Carried separately because the timeline needs its
+    /// colour and description, and a projection does not populate a nested navigation on its own.
+    /// </summary>
     public virtual Category? Category { get; init; }
 
     public static ScheduleEntityReturn Create(ScheduleEntity scheduleEntity)
@@ -24,6 +30,7 @@ public record ScheduleEntityReturn
 
         return new ScheduleEntityReturn()
         {
+            Category = scheduleEntity.CategorySchedule?.Category,
             Id = scheduleEntity.Id,
             UserId = scheduleEntity.UserId,
             RepeatingEntity = scheduleEntity.RepeatingEntity,
@@ -34,7 +41,7 @@ public record ScheduleEntityReturn
             ScheduledTasks = scheduleEntity.ScheduledTasks,
             ScheduledCategories = scheduleEntity.ScheduledCategories,
             FixedTask = scheduleEntity.FixedTask,
-            Category = scheduleEntity.Category
+            CategorySchedule = scheduleEntity.CategorySchedule
         };
     }
 

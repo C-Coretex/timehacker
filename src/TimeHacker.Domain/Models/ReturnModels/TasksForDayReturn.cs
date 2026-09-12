@@ -13,12 +13,8 @@ public record TasksForDayReturn
         return new TasksForDayReturn()
         {
             Date = scheduleSnapshot.Date,
-            TasksTimeline = scheduleSnapshot.ScheduledTasks
-                .Select(TaskContainerReturn.Create)
-                .ToList(),
-            CategoriesTimeline = scheduleSnapshot.ScheduledCategories
-                .Select(CategoryContainerReturn.Create)
-                .ToList()
+            TasksTimeline = [.. scheduleSnapshot.ScheduledTasks.Select(TaskContainerReturn.Create)],
+            CategoriesTimeline = [.. scheduleSnapshot.ScheduledCategories.Select(CategoryContainerReturn.Create)]
         };
     }
 

@@ -1,4 +1,4 @@
-using TimeHacker.Domain.IRepositories.Tags;
+﻿using TimeHacker.Domain.IRepositories.Tags;
 using TimeHacker.Helpers.Domain.Abstractions.Interfaces.DbEntity;
 
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
@@ -62,7 +62,7 @@ public class ValueConverterTests(DbContainerFixture fixture) : DbIntegrationTest
             Date = date,
             ScheduledCategories =
             {
-                new ScheduledCategory { UserId = CurrentUser.UserId, Date = date, Name = "Colored", Color = color }
+                new ScheduledCategory { UserId = CurrentUser.UserId, Date = date, Name = "Colored category", ScheduleDescription = "Colored", Color = color }
             }
         };
         Db.Add(snapshot);
@@ -72,6 +72,36 @@ public class ValueConverterTests(DbContainerFixture fixture) : DbIntegrationTest
         var reloaded = await ReloadAsync<ScheduledCategory>(scheduledCategoryId);
 
         reloaded.Color.ToArgb().Should().Be(color.ToArgb());
+    }
+
+    [Fact]
+    [Trait("CategoryScheduleWallClock", "RoundTrip")]
+    public async Task CategoryScheduleWindow_Should_RoundTripAsWallClock()
+    {
+        // Unlike every other timestamp in the app, a window's Date/StartTime/EndTime are stored exactly
+        // as entered and never UTC-converted — so they must come back byte-identical.
+        var date = new DateOnly(2026, 6, 1);
+        var start = new TimeOnly(23, 30);
+        var end = new TimeOnly(23, 59);
+
+        var category = new Category { Name = "Work", Color = Color.SteelBlue };
+        await Resolve<ICategoryRepository>().AddAndSaveAsync(category, TestContext.Current.CancellationToken);
+
+        var schedule = new CategorySchedule
+        {
+            CategoryId = category.Id,
+            Description = "Late shift",
+            Date = date,
+            StartTime = start,
+            EndTime = end
+        };
+        await Resolve<ICategoryScheduleRepository>().AddAndSaveAsync(schedule, TestContext.Current.CancellationToken);
+
+        var reloaded = await ReloadAsync<CategorySchedule>(schedule.Id);
+
+        reloaded.Date.Should().Be(date);
+        reloaded.StartTime.Should().Be(start);
+        reloaded.EndTime.Should().Be(end);
     }
 
     private async Task<TEntity> ReloadAsync<TEntity>(Guid id) where TEntity : class, IDbEntity<Guid>

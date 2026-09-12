@@ -61,16 +61,81 @@ public class CategoriesController(ICategoryAppService categoryService) : Control
         return TypedResults.NoContent();
     }
 
+    /// <summary>
+    /// Attaches a recurrence to one category schedule. The body's ParentEntityId is a <b>category schedule</b>
+    /// id, not a category id — the recurrence repeats a specific window, and takes that window's own date as
+    /// its anchor. Kept off the nested routes below because the :guid constraint is what tells the two apart.
+    /// </summary>
     [ProducesResponseType(typeof(ScheduleEntityReturnModel), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost("schedules")]
-    public async Task<Created<ScheduleEntityReturnModel>> PostNewScheduleForTask(
+    public async Task<Created<ScheduleEntityReturnModel>> PostNewRecurrenceForCategorySchedule(
         [FromBody] InputScheduleEntityModel inputScheduleEntityModel,
         [FromServices] IScheduleEntityAppService scheduleEntityAppService,
         CancellationToken cancellationToken = default)
     {
-        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(ScheduleEntityParentType.Category), cancellationToken);
+        var entity = await scheduleEntityAppService.Save(inputScheduleEntityModel.CreateDto(ScheduleEntityParentType.CategorySchedule), cancellationToken);
         var data = ScheduleEntityReturnModel.Create(entity);
 
         return TypedResults.Created("", data);
+    }
+
+    [ProducesResponseType(typeof(IAsyncEnumerable<CategoryScheduleReturnModel>), StatusCodes.Status200OK)]
+    [HttpGet("{categoryId:guid}/schedules")]
+    public Ok<IAsyncEnumerable<CategoryScheduleReturnModel>> GetSchedules(
+        Guid categoryId,
+        [FromServices] ICategoryScheduleAppService categoryScheduleService,
+        CancellationToken cancellationToken = default)
+    {
+        var data = categoryScheduleService.GetAllForCategory(categoryId, cancellationToken).Select(CategoryScheduleReturnModel.Create);
+        return TypedResults.Ok(data);
+    }
+
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpPost("{categoryId:guid}/schedules")]
+    public async Task<Created<Guid>> AddSchedule(
+        Guid categoryId,
+        [FromBody] InputCategoryScheduleModel inputCategoryScheduleModel,
+        [FromServices] ICategoryScheduleAppService categoryScheduleService,
+        CancellationToken cancellationToken = default)
+    {
+        var schedule = inputCategoryScheduleModel.CreateDto(categoryId);
+        var id = await categoryScheduleService.AddAsync(schedule, cancellationToken);
+
+        return TypedResults.Created($"/api/categories/{categoryId}/schedules/{id}", id);
+    }
+
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpPut("{categoryId:guid}/schedules/{id:guid}")]
+    public async Task<Ok> UpdateSchedule(
+        Guid categoryId,
+        Guid id,
+        [FromBody] InputCategoryScheduleModel inputCategoryScheduleModel,
+        [FromServices] ICategoryScheduleAppService categoryScheduleService,
+        CancellationToken cancellationToken = default)
+    {
+        var schedule = inputCategoryScheduleModel.CreateDto(categoryId) with { Id = id };
+        await categoryScheduleService.UpdateAsync(schedule, cancellationToken);
+
+        return TypedResults.Ok();
+    }
+
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpDelete("{categoryId:guid}/schedules/{id:guid}")]
+    public async Task<NoContent> DeleteSchedule(
+        Guid categoryId,
+        Guid id,
+        [FromServices] ICategoryScheduleAppService categoryScheduleService,
+        CancellationToken cancellationToken = default)
+    {
+        await categoryScheduleService.DeleteAsync(categoryId, id, cancellationToken);
+
+        return TypedResults.NoContent();
     }
 }

@@ -34,26 +34,14 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<DateTime>("CreatedTimestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
                     b.Property<string>("Description")
                         .HasMaxLength(516)
                         .HasColumnType("character varying(516)");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
-
-                    b.Property<Guid?>("ScheduleEntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time without time zone");
 
                     b.Property<DateTime?>("UpdatedTimestamp")
                         .HasColumnType("timestamp with time zone");
@@ -62,9 +50,6 @@ namespace TimeHacker.Migrations.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ScheduleEntityId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -103,6 +88,58 @@ namespace TimeHacker.Migrations.Migrations
                     b.HasIndex("FixedTaskId");
 
                     b.ToTable("CategoryFixedTask");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.CategorySchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(516)
+                        .HasColumnType("character varying(516)");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<Guid?>("ScheduleEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<DateTime?>("UpdatedTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ScheduleEntityId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "Date");
+
+                    b.ToTable("CategorySchedule");
+
+                    b
+                        .HasAnnotation("Rls:Enabled", true)
+                        .HasAnnotation("Rls:TenantColumn", "UserId");
                 });
 
             modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", b =>
@@ -205,8 +242,14 @@ namespace TimeHacker.Migrations.Migrations
                     b.Property<Guid>("ParentCategoryId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ParentCategoryScheduleId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("ParentScheduleEntity")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ScheduleDescription")
+                        .HasColumnType("text");
 
                     b.Property<TimeSpan>("Start")
                         .HasColumnType("interval");
@@ -514,18 +557,11 @@ namespace TimeHacker.Migrations.Migrations
 
             modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.Category", b =>
                 {
-                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
-                        .WithOne("Category")
-                        .HasForeignKey("TimeHacker.Domain.Entities.Categories.Category", "ScheduleEntityId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("TimeHacker.Domain.Entities.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ScheduleEntity");
 
                     b.Navigation("User");
                 });
@@ -566,6 +602,32 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("FixedTask");
+                });
+
+            modelBuilder.Entity("TimeHacker.Domain.Entities.Categories.CategorySchedule", b =>
+                {
+                    b.HasOne("TimeHacker.Domain.Entities.Categories.Category", "Category")
+                        .WithMany("Schedules")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", "ScheduleEntity")
+                        .WithOne("CategorySchedule")
+                        .HasForeignKey("TimeHacker.Domain.Entities.Categories.CategorySchedule", "ScheduleEntityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TimeHacker.Domain.Entities.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("ScheduleEntity");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", b =>
@@ -734,11 +796,13 @@ namespace TimeHacker.Migrations.Migrations
                     b.Navigation("CategoryDynamicTasks");
 
                     b.Navigation("CategoryFixedTasks");
+
+                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("TimeHacker.Domain.Entities.ScheduleSnapshots.ScheduleEntity", b =>
                 {
-                    b.Navigation("Category");
+                    b.Navigation("CategorySchedule");
 
                     b.Navigation("FixedTask");
 

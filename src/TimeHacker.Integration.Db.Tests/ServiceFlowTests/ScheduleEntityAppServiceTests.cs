@@ -1,4 +1,4 @@
-using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Application.Api.Contracts.IAppServices.ScheduleSnapshots;
 using TimeHacker.Domain.BusinessLogicExceptions;
 using TimeHacker.Domain.Models.InputModels.ScheduleSnapshots;
@@ -38,29 +38,33 @@ public class ScheduleEntityAppServiceTests(DbContainerFixture fixture) : DbInteg
     }
 
     [Fact]
-    [Trait("Save", "CategoryParent")]
-    public async Task Save_Should_CreateScheduleAndLinkCategory()
+    [Trait("Save", "CategoryScheduleParent")]
+    public async Task Save_Should_CreateScheduleAndLinkCategorySchedule()
     {
         var anchorDate = new DateOnly(2026, 6, 1);
-        var category = new Category
+        var category = new Category { Name = "Cat", Color = Color.SeaGreen };
+        await Resolve<ICategoryRepository>().AddAndSaveAsync(category, TestContext.Current.CancellationToken);
+
+        var categorySchedule = new CategorySchedule
         {
-            Name = "Cat",
-            Color = Color.SeaGreen,
+            CategoryId = category.Id,
+            Description = "Working hours",
             Date = anchorDate,
             StartTime = new TimeOnly(9, 0),
             EndTime = new TimeOnly(10, 0)
         };
-        await Resolve<ICategoryRepository>().AddAndSaveAsync(category, TestContext.Current.CancellationToken);
+        await Resolve<ICategoryScheduleRepository>().AddAndSaveAsync(categorySchedule, TestContext.Current.CancellationToken);
 
-        var dto = new ScheduleEntityCreateDto(ScheduleEntityParentType.Category, category.Id, GraphSeeder.DailyRepeat());
+        var dto = new ScheduleEntityCreateDto(ScheduleEntityParentType.CategorySchedule, categorySchedule.Id, GraphSeeder.DailyRepeat());
         var result = await Resolve<IScheduleEntityAppService>().Save(dto, TestContext.Current.CancellationToken);
 
         result.Id.Should().NotBeNull();
         Db.ChangeTracker.Clear();
-        var reloaded = await Db.Set<Category>().FirstAsync(x => x.Id == category.Id, TestContext.Current.CancellationToken);
+        // The recurrence link lives on the window, not on the category.
+        var reloaded = await Db.Set<CategorySchedule>().FirstAsync(x => x.Id == categorySchedule.Id, TestContext.Current.CancellationToken);
         reloaded.ScheduleEntityId.Should().Be(result.Id);
 
-        // A category is anchored to its own Date, exactly as a task is to its StartTimestamp.
+        // A window is anchored to its own Date, exactly as a task is to its StartTimestamp.
         var schedule = await Db.Set<ScheduleEntity>().FirstAsync(x => x.Id == result.Id, TestContext.Current.CancellationToken);
         schedule.FirstEntityCreated.Should().Be(anchorDate);
         schedule.LastEntityCreated.Should().Be(anchorDate);

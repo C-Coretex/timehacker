@@ -22,6 +22,19 @@ public interface ICategoriesApi
     [Delete("/api/categories/{id}")]
     Task<IApiResponse> Delete(Guid id);
 
+    /// <summary>Attaches a recurrence. ParentEntityId is a <b>category schedule</b> id, not a category id.</summary>
     [Post("/api/categories/schedules")]
-    Task<IApiResponse<ScheduleEntityReturnModel>> CreateSchedule([Body] InputScheduleEntityModel model);
+    Task<IApiResponse<ScheduleEntityReturnModel>> CreateRecurrence([Body] InputScheduleEntityModel model);
+
+    [Get("/api/categories/{categoryId}/schedules")]
+    Task<IApiResponse<IReadOnlyList<CategoryScheduleReturnModel>>> GetSchedules(Guid categoryId);
+
+    [Post("/api/categories/{categoryId}/schedules")]
+    Task<IApiResponse<Guid>> CreateSchedule(Guid categoryId, [Body] InputCategoryScheduleModel model);
+
+    [Put("/api/categories/{categoryId}/schedules/{id}")]
+    Task<IApiResponse> UpdateSchedule(Guid categoryId, Guid id, [Body] InputCategoryScheduleModel model);
+
+    [Delete("/api/categories/{categoryId}/schedules/{id}")]
+    Task<IApiResponse> DeleteSchedule(Guid categoryId, Guid id);
 }

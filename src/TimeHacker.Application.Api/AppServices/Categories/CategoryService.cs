@@ -3,7 +3,7 @@ using TimeHacker.Application.Api.Contracts.IAppServices.Categories;
 
 namespace TimeHacker.Application.Api.AppServices.Categories;
 
-public class CategoryService(ICategoryRepository categoryRepository)
+public class CategoryService(ICategoryRepository categoryRepository, IScheduleEntityRepository scheduleEntityRepository)
     : ICategoryAppService
 {
     public IAsyncEnumerable<CategoryDto> GetAll(CancellationToken cancellationToken = default) => categoryRepository.GetAll(true).Select(CategoryDto.Selector).AsAsyncEnumerable();
@@ -26,12 +26,20 @@ public class CategoryService(ICategoryRepository categoryRepository)
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        if(!await categoryRepository.DeleteAndSaveAsync(id, cancellationToken))
+        // The database cascades Category -> CategorySchedule, but each window's FK points TO its
+        // ScheduleEntity, so those recurrence rows would be left orphaned. Delete them first, while the
+        // navigation the predicate walks still exists.
+        var schedulesDeleted = await scheduleEntityRepository.DeleteBy(
+            x => x.CategorySchedule != null && x.CategorySchedule.CategoryId == id,
+            cancellationToken);
+        var categoryDeleted = await categoryRepository.DeleteAndSaveAsync(id, cancellationToken);
+
+        if (schedulesDeleted == 0 && !categoryDeleted)
             throw new NotFoundException("Category", id.ToString());
     }
 
-    // Projects through the Selector rather than loading the entity and mapping it, so the linked
-    // ScheduleEntity comes back in the same query instead of as a silent null.
+    // Projects through the Selector rather than loading the entity and mapping it, so the category's
+    // schedules come back in the same query instead of as a silent empty list.
     public Task<CategoryDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         categoryRepository.GetAll()
             .Where(x => x.Id == id)

@@ -1,29 +1,10 @@
-import { Button, Space, Tag, Typography } from 'antd';
+import { Button, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
 import type { ColumnType } from 'antd/es/table';
 import type { Breakpoint } from 'antd/es/_util/responsiveObserver';
 import type { TFunction } from 'i18next';
-import type { CategoryDisplayModel, ScheduleEntityReturnModel } from '../../api/types';
+import type { CategoryDisplayModel } from '../../api/types';
 import { argbToHex } from '../../utils/colorArgb';
-import { recurrenceTypeLabel } from '../../utils/describeRecurrence';
-
-const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunction) => {
-  // Without a schedule the category still lands on its own date — it just never repeats.
-  if (!scheduleEntity) return <Tag>{t('categories.notScheduled')}</Tag>;
-
-  return (
-    <Space orientation="vertical" size={0}>
-      <Tag color="blue">{recurrenceTypeLabel(scheduleEntity.repeatingEntity.entityType, t)}</Tag>
-      {scheduleEntity.endsOn && (
-        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-          {t('tasks.endsShort')}: {dayjs(scheduleEntity.endsOn).format('MMM D, YYYY')}
-        </Typography.Text>
-      )}
-    </Space>
-  );
-};
 
 export const getCategoryColumns = (
   isMobile: boolean,
@@ -58,24 +39,14 @@ export const getCategoryColumns = (
     responsive: ['md'] as Breakpoint[],
   },
   {
-    title: t('categories.date'),
-    dataIndex: 'date',
-    key: 'date',
-    responsive: ['md'] as Breakpoint[],
-    render: (date: Dayjs) => date.format('MMM D, YYYY'),
-  },
-  {
-    title: t('categories.timeWindow'),
-    key: 'timeWindow',
+    title: t('categories.schedules'),
+    key: 'schedules',
     render: (_: unknown, category: CategoryDisplayModel) =>
-      `${(category.startTime as Dayjs).format('HH:mm')} – ${(category.endTime as Dayjs).format('HH:mm')}`,
-  },
-  {
-    title: t('categories.schedule'),
-    dataIndex: 'scheduleEntity',
-    key: 'schedule',
-    responsive: ['lg'] as Breakpoint[],
-    render: (scheduleEntity: ScheduleEntityReturnModel | null) => scheduleCell(scheduleEntity, t),
+      category.schedules.length === 0 ? (
+        <Tag>{t('categories.noSchedules')}</Tag>
+      ) : (
+        <Tag color="blue">{t('categories.scheduleCount', { count: category.schedules.length })}</Tag>
+      ),
   },
   {
     title: t('categories.actions'),

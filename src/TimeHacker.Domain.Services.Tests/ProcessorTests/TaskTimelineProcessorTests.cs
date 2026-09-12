@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using TimeHacker.Domain.IProcessors;
 using TimeHacker.Domain.Services.Processors;
 
@@ -53,46 +53,76 @@ public class TaskTimelineProcessorTests
         act.Should().NotThrow();
     }
 
-    private static Category NewCategory(string name, TimeOnly start, TimeOnly end) => new()
+    private static CategorySchedule NewCategorySchedule(string categoryName, TimeOnly start, TimeOnly end, string? windowDescription = null, Category? category = null)
     {
-        UserId = Guid.NewGuid(),
-        Name = name,
-        Color = Color.Blue,
-        StartTime = start,
-        EndTime = end,
-        ScheduleEntityId = Guid.NewGuid()
-    };
+        var userId = Guid.NewGuid();
+        category ??= new Category { UserId = userId, Name = categoryName, Color = Color.Blue };
+
+        return new CategorySchedule
+        {
+            UserId = category.UserId,
+            CategoryId = category.Id,
+            Category = category,
+            Description = windowDescription,
+            StartTime = start,
+            EndTime = end,
+            ScheduleEntityId = Guid.NewGuid()
+        };
+    }
 
     [Fact]
-    [Trait("GetTasksForDay", "Should map categories onto the day's time windows")]
+    [Trait("GetTasksForDay", "Should map category schedules onto the day's time windows")]
     public void GetTasksForDay_ShouldMapCategoriesToTimeWindows()
     {
         var date = new DateOnly(2026, 6, 24);
-        var category = NewCategory("Work", new TimeOnly(09, 00), new TimeOnly(18, 00));
+        var schedule = NewCategorySchedule("Work", new TimeOnly(09, 00), new TimeOnly(18, 00), windowDescription: "Working hours");
 
-        var result = _processor.GetTasksForDay([], [], [], [category], date);
+        var result = _processor.GetTasksForDay([], [], [], [schedule], date);
 
         var container = result.CategoriesTimeline.Single();
+        // The band is identified by the parent category; the window only adds an optional note.
         container.Category.Name.Should().Be("Work");
-        container.ScheduleEntityId.Should().Be(category.ScheduleEntityId);
+        container.ScheduleDescription.Should().Be("Working hours");
+        container.CategoryScheduleId.Should().Be(schedule.Id);
+        container.ScheduleEntityId.Should().Be(schedule.ScheduleEntityId);
         container.TimeRange.Start.Should().Be(new TimeSpan(09, 00, 00));
         container.TimeRange.End.Should().Be(new TimeSpan(18, 00, 00));
     }
 
     [Fact]
-    [Trait("GetTasksForDay", "Should keep every overlapping category")]
+    [Trait("GetTasksForDay", "Should keep every overlapping category window")]
     public void GetTasksForDay_ShouldKeepOverlappingCategories()
     {
         var date = new DateOnly(2026, 6, 24);
 
         // Categories are a backdrop, not a schedule — several may cover the same hour and all must survive.
-        var work = NewCategory("Work", new TimeOnly(09, 00), new TimeOnly(18, 00));
-        var meetings = NewCategory("Meetings", new TimeOnly(12, 00), new TimeOnly(14, 00));
+        var work = NewCategorySchedule("Work", new TimeOnly(09, 00), new TimeOnly(18, 00));
+        var meetings = NewCategorySchedule("Meetings", new TimeOnly(12, 00), new TimeOnly(14, 00));
 
         var result = _processor.GetTasksForDay([], [], [], [work, meetings], date);
 
         result.CategoriesTimeline.Should().HaveCount(2);
         result.CategoriesTimeline.Select(c => c.Category.Name).Should().Equal("Work", "Meetings");
+    }
+
+    [Fact]
+    [Trait("GetTasksForDay", "Should keep several windows belonging to the same category")]
+    public void GetTasksForDay_ShouldKeepMultipleWindowsOfTheSameCategory()
+    {
+        var date = new DateOnly(2026, 6, 24);
+
+        // The case the split exists for: one category owning two windows on one day.
+        var category = new Category { UserId = Guid.NewGuid(), Name = "Work", Color = Color.Blue };
+        var morning = NewCategorySchedule("Work", new TimeOnly(09, 00), new TimeOnly(12, 00), "Working hours", category);
+        var evening = NewCategorySchedule("Work", new TimeOnly(18, 00), new TimeOnly(20, 00), "Overtime", category);
+
+        var result = _processor.GetTasksForDay([], [], [], [morning, evening], date);
+
+        result.CategoriesTimeline.Should().HaveCount(2);
+        result.CategoriesTimeline.Select(c => c.ScheduleDescription).Should().Equal("Working hours", "Overtime");
+        result.CategoriesTimeline.Should().AllSatisfy(c => c.Category.Id.Should().Be(category.Id));
+        // Both bands still carry the one category name — the description is what tells them apart.
+        result.CategoriesTimeline.Should().AllSatisfy(c => c.Category.Name.Should().Be("Work"));
     }
 
     [Fact]
@@ -112,7 +142,7 @@ public class TaskTimelineProcessorTests
         };
 
         var withoutCategories = _processor.GetTasksForDay([fixedTask], [], [], [], date);
-        var withCategories = _processor.GetTasksForDay([fixedTask], [], [], [NewCategory("Work", new TimeOnly(09, 00), new TimeOnly(18, 00))], date);
+        var withCategories = _processor.GetTasksForDay([fixedTask], [], [], [NewCategorySchedule("Work", new TimeOnly(09, 00), new TimeOnly(18, 00))], date);
 
         withCategories.TasksTimeline.Select(t => t.TimeRange)
             .Should().Equal(withoutCategories.TasksTimeline.Select(t => t.TimeRange));

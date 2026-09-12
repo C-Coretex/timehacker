@@ -16,14 +16,29 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     }
 
     [Fact]
-    [Trait("Cascade", "ScheduleEntity->Category")]
-    public async Task DeletingScheduleEntity_Should_CascadeDeleteCategory()
+    [Trait("Cascade", "ScheduleEntity->CategorySchedule")]
+    public async Task DeletingScheduleEntity_Should_CascadeDeleteCategorySchedule()
     {
-        var category = await Resolve<GraphSeeder>().SeedCategoryWithSchedule(TestContext.Current.CancellationToken);
+        var schedule = await Resolve<GraphSeeder>().SeedCategoryScheduleWithSchedule(TestContext.Current.CancellationToken);
 
-        await DeleteByIdAsync<ScheduleEntity>(category.ScheduleEntityId!.Value);
+        await DeleteByIdAsync<ScheduleEntity>(schedule.ScheduleEntityId!.Value);
 
-        (await ExistsAsync<Category>(category.Id)).Should().BeFalse();
+        (await ExistsAsync<CategorySchedule>(schedule.Id)).Should().BeFalse();
+        // Only the window goes — the category it labelled is an independent row.
+        (await ExistsAsync<Category>(schedule.CategoryId)).Should().BeTrue();
+    }
+
+    [Fact]
+    [Trait("Cascade", "Category->CategorySchedule")]
+    public async Task DeletingCategory_Should_CascadeDeleteItsSchedules()
+    {
+        var (category, morning, evening) = await Resolve<GraphSeeder>()
+            .SeedCategoryWithTwoWindowsOn(new DateOnly(2026, 6, 1), TestContext.Current.CancellationToken);
+
+        await DeleteByIdAsync<Category>(category.Id);
+
+        (await ExistsAsync<CategorySchedule>(morning.Id)).Should().BeFalse();
+        (await ExistsAsync<CategorySchedule>(evening.Id)).Should().BeFalse();
     }
 
     [Fact]

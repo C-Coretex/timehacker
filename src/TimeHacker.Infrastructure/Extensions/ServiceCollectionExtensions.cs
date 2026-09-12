@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
 
         // Same DbContext is shared between repositories in the same scope, so transactions would work out of the box
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryScheduleRepository, CategoryScheduleRepository>();
 
         services.AddScoped<IScheduleSnapshotRepository, ScheduleSnapshotRepository>();
         services.AddScoped<IScheduledTaskRepository, ScheduledTaskRepository>();

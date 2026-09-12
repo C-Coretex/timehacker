@@ -7,12 +7,12 @@ namespace TimeHacker.Application.Api.AppServices.ScheduleSnapshots;
 public class ScheduleEntityAppService(
     IScheduleEntityRepository scheduleEntityRepository,
     IFixedTaskRepository fixedTaskRepository,
-    ICategoryRepository categoryRepository,
+    ICategoryScheduleRepository categoryScheduleRepository,
     TimeProvider timeProvider) : IScheduleEntityAppService
 {
     /// <summary>
     /// Creates a recurrence ScheduleEntity and attaches it to its polymorphic parent
-    /// (a FixedTask or a Category). Done in two phases around the persist: first read the chosen parent —
+    /// (a FixedTask or a CategorySchedule). Done in two phases around the persist: first read the chosen parent —
     /// both to validate it exists and to take the day it already occupies as the recurrence's anchor —
     /// then, after the entity has an Id, stamp that Id onto the parent.
     /// </summary>
@@ -30,10 +30,10 @@ public class ScheduleEntityAppService(
                 NotFoundException.ThrowIfNull(fixedTask, nameof(ScheduleEntityParentType.FixedTask), scheduleEntityCreateDto.ParentEntityId.ToString());
                 anchorDate = DateOnly.FromDateTime(fixedTask.StartTimestamp);
                 break;
-            case ScheduleEntityParentType.Category:
-                var category = await categoryRepository.GetByIdAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken: cancellationToken);
-                NotFoundException.ThrowIfNull(category, nameof(ScheduleEntityParentType.Category), scheduleEntityCreateDto.ParentEntityId.ToString());
-                anchorDate = category.Date;
+            case ScheduleEntityParentType.CategorySchedule:
+                var categorySchedule = await categoryScheduleRepository.GetByIdAsync(scheduleEntityCreateDto.ParentEntityId, cancellationToken: cancellationToken);
+                NotFoundException.ThrowIfNull(categorySchedule, nameof(ScheduleEntityParentType.CategorySchedule), scheduleEntityCreateDto.ParentEntityId.ToString());
+                anchorDate = categorySchedule.Date;
                 break;
             default:
                 throw new NotProvidedException(nameof(scheduleEntityCreateDto));
@@ -52,8 +52,8 @@ public class ScheduleEntityAppService(
                     scheduleEntity.Id,
                     cancellationToken);
                 break;
-            case ScheduleEntityParentType.Category:
-                await categoryRepository.UpdateProperty(
+            case ScheduleEntityParentType.CategorySchedule:
+                await categoryScheduleRepository.UpdateProperty(
                     x => x.Id == scheduleEntityCreateDto.ParentEntityId,
                     x => x.ScheduleEntityId,
                     scheduleEntity.Id,
