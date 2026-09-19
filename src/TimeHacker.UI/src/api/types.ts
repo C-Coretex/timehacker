@@ -17,12 +17,14 @@ export interface FixedTaskReturnModel {
     startTimestamp: string;
     endTimestamp: string;
     scheduleEntity: ScheduleEntityReturnModel | null;
+    categories: CategoryReturnModel[];
     tags: unknown[];
 }
 
 export interface InputFixedTask {
     name: string;
     description: string;
+    categoryIds?: string[];
     priority: number;
     startTimestamp: string;
     endTimestamp: string;
@@ -31,6 +33,7 @@ export interface InputFixedTask {
 export interface FixedTaskFormData {
     name: string;
     description: string;
+    categoryIds: string[];
     priority: number;
     startTimestamp: Dayjs;
     endTimestamp: Dayjs;
@@ -40,10 +43,12 @@ export interface FixedTaskDisplayModel {
     id: string;
     name: string;
     description: string;
+    categoryIds: string[];
     priority: number;
     startTimestamp: Dayjs;
     endTimestamp: Dayjs;
     scheduleEntity: ScheduleEntityReturnModel | null;
+    categories: CategoryReturnModel[];
     tags: unknown[];
 }
 
@@ -56,6 +61,7 @@ export interface DynamicTaskReturnModel {
     maxTimeToFinish: string;
     optimalTimeToFinish: string | null;
     createdTimestamp: string;
+    categories: CategoryReturnModel[];
     tags: unknown[];
 }
 

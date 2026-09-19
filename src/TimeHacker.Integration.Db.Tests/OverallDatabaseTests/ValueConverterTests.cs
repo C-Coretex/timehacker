@@ -65,8 +65,8 @@ public class ValueConverterTests(DbContainerFixture fixture) : DbIntegrationTest
                 new ScheduledCategory { UserId = CurrentUser.UserId, Date = date, Name = "Colored category", ScheduleDescription = "Colored", Color = color }
             }
         };
-        Db.Add(snapshot);
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        SharedDb.Add(snapshot);
+        await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
         var scheduledCategoryId = snapshot.ScheduledCategories.Single().Id;
 
         var reloaded = await ReloadAsync<ScheduledCategory>(scheduledCategoryId);

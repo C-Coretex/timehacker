@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { createFixedTask, postNewScheduleForTask, fetchFixedTaskById } from 'api/fixedTasks';
 import { createDynamicTask } from 'api/dynamicTasks';
 import type { CalendarEvent } from 'utils/calendarUtils';
+import { attachCategoriesToEvents } from 'utils/calendarUtils';
 import { argbToHex } from 'utils/colorArgb';
 import { toFixedTaskPayload } from 'utils/fixedTaskPayload';
 import type { ScheduleEntityReturnModel } from 'api/types';
@@ -22,6 +23,7 @@ import { useSettings } from 'contexts/SettingsContext';
 import { useIsMobile } from 'hooks/useIsMobile';
 import { useCalendarDateRanges } from 'hooks/useCalendarDateRanges';
 import { useCalendarTasks } from 'hooks/useCalendarTasks';
+import { useTaskCategories } from 'hooks/useTaskCategories';
 import { ThreeDayView } from './ThreeDayView';
 import { UnifiedTaskFormModal } from 'components/UnifiedTaskFormModal';
 import type { ScheduleFormPayload } from 'components/UnifiedTaskFormModal';
@@ -61,6 +63,11 @@ export const CalendarPage: FC = () => {
 
   const { getDatesForView } = useCalendarDateRanges(selectedDate, weekStartDay);
   const { events, backgroundEvents, loading, error, fetchTasks, refresh } = useCalendarTasks();
+  const { categoriesByTaskId, fetchTaskCategories } = useTaskCategories();
+  const eventsWithCategories = useMemo(
+    () => attachCategoriesToEvents(events, categoriesByTaskId),
+    [events, categoriesByTaskId]
+  );
 
   useEffect(() => {
     if (!initialViewSet.current && screens.md !== undefined) {
@@ -109,12 +116,12 @@ export const CalendarPage: FC = () => {
         }
         setTaskModalOpen(false);
         notification.success({ title: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
-        await fetchTasks(getDatesForView(calendarView));
+        await Promise.all([fetchTasks(getDatesForView(calendarView)), fetchTaskCategories()]);
       } catch {
         notification.error({ title: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
       }
     },
-    [fetchTasks, getDatesForView, calendarView, notification, t]
+    [fetchTasks, fetchTaskCategories, getDatesForView, calendarView, notification, t]
   );
 
   const handleSaveDynamic = useCallback(
@@ -123,12 +130,12 @@ export const CalendarPage: FC = () => {
         await createDynamicTask(data);
         setTaskModalOpen(false);
         notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
-        await fetchTasks(getDatesForView(calendarView));
+        await Promise.all([fetchTasks(getDatesForView(calendarView)), fetchTaskCategories()]);
       } catch {
         notification.error({ title: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
       }
     },
-    [fetchTasks, getDatesForView, calendarView, notification, t]
+    [fetchTasks, fetchTaskCategories, getDatesForView, calendarView, notification, t]
   );
 
   const eventStyleGetter = useCallback(
@@ -205,7 +212,7 @@ export const CalendarPage: FC = () => {
       ) : (
         <Calendar
           localizer={localizer}
-          events={events}
+          events={eventsWithCategories}
           backgroundEvents={backgroundEvents}
           startAccessor="start"
           endAccessor="end"

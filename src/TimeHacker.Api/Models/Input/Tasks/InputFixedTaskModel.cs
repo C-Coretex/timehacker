@@ -1,3 +1,5 @@
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+
 namespace TimeHacker.Api.Models.Input.Tasks;
 
 public record InputFixedTaskModel
@@ -14,7 +16,6 @@ public record InputFixedTaskModel
     [Required]
     public required byte Priority { get; init; }
 
-    // Normalised to UTC by DateTimeUtcJsonConverter as the body is read, so no parsing is needed here.
     [Required]
     public required DateTime StartTimestamp { get; init; }
 
@@ -32,7 +33,8 @@ public record InputFixedTaskModel
             Description = Description,
             Priority = Priority,
             StartTimestamp = StartTimestamp,
-            EndTimestamp = EndTimestamp
+            EndTimestamp = EndTimestamp,
+            Categories = [.. CategoryIds.Select(LinkCategoryDto.EmptyLink)]
         };
     }
 }

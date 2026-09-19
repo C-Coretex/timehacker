@@ -10,6 +10,7 @@ export function toFixedTaskPayload(data: FixedTaskFormData): InputFixedTask {
   return {
     name: data.name,
     description: data.description,
+    categoryIds: data.categoryIds ?? [],
     priority: data.priority,
     startTimestamp: dayjs(data.startTimestamp).toISOString(),
     endTimestamp: dayjs(data.endTimestamp).toISOString(),

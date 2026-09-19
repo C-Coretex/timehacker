@@ -1,24 +1,31 @@
-﻿namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+using TimeHacker.Domain.Entities.Categories;
+
+namespace TimeHacker.Application.Api.Tests.AppServiceTests.Tasks;
 
 public class DynamicTaskAppServiceTests
 {
     #region Mocks
 
     private readonly Mock<IDynamicTaskRepository> _dynamicTasksRepository = new();
+    private readonly Mock<ICategoryRepository> _categoryRepository = new();
 
     #endregion
 
     #region Properties & constructor
 
     private List<DynamicTask> _dynamicTasks = null!;
+    private List<Category> _categories = null!;
 
     private readonly IDynamicTaskAppService _dynamicTaskAppService;
     private readonly Guid _userId = Guid.NewGuid();
 
+    private Guid OwnCategoryId => _categories.First(x => x.UserId == _userId).Id;
+
     public DynamicTaskAppServiceTests()
     {
         SetupMocks(_userId);
-        _dynamicTaskAppService = new DynamicTaskAppService(_dynamicTasksRepository.Object);
+        _dynamicTaskAppService = new DynamicTaskAppService(_dynamicTasksRepository.Object, _categoryRepository.Object);
     }
 
     #endregion
@@ -29,7 +36,8 @@ public class DynamicTaskAppServiceTests
     {
         var newEntry = new DynamicTaskDto()
         {
-            Name = "TestDynamicTask1000"
+            Name = "TestDynamicTask1000",
+            Categories = [LinkCategoryDto.EmptyLink(OwnCategoryId)]
         };
         await _dynamicTaskAppService.AddAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _dynamicTasks.FirstOrDefault(x => x.Name == newEntry.Name);
@@ -44,7 +52,8 @@ public class DynamicTaskAppServiceTests
         var newEntry = new DynamicTaskDto()
         {
             Id = _dynamicTasks.First(x => x.UserId == _userId).Id,
-            Name = "TestDynamicTask1000"
+            Name = "TestDynamicTask1000",
+            Categories = [LinkCategoryDto.EmptyLink(OwnCategoryId)]
         };
         await _dynamicTaskAppService.UpdateAsync(newEntry, TestContext.Current.CancellationToken);
         var result = _dynamicTasks.FirstOrDefault(x => x.Id == newEntry.Id);
@@ -63,7 +72,8 @@ public class DynamicTaskAppServiceTests
         {
             Id = taskToUpdate.Id,
             Name = "Updated Name Once",
-            Priority = 3
+            Priority = 3,
+            Categories = [LinkCategoryDto.EmptyLink(OwnCategoryId)]
         };
 
         await _dynamicTaskAppService.UpdateAsync(updateDto, TestContext.Current.CancellationToken);
@@ -104,6 +114,99 @@ public class DynamicTaskAppServiceTests
         var result = await _dynamicTaskAppService.GetByIdAsync(id, TestContext.Current.CancellationToken);
         result.Should().NotBeNull();
         result!.Id.Should().Be(id);
+    }
+
+    [Fact]
+    [Trait("AddAsync", "Should link the given categories")]
+    public async Task AddAsync_ShouldLinkCategories()
+    {
+        var categoryId = OwnCategoryId;
+
+        await _dynamicTaskAppService.AddAsync(new DynamicTaskDto
+        {
+            Name = "Categorised",
+            Categories = [LinkCategoryDto.EmptyLink(categoryId)]
+        }, TestContext.Current.CancellationToken);
+
+        _dynamicTasks.Single(x => x.Name == "Categorised")
+            .CategoryDynamicTasks.Should().ContainSingle(link => link.CategoryId == categoryId);
+    }
+
+    [Fact]
+    [Trait("AddAsync", "Should collapse a repeated category id")]
+    public async Task AddAsync_ShouldNotLinkTheSameCategoryTwice()
+    {
+        var categoryId = OwnCategoryId;
+
+        await _dynamicTaskAppService.AddAsync(new DynamicTaskDto
+        {
+            Name = "Categorised",
+            Categories = [LinkCategoryDto.EmptyLink(categoryId), LinkCategoryDto.EmptyLink(categoryId)]
+        }, TestContext.Current.CancellationToken);
+
+        _dynamicTasks.Single(x => x.Name == "Categorised").CategoryDynamicTasks.Should().HaveCount(1);
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should replace the linked categories")]
+    public async Task UpdateAsync_ShouldReplaceCategories()
+    {
+        var task = _dynamicTasks.First(x => x.UserId == _userId);
+        var categoryId = OwnCategoryId;
+        task.CategoryDynamicTasks.Add(new CategoryDynamicTask { CategoryId = Guid.NewGuid(), DynamicTaskId = task.Id });
+
+        await _dynamicTaskAppService.UpdateAsync(new DynamicTaskDto
+        {
+            Id = task.Id,
+            Name = task.Name,
+            Categories = [LinkCategoryDto.EmptyLink(categoryId)]
+        }, TestContext.Current.CancellationToken);
+
+        task.CategoryDynamicTasks.Should().ContainSingle(link => link.CategoryId == categoryId);
+    }
+
+    [Fact]
+    [Trait("AddAsync+UpdateAsync", "Should reject a dynamic task with no category")]
+    public async Task AddAsync_And_UpdateAsync_ShouldThrow_WhenNoCategoriesGiven()
+    {
+        // Unlike a fixed task, a dynamic one must always carry at least one category.
+        var task = _dynamicTasks.First(x => x.UserId == _userId);
+        task.CategoryDynamicTasks.Add(new CategoryDynamicTask { CategoryId = OwnCategoryId, DynamicTaskId = task.Id });
+
+        var add = async () => await _dynamicTaskAppService.AddAsync(
+            new DynamicTaskDto { Name = "Uncategorised" }, TestContext.Current.CancellationToken);
+        await add.Should().ThrowAsync<DataIsNotCorrectException>();
+
+        var update = async () => await _dynamicTaskAppService.UpdateAsync(
+            new DynamicTaskDto { Id = task.Id, Name = task.Name }, TestContext.Current.CancellationToken);
+        await update.Should().ThrowAsync<DataIsNotCorrectException>();
+
+        // The rejected update left the existing link alone.
+        _dynamicTasks.Should().NotContain(x => x.Name == "Uncategorised");
+        task.CategoryDynamicTasks.Should().ContainSingle();
+    }
+
+    [Theory]
+    [Trait("AddAsync+UpdateAsync", "Should reject a category the user cannot see")]
+    [InlineData(true), InlineData(false)]
+    public async Task AddAsync_And_UpdateAsync_ShouldThrowNotFound_ForInvisibleCategory(bool anotherUsersCategory)
+    {
+        // A foreign key check bypasses RLS, so an unguarded link would be written and then read back as nothing.
+        var categoryId = anotherUsersCategory
+            ? _categories.First(x => x.UserId != _userId).Id
+            : Guid.NewGuid();
+        var categories = new[] { LinkCategoryDto.EmptyLink(categoryId) };
+
+        var add = async () => await _dynamicTaskAppService.AddAsync(
+            new DynamicTaskDto { Name = "Sneaky", Categories = categories }, TestContext.Current.CancellationToken);
+        (await add.Should().ThrowAsync<NotFoundException>()).Which.ResourceName.Should().Be("Category");
+
+        var update = async () => await _dynamicTaskAppService.UpdateAsync(
+            new DynamicTaskDto { Id = _dynamicTasks.First(x => x.UserId == _userId).Id, Name = "Sneaky", Categories = categories },
+            TestContext.Current.CancellationToken);
+        (await update.Should().ThrowAsync<NotFoundException>()).Which.ResourceName.Should().Be("Category");
+
+        _dynamicTasks.Should().NotContain(x => x.Name == "Sneaky");
     }
 
     // Validation Tests
@@ -172,6 +275,13 @@ public class DynamicTaskAppServiceTests
         ];
 
         _dynamicTasksRepository.As<IUserScopedRepositoryBase<DynamicTask, Guid>>().SetupRepositoryMock(_dynamicTasks);
+
+        _categories =
+        [
+            new() { UserId = userId, Name = "Own category" },
+            new() { UserId = Guid.NewGuid(), Name = "Another user's category" }
+        ];
+        _categoryRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories, userId);
     }
 
     #endregion

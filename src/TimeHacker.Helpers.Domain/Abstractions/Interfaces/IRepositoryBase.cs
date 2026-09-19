@@ -31,6 +31,10 @@ public interface IRepositoryBase<TModel, in TId>: IRepositoryBase<TModel> where 
     Task<bool> DeleteAndSaveAsync(TId id, CancellationToken cancellationToken = default);
     Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
 
+    /// <param name="queryPipelineSteps">
+    /// Applied to the fetch. Pass the Includes the update needs: a collection the update replaces must be
+    /// loaded, or EF sees no removals and only ever adds.
+    /// </param>
     /// <returns>The updated entry, or null if it was not found</returns>
-    Task<TModel?> GetAndUpdateAndSaveAsync(TId id, Action<TModel> updateFunction, CancellationToken cancellationToken = default);
+    Task<TModel?> GetAndUpdateAndSaveAsync(TId id, Action<TModel> updateFunction, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps);
 }

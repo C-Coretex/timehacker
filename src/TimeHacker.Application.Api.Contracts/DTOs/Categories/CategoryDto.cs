@@ -1,13 +1,11 @@
-using System.Drawing;
+﻿using System.Drawing;
 using TimeHacker.Application.Api.Contracts.DTOs.ScheduleSnapshots;
 using TimeHacker.Domain.Entities.Categories;
 
 namespace TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
-public record CategoryDto
+public record CategoryDto : LinkCategoryDto
 {
-    public Guid? Id { get; init; }
-
     public required string Name { get; init; }
     public string? Description { get; init; }
     public Color Color { get; init; }
@@ -51,6 +49,8 @@ public record CategoryDto
     /// </summary>
     public Category GetEntity(Category? category = null)
     {
+        ArgumentNullException.ThrowIfNull(Name);
+
         category ??= new Category();
 
         category.Name = Name;

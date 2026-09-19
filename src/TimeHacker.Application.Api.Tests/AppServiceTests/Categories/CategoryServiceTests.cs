@@ -206,7 +206,7 @@ public class CategoryServiceTests
         var result = _categoryService.GetAll(TestContext.Current.CancellationToken).ToBlockingEnumerable(TestContext.Current.CancellationToken).ToList();
 
         result.Should().NotBeEmpty();
-        result.Should().OnlyContain(c => c.Id.HasValue && userCategoryIds.Contains(c.Id.Value));
+        result.Should().OnlyContain(c => userCategoryIds.Contains(c.Id));
         result.Count.Should().Be(_categories.Count(c => c.UserId == _userId));
     }
 

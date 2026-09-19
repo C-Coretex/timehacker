@@ -5,7 +5,8 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import type { TFunction } from 'i18next';
 import type { ColumnType } from 'antd/es/table';
-import type { FixedTaskDisplayModel, ScheduleEntityReturnModel } from '../../../../api/types';
+import type { FixedTaskDisplayModel, ScheduleEntityReturnModel, CategoryReturnModel } from '../../../../api/types';
+import { CategoryTags } from '../../../../components/CategoryTags';
 import { recurrenceTypeLabel } from '../../../../utils/describeRecurrence';
 
 const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunction) => {
@@ -32,6 +33,13 @@ export const getFixedTaskColumns = (
   { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
   { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
   { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+  {
+    title: t('tasks.categories'),
+    dataIndex: 'categories',
+    key: 'categories',
+    responsive: ['md'] as Breakpoint[],
+    render: (categories: CategoryReturnModel[]) => <CategoryTags categories={categories} />,
+  },
   {
     title: t('tasks.schedule'),
     dataIndex: 'scheduleEntity',

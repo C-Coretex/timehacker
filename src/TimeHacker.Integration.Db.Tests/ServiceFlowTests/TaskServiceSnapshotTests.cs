@@ -1,4 +1,4 @@
-using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
+﻿using TimeHacker.Application.Api.Contracts.IAppServices.Tasks;
 
 namespace TimeHacker.Integration.Db.Tests.ServiceFlowTests;
 
@@ -90,11 +90,10 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
         // Guarantee the regenerated snapshot's CreatedTimestamp is strictly later than the original's so the
         // "deleted and re-inserted" assertion below can't be satisfied by an unchanged row sharing a timestamp.
         await Task.Delay(10, TestContext.Current.CancellationToken);
-        // Production runs each request in its own DI scope/DbContext; emulate that so the refresh doesn't
-        // collide with snapshots still tracked from the previous call. The service uses the current
-        // user's scoped context (not the admin Db), so clear that one.
-        Resolve<TimeHackerDbContext>().ChangeTracker.Clear();
-        await service.RefreshTasksForDays(dates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
+        // Production runs each request in its own DI scope/DbContext, so the refresh gets a real one rather
+        // than reusing the scope whose context still tracks the snapshots the first call created.
+        await ResolveInNewScope<ITaskAppService>()
+            .RefreshTasksForDays(dates, TestContext.Current.CancellationToken).ToListAsync(TestContext.Current.CancellationToken);
 
         // Exactly one snapshot for the date, but it was deleted and re-inserted (new Id, strictly newer
         // CreatedTimestamp) rather than left untouched or duplicated; its single child task was replaced.
@@ -113,7 +112,7 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
     public async Task RefreshTasksForDays_Should_ExpandRecurrenceAndTrackLastEntityCreated(int numberOfDays)
     {
         var anchorDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        var task = await Resolve<GraphSeeder>().SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken, anchorDate);
+        var task = await Seeder.SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken, anchorDate);
         var scheduleEntityId = task.ScheduleEntityId!.Value;
         // A date a few days out: the daily recurrence (anchored at the task's own day) will hit it.
         var date = anchorDate.AddDays(3);
@@ -136,7 +135,7 @@ public class TaskServiceSnapshotTests(DbContainerFixture fixture) : DbIntegratio
     }
 
     private Task SeedFixedTaskOn(DateOnly date, string name)
-        => Resolve<GraphSeeder>().SeedFixedTaskOn(date, name, TestContext.Current.CancellationToken);
+        => Seeder.SeedFixedTaskOn(date, name, TestContext.Current.CancellationToken);
 
     private async Task<int> CountSnapshotsOn(DateOnly date)
     {

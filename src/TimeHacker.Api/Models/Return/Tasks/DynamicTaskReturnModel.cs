@@ -1,4 +1,5 @@
-﻿using TimeHacker.Api.Models.Return.Tags;
+﻿using TimeHacker.Api.Models.Return.Categories;
+using TimeHacker.Api.Models.Return.Tags;
 
 namespace TimeHacker.Api.Models.Return.Tasks;
 
@@ -11,6 +12,7 @@ public record DynamicTaskReturnModel(
     TimeSpan MaxTimeToFinish,
     TimeSpan? OptimalTimeToFinish,
     DateTime CreatedTimestamp,
+    IEnumerable<CategoryReturnModel> Categories,
     IEnumerable<TagReturnModel> Tags
 )
 {
@@ -27,7 +29,8 @@ public record DynamicTaskReturnModel(
             task.MaxTimeToFinish,
             task.OptimalTimeToFinish,
             task.CreatedTimestamp,
-            task.Tags.Select(x => TagReturnModel.Create(x))
+            task.RichCategories.Select(CategoryReturnModel.Create),
+            task.Tags.Select(TagReturnModel.Create)
         );
     }
 }

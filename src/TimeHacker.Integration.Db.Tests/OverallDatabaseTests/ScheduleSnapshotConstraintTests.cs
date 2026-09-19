@@ -10,14 +10,14 @@ public class ScheduleSnapshotConstraintTests(DbContainerFixture fixture) : DbInt
     [Trait("AlternateKey", "UserId+Date")]
     public async Task DuplicateUserDate_Should_BeRejected()
     {
-        Db.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date });
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        SharedDb.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date });
+        await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Clear the tracker so the second insert is validated by the database's unique constraint rather
         // than EF's in-memory alternate-key identity check.
-        Db.ChangeTracker.Clear();
-        Db.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date });
-        var act = async () => await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        SharedDb.ChangeTracker.Clear();
+        SharedDb.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date });
+        var act = async () => await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await act.Should().ThrowAsync<DbUpdateException>();
     }
@@ -26,12 +26,12 @@ public class ScheduleSnapshotConstraintTests(DbContainerFixture fixture) : DbInt
     [Trait("AlternateKey", "CompositeNotDateOnly")]
     public async Task SameDateDifferentUsers_Should_Coexist()
     {
-        Db.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date });
-        Db.Add(new ScheduleSnapshot { UserId = OtherUsers.First().UserId, Date = Date });
+        SharedDb.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date });
+        SharedDb.Add(new ScheduleSnapshot { UserId = OtherUsers.First().UserId, Date = Date });
 
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var count = await Db.Set<ScheduleSnapshot>().CountAsync(x => x.Date == Date, TestContext.Current.CancellationToken);
+        var count = await SharedDb.Set<ScheduleSnapshot>().CountAsync(x => x.Date == Date, TestContext.Current.CancellationToken);
         count.Should().Be(2);
     }
 
@@ -39,11 +39,11 @@ public class ScheduleSnapshotConstraintTests(DbContainerFixture fixture) : DbInt
     [Trait("CompositeFK", "ResolvesAgainstAlternateKey")]
     public async Task ScheduledTask_WithMatchingSnapshot_Should_Insert()
     {
-        var snapshot = Db.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date }).Entity;
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var snapshot = SharedDb.Add(new ScheduleSnapshot { UserId = CurrentUser.UserId, Date = Date }).Entity;
+        await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        Db.Add(new ScheduledTask { UserId = CurrentUser.UserId, Date = Date, Name = "t", IsFixed = true, ScheduleSnapshot = snapshot });
-        var act = async () => await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        SharedDb.Add(new ScheduledTask { UserId = CurrentUser.UserId, Date = Date, Name = "t", IsFixed = true, ScheduleSnapshot = snapshot });
+        var act = async () => await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await act.Should().NotThrowAsync();
     }
@@ -53,8 +53,8 @@ public class ScheduleSnapshotConstraintTests(DbContainerFixture fixture) : DbInt
     public async Task ScheduledTask_WithoutMatchingSnapshot_Should_BeRejected()
     {
         // No snapshot for this (UserId, Date) -> the composite FK cannot resolve.
-        Db.Add(new ScheduledTask { UserId = CurrentUser.UserId, Date = new DateOnly(2026, 6, 3), Name = "t", IsFixed = true });
-        var act = async () => await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+        SharedDb.Add(new ScheduledTask { UserId = CurrentUser.UserId, Date = new DateOnly(2026, 6, 3), Name = "t", IsFixed = true });
+        var act = async () => await SharedDb.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await act.Should().ThrowAsync<DbUpdateException>();
     }

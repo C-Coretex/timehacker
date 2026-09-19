@@ -19,9 +19,9 @@ public class CategoryService(ICategoryRepository categoryRepository, IScheduleEn
     {
         NotProvidedException.ThrowIfNull(category);
 
-        var entity = await categoryRepository.GetAndUpdateAndSaveAsync(category.Id!.Value, e => category.GetEntity(e), cancellationToken);
+        var entity = await categoryRepository.GetAndUpdateAndSaveAsync(category.Id, e => category.GetEntity(e), cancellationToken);
         if (entity is null)
-            throw new NotFoundException("Category", category.Id!.Value.ToString());
+            throw new NotFoundException("Category", category.Id.ToString());
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

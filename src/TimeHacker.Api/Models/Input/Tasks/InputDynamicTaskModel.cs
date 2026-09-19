@@ -1,3 +1,5 @@
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+
 namespace TimeHacker.Api.Models.Input.Tasks;
 
 public record InputDynamicTaskModel
@@ -31,7 +33,8 @@ public record InputDynamicTaskModel
             Priority = Priority,
             MinTimeToFinish = MinTimeToFinish,
             MaxTimeToFinish = MaxTimeToFinish,
-            OptimalTimeToFinish = OptimalTimeToFinish
+            OptimalTimeToFinish = OptimalTimeToFinish,
+            Categories = [.. CategoryIds.Select(LinkCategoryDto.EmptyLink)]
         };
     }
 }

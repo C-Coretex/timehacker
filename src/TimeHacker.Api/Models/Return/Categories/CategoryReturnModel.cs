@@ -1,4 +1,4 @@
-using TimeHacker.Application.Api.Contracts.DTOs.Categories;
+﻿using TimeHacker.Application.Api.Contracts.DTOs.Categories;
 
 namespace TimeHacker.Api.Models.Return.Categories;
 
@@ -15,7 +15,7 @@ public record CategoryReturnModel(
         ArgumentNullException.ThrowIfNull(category);
 
         return new CategoryReturnModel(
-            category.Id!.Value,
+            category.Id,
             category.Name,
             category.Description,
             category.Color,

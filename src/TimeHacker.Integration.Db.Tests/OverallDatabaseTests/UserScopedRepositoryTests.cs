@@ -1,4 +1,4 @@
-using TimeHacker.Domain.BusinessLogicExceptions;
+﻿using TimeHacker.Domain.BusinessLogicExceptions;
 
 namespace TimeHacker.Integration.Db.Tests.OverallDatabaseTests;
 
@@ -287,8 +287,10 @@ public class UserScopedRepositoryTests(DbContainerFixture fixture): DbIntegratio
         // Full: a task graph for the current user whose schedule child is a stub pointing at another
         // user's row, marked Modified. The foreign row is invisible under RLS, so the UPDATE affects 0
         // rows and is mapped to NotFound for the current user.
-        var dbContext = Resolve<TimeHackerDbContext>();
-        var scheduleRepo = Resolve<IScheduleEntityRepository>();
+        // Shared scope: the guard works by inspecting its own context's ChangeTracker, so the attach and
+        // the save have to happen on one context.
+        var dbContext = ResolveShared<TimeHackerDbContext>();
+        var scheduleRepo = ResolveShared<IScheduleEntityRepository>();
 
         var task = GraphSeeder.BuildTaskWithScheduleStub(foreignSchedule.Id, CurrentUser.UserId);
         dbContext.Attach(task);
@@ -315,8 +317,10 @@ public class UserScopedRepositoryTests(DbContainerFixture fixture): DbIntegratio
 
         // Full: same stub graph, but the foreign schedule child is marked Deleted. Deleting a row owned
         // by another user hits 0 rows under RLS -> NotFound.
-        var dbContext = Resolve<TimeHackerDbContext>();
-        var scheduleRepo = Resolve<IScheduleEntityRepository>();
+        // Shared scope: the guard works by inspecting its own context's ChangeTracker, so the attach and
+        // the save have to happen on one context.
+        var dbContext = ResolveShared<TimeHackerDbContext>();
+        var scheduleRepo = ResolveShared<IScheduleEntityRepository>();
 
         var task = GraphSeeder.BuildTaskWithScheduleStub(foreignSchedule.Id, CurrentUser.UserId);
         dbContext.Attach(task);

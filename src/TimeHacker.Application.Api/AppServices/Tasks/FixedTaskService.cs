@@ -1,26 +1,33 @@
-﻿using TimeHacker.Application.Api.QueryPipelineSteps;
-using TimeHacker.Domain.Entities.Tags;
+﻿using TimeHacker.Application.Api.Extensions;
+using TimeHacker.Application.Api.QueryPipelineSteps;
 
 namespace TimeHacker.Application.Api.AppServices.Tasks;
 
-public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, IScheduleEntityRepository scheduleEntityRepository)
+public class FixedTaskAppService(
+    IFixedTaskRepository fixedTaskRepository,
+    IScheduleEntityRepository scheduleEntityRepository,
+    ICategoryRepository categoryRepository)
     : IFixedTaskAppService
 {
+    //TODL: add GetAll for slim DTOs (no unneeded navigation property materializations)
+    //maybe Func - GetSelector with necessary options, which would disable some navigation property fetch?
     public IAsyncEnumerable<FixedTaskDto> GetAll(CancellationToken cancellationToken = default) =>
         fixedTaskRepository.GetAll().Select(FixedTaskDto.Selector).AsAsyncEnumerable();
 
     public async Task<Guid> AddAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {
         NotProvidedException.ThrowIfNull(task);
+        await categoryRepository.ThrowIfAnyCategoryIsNotVisibleAsync(task.Categories, cancellationToken);
 
-        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntity(), cancellationToken)).Id;
+        return (await fixedTaskRepository.AddAndSaveAsync(task.GetEntityWithJunctions(), cancellationToken)).Id;
     }
 
     public async Task UpdateAsync(FixedTaskDto task, CancellationToken cancellationToken = default)
     {
         NotProvidedException.ThrowIfNull(task);
+        await categoryRepository.ThrowIfAnyCategoryIsNotVisibleAsync(task.Categories, cancellationToken);
 
-        var entity = await fixedTaskRepository.GetAndUpdateAndSaveAsync(task.Id!.Value, e => task.GetEntity(e), cancellationToken);
+        var entity = await fixedTaskRepository.GetAndUpdateAndSaveAsync(task.Id!.Value, e => task.GetEntityWithJunctions(e), cancellationToken, QueryPipelineFixedTasks.IncludeCategoryLinks);
         if (entity is null)
             throw new NotFoundException("FixedTask", task.Id!.Value.ToString());
     }
@@ -41,7 +48,7 @@ public class FixedTaskAppService(IFixedTaskRepository fixedTaskRepository, ISche
 
     public async Task<FixedTaskDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken, queryPipelineSteps: QueryPipelineFixedTasks.IncludeRepeatingData);
+        var entity = await fixedTaskRepository.GetByIdAsync(id, cancellationToken: cancellationToken, queryPipelineSteps: [QueryPipelineFixedTasks.IncludeRepeatingData, QueryPipelineFixedTasks.IncludeCategoryData]);
         return FixedTaskDto.Create(entity);
     }
 }

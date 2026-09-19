@@ -3,7 +3,8 @@ import type { Breakpoint } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { TFunction } from 'i18next';
 import type { ColumnType } from 'antd/es/table';
-import type { DynamicTaskReturnModel } from '../../../../api/types';
+import type { DynamicTaskReturnModel, CategoryReturnModel } from '../../../../api/types';
+import { CategoryTags } from '../../../../components/CategoryTags';
 
 const formatDuration = (value: string): string => {
   if (!value) return '-';
@@ -24,6 +25,13 @@ export const getDynamicTaskColumns = (
   { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
   { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
   { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+  {
+    title: t('tasks.categories'),
+    dataIndex: 'categories',
+    key: 'categories',
+    responsive: ['md'] as Breakpoint[],
+    render: (categories: CategoryReturnModel[]) => <CategoryTags categories={categories} />,
+  },
   {
     title: isMobile ? t('tasks.min') : t('tasks.minDuration'),
     dataIndex: 'minTimeToFinish',

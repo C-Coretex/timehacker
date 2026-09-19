@@ -165,12 +165,12 @@ public class RepositoryBase<TDbContext, TModel, TId>(TDbContext dbContext, DbSet
     public virtual Task DeleteRangeAndSaveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
         => ExecuteDeleteAsync(x => ids.Contains(x.Id), cancellationToken);
 
-    public virtual async Task<TModel?> GetAndUpdateAndSaveAsync(TId id, Action<TModel> updateFunction, CancellationToken cancellationToken = default)
+    public virtual async Task<TModel?> GetAndUpdateAndSaveAsync(TId id, Action<TModel> updateFunction, CancellationToken cancellationToken = default, params IEnumerable<QueryPipelineStep<TModel>> queryPipelineSteps)
     {
         ArgumentNullException.ThrowIfNull(updateFunction);
 
         // Fetch tracked so the mutation is persisted by SaveChangesAsync and the original xmin concurrency token is carried.
-        var entity = await GetByIdAsync(id, asNoTracking: false, cancellationToken: cancellationToken);
+        var entity = await GetByIdAsync(id, asNoTracking: false, cancellationToken: cancellationToken, queryPipelineSteps: queryPipelineSteps);
         if (entity is null)
             return null;
 

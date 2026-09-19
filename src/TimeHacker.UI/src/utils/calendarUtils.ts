@@ -1,10 +1,13 @@
 import type { CategoryForDayItem, TaskForDayItem } from '../api/tasks';
+import type { CategoryReturnModel } from '../api/types';
 import { parseTimeToMinutes, utcMinutesToDate, localMinutesToDate } from './timeUtils';
 
 export interface TaskEventResource {
   type: 'fixed' | 'dynamic';
   isFixed: boolean;
   task: { id: string; name: string; description: string | null; priority: number };
+  /** Joined on from the task endpoints — the timeline snapshot carries no links. Empty until they load. */
+  categories: CategoryReturnModel[];
   start: Date;
   end: Date;
 }
@@ -60,6 +63,7 @@ export function taskForDayToEvent(item: TaskForDayItem, date: Date, index?: numb
         description: task.description,
         priority: task.priority,
       },
+      categories: [],
       start,
       end,
     },
@@ -114,5 +118,24 @@ export function categoriesForDayToEvents(items: CategoryForDayItem[], date: Date
         end,
       },
     };
+  });
+}
+
+/**
+ * Fills in each task event's categories from the task id the timeline reports. Category bands are left
+ * alone: they already name their own category.
+ */
+export function attachCategoriesToEvents(
+  events: CalendarEvent[],
+  categoriesByTaskId: Map<string, CategoryReturnModel[]>
+): CalendarEvent[] {
+  if (categoriesByTaskId.size === 0) return events;
+
+  return events.map((event) => {
+    const resource = event.resource;
+    if (!resource || resource.type === 'category') return event;
+
+    const categories = categoriesByTaskId.get(resource.task.id) ?? [];
+    return categories.length === 0 ? event : { ...event, resource: { ...resource, categories } };
   });
 }

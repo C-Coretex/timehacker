@@ -23,6 +23,8 @@ export const useFixedTasks = () => {
         startTimestamp: dayjs(task.startTimestamp),
         endTimestamp: dayjs(task.endTimestamp),
         scheduleEntity: task.scheduleEntity ?? null,
+        categories: task.categories ?? [],
+        categoryIds: (task.categories ?? []).map((category) => category.id),
         tags: task.tags ?? [],
       }));
     },

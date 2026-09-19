@@ -8,7 +8,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "ScheduleEntity->FixedTask")]
     public async Task DeletingScheduleEntity_Should_CascadeDeleteFixedTask()
     {
-        var task = await Resolve<GraphSeeder>().SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken);
+        var task = await Seeder.SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<ScheduleEntity>(task.ScheduleEntityId!.Value);
 
@@ -19,7 +19,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "ScheduleEntity->CategorySchedule")]
     public async Task DeletingScheduleEntity_Should_CascadeDeleteCategorySchedule()
     {
-        var schedule = await Resolve<GraphSeeder>().SeedCategoryScheduleWithSchedule(TestContext.Current.CancellationToken);
+        var schedule = await Seeder.SeedCategoryScheduleWithSchedule(TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<ScheduleEntity>(schedule.ScheduleEntityId!.Value);
 
@@ -32,7 +32,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "Category->CategorySchedule")]
     public async Task DeletingCategory_Should_CascadeDeleteItsSchedules()
     {
-        var (category, morning, evening) = await Resolve<GraphSeeder>()
+        var (category, morning, evening) = await Seeder
             .SeedCategoryWithTwoWindowsOn(new DateOnly(2026, 6, 1), TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<Category>(category.Id);
@@ -45,7 +45,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "Snapshot->ScheduledChildren")]
     public async Task DeletingSnapshot_Should_CascadeDeleteScheduledChildren()
     {
-        var snapshot = await Resolve<GraphSeeder>().SeedSnapshotWithChildren(new DateOnly(2026, 6, 1), TestContext.Current.CancellationToken);
+        var snapshot = await Seeder.SeedSnapshotWithChildren(new DateOnly(2026, 6, 1), TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<ScheduleSnapshot>(snapshot.Id);
 
@@ -57,7 +57,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "ScheduleEntity->ScheduledChildren")]
     public async Task DeletingScheduleEntity_Should_CascadeDeleteScheduledChildrenButKeepSnapshot()
     {
-        var (scheduleEntity, snapshot) = await Resolve<GraphSeeder>()
+        var (scheduleEntity, snapshot) = await Seeder
             .SeedScheduleEntityWithSnapshotChildren(new DateOnly(2026, 6, 2), TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<ScheduleEntity>(scheduleEntity.Id);
@@ -71,7 +71,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "FixedTask->Junctions")]
     public async Task DeletingFixedTask_Should_RemoveJunctionsButKeepCategoryAndTag()
     {
-        var (category, tag, task) = await Resolve<GraphSeeder>().SeedFixedTaskWithCategoryAndTagJunctions(TestContext.Current.CancellationToken);
+        var (category, tag, task) = await Seeder.SeedFixedTaskWithCategoryAndTagJunctions(TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<FixedTask>(task.Id);
 
@@ -85,7 +85,7 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
     [Trait("Cascade", "Category->Junction")]
     public async Task DeletingCategory_Should_RemoveJunctionButKeepFixedTask()
     {
-        var (category, _, task) = await Resolve<GraphSeeder>().SeedFixedTaskWithCategoryAndTagJunctions(TestContext.Current.CancellationToken);
+        var (category, _, task) = await Seeder.SeedFixedTaskWithCategoryAndTagJunctions(TestContext.Current.CancellationToken);
 
         await DeleteByIdAsync<Category>(category.Id);
 
@@ -95,19 +95,19 @@ public class CascadeDeleteTests(DbContainerFixture fixture) : DbIntegrationTestB
 
     private async Task DeleteByIdAsync<TEntity>(Guid id) where TEntity : class
     {
-        Db.ChangeTracker.Clear();
-        var entity = await Db.Set<TEntity>().FindAsync([id], TestContext.Current.CancellationToken);
-        Db.Remove(entity!);
-        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
-        Db.ChangeTracker.Clear();
+        var db = Db;
+        var entity = await db.Set<TEntity>().FindAsync([id], TestContext.Current.CancellationToken);
+        db.Remove(entity!);
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
     }
 
     private async Task<bool> ExistsAsync<TEntity>(Guid id) where TEntity : class
-        => await Db.Set<TEntity>().FindAsync([id], TestContext.Current.CancellationToken) is not null;
+    {
+        return await Db.Set<TEntity>().FindAsync([id], TestContext.Current.CancellationToken) is not null;
+    }
 
     private async Task<int> CountAsync<TEntity>() where TEntity : class
     {
-        Db.ChangeTracker.Clear();
         return await Db.Set<TEntity>().CountAsync(TestContext.Current.CancellationToken);
     }
 }

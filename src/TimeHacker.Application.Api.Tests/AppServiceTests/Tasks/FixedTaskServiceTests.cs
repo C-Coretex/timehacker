@@ -6,6 +6,7 @@ public class FixedTaskAppServiceTests
 
     private readonly Mock<IFixedTaskRepository> _fixedTasksRepository = new();
     private readonly Mock<IScheduleEntityRepository> _scheduleEntityRepository = new();
+    private readonly Mock<ICategoryRepository> _categoryRepository = new();
 
     #endregion
 
@@ -13,14 +14,17 @@ public class FixedTaskAppServiceTests
 
     private List<FixedTask> _fixedTasks = null!;
     private List<ScheduleEntity> _scheduleEntities = null!;
+    private List<Category> _categories = null!;
 
     private readonly IFixedTaskAppService _fixedTaskAppService;
     private readonly Guid _userId = Guid.NewGuid();
 
+    private Guid OwnCategoryId => _categories.First(x => x.UserId == _userId).Id;
+
     public FixedTaskAppServiceTests()
     {
         SetupMocks(_userId);
-        _fixedTaskAppService = new FixedTaskAppService(_fixedTasksRepository.Object, _scheduleEntityRepository.Object);
+        _fixedTaskAppService = new FixedTaskAppService(_fixedTasksRepository.Object, _scheduleEntityRepository.Object, _categoryRepository.Object);
     }
 
     #endregion
@@ -177,6 +181,94 @@ public class FixedTaskAppServiceTests
         result!.Id.Should().Be(id);
     }
 
+    [Fact]
+    [Trait("AddAsync", "Should link the given categories")]
+    public async Task AddAsync_ShouldLinkCategories()
+    {
+        var categoryId = OwnCategoryId;
+
+        await _fixedTaskAppService.AddAsync(new FixedTaskDto
+        {
+            Name = "Categorised",
+            Categories = [LinkCategoryDto.EmptyLink(categoryId)]
+        }, TestContext.Current.CancellationToken);
+
+        _fixedTasks.Single(x => x.Name == "Categorised")
+            .CategoryFixedTasks.Should().ContainSingle(link => link.CategoryId == categoryId);
+    }
+
+    [Fact]
+    [Trait("AddAsync", "Should collapse a repeated category id")]
+    public async Task AddAsync_ShouldNotLinkTheSameCategoryTwice()
+    {
+        var categoryId = OwnCategoryId;
+
+        await _fixedTaskAppService.AddAsync(new FixedTaskDto
+        {
+            Name = "Categorised",
+            Categories = [LinkCategoryDto.EmptyLink(categoryId), LinkCategoryDto.EmptyLink(categoryId)]
+        }, TestContext.Current.CancellationToken);
+
+        _fixedTasks.Single(x => x.Name == "Categorised").CategoryFixedTasks.Should().HaveCount(1);
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should replace the linked categories")]
+    public async Task UpdateAsync_ShouldReplaceCategories()
+    {
+        var task = _fixedTasks.First(x => x.UserId == _userId);
+        var categoryId = OwnCategoryId;
+        task.CategoryFixedTasks.Add(new CategoryFixedTask { CategoryId = Guid.NewGuid(), FixedTaskId = task.Id });
+
+        await _fixedTaskAppService.UpdateAsync(new FixedTaskDto
+        {
+            Id = task.Id,
+            Name = task.Name,
+            Categories = [LinkCategoryDto.EmptyLink(categoryId)]
+        }, TestContext.Current.CancellationToken);
+
+        task.CategoryFixedTasks.Should().ContainSingle(link => link.CategoryId == categoryId);
+    }
+
+    [Fact]
+    [Trait("UpdateAsync", "Should unlink every category when none is given")]
+    public async Task UpdateAsync_ShouldClearCategories_WhenNoneGiven()
+    {
+        var task = _fixedTasks.First(x => x.UserId == _userId);
+        task.CategoryFixedTasks.Add(new CategoryFixedTask { CategoryId = OwnCategoryId, FixedTaskId = task.Id });
+
+        await _fixedTaskAppService.UpdateAsync(new FixedTaskDto
+        {
+            Id = task.Id,
+            Name = task.Name
+        }, TestContext.Current.CancellationToken);
+
+        task.CategoryFixedTasks.Should().BeEmpty();
+    }
+
+    [Theory]
+    [Trait("AddAsync+UpdateAsync", "Should reject a category the user cannot see")]
+    [InlineData(true), InlineData(false)]
+    public async Task AddAsync_And_UpdateAsync_ShouldThrowNotFound_ForInvisibleCategory(bool anotherUsersCategory)
+    {
+        // A foreign key check bypasses RLS, so an unguarded link would be written and then read back as nothing.
+        var categoryId = anotherUsersCategory
+            ? _categories.First(x => x.UserId != _userId).Id
+            : Guid.NewGuid();
+        var categories = new[] { LinkCategoryDto.EmptyLink(categoryId) };
+
+        var add = async () => await _fixedTaskAppService.AddAsync(
+            new FixedTaskDto { Name = "Sneaky", Categories = categories }, TestContext.Current.CancellationToken);
+        (await add.Should().ThrowAsync<NotFoundException>()).Which.ResourceName.Should().Be("Category");
+
+        var update = async () => await _fixedTaskAppService.UpdateAsync(
+            new FixedTaskDto { Id = _fixedTasks.First(x => x.UserId == _userId).Id, Name = "Sneaky", Categories = categories },
+            TestContext.Current.CancellationToken);
+        (await update.Should().ThrowAsync<NotFoundException>()).Which.ResourceName.Should().Be("Category");
+
+        _fixedTasks.Should().NotContain(x => x.Name == "Sneaky");
+    }
+
     // Validation Tests
     [Fact]
     [Trait("AddAsync", "Should throw on null input")]
@@ -257,6 +349,13 @@ public class FixedTaskAppServiceTests
         _scheduleEntities = [];
 
         _scheduleEntityRepository.As<IUserScopedRepositoryBase<ScheduleEntity, Guid>>().SetupRepositoryMock(_scheduleEntities);
+
+        _categories =
+        [
+            new() { UserId = userId, Name = "Own category" },
+            new() { UserId = Guid.NewGuid(), Name = "Another user's category" }
+        ];
+        _categoryRepository.As<IUserScopedRepositoryBase<Category, Guid>>().SetupRepositoryMock(_categories, userId);
 
         // Setup DeleteBy method for code-side cascade delete
         _scheduleEntityRepository.Setup(x => x.DeleteBy(It.IsAny<Expression<Func<ScheduleEntity, bool>>>(), It.IsAny<CancellationToken>()))

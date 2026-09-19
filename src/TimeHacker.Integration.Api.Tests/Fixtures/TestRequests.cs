@@ -63,12 +63,14 @@ internal static class TestRequests
         TimeSpan? max = null,
         TimeSpan? optimal = null,
         byte priority = 5,
+        IEnumerable<Guid>? categoryIds = null,
         string? description = "reading")
         => new()
         {
             Name = name,
             Description = description,
             Priority = priority,
+            CategoryIds = categoryIds ?? [],
             MinTimeToFinish = min ?? TimeSpan.FromMinutes(30),
             MaxTimeToFinish = max ?? TimeSpan.FromMinutes(60),
             OptimalTimeToFinish = optimal

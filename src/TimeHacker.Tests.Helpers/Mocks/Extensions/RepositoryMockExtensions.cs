@@ -21,10 +21,10 @@ public static class RepositoryMockExtensions
             .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
 
         repository.Setup(x => x.GetByIdAsync(It.IsAny<TId>(), It.IsAny<bool>(), It.IsAny<CancellationToken>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
-            .Returns<TId, bool, CancellationToken, QueryPipelineStep<TModel>[]>((id, _, _, _) => Task.FromResult(source.FirstOrDefault(x => x.Id!.Equals(id))));
+            .Returns<TId, bool, CancellationToken, IEnumerable<QueryPipelineStep<TModel>>>((id, _, _, _) => Task.FromResult(source.FirstOrDefault(x => x.Id!.Equals(id))));
 
-        repository.Setup(x => x.GetAndUpdateAndSaveAsync(It.IsAny<TId>(), It.IsAny<Action<TModel>>(), It.IsAny<CancellationToken>()))
-            .Returns<TId, Action<TModel>, CancellationToken>((id, updateFunction, _) =>
+        repository.Setup(x => x.GetAndUpdateAndSaveAsync(It.IsAny<TId>(), It.IsAny<Action<TModel>>(), It.IsAny<CancellationToken>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
+            .Returns<TId, Action<TModel>, CancellationToken, IEnumerable<QueryPipelineStep<TModel>>>((id, updateFunction, _, _) =>
             {
                 var entry = source.FirstOrDefault(x => x.Id!.Equals(id));
                 if (entry is null)
@@ -50,10 +50,10 @@ public static class RepositoryMockExtensions
             .Callback<TModel, CancellationToken>((entry, _) => source.Add(entry))
             .Returns<TModel, CancellationToken>((entry, _) => Task.FromResult(entry));
 
-        repository.Setup(x => x.GetAll(It.IsAny< IEnumerable<QueryPipelineStep<TModel>>>()))
+        repository.Setup(x => x.GetAll(It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
             .Returns(source.BuildMock());
 
-        repository.Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny< IEnumerable<QueryPipelineStep<TModel>>>()))
+        repository.Setup(x => x.GetAll(It.IsAny<bool>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
             .Returns(source.BuildMock());
     }
 
@@ -105,8 +105,8 @@ public static class RepositoryMockExtensions
             .Returns<TId, bool, CancellationToken, IEnumerable<QueryPipelineStep<TModel>>>((id, _, _, _) =>
                 Task.FromResult(GetUserScopedData().FirstOrDefault(x => x.Id!.Equals(id))));
 
-        repository.Setup(x => x.GetAndUpdateAndSaveAsync(It.IsAny<TId>(), It.IsAny<Action<TModel>>(), It.IsAny<CancellationToken>()))
-            .Returns<TId, Action<TModel>, CancellationToken>((id, updateFunction, _) =>
+        repository.Setup(x => x.GetAndUpdateAndSaveAsync(It.IsAny<TId>(), It.IsAny<Action<TModel>>(), It.IsAny<CancellationToken>(), It.IsAny<IEnumerable<QueryPipelineStep<TModel>>>()))
+            .Returns<TId, Action<TModel>, CancellationToken, IEnumerable<QueryPipelineStep<TModel>>>((id, updateFunction, _, _) =>
             {
                 // Only found when the current user owns the entity (mirrors RLS visibility).
                 var entry = GetUserScopedData().FirstOrDefault(x => x.Id!.Equals(id));

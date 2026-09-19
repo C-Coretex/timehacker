@@ -22,6 +22,9 @@ public sealed record TimelineTaskResponse
 
 public sealed record TimelineTaskInfo
 {
+    /// <summary>The originating FixedTask/DynamicTask id, not the snapshot row's own id.</summary>
+    public Guid Id { get; init; }
+
     public required string Name { get; init; }
     public string? Description { get; init; }
     public byte Priority { get; init; }

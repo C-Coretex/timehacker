@@ -1,3 +1,4 @@
+﻿using TimeHacker.Api.Models.Return.Categories;
 using TimeHacker.Api.Models.Return.Tags;
 
 namespace TimeHacker.Api.Models.Return.Tasks;
@@ -12,6 +13,7 @@ public record FixedTaskReturnModel(
     DateTime EndTimestamp,
     DateTime CreatedTimestamp,
     ScheduleEntityReturnModel? ScheduleEntity,
+    IEnumerable<CategoryReturnModel> Categories,
     IEnumerable<TagReturnModel> Tags)
 {
     public static FixedTaskReturnModel Create(FixedTaskDto fixedTask)
@@ -27,6 +29,7 @@ public record FixedTaskReturnModel(
             fixedTask.EndTimestamp,
             fixedTask.CreatedTimestamp,
             fixedTask.ScheduleEntity != null ? ScheduleEntityReturnModel.Create(fixedTask.ScheduleEntity) : null,
+            fixedTask.RichCategories.Select(CategoryReturnModel.Create),
             fixedTask.Tags.Select(TagReturnModel.Create)
         );
     }

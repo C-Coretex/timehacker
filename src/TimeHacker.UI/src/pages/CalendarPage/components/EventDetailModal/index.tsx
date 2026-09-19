@@ -3,6 +3,7 @@ import { Badge, Button, Descriptions, Divider, Modal, Space, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { ScheduleInfo } from '../ScheduleInfo';
+import { CategoryTags } from '../../../../components/CategoryTags';
 import { argbToHex } from '../../../../utils/colorArgb';
 import type { EventDetailModalProps } from './types';
 
@@ -18,6 +19,7 @@ export const EventDetailModal: FC<EventDetailModalProps> = ({
   const resource = event?.resource;
   const isCategory = resource?.type === 'category';
   const task = resource && resource.type !== 'category' ? resource.task : undefined;
+  const taskCategories = resource && resource.type !== 'category' ? resource.categories : [];
 
   return (
     <Modal open={open} title={null} footer={null} onCancel={onClose} width={600}>
@@ -100,6 +102,9 @@ export const EventDetailModal: FC<EventDetailModalProps> = ({
             )}
             <Descriptions.Item label={t('calendar.priorityLabel')}>
               {task?.priority ?? '-'}
+            </Descriptions.Item>
+            <Descriptions.Item label={t('calendar.categoriesLabel')}>
+              <CategoryTags categories={taskCategories} />
             </Descriptions.Item>
             <Descriptions.Item label={t('calendar.startLabel')}>
               {dayjs(event.start).format(`YYYY-MM-DD ${timeDisplayFormat}`)}

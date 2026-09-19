@@ -16,9 +16,9 @@ public class CategoryScheduleUserScopingTests(DbContainerFixture fixture) : DbIn
     public async Task GetAll_Should_OnlyReturnCurrentUsersSchedules()
     {
         var ct = TestContext.Current.CancellationToken;
-        var own = await Resolve<GraphSeeder>().SeedCategoryScheduleForCurrentUser("Mine");
+        var own = await Seeder.SeedCategoryScheduleForCurrentUser("Mine");
         foreach (var user in OtherUsers)
-            await user.Resolve<GraphSeeder>().SeedCategoryScheduleForCurrentUser("Theirs");
+            await user.Seeder.SeedCategoryScheduleForCurrentUser("Theirs");
 
         // Full: the repository returns only the current user's window.
         var result = await Resolve<ICategoryScheduleRepository>().GetAll().ToListAsync(ct);
@@ -51,7 +51,7 @@ public class CategoryScheduleUserScopingTests(DbContainerFixture fixture) : DbIn
     {
         var ct = TestContext.Current.CancellationToken;
         var theirs = await SeedForOtherUser();
-        var own = await Resolve<GraphSeeder>().SeedCategoryScheduleForCurrentUser();
+        var own = await Seeder.SeedCategoryScheduleForCurrentUser();
 
         var repo = Resolve<ICategoryScheduleRepository>();
         (await repo.ExistsAsync(theirs.Id, ct)).Should().BeFalse();
@@ -67,7 +67,7 @@ public class CategoryScheduleUserScopingTests(DbContainerFixture fixture) : DbIn
     public async Task Add_Should_RejectForeignUserIdUnderRls()
     {
         var ct = TestContext.Current.CancellationToken;
-        var own = await Resolve<GraphSeeder>().SeedCategoryScheduleForCurrentUser();
+        var own = await Seeder.SeedCategoryScheduleForCurrentUser();
 
         // RLS only: inserting a row stamped for another user violates the WITH CHECK policy.
         await using var rls = await CreateRlsContextAsync(CurrentUser.UserId, ct);
@@ -113,7 +113,7 @@ public class CategoryScheduleUserScopingTests(DbContainerFixture fixture) : DbIn
     public async Task Update_Should_RejectChangingUserIdToAnotherUser()
     {
         var ct = TestContext.Current.CancellationToken;
-        var own = await Resolve<GraphSeeder>().SeedCategoryScheduleForCurrentUser();
+        var own = await Seeder.SeedCategoryScheduleForCurrentUser();
 
         // RLS only: reassigning an owned row to another user violates the WITH CHECK policy.
         await using var rls = await CreateRlsContextAsync(CurrentUser.UserId, ct);
@@ -164,7 +164,7 @@ public class CategoryScheduleUserScopingTests(DbContainerFixture fixture) : DbIn
         var ct = TestContext.Current.CancellationToken;
         var date = new DateOnly(2026, 6, 1);
 
-        var (category, morning, evening) = await Resolve<GraphSeeder>().SeedCategoryWithTwoWindowsOn(date, ct);
+        var (category, morning, evening) = await Seeder.SeedCategoryWithTwoWindowsOn(date, ct);
 
         // The (UserId, Date) index is a plain lookup index — nothing constrains one window per day, and
         // a third window overlapping the first must insert cleanly too.
@@ -185,5 +185,5 @@ public class CategoryScheduleUserScopingTests(DbContainerFixture fixture) : DbIn
     }
 
     private Task<CategorySchedule> SeedForOtherUser()
-        => OtherUsers.First().Resolve<GraphSeeder>().SeedCategoryScheduleForCurrentUser("Theirs");
+        => OtherUsers.First().Seeder.SeedCategoryScheduleForCurrentUser("Theirs");
 }

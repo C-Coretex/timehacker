@@ -35,6 +35,24 @@ public sealed class TimelineApiTests(ApiTestFixture fixture) : ApiIntegrationTes
     }
 
     [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
+    public async Task GetTasksForDay_Should_ReportTheOriginatingTaskId()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var (start, end) = SlotOn(Today);
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Cat"))).Content;
+        var fixedId = (await api.FixedTasks.Create(TestRequests.NewFixedTask("Morning", start, end, categoryIds: [categoryId]))).Content;
+
+        var day = await api.Tasks.GetForDay(D(Today));
+
+        // The timeline is served from a denormalized snapshot, and the snapshot carries no category links —
+        // the calendar joins them on from the task endpoints using exactly this id. If it ever reported the
+        // snapshot row's own id instead, that join would match nothing and the categories would silently
+        // never appear.
+        day.Content!.TasksTimeline.Should().Contain(t => t.Task.Id == fixedId);
+        (await api.FixedTasks.Get(fixedId)).Content!.Categories.Should().ContainSingle(c => c.Id == categoryId);
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/tasks/timeline/day")]
     public async Task GetTasksForDay_SecondCall_Should_ReuseSnapshot()
     {
         var api = await CreateAuthenticatedApiAsync();

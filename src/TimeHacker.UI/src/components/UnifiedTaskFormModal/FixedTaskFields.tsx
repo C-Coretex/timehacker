@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Form, Input, Slider, TimePicker, Row, Col } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { CategorySelect } from '../CategorySelect';
 import { getFixedPriorityMarks } from './constants';
 
 export const FixedTaskFields: FC = () => {
@@ -20,6 +21,8 @@ export const FixedTaskFields: FC = () => {
       <Form.Item name="description" label={t('taskForm.description')}>
         <Input.TextArea rows={3} placeholder={t('taskForm.description')} />
       </Form.Item>
+
+      <CategorySelect />
 
       <Form.Item
         name="priority"

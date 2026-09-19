@@ -11,7 +11,7 @@ public class FixedTaskCascadeDeleteTests(DbContainerFixture fixture) : DbIntegra
     [Trait("DeleteAsync", "CascadesScheduleAndInstances")]
     public async Task DeleteAsync_Should_RemoveTaskScheduleAndScheduledInstances()
     {
-        var graphSeeder = Resolve<GraphSeeder>();
+        var graphSeeder = Seeder;
         var task = await graphSeeder.SeedFixedTaskWithSchedule(TestContext.Current.CancellationToken);
         var scheduleEntityId = task.ScheduleEntityId!.Value;
 

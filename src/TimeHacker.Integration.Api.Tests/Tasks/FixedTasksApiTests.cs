@@ -1,3 +1,5 @@
+﻿using System.Text.Json;
+using TimeHacker.Domain.Entities.Categories;
 using TimeHacker.Domain.Entities.ScheduleSnapshots;
 
 namespace TimeHacker.Integration.Api.Tests.Tasks;
@@ -24,15 +26,79 @@ public sealed class FixedTasksApiTests(ApiTestFixture fixture) : ApiIntegrationT
     }
 
     [Fact, Trait("Endpoint", "POST /api/fixed-tasks")]
-    public async Task Create_WithCategoryIds_Should_Succeed()
+    public async Task Create_WithCategoryIds_Should_LinkAndRoundTripThem()
     {
         var api = await CreateAuthenticatedApiAsync();
         var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Cat"))).Content;
 
         var create = await api.FixedTasks.Create(TestRequests.NewFixedTask(categoryIds: [categoryId]));
-
         create.StatusCode.Should().Be(HttpStatusCode.Created);
-        (await api.FixedTasks.Get(create.Content)).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        (await LinkedCategoryIdsOf(create.Content)).Should().ContainSingle(id => id == categoryId);
+
+        // The link must also come back out of both read endpoints, named, not just id-shaped.
+        var get = await api.FixedTasks.Get(create.Content);
+        get.StatusCode.Should().Be(HttpStatusCode.OK);
+        get.Content!.Categories.Should().ContainSingle(c => c.Id == categoryId && c.Name == "Cat");
+
+        var all = await api.FixedTasks.GetAll();
+        all.Content!.Single().Categories.Should().ContainSingle(c => c.Id == categoryId && c.Name == "Cat");
+    }
+
+    [Fact, Trait("Endpoint", "PUT /api/fixed-tasks/{id}")]
+    public async Task Update_Should_ReplaceLinkedCategories()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var first = (await api.Categories.Create(TestRequests.NewCategory("First"))).Content;
+        var second = (await api.Categories.Create(TestRequests.NewCategory("Second"))).Content;
+        var id = (await api.FixedTasks.Create(TestRequests.NewFixedTask(categoryIds: [first]))).Content;
+
+        var update = await api.FixedTasks.Update(id, TestRequests.NewFixedTask(categoryIds: [second]));
+        update.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        (await LinkedCategoryIdsOf(id)).Should().BeEquivalentTo([second]);
+        (await api.FixedTasks.Get(id)).Content!.Categories.Should().ContainSingle(c => c.Id == second);
+    }
+
+    [Fact, Trait("Endpoint", "PUT /api/fixed-tasks/{id}")]
+    public async Task Update_WithoutCategoryIds_Should_UnlinkAll()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Cat"))).Content;
+        var id = (await api.FixedTasks.Create(TestRequests.NewFixedTask(categoryIds: [categoryId]))).Content;
+
+        (await api.FixedTasks.Update(id, TestRequests.NewFixedTask())).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        (await LinkedCategoryIdsOf(id)).Should().BeEmpty();
+        // Unlinking must not take the category with it.
+        (await api.Categories.Get(categoryId)).StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact, Trait("Endpoint", "Not found")]
+    public async Task Create_And_Update_Should_Return404_ForUnknownCategoryId()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var unknownCategory = Guid.CreateVersion7();
+
+        var create = await api.FixedTasks.Create(TestRequests.NewFixedTask(categoryIds: [unknownCategory]));
+        await AssertCategoryNotFound(create);
+
+        var id = (await api.FixedTasks.Create(TestRequests.NewFixedTask())).Content;
+        await AssertCategoryNotFound(await api.FixedTasks.Update(id, TestRequests.NewFixedTask(categoryIds: [unknownCategory])));
+        (await LinkedCategoryIdsOf(id)).Should().BeEmpty();
+    }
+
+    [Fact, Trait("Endpoint", "Cross-user 404")]
+    public async Task Create_Should_Return404_ForAnotherUsersCategory()
+    {
+        var userA = await CreateAuthenticatedApiAsync();
+        var categoryId = (await userA.Categories.Create(TestRequests.NewCategory("A-only"))).Content;
+
+        // RLS hides A's category from B on reads, and a foreign-key check would not: the link must be refused.
+        var userB = await CreateAuthenticatedApiAsync();
+        await AssertCategoryNotFound(await userB.FixedTasks.Create(TestRequests.NewFixedTask(categoryIds: [categoryId])));
+
+        (await AdminDbContext.Set<CategoryFixedTask>().CountAsync(TestContext.Current.CancellationToken)).Should().Be(0);
     }
 
     [Fact, Trait("Endpoint", "GET /api/fixed-tasks")]
@@ -113,5 +179,35 @@ public sealed class FixedTasksApiTests(ApiTestFixture fixture) : ApiIntegrationT
 
         (await AdminDbContext.Set<FixedTask>().CountAsync(cancellationToken)).Should().Be(1);
         (await AdminDbContext.Set<ScheduleEntity>().CountAsync(cancellationToken)).Should().Be(1);
+    }
+
+    [Fact, Trait("Endpoint", "GET /api/fixed-tasks")]
+    public async Task Get_Should_ReportEachCategoryWithItsWindows()
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var categoryId = (await api.Categories.Create(TestRequests.NewCategory("Cat"))).Content;
+        var windowId = (await api.Categories.CreateSchedule(categoryId, TestRequests.NewCategorySchedule())).Content;
+        var taskId = (await api.FixedTasks.Create(TestRequests.NewFixedTask(categoryIds: [categoryId]))).Content;
+
+        // Both read paths build the DTO differently — one an EF projection, one a compiled selector over an
+        // Included graph — so both are held to carrying the category's windows.
+        (await api.FixedTasks.Get(taskId)).Content!.Categories.Single()
+            .Schedules.Should().ContainSingle(s => s.Id == windowId);
+        (await api.FixedTasks.GetAll()).Content!.Single().Categories.Single()
+            .Schedules.Should().ContainSingle(s => s.Id == windowId);
+    }
+
+    private async Task<List<Guid>> LinkedCategoryIdsOf(Guid taskId)
+        => await AdminDbContext.Set<CategoryFixedTask>()
+            .Where(x => x.FixedTaskId == taskId)
+            .Select(x => x.CategoryId)
+            .ToListAsync(TestContext.Current.CancellationToken);
+
+    private static async Task AssertCategoryNotFound(IApiResponse response)
+    {
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        using var body = JsonDocument.Parse(((ApiException)response.Error!).Content!);
+        body.RootElement.GetProperty("title").GetString().Should().Be("Resource is not found.");
+        body.RootElement.GetProperty("ResourceName").GetString().Should().Be("Category");
     }
 }

@@ -59,6 +59,7 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
       form.setFieldsValue({
         name: initialFixedData.name,
         description: initialFixedData.description,
+        categoryIds: initialFixedData.categoryIds ?? [],
         priority: initialFixedData.priority,
         startTime: start,
         endTime: end,
@@ -67,6 +68,7 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
       form.setFieldsValue({
         name: initialDynamicData.name,
         description: initialDynamicData.description ?? '',
+        categoryIds: initialDynamicData.categories.map((category) => category.id),
         dynamicPriority: initialDynamicData.priority,
         minMinutes: timeSpanToMinutes(initialDynamicData.minTimeToFinish),
         maxMinutes: timeSpanToMinutes(initialDynamicData.maxTimeToFinish),
@@ -89,6 +91,7 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
       const taskData: FixedTaskFormData = {
         name: values.name as string,
         description: values.description as string,
+        categoryIds: (values.categoryIds as string[]) ?? [],
         priority: values.priority as number,
         startTimestamp,
         endTimestamp,
@@ -99,6 +102,7 @@ export const UnifiedTaskFormModal: FC<UnifiedTaskFormModalProps> = ({
       const payload: InputDynamicTask = {
         name: values.name as string,
         description: (values.description as string) || undefined,
+        categoryIds: (values.categoryIds as string[]) ?? [],
         priority: values.dynamicPriority as number,
         minTimeToFinish: minutesToTimeSpan(values.minMinutes as number),
         maxTimeToFinish: minutesToTimeSpan(values.maxMinutes as number),
