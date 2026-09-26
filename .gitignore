@@ -280,6 +280,7 @@ ClientBin/
 *.dbproj.schemaview
 *.jfm
 *.pfx
+src/certs/
 *.publishsettings
 orleans.codegen.cs
 

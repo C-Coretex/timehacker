@@ -244,11 +244,11 @@ npm run preview
 
 **Docker (Recommended):**
 ```bash
-# From src/ directory
-docker compose up
+# From src/ directory, after the one-time certificate setup in ../README.md#running-locally
+docker compose --profile dev up
 ```
 - UI service runs on port **5173**
-- All services (API, databases, pgAdmin) start together
+- The profile picks the services (`minimal`, `dev`, `full`); a bare `docker compose up` starts only the database
 
 **Path Aliases** (configured in `vite.config.ts`):
 - `api` → `src/api`

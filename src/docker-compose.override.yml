@@ -4,9 +4,12 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: 8080
       ASPNETCORE_HTTPS_PORTS: 8081
+      ASPNETCORE_URLS: https://+:8081;http://+:8080
+      # Created by resources/Init/setup-dev-certs.ps1 / .sh; the API fails to start until it has run.
+      Kestrel__Certificates__Default__Path: /certs/timehacker.pem
+      Kestrel__Certificates__Default__KeyPath: /certs/timehacker.key
     ports:
       - "8080:8080"
       - "8081:8081"
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ./certs:/certs:ro

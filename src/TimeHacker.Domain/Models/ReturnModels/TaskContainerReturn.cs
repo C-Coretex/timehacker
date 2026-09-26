@@ -37,7 +37,7 @@ public record TaskContainerReturn
         var entity = new TaskContainerReturn
         {
             IsFixed = task.IsFixed,
-            ScheduleEntityId = task.ParentTaskId,
+            ScheduleEntityId = task.ParentScheduleEntityId,
             TimeRange = new TimeRange(task.Start, task.End),
             Task = task.IsFixed 
                 ? new FixedTask()

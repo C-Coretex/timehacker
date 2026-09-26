@@ -8,7 +8,7 @@ namespace TimeHacker.Api.Controllers.Tasks;
 public class TasksController(ITaskAppService taskService)
     : ControllerBase
 {
-    [ProducesResponseType(typeof(TasksForDayReturn), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TasksForDayDto), StatusCodes.Status200OK)]
     [HttpGet("timeline/day")]
     public async Task<Ok<TasksForDayDto>> GetTasksForDay(string date, CancellationToken cancellationToken = default)
     {
@@ -20,7 +20,7 @@ public class TasksController(ITaskAppService taskService)
         return TypedResults.Ok(data);
     }
 
-    [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayDto>), StatusCodes.Status200OK)]
     [HttpGet("timeline")]
     public Ok<IAsyncEnumerable<TasksForDayDto>> GetTasksForDays([FromQuery] ICollection<DateOnly> dates, CancellationToken cancellationToken = default)
     {
@@ -29,7 +29,7 @@ public class TasksController(ITaskAppService taskService)
         return TypedResults.Ok(data);
     }
 
-    [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayReturn>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IAsyncEnumerable<TasksForDayDto>), StatusCodes.Status200OK)]
     [HttpPost("timeline/refresh")]
     public Ok<IAsyncEnumerable<TasksForDayDto>> RefreshTasksForDays([FromBody] ICollection<DateOnly> dates, CancellationToken cancellationToken = default)
     {

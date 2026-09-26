@@ -2,6 +2,38 @@
 
 > **Note:** For frontend documentation, see [TimeHacker.UI/README.md](TimeHacker.UI/README.md)
 
+## Running locally
+
+The API must serve HTTPS: the UI calls `https://localhost:8081`, and the auth and antiforgery cookies are
+`Secure`. Before the first `docker compose up`, create and trust a localhost certificate:
+
+```bash
+# from the repository root (the scripts resolve paths from their own location, so any directory works)
+powershell -ExecutionPolicy Bypass -File resources/Init/setup-dev-certs.ps1   # Windows
+sh resources/Init/setup-dev-certs.sh                                           # macOS / Linux
+```
+
+It writes `src/certs/timehacker.pem` + `.key` (git-ignored), which `docker-compose.override.yml` mounts into
+the API. Without it the API exits with `Could not find file '/certs/timehacker.pem'`. Re-run it when the
+certificate expires.
+
+- **With the .NET SDK** it exports the machine's ASP.NET Core dev certificate, creating and trusting it if
+  needed, so Visual Studio and `dotnet run` share it.
+- **Without the SDK** (a runtime-only install counts as none) it generates the certificate in the
+  `mcr.microsoft.com/dotnet/sdk` image and trusts it itself. Windows and macOS ask for confirmation. On
+  Linux the script prints what to trust manually, or you can open `https://localhost:8081` once and
+  accept the warning.
+
+Then pick a profile:
+
+```bash
+docker compose --profile minimal up   # ui + api + db
+docker compose --profile dev up       # + pgAdmin
+docker compose --profile full up      # + observability (Alloy/Loki/Tempo/Prometheus/Grafana)
+```
+
+The seeded Development account is `test@aa.bb` / `Qwerty123`.
+
 ## Architecture
 
 Clean Architecture with 4 layers:
