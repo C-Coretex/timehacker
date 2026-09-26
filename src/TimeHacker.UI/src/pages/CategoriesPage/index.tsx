@@ -11,14 +11,13 @@ import { PageHeader } from '../../components/PageHeader';
 import type { CategoryDisplayModel, CategoryFormData } from '../../api/types';
 import { useCategories } from '../../hooks/useCategories';
 import { useCategoryScheduleEditor } from '../../hooks/useCategoryScheduleEditor';
-import { useIsMobile } from '../../hooks/useIsMobile';
 import { toCategoryPayload, toCategorySchedulePayload } from '../../utils/categoryPayloads';
+import { CategoryCards } from './CategoryCards';
 import { getCategoryColumns } from './columns';
 import { SchedulesPanel } from './SchedulesPanel';
 
-/** Categories as a table; each row expands into the time windows that category occupies. */
+/** Categories as a table (cards on phones); each one opens onto the time windows that category occupies. */
 export const CategoriesPage: FC = () => {
-  const { isMobile } = useIsMobile();
   const { t } = useTranslation();
   const { notification, modal } = App.useApp();
   const { categories, loading, error, fetchCategories, create, update, remove } = useCategories();
@@ -90,18 +89,18 @@ export const CategoriesPage: FC = () => {
       )}
 
       <Table
-        columns={getCategoryColumns(isMobile, t, openModal, handleDelete)}
+        className="th-desktop-only"
+        columns={getCategoryColumns(t, openModal, handleDelete)}
         dataSource={categories}
         loading={loading}
         rowKey="id"
         locale={{ emptyText: t('categories.noCategories') }}
-        scroll={isMobile ? { x: 500 } : undefined}
-        size={isMobile ? 'small' : 'middle'}
+        scroll={{ x: 'max-content' }}
+        size="middle"
         expandable={{
           expandedRowRender: (category) => (
             <SchedulesPanel
               category={category}
-              isMobile={isMobile}
               t={t}
               onAdd={windows.openAdd}
               onEdit={windows.openEdit}
@@ -109,6 +108,16 @@ export const CategoriesPage: FC = () => {
             />
           ),
         }}
+      />
+      <CategoryCards
+        className="th-phone-only"
+        categories={categories}
+        loading={loading}
+        onEdit={openModal}
+        onDelete={handleDelete}
+        onAddWindow={windows.openAdd}
+        onEditWindow={windows.openEdit}
+        onDeleteWindow={windows.remove}
       />
 
       <CategoryFormModal

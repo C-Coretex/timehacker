@@ -7,3 +7,16 @@ body {
   background: var(--th-page);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Where a page shows a table on desktop and cards on phones, both render and CSS picks one (768px, antd `md`). */
+@media (max-width: 767px) {
+  .th-desktop-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .th-phone-only {
+    display: none !important;
+  }
+}

@@ -11,9 +11,11 @@ import type { CalendarView } from 'contexts/CalendarDateContext';
 import { useSettings } from 'contexts/SettingsContext';
 import type { CalendarEvent } from 'utils/calendarUtils';
 import { DayHeader, WeekdayHeader } from './components/DayHeader';
+import { MonthDateHeader } from './components/MonthDateHeader';
 import { PlannerEvent } from './components/PlannerEvent';
 import { QuickAddSlot } from './components/QuickAddSlot';
 import { eventPropGetter } from './eventPropGetter';
+import { MonthEventsContext, monthDayKey } from './monthEventsContext';
 import { QuickAddContext } from './quickAddContext';
 import { ThreeDayView } from './ThreeDayView';
 import './calendar-theme.css';
@@ -24,7 +26,7 @@ const VIEWS = { month: true, week: true, day: true, '3day': ThreeDayView };
 const COMPONENTS = {
   event: PlannerEvent,
   header: DayHeader,
-  month: { header: WeekdayHeader },
+  month: { header: WeekdayHeader, dateHeader: MonthDateHeader },
   timeSlotWrapper: QuickAddSlot,
 };
 
@@ -68,33 +70,45 @@ export const PlannerCalendar: FC<PlannerCalendarProps> = ({
     [timeFormat, timeDisplayFormat]
   );
 
+  const eventsByDay = useMemo(
+    () =>
+      events.reduce((byDay, event) => {
+        const key = monthDayKey(event.start);
+        byDay.set(key, [...(byDay.get(key) ?? []), event]);
+        return byDay;
+      }, new Map<string, CalendarEvent[]>()),
+    [events]
+  );
+
   return (
     <div className="th-planner-frame">
       <QuickAddContext.Provider value={onQuickAdd}>
-        <Calendar
-          className="th-planner"
-          localizer={localizer}
-          culture={i18n.language?.startsWith('ru') ? 'ru' : 'en'}
-          events={events}
-          backgroundEvents={backgroundEvents}
-          views={VIEWS}
-          view={calendarView as View}
-          onView={(view) => setCalendarView(view as CalendarView)}
-          date={selectedDate}
-          onNavigate={setSelectedDate}
-          onDrillDown={(date) => {
-            setSelectedDate(date);
-            setCalendarView('day');
-          }}
-          toolbar={false}
-          selectable="ignoreEvents"
-          onSelectSlot={onSelectSlot}
-          onSelectEvent={onSelectEvent}
-          eventPropGetter={eventPropGetter}
-          components={COMPONENTS}
-          formats={formats}
-          scrollToTime={SCROLL_TO}
-        />
+        <MonthEventsContext.Provider value={eventsByDay}>
+          <Calendar
+            className="th-planner"
+            localizer={localizer}
+            culture={i18n.language?.startsWith('ru') ? 'ru' : 'en'}
+            events={events}
+            backgroundEvents={backgroundEvents}
+            views={VIEWS}
+            view={calendarView as View}
+            onView={(view) => setCalendarView(view as CalendarView)}
+            date={selectedDate}
+            onNavigate={setSelectedDate}
+            onDrillDown={(date) => {
+              setSelectedDate(date);
+              setCalendarView('day');
+            }}
+            toolbar={false}
+            selectable="ignoreEvents"
+            onSelectSlot={onSelectSlot}
+            onSelectEvent={onSelectEvent}
+            eventPropGetter={eventPropGetter}
+            components={COMPONENTS}
+            formats={formats}
+            scrollToTime={SCROLL_TO}
+          />
+        </MonthEventsContext.Provider>
       </QuickAddContext.Provider>
       {loading && (
         <div className="th-planner-frame__loading">

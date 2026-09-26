@@ -7,7 +7,6 @@ import { getCategoryScheduleColumns } from './scheduleColumns';
 
 interface SchedulesPanelProps {
   category: CategoryDisplayModel;
-  isMobile: boolean;
   t: TFunction;
   onAdd: (category: CategoryDisplayModel) => void;
   onEdit: (category: CategoryDisplayModel, schedule: CategoryScheduleDisplayModel) => void;
@@ -17,16 +16,14 @@ interface SchedulesPanelProps {
 /** The expanded row of the categories table: every time window this category occupies. */
 export const SchedulesPanel: FC<SchedulesPanelProps> = ({
   category,
-  isMobile,
   t,
   onAdd,
   onEdit,
   onDelete,
 }) => (
-  <div style={{ padding: isMobile ? '0 8px 8px' : '0 16px 12px' }}>
+  <div style={{ padding: '0 16px 12px' }}>
     <Table
       columns={getCategoryScheduleColumns(
-        isMobile,
         t,
         (schedule) => onEdit(category, schedule),
         onDelete

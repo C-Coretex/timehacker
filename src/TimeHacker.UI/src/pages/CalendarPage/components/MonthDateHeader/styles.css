@@ -1,0 +1,79 @@
+/* Desktop keeps rbc's own look (the number alone, event pills below); the dots are phone-only. */
+.th-month-date__dots {
+  display: none;
+}
+
+/* Phones: a 50px column cannot hold a readable pill, so the pills and "+N more" rows go and each day becomes one
+   tap target showing its number and a dot per task. rbc measures its row limit from these same rows; with them
+   hidden it simply renders every event (still hidden), and it re-measures on resize. */
+@media (max-width: 767px) {
+  .th-planner .rbc-month-view .rbc-row-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .th-planner .rbc-month-view .rbc-row-content > .rbc-row ~ .rbc-row {
+    display: none;
+  }
+
+  .th-planner .rbc-month-view .rbc-row-content > .rbc-row:first-child {
+    flex: 1;
+  }
+
+  .th-planner .rbc-month-view .rbc-date-cell {
+    display: flex;
+    padding: 0;
+    text-align: center;
+  }
+
+  .th-month-date {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding-top: 6px;
+    user-select: none;
+  }
+
+  .th-month-date__label {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    border-radius: var(--th-radius-pill);
+  }
+
+  .th-planner .rbc-date-cell.rbc-now .th-month-date__label {
+    background: var(--th-today-circle);
+    color: var(--th-on-primary);
+  }
+
+  .th-month-date__dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    max-width: 100%;
+  }
+
+  .th-month-date__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--th-event-fixed);
+  }
+
+  .th-month-date__dot--dynamic {
+    background: var(--th-event-dynamic);
+  }
+
+  .th-month-date__more {
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--th-text-muted);
+  }
+}

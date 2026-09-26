@@ -6,8 +6,8 @@ import type { TFunction } from 'i18next';
 import type { CategoryDisplayModel } from '../../api/types';
 import { argbToHex } from '../../utils/colorArgb';
 
+/** Desktop table only (phones get CategoryCards); actions stay pinned right when a narrow window scrolls it. */
 export const getCategoryColumns = (
-  isMobile: boolean,
   t: TFunction,
   onEdit: (category: CategoryDisplayModel) => void,
   onDelete: (id: string) => void
@@ -16,7 +16,7 @@ export const getCategoryColumns = (
     title: t('categories.color'),
     dataIndex: 'color',
     key: 'color',
-    width: isMobile ? 48 : 72,
+    width: 72,
     render: (color: number) => (
       <span
         aria-hidden
@@ -36,7 +36,7 @@ export const getCategoryColumns = (
     title: t('categories.description'),
     dataIndex: 'description',
     key: 'description',
-    responsive: ['md'] as Breakpoint[],
+    responsive: ['xl'] as Breakpoint[],
   },
   {
     title: t('categories.schedules'),
@@ -51,25 +51,23 @@ export const getCategoryColumns = (
   {
     title: t('categories.actions'),
     key: 'actions',
-    width: isMobile ? 80 : undefined,
+    fixed: 'right',
     render: (_: unknown, category: CategoryDisplayModel) => (
       <>
         <Button
           type="link"
           icon={<EditOutlined />}
           onClick={() => onEdit(category)}
-          size={isMobile ? 'small' : 'middle'}
         >
-          {!isMobile && t('categories.edit')}
+          {t('categories.edit')}
         </Button>
         <Button
           type="link"
           danger
           icon={<DeleteOutlined />}
           onClick={() => onDelete(category.id)}
-          size={isMobile ? 'small' : 'middle'}
         >
-          {!isMobile && t('categories.delete')}
+          {t('categories.delete')}
         </Button>
       </>
     ),

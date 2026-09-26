@@ -1,0 +1,139 @@
+/* The accent is reset per card (the inline style overrides it) so a nested card never inherits its parent's. */
+.th-list-card {
+  --th-list-card-accent: transparent;
+  --th-list-card-bg: var(--th-event-fixed-row);
+  overflow: hidden;
+  border-left: 4px solid var(--th-list-card-accent);
+  border-radius: var(--th-radius-control);
+  background: var(--th-list-card-bg);
+  color: var(--th-text);
+  transition: filter 0.15s;
+}
+
+.th-list-card--dynamic {
+  --th-list-card-bg: var(--th-event-dynamic-row);
+}
+
+.th-list-card--plain {
+  --th-list-card-bg: var(--th-panel);
+  border-top: 1px solid var(--th-border);
+  border-right: 1px solid var(--th-border);
+  border-bottom: 1px solid var(--th-border);
+}
+
+.th-list-card:hover {
+  filter: brightness(0.97);
+}
+
+.th-list-card__row {
+  display: flex;
+  align-items: center;
+}
+
+.th-list-card__open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.th-list-card__open:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: -2px;
+}
+
+.th-list-card__delete.ant-btn {
+  flex: none;
+  margin-right: 6px;
+}
+
+.th-list-card__main {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.th-list-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.th-list-card__title {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.th-list-card__description {
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--th-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.th-list-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 12px;
+  color: var(--th-text-muted);
+}
+
+.th-list-card__meta strong {
+  font-weight: 600;
+  color: var(--th-text);
+}
+
+.th-list-card__aside {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.th-list-card__footer {
+  padding: 0 14px 10px;
+}
+
+/* A column of cards, as the phone lists and Today use it. */
+.th-list-card-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.th-list-card-list__loading {
+  display: block;
+  margin: 32px auto;
+}
+
+.th-list-card-range {
+  display: grid;
+  justify-items: end;
+  line-height: 1.35;
+}
+
+.th-list-card-range__to {
+  font-weight: 500;
+  color: var(--th-text-muted);
+}

@@ -8,12 +8,11 @@ import { useFixedTasks } from '../../../../hooks/useFixedTasks';
 import { UnifiedTaskFormModal } from '../../../../components/UnifiedTaskFormModal';
 import type { ScheduleFormPayload } from '../../../../components/UnifiedTaskFormModal';
 import type { FixedTaskDisplayModel, FixedTaskFormData } from '../../../../api/types';
-import { useIsMobile } from '../../../../hooks/useIsMobile';
 import { toFixedTaskPayload } from '../../../../utils/fixedTaskPayload';
 import { getFixedTaskColumns } from './columns';
+import { FixedTaskCards } from './FixedTaskCards';
 
 export const FixedTasksTab: FC = () => {
-  const { isMobile } = useIsMobile();
   const { t } = useTranslation();
   const { tasks, loading, error, createTask, updateTask, deleteTask } = useFixedTasks();
   const { notification, modal } = App.useApp();
@@ -65,14 +64,16 @@ export const FixedTasksTab: FC = () => {
       )}
 
       <Table
-        columns={getFixedTaskColumns(isMobile, t, openModal, handleDelete)}
+        className="th-desktop-only"
+        columns={getFixedTaskColumns(t, openModal, handleDelete)}
         dataSource={tasks}
         loading={loading}
         rowKey="id"
         locale={{ emptyText: t('tasks.noFixedTasks') }}
-        scroll={isMobile ? { x: 500 } : undefined}
-        size={isMobile ? 'small' : 'middle'}
+        scroll={{ x: 'max-content' }}
+        size="middle"
       />
+      <FixedTaskCards className="th-phone-only" tasks={tasks} loading={loading} onEdit={openModal} onDelete={handleDelete} />
 
       <UnifiedTaskFormModal
         open={modalOpen}

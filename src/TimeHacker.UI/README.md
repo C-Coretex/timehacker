@@ -194,16 +194,26 @@ Routes defined in `config/AppRoutes.tsx`:
 - Events adapt to their size (card → two lines → one line → "…") via CSS container queries, at 88px an hour;
   each shows its category dots and description when there is room, Highest priority is ringed red, Lowest fades
 - Event click shows `EventDetailModal`; phones get a week strip + "tasks left today" summary in day view
+- Month on phones: each day shows its number and a dot per task (`MonthDateHeader`) and opens that day when tapped;
+  desktop keeps rbc's event pills
 
 **TodayPage** (`pages/TodayPage/`)
 - Today's timeline as a list with re-plan / add-task buttons; read-only, since the API does not track completion
 
+**ListCard** (`components/ListCard/`)
+- The design's list row: accent rail, title with category dots, description, meta line, a summary on the right
+  (`ListCardRange` for a from – to pair), tap to open and an optional delete button; `ListCardList` adds the
+  loading and empty states
+- Today's rows, and the phone lists of tasks and categories
+
 **TasksPage** (`pages/TasksPage.tsx`)
 - Tabbed interface: Fixed Tasks / Dynamic Tasks
-- Ant Design tables with inline CRUD actions
+- Ant Design tables with inline CRUD actions on desktop; on phones the same data as `ListCard` rows (tap to edit,
+  🗑 to delete)
 - Modals for create/edit operations
-- Responsive: hides Schedule column on mobile
 - Fixed Tasks table shows recurring type badge and ends-on date
+- CategoriesPage works the same way: a table with expandable time windows on desktop, cards on phones whose
+  windows open under the card
 
 ## Custom Hooks
 
@@ -249,6 +259,8 @@ Routes defined in `config/AppRoutes.tsx`:
 
 **Responsive Design:**
 - Shell and page chrome switch in CSS at 768px (antd `md`)
+- Tables on desktop, cards on phones: both render, `.th-desktop-only` / `.th-phone-only` (`index.css`) pick one
+- Forms' calendar card folds into a date row on phones; the planner's day headers compact by column width
 - `useIsMobile()` hook where behaviour (not just looks) differs, e.g. the planner's initial view
 
 ## Development

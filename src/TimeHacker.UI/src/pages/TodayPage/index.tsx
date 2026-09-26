@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import type { FC } from 'react';
-import { Alert, Button, Empty, Spin, Tooltip } from 'antd';
+import { Alert, Button, Tooltip } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { EventDetailModal } from 'components/EventDetailModal';
+import { ListCardList } from 'components/ListCard';
 import { MagicWandIcon } from 'components/MagicWandIcon';
 import { PageHeader } from 'components/PageHeader';
 import { UnifiedTaskFormModal } from 'components/UnifiedTaskFormModal';
@@ -70,19 +71,12 @@ export const TodayPage: FC = () => {
 
       {error && <Alert type="error" title={error} showIcon className="th-today__error" />}
 
-      {loading && tasks.length === 0 ? (
-        <Spin className="th-today__loading" />
-      ) : tasks.length === 0 ? (
-        <Empty description={t('today.empty')} />
-      ) : (
-        <ul className="th-today__list">
-          {tasks.map((task) => (
-            <li key={task.id}>
-              <TodayTaskRow event={task} isPast={task.end < now} onOpen={details.open} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ListCardList
+        items={tasks}
+        loading={loading}
+        emptyText={t('today.empty')}
+        renderItem={(task) => <TodayTaskRow event={task} isPast={task.end < now} onOpen={details.open} />}
+      />
 
       <EventDetailModal
         open={details.isOpen}

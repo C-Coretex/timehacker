@@ -15,7 +15,8 @@ export const PrivateRoute: FC<PrivateRouteProps> = ({
 
   if (auth && loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      // Fills the shell's page panel (a flex column); 100vh would overflow it under the phone top bar.
+      <div style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Spin size="large" />
       </div>
     );

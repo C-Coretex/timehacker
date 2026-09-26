@@ -9,5 +9,7 @@ export interface CalendarCardProps {
   highlight?: { start: Dayjs; end: Dayjs };
   /** Rendered under the grid, inside the card (repeat picker, time fields). */
   footer?: ReactNode;
+  /** Phones fold the month grid into a date row that opens it (forms); picking a day folds it again. */
+  collapsible?: boolean;
   className?: string;
 }

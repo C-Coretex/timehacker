@@ -46,17 +46,24 @@
   color: var(--th-indigo);
 }
 
-/* Phone week view: the columns only fit the weekday initial over its number. */
-@media (max-width: 767px) {
+/* The header compacts with its own column, not the viewport, so a tablet week fits as well as a phone one. */
+.th-planner .rbc-time-header-cell .rbc-header {
+  container: th-day-header / inline-size;
+}
+
+@container th-day-header (max-width: 99px) {
+  .th-day-header__month {
+    display: none;
+  }
+}
+
+/* Only the weekday over its number fits. */
+@container th-day-header (max-width: 71px) {
   .th-day-header {
     flex-direction: column;
     gap: 2px;
     padding: 6px 0;
     font-size: 10px;
-  }
-
-  .th-day-header__month {
-    display: none;
   }
 
   .th-day-header__number {

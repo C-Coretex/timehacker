@@ -25,14 +25,14 @@ const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunc
   );
 };
 
+/** Desktop table only (phones get FixedTaskCards); actions stay pinned right when a narrow window scrolls it. */
 export const getFixedTaskColumns = (
-  isMobile: boolean,
   t: TFunction,
   onEdit: (task: FixedTaskDisplayModel) => void,
   onDelete: (id: string) => void
 ): ColumnType<FixedTaskDisplayModel>[] => [
   { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
-  { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
+  { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['xl'] as Breakpoint[] },
   {
     title: t('tasks.priority'),
     dataIndex: 'priority',
@@ -43,7 +43,6 @@ export const getFixedTaskColumns = (
     title: t('tasks.categories'),
     dataIndex: 'categories',
     key: 'categories',
-    responsive: ['md'] as Breakpoint[],
     render: (categories: CategoryReturnModel[]) => <CategoryTags categories={categories} />,
   },
   {
@@ -54,28 +53,28 @@ export const getFixedTaskColumns = (
     render: (scheduleEntity: ScheduleEntityReturnModel | null) => scheduleCell(scheduleEntity, t),
   },
   {
-    title: isMobile ? t('tasks.start') : t('tasks.startTime'),
+    title: t('tasks.startTime'),
     dataIndex: 'startTimestamp',
     key: 'startTimestamp',
-    render: (date: Dayjs) => date.format(isMobile ? 'MM/DD HH:mm' : 'YYYY-MM-DD HH:mm'),
+    render: (date: Dayjs) => date.format('YYYY-MM-DD HH:mm'),
   },
   {
-    title: isMobile ? t('tasks.end') : t('tasks.endTime'),
+    title: t('tasks.endTime'),
     dataIndex: 'endTimestamp',
     key: 'endTimestamp',
-    render: (date: Dayjs) => date.format(isMobile ? 'MM/DD HH:mm' : 'YYYY-MM-DD HH:mm'),
+    render: (date: Dayjs) => date.format('YYYY-MM-DD HH:mm'),
   },
   {
     title: t('tasks.actions'),
     key: 'actions',
-    width: isMobile ? 80 : undefined,
+    fixed: 'right',
     render: (_: unknown, task: FixedTaskDisplayModel) => (
       <>
-        <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(task)} size={isMobile ? 'small' : 'middle'}>
-          {!isMobile && t('tasks.edit')}
+        <Button type="link" icon={<EditOutlined />} onClick={() => onEdit(task)}>
+          {t('tasks.edit')}
         </Button>
-        <Button type="link" danger icon={<DeleteOutlined />} onClick={() => onDelete(task.id)} size={isMobile ? 'small' : 'middle'}>
-          {!isMobile && t('tasks.delete')}
+        <Button type="link" danger icon={<DeleteOutlined />} onClick={() => onDelete(task.id)}>
+          {t('tasks.delete')}
         </Button>
       </>
     ),

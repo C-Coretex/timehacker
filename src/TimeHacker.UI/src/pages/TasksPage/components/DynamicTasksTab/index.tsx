@@ -7,11 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { useDynamicTasks } from '../../../../hooks/useDynamicTasks';
 import { UnifiedTaskFormModal } from '../../../../components/UnifiedTaskFormModal';
 import type { DynamicTaskReturnModel, InputDynamicTask } from '../../../../api/types';
-import { useIsMobile } from '../../../../hooks/useIsMobile';
 import { getDynamicTaskColumns } from './columns';
+import { DynamicTaskCards } from './DynamicTaskCards';
 
 export const DynamicTasksTab: FC = () => {
-  const { isMobile } = useIsMobile();
   const { t } = useTranslation();
   const { tasks, loading, error, createTask, updateTask, deleteTask } = useDynamicTasks();
   const { notification, modal } = App.useApp();
@@ -62,14 +61,16 @@ export const DynamicTasksTab: FC = () => {
       )}
 
       <Table
-        columns={getDynamicTaskColumns(isMobile, t, openModal, handleDelete)}
+        className="th-desktop-only"
+        columns={getDynamicTaskColumns(t, openModal, handleDelete)}
         dataSource={tasks}
         loading={loading}
         rowKey="id"
         locale={{ emptyText: t('tasks.noDynamicTasks') }}
-        scroll={isMobile ? { x: 500 } : undefined}
-        size={isMobile ? 'small' : 'middle'}
+        scroll={{ x: 'max-content' }}
+        size="middle"
       />
+      <DynamicTaskCards className="th-phone-only" tasks={tasks} loading={loading} onEdit={openModal} onDelete={handleDelete} />
 
       <UnifiedTaskFormModal
         open={modalOpen}

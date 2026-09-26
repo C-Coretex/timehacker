@@ -31,7 +31,10 @@
   font-family: var(--th-font-sans);
 }
 
+/* rbc pulls the header 1px past the edge (margin-right: scrollbar width − 1, i.e. −1px with overlay scrollbars),
+   which would otherwise leave a horizontal scrollbar under the grid. */
 .th-planner .rbc-time-view {
+  overflow-x: hidden;
   overflow-y: auto;
   border: 0;
 }
@@ -219,6 +222,8 @@
   border-radius: 0;
   background-color: color-mix(in srgb, var(--th-category-color, var(--th-primary)) var(--th-band-alpha), transparent);
   box-shadow: none;
+  /* Its width is forced above, so it can be the size container its label adapts to. */
+  container: th-band / inline-size;
 }
 
 /* Overlapping categories are expected — inset each successive one so every window keeps a visible
@@ -265,6 +270,13 @@
   font-weight: 400;
   font-size: 10px;
   opacity: 0.85;
+}
+
+/* A narrow column (phone 3-day, tablet week) keeps the name and drops the time rather than clip mid-digit. */
+@container th-band (max-width: 140px) {
+  .th-category-label-time {
+    display: none;
+  }
 }
 
 /* ===== Phones ===== */

@@ -4,6 +4,7 @@ import { Calendar } from 'antd';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useCalendarLocale } from 'hooks/useCalendarLocale';
+import { CalendarCardDateRow } from './DateRow';
 import { CalendarCardHeader } from './Header';
 import type { CalendarCardProps } from './types';
 import './styles.css';
@@ -14,10 +15,12 @@ const classNames = (...names: (string | false | undefined)[]) => names.filter(Bo
  * The design's month card (« ‹ month › », bold weekdays, navy selection). It owns the month being browsed,
  * so paging through months never changes the selected day — antd's own header would select as it pages.
  */
-export const CalendarCard: FC<CalendarCardProps> = ({ value, onChange, highlight, footer, className }) => {
+export const CalendarCard: FC<CalendarCardProps> = ({ value, onChange, highlight, footer, collapsible = false, className }) => {
   const locale = useCalendarLocale();
   const [panel, setPanel] = useState<Dayjs>(() => value ?? dayjs());
   const [followedValue, setFollowedValue] = useState(value);
+  // Only phones read this (CSS hides the grid while folded); desktop always shows the grid.
+  const [expanded, setExpanded] = useState(false);
 
   // Follow a selection made elsewhere (the planner, a form reset) by jumping to its month.
   if (value && (!followedValue || !value.isSame(followedValue, 'day'))) {
@@ -46,14 +49,19 @@ export const CalendarCard: FC<CalendarCardProps> = ({ value, onChange, highlight
     );
 
   return (
-    <div className={classNames('th-calendar-card', className)}>
+    <div
+      className={classNames('th-calendar-card', collapsible && 'th-calendar-card--collapsible', expanded && 'is-expanded', className)}
+    >
+      {collapsible && <CalendarCardDateRow value={value} expanded={expanded} onToggle={() => setExpanded((open) => !open)} />}
       <Calendar
         fullscreen={false}
         value={panel}
         locale={locale}
         onSelect={(date, { source }) => {
           setPanel(date);
-          if (source === 'date') onChange?.(date);
+          if (source !== 'date') return;
+          onChange?.(date);
+          setExpanded(false);
         }}
         headerRender={() => <CalendarCardHeader panel={panel} onNavigate={setPanel} />}
         fullCellRender={(day, info) =>

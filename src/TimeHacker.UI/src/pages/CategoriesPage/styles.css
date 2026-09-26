@@ -1,0 +1,33 @@
+/* ===== Phone cards: a category's windows under its card ===== */
+.th-category-windows {
+  display: grid;
+  gap: 6px;
+}
+
+.th-category-windows__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--th-indigo);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.th-category-windows__toggle:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 2px;
+}
+
+.th-category-windows .th-list-card {
+  --th-list-card-bg: var(--th-lavender-100);
+}
+
+.th-category-windows__add.ant-btn {
+  justify-self: start;
+}

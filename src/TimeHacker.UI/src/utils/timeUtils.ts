@@ -87,3 +87,14 @@ export function timeSpanToMinutes(value: string): number {
   }
   return 0;
 }
+
+/** An HH:mm:ss TimeSpan as "1h 30m" — a dynamic task's durations in lists; "-" when empty. */
+export function formatTimeSpan(value: string | null | undefined): string {
+  if (!value) return '-';
+  const parts = value.split(/[.:]/).map(Number);
+  if (parts.length >= 3) {
+    const [h, m] = parts;
+    return `${h ?? 0}h ${m ?? 0}m`;
+  }
+  return value;
+}

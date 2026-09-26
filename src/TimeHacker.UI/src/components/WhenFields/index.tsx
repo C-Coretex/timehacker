@@ -18,8 +18,8 @@ interface WhenFieldsProps {
 
 /**
  * "When" for anything placed on a day — a fixed task or a category window: the day on the design's
- * calendar card, with its time range and repeat rule in the card's footer. Fields: `date`, `startTime`,
- * `endTime`, plus the recurrence fields while creating.
+ * calendar card (folded to a date row on phones), with its time range and repeat rule in the card's footer.
+ * Fields: `date`, `startTime`, `endTime`, plus the recurrence fields while creating.
  */
 export const WhenFields: FC<WhenFieldsProps> = ({ isEdit, scheduleEntity }) => {
   const anchorDate = Form.useWatch<Dayjs | undefined>('date');
@@ -27,6 +27,7 @@ export const WhenFields: FC<WhenFieldsProps> = ({ isEdit, scheduleEntity }) => {
   return (
     <Form.Item name="date" noStyle>
       <CalendarCard
+        collapsible
         footer={
           <>
             {isEdit ? <ScheduleSummary scheduleEntity={scheduleEntity ?? null} /> : <RepeatPicker anchorDate={anchorDate} />}

@@ -133,3 +133,54 @@
   padding-top: 8px;
   border-top: 1px solid var(--th-border);
 }
+
+/* ===== Collapsible (the forms' "When" card) =====
+   Phones fold the month grid into a date row so the time fields sit right under the form's other fields, as in
+   the design; the row is .th-phone-only, and desktop always shows the grid. */
+.th-calendar-card__date-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--th-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.th-calendar-card__date-row:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 2px;
+}
+
+.th-calendar-card__date-icon,
+.th-calendar-card__date-chevron {
+  color: var(--th-indigo);
+}
+
+.th-calendar-card__date-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.th-calendar-card__date-chevron {
+  font-size: 11px;
+}
+
+@media (max-width: 767px) {
+  .th-calendar-card--collapsible:not(.is-expanded) .ant-picker-calendar {
+    display: none;
+  }
+
+  .th-calendar-card--collapsible.is-expanded .th-calendar-card__date-row {
+    margin-bottom: 6px;
+  }
+}
