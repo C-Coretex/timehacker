@@ -1,149 +1,198 @@
-/* ===== Calendar sizing ===== */
-.rbc-calendar {
+/* react-big-calendar restyled to the design. Every colour is a --th-* token, so light and dark share one
+   rule set; `.dark` is handled by the variables, not by overrides here. */
+
+/* ===== Frame & sizing ===== */
+/* The grid is a component with its own surface; the page around it shows the shell's glow. */
+.th-planner-frame {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-card);
+  background: var(--th-panel);
 }
 
-.rbc-time-view {
+.th-planner-frame__loading {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--th-panel) 55%, transparent);
+}
+
+.th-planner.rbc-calendar {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--th-text);
+  font-family: var(--th-font-sans);
+}
+
+.th-planner .rbc-time-view {
   overflow-y: auto;
+  border: 0;
 }
 
-/* Hide the all-day row in week/day views (no all-day events in this app) */
-.rbc-allday-cell {
+/* No all-day events in this app. */
+.th-planner .rbc-allday-cell {
   display: none;
 }
 
-.rbc-time-view .rbc-header {
-  border-bottom: none;
+/* ===== Grid lines ===== */
+.th-planner .rbc-time-content {
+  border-top: 1px solid var(--th-grid);
 }
 
-/* ===== Toolbar styling ===== */
-.rbc-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  margin-bottom: 8px;
-  gap: 8px;
+.th-planner .rbc-time-content > * + * > *,
+.th-planner .rbc-time-header-content,
+.th-planner .rbc-day-bg + .rbc-day-bg,
+.th-planner .rbc-header + .rbc-header,
+.th-planner .rbc-month-row + .rbc-month-row {
+  border-color: var(--th-grid);
 }
 
-.rbc-toolbar-label {
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  flex: 1;
+/* Tall enough that a quarter-hour task gets a line of text; PlannerEvent/styles.css covers anything shorter. */
+.th-planner .rbc-timeslot-group {
+  min-height: 88px;
+  border-bottom-color: var(--th-grid);
 }
 
-.rbc-toolbar button {
-  border-radius: 4px;
-  padding: 4px 12px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s;
-  cursor: pointer;
+.th-planner .rbc-day-slot .rbc-time-slot {
+  border-top-color: var(--th-grid-soft);
 }
 
-.rbc-btn-group {
-  display: flex;
-  gap: 2px;
+.th-planner .rbc-time-gutter .rbc-timeslot-group {
+  border-bottom: 0;
 }
 
-.rbc-btn-group button + button {
-  margin-left: 0;
+.th-planner .rbc-label {
+  padding: 0 8px;
+  color: var(--th-indigo);
+  font-size: 11px;
 }
 
-/* ===== Light theme (default) ===== */
-.rbc-calendar {
-  color: #333;
+.th-planner .rbc-today {
+  background-color: color-mix(in srgb, var(--th-lavender-100) 45%, transparent);
 }
 
-.rbc-toolbar button {
-  color: #555;
-  border-color: #d9d9d9;
-  background-color: #fff;
+.th-planner .rbc-off-range-bg {
+  background-color: var(--th-grid-soft);
 }
 
-.rbc-toolbar button:hover,
-.rbc-toolbar button:focus {
-  color: #1890ff;
-  border-color: #1890ff;
-  background-color: #e6f7ff;
-}
-
-.rbc-toolbar button.rbc-active {
-  color: #fff;
-  background-color: #1890ff;
-  border-color: #1890ff;
-}
-
-.rbc-today {
-  background-color: #e6f7ff;
-}
-
-.rbc-off-range-bg {
-  background-color: #fafafa;
-}
-
-.rbc-header {
-  color: #555;
-  border-bottom-color: #e8e8e8;
-  font-weight: 500;
-  padding: 8px 4px;
-  font-size: 13px;
-}
-
-.rbc-month-view,
-.rbc-time-view {
-  border-color: #e8e8e8;
-}
-
-.rbc-month-row + .rbc-month-row,
-.rbc-day-bg + .rbc-day-bg,
-.rbc-header + .rbc-header {
-  border-color: #e8e8e8;
-}
-
-.rbc-time-content,
-.rbc-time-header-content,
-.rbc-time-header {
-  border-color: #e8e8e8;
-}
-
-.rbc-timeslot-group {
-  border-bottom-color: #e8e8e8;
-}
-
-.rbc-time-slot {
-  border-top-color: #f0f0f0;
-}
-
-.rbc-day-slot .rbc-time-slot {
-  border-top-color: #f0f0f0;
-}
-
-.rbc-current-time-indicator {
-  background-color: #1890ff;
+.th-planner .rbc-current-time-indicator {
   height: 2px;
+  background-color: var(--th-primary);
 }
 
-/* ===== Event styling ===== */
-.rbc-event {
-  border-radius: 6px;
-  padding: 3px 8px;
+/* ===== Headers ===== */
+.th-planner .rbc-time-header {
+  border-bottom: 1px solid var(--th-grid);
+}
+
+.th-planner .rbc-header {
+  padding: 0;
+  border-bottom: 0;
+  font-weight: 400;
+}
+
+.th-planner .rbc-header .rbc-button-link {
+  display: block;
+  width: 100%;
+}
+
+/* rbc hides the header row in day view; the design shows the day's header there too (phones use the strip). */
+.th-planner .rbc-time-header-cell-single-day {
+  display: flex;
+}
+
+.th-planner .rbc-month-view {
+  border-color: var(--th-grid);
+  border-radius: var(--th-radius-card);
+}
+
+.th-planner .rbc-month-view .rbc-header {
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--th-grid);
+}
+
+.th-planner .rbc-date-cell {
+  padding: 4px 6px;
   font-size: 12px;
-  line-height: 1.4;
-  border: none !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.rbc-event-content {
+.th-planner .rbc-date-cell.rbc-now {
+  font-weight: 700;
+  color: var(--th-indigo);
+}
+
+.th-planner .rbc-off-range {
+  color: var(--th-text-muted);
+}
+
+.th-planner .rbc-show-more {
+  background: transparent;
+  color: var(--th-primary);
+  font-size: 11px;
+}
+
+/* ===== Events (shape only — PlannerEvent/styles.css paints them) ===== */
+.th-planner .rbc-event {
+  border: none !important;
+  border-radius: var(--th-radius-control);
+  font-size: 12px;
+}
+
+.th-planner .rbc-event:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 1px;
+}
+
+.th-planner .rbc-event-content {
   white-space: normal;
   overflow: hidden;
 }
 
-.rbc-event-label {
+.th-planner .rbc-event-label {
   display: none;
+}
+
+.th-planner .rbc-slot-selection {
+  border-radius: var(--th-radius-control);
+  background: color-mix(in srgb, var(--th-primary) 70%, transparent);
+  color: var(--th-on-primary);
+  font-size: 11px;
+}
+
+/* ===== Quick add =====
+   Hovering an empty hour shows the design's dashed magenta slot; its ⊕ is a real button (QuickAddSlot) and
+   the only click target — a click elsewhere in the hour does nothing, a drag still selects a range. rbc
+   stacks .rbc-events-container over every slot, so it is made click-through and only the events themselves
+   take the pointer back. rbc finds events for selection with elementFromPoint + closest('.rbc-event'), which
+   honours pointer-events, so selection keeps working. */
+@media (hover: hover) {
+  .th-planner .rbc-day-slot .rbc-events-container {
+    pointer-events: none;
+  }
+
+  .th-planner .rbc-day-slot .rbc-event {
+    pointer-events: auto;
+  }
+
+  .th-planner .rbc-day-slot .rbc-timeslot-group {
+    position: relative;
+  }
+
+  .th-planner .rbc-day-slot .rbc-timeslot-group:hover::before {
+    content: '';
+    position: absolute;
+    inset: 2px 3px;
+    border: 1.5px dashed var(--th-primary);
+    border-radius: var(--th-radius-control);
+    background: var(--th-primary-soft);
+  }
 }
 
 /* ===== Category background bands =====
@@ -152,7 +201,7 @@
    events in front. z-index: 0 pins that explicitly — anything above 2 would lift the band (and its name
    pill) over the tasks, and 3 would also fight .rbc-current-time-indicator.
    The trade-off is that a day packed with tasks covers most of the tint; the left rail and any
-   task-free gap are what keep the category readable. Raise the alpha below if it needs more presence.
+   task-free gap are what keep the category readable. Raise --th-band-alpha if it needs more presence.
 
    Geometry must be forced from here: rbc writes top/height/width/left as inline styles from its own
    layout pass, so eventPropGetter can only contribute the colour (via --th-category-color) and the
@@ -166,9 +215,9 @@
   min-height: 0;
   overflow: visible;
   border: none;
-  border-left: 3px solid var(--th-category-color, #1890ff);
+  border-left: 3px solid var(--th-category-color, var(--th-primary));
   border-radius: 0;
-  background-color: color-mix(in srgb, var(--th-category-color, #1890ff) 12%, transparent);
+  background-color: color-mix(in srgb, var(--th-category-color, var(--th-primary)) var(--th-band-alpha), transparent);
   box-shadow: none;
 }
 
@@ -207,9 +256,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #fff;
-  background-color: var(--th-category-color, #1890ff);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  color: var(--th-on-primary);
+  background-color: var(--th-category-color, var(--th-primary));
+  box-shadow: 0 1px 2px var(--th-shadow);
 }
 
 .th-category-label-time {
@@ -218,156 +267,19 @@
   opacity: 0.85;
 }
 
-/* ===== Dark theme ===== */
-.dark .rbc-calendar {
-  color: #e0e0e0;
-}
-
-.dark .rbc-toolbar button {
-  color: #d0d0d0;
-  border-color: #555;
-  background-color: #2a2a2a;
-}
-
-.dark .rbc-toolbar button:hover,
-.dark .rbc-toolbar button:focus {
-  color: #69b1ff;
-  border-color: #69b1ff;
-  background-color: rgba(105, 177, 255, 0.1);
-}
-
-.dark .rbc-toolbar button.rbc-active {
-  color: #fff;
-  background-color: #177ddc;
-  border-color: #177ddc;
-}
-
-.dark .rbc-today {
-  background-color: rgba(23, 125, 220, 0.15);
-}
-
-.dark .rbc-off-range-bg {
-  background-color: #1a1a1a;
-}
-
-/* The tint needs more weight on a dark ground to stay perceptible at the same low alpha. */
-.dark .rbc-day-slot .rbc-background-event.th-category-band {
-  background-color: color-mix(in srgb, var(--th-category-color, #177ddc) 20%, transparent);
-}
-
-.dark .rbc-off-range a {
-  color: #666;
-}
-
-.dark .rbc-header {
-  color: #d0d0d0;
-  border-bottom-color: #444;
-}
-
-.dark .rbc-month-view,
-.dark .rbc-time-view {
-  border-color: #444;
-  background-color: #1f1f1f;
-}
-
-.dark .rbc-month-row + .rbc-month-row {
-  border-top-color: #444;
-}
-
-.dark .rbc-day-bg + .rbc-day-bg {
-  border-left-color: #444;
-}
-
-.dark .rbc-header + .rbc-header {
-  border-left-color: #444;
-}
-
-.dark .rbc-time-content {
-  border-top-color: #444;
-}
-
-.dark .rbc-time-content > * + * > * {
-  border-left-color: #444;
-}
-
-.dark .rbc-time-header-content {
-  border-left-color: #444;
-}
-
-.dark .rbc-timeslot-group {
-  border-bottom-color: #444;
-}
-
-.dark .rbc-time-slot {
-  border-top-color: #333;
-}
-
-.dark .rbc-day-slot .rbc-time-slot {
-  border-top-color: #333;
-}
-
-.dark .rbc-current-time-indicator {
-  background-color: #69b1ff;
-}
-
-.dark .rbc-date-cell a {
-  color: #d0d0d0;
-}
-
-.dark .rbc-show-more {
-  color: #69b1ff;
-}
-
-.dark .rbc-label {
-  color: #aaa;
-}
-
-/* ===== Mobile responsive ===== */
+/* ===== Phones ===== */
 @media (max-width: 767px) {
-  .rbc-toolbar {
-    flex-wrap: wrap;
-    gap: 4px;
-    font-size: 13px;
-    padding: 4px 0;
-  }
-
-  .rbc-toolbar-label {
-    width: 100%;
-    text-align: center;
-    order: -1;
-    padding: 4px 0;
-    font-size: 14px;
-  }
-
-  .rbc-toolbar button {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-
-  .rbc-btn-group {
-    flex-wrap: wrap;
-  }
-
-  .rbc-header {
-    font-size: 12px;
-    padding: 4px 2px;
-  }
-
-  .rbc-time-header-cell .rbc-header {
-    font-size: 11px;
-  }
-
-  .rbc-label {
-    font-size: 11px;
+  .th-planner .rbc-label {
     padding: 0 4px;
+    font-size: 10px;
   }
 
-  .rbc-event {
-    font-size: 11px;
-    padding: 1px 3px;
-  }
-
-  .rbc-time-gutter {
+  .th-planner .rbc-time-gutter {
     min-width: 40px;
+  }
+
+  /* The week strip above the grid names the day. */
+  .th-planner .rbc-time-header-cell-single-day {
+    display: none;
   }
 }

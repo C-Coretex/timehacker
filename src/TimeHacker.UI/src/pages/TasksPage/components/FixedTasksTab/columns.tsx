@@ -7,6 +7,7 @@ import type { TFunction } from 'i18next';
 import type { ColumnType } from 'antd/es/table';
 import type { FixedTaskDisplayModel, ScheduleEntityReturnModel, CategoryReturnModel } from '../../../../api/types';
 import { CategoryTags } from '../../../../components/CategoryTags';
+import { PriorityTag } from '../../../../components/PriorityTag';
 import { recurrenceTypeLabel } from '../../../../utils/describeRecurrence';
 
 const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunction) => {
@@ -14,7 +15,7 @@ const scheduleCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFunc
 
   return (
     <Space orientation="vertical" size={0}>
-      <Tag color="blue">{recurrenceTypeLabel(scheduleEntity.repeatingEntity.entityType, t)}</Tag>
+      <Tag color="purple">{recurrenceTypeLabel(scheduleEntity.repeatingEntity.entityType, t)}</Tag>
       {scheduleEntity.endsOn && (
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
           {t('tasks.endsShort')}: {dayjs(scheduleEntity.endsOn).format('MMM D, YYYY')}
@@ -32,7 +33,12 @@ export const getFixedTaskColumns = (
 ): ColumnType<FixedTaskDisplayModel>[] => [
   { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
   { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
-  { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+  {
+    title: t('tasks.priority'),
+    dataIndex: 'priority',
+    key: 'priority',
+    render: (priority: number) => <PriorityTag priority={priority} />,
+  },
   {
     title: t('tasks.categories'),
     dataIndex: 'categories',

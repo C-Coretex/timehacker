@@ -46,24 +46,24 @@ export const useCategories = () => {
       'Failed to load categories. Please check your network or API server connection.',
   });
 
+  /** Resolves to the new category's id, or null when creating failed. */
   const create = useCallback(
-    async (category: InputCategory) => {
-      await withRefetch(() => createCategory(category), 'Failed to create category.');
+    async (category: InputCategory): Promise<string | null> => {
+      const result = await withRefetch(() => createCategory(category), 'Failed to create category.');
+      return result.succeeded ? result.value : null;
     },
     [withRefetch]
   );
 
   const update = useCallback(
-    async (id: string, category: InputCategory) => {
-      await withRefetch(() => updateCategory(id, category), 'Failed to update category.');
-    },
+    async (id: string, category: InputCategory): Promise<boolean> =>
+      (await withRefetch(() => updateCategory(id, category), 'Failed to update category.')).succeeded,
     [withRefetch]
   );
 
   const remove = useCallback(
-    async (id: string) => {
-      await withRefetch(() => deleteCategory(id), 'Failed to delete category.');
-    },
+    async (id: string): Promise<boolean> =>
+      (await withRefetch(() => deleteCategory(id), 'Failed to delete category.')).succeeded,
     [withRefetch]
   );
 

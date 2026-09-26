@@ -1,0 +1,8 @@
+/* 7-segment face for the digital time field (DSEG, SIL OFL 1.1 — see node_modules/dseg/DSEG-LICENSE.txt). */
+@font-face {
+  font-family: 'DSEG7 Classic';
+  src: url('dseg/fonts/DSEG7-Classic/DSEG7Classic-Bold.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}

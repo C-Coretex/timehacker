@@ -7,17 +7,21 @@ interface UseEntityCrudOptions<TDisplay> {
   fetchErrorMessage: string;
 }
 
+/** Outcome of a mutation run through `withRefetch`; failures were already reported to the user. */
+export type MutationResult<T> = { succeeded: true; value: T } | { succeeded: false };
+
 interface UseEntityCrudResult<TDisplay> {
   items: TDisplay[];
   loading: boolean;
   error: string | null;
   fetch: () => Promise<void>;
-  withRefetch: (action: () => Promise<unknown>, errorMessage: string) => Promise<void>;
+  withRefetch: <T>(action: () => Promise<T>, errorMessage: string) => Promise<MutationResult<T>>;
 }
 
 /**
  * Manages fetch/loading/error state for a list of entities and provides a helper
- * to run a mutating action then refetch.
+ * to run a mutating action then refetch. The helper reports the outcome instead of throwing, so callers
+ * can skip their success message (and keep a dialog open) when the action failed.
  */
 export function useEntityCrud<TDisplay>({
   fetchFn,
@@ -52,12 +56,14 @@ export function useEntityCrud<TDisplay>({
   }, [notification]);
 
   const withRefetch = useCallback(
-    async (action: () => Promise<unknown>, errorMessage: string) => {
+    async <T,>(action: () => Promise<T>, errorMessage: string): Promise<MutationResult<T>> => {
       try {
-        await action();
+        const value = await action();
         await fetch();
+        return { succeeded: true, value };
       } catch {
         notification.error({ title: tRef.current('errors.generic'), description: errorMessage });
+        return { succeeded: false };
       }
     },
     [fetch, notification]

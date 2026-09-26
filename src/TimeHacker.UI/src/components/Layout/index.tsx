@@ -1,137 +1,23 @@
-import { useState } from 'react';
 import type { FC } from 'react';
-import { Outlet, useNavigate } from 'react-router';
-import { Button, Drawer, Layout as AntdLayout, Menu, theme } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
+import { CursorGradient } from './CursorGradient';
+import { DesktopSidebar } from './DesktopSidebar';
+import { MobileNav } from './MobileNav';
+import './styles.css';
 
-import { useAuth } from 'contexts/AuthContext';
-import { useCalendarDate } from 'contexts/CalendarDateContext';
-import { useSettings } from 'contexts/SettingsContext';
-import { useIsMobile } from '../../hooks/useIsMobile';
-import { SidebarLogo } from './SidebarLogo';
-import { MiniCalendar } from './MiniCalendar';
-import { getMainMenuItems, LOGOUT_MENU_KEY } from './utils';
-
-const { Content, Sider } = AntdLayout;
-
-export const Layout: FC = () => {
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-  const { isMobile } = useIsMobile();
-  const { t } = useTranslation();
-  const { selectedDate, setSelectedDate, calendarView } = useCalendarDate();
-  const { weekStart } = useSettings();
-  const weekStartDay = weekStart === 'monday' ? 1 : 0;
-
-  const [collapsed, setCollapsed] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const { token: { colorBgContainer, borderRadiusLG } } = theme.useToken();
-
-  const mainMenuItems = getMainMenuItems(isAuthenticated, t);
-
-  const handleLogoClick = () => {
-    navigate('/');
-    setDrawerOpen(false);
-  };
-
-  const handleMiniCalendarSelect = (date: Date) => {
-    setSelectedDate(date);
-    navigate('/');
-    setDrawerOpen(false);
-  };
-
-  const handleMenuClick = async ({ key }: { key: string }) => {
-    setDrawerOpen(false);
-    if (key === LOGOUT_MENU_KEY) {
-      await logout();
-      navigate('/login');
-    }
-  };
-
-  const menuNode = (
-    <Menu
-      theme="dark"
-      defaultSelectedKeys={['1']}
-      mode="inline"
-      items={mainMenuItems}
-      onClick={handleMenuClick}
-    />
-  );
-
-  return (
-    <AntdLayout style={{ height: '100vh', overflow: 'hidden' }}>
-      {isMobile ? (
-        <Drawer
-          placement="left"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          styles={{ body: { padding: 0, background: '#001529' }, wrapper: { width: 280 } }}
-        >
-          <SidebarLogo onClick={handleLogoClick} />
-          {menuNode}
-          <MiniCalendar
-            selectedDate={selectedDate}
-            onSelect={handleMiniCalendarSelect}
-            currentView={calendarView}
-            weekStartDay={weekStartDay}
-          />
-        </Drawer>
-      ) : (
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={(value) => setCollapsed(value)}
-          width={240}
-          style={{ overflow: 'auto' }}
-        >
-          <SidebarLogo collapsed={collapsed} onClick={handleLogoClick} />
-          {menuNode}
-          {!collapsed && (
-            <MiniCalendar
-              selectedDate={selectedDate}
-              onSelect={handleMiniCalendarSelect}
-              currentView={calendarView}
-              weekStartDay={weekStartDay}
-            />
-          )}
-        </Sider>
-      )}
-
-      <AntdLayout>
-        <Content
-          style={{
-            margin: isMobile ? '8px' : '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
-          {isMobile && (
-            <Button
-              type="text"
-              icon={<MenuOutlined />}
-              onClick={() => setDrawerOpen(true)}
-              style={{ alignSelf: 'flex-start', marginBottom: 8 }}
-            />
-          )}
-          <div
-            style={{
-              padding: isMobile ? 12 : 24,
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-              overflow: 'auto',
-            }}
-          >
-            <Outlet />
-          </div>
-        </Content>
-      </AntdLayout>
-    </AntdLayout>
-  );
-};
-
+/**
+ * App shell: the cursor glow across the whole backdrop, the sidebar on desktop or top bar + menu on phones,
+ * and the page. Nothing in the shell paints a surface — only components do, so the glow shows everywhere else.
+ */
+export const Layout: FC = () => (
+  <div className="th-shell">
+    <CursorGradient />
+    <DesktopSidebar />
+    <MobileNav />
+    <main className="th-shell__main">
+      <div className="th-shell__panel">
+        <Outlet />
+      </div>
+    </main>
+  </div>
+);

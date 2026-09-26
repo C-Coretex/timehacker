@@ -1,254 +1,125 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import type { CSSProperties, FC } from 'react';
-import { Calendar, dayjsLocalizer, type View } from 'react-big-calendar';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { FC } from 'react';
+import type { SlotInfo } from 'react-big-calendar';
+import { Alert } from 'antd';
 import dayjs from 'dayjs';
-import updateLocale from 'dayjs/plugin/updateLocale';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import './calendar-theme.css';
-import { Alert, App, Button, Spin } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
-
-import { createFixedTask, postNewScheduleForTask, fetchFixedTaskById } from 'api/fixedTasks';
-import { createDynamicTask } from 'api/dynamicTasks';
-import type { CalendarEvent } from 'utils/calendarUtils';
-import { attachCategoriesToEvents } from 'utils/calendarUtils';
-import { argbToHex } from 'utils/colorArgb';
-import { toFixedTaskPayload } from 'utils/fixedTaskPayload';
-import type { ScheduleEntityReturnModel } from 'api/types';
-import { useTheme } from 'contexts/ThemeContext';
-import { useCalendarDate } from 'contexts/CalendarDateContext';
-import type { CalendarView } from 'contexts/CalendarDateContext';
-import { useSettings } from 'contexts/SettingsContext';
-import { useIsMobile } from 'hooks/useIsMobile';
-import { useCalendarDateRanges } from 'hooks/useCalendarDateRanges';
-import { useCalendarTasks } from 'hooks/useCalendarTasks';
-import { useTaskCategories } from 'hooks/useTaskCategories';
-import { ThreeDayView } from './ThreeDayView';
+import { EventDetailModal } from 'components/EventDetailModal';
+import { TodaySummaryPill } from 'components/TodaySummaryPill';
 import { UnifiedTaskFormModal } from 'components/UnifiedTaskFormModal';
-import type { ScheduleFormPayload } from 'components/UnifiedTaskFormModal';
-import type { FixedTaskFormData, InputDynamicTask } from 'api/types';
-import { CustomCalendarEvent } from './components/CustomCalendarEvent';
-import { EventDetailModal } from './components/EventDetailModal';
+import { useCalendarDate } from 'contexts/CalendarDateContext';
+import { useSettings } from 'contexts/SettingsContext';
+import { useCalendarTasks } from 'hooks/useCalendarTasks';
+import { useEventDetails } from 'hooks/useEventDetails';
+import { useIsMobile } from 'hooks/useIsMobile';
+import { useTaskCategories } from 'hooks/useTaskCategories';
+import { useTaskComposer } from 'hooks/useTaskComposer';
+import { attachCategoriesToEvents } from 'utils/calendarUtils';
+import { summarizeDay } from 'utils/daySummary';
+import { daysIn, formatRangeTitle, shiftDate, visibleRange } from 'utils/plannerRange';
+import { PlannerToolbar } from './components/PlannerToolbar';
+import { WeekStrip } from './components/WeekStrip';
+import { PlannerCalendar } from './PlannerCalendar';
+import './styles.css';
 
-dayjs.extend(updateLocale);
-
-const calendarViews = {
-  month: true,
-  week: true,
-  day: true,
-  '3day': ThreeDayView,
-};
-
+/** The planner: tasks and category windows over a D/3D/W/M time grid, with quick-add on empty slots. */
 export const CalendarPage: FC = () => {
-  const { darkMode } = useTheme();
-  const { notification } = App.useApp();
+  const { weekStartDay } = useSettings();
   const { isMobile, screens } = useIsMobile();
-  const { t, i18n } = useTranslation();
-  const { timeDisplayFormat, weekStart: weekStartSetting } = useSettings();
-  const initialViewSet = useRef(false);
   const { selectedDate, setSelectedDate, calendarView, setCalendarView } = useCalendarDate();
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [taskModalOpen, setTaskModalOpen] = useState(false);
-  const [scheduleData, setScheduleData] = useState<ScheduleEntityReturnModel | null>(null);
-  const [loadingSchedule, setLoadingSchedule] = useState(false);
-
-  const weekStartDay = weekStartSetting === 'monday' ? 1 : 0;
-
-  const localizer = useMemo(() => {
-    dayjs.updateLocale('en', { weekStart: weekStartDay });
-    return dayjsLocalizer(dayjs);
-  }, [weekStartDay]);
-
-  const { getDatesForView } = useCalendarDateRanges(selectedDate, weekStartDay);
   const { events, backgroundEvents, loading, error, fetchTasks, refresh } = useCalendarTasks();
   const { categoriesByTaskId, fetchTaskCategories } = useTaskCategories();
-  const eventsWithCategories = useMemo(
-    () => attachCategoriesToEvents(events, categoriesByTaskId),
-    [events, categoriesByTaskId]
-  );
+  const details = useEventDetails();
 
+  const range = useMemo(
+    () => visibleRange(calendarView, selectedDate, weekStartDay),
+    [calendarView, selectedDate, weekStartDay]
+  );
+  const days = useMemo(() => daysIn(range), [range]);
+  const upcomingDays = days.filter((day) => !dayjs(day).isBefore(dayjs(), 'day'));
+  const planned = useMemo(() => attachCategoriesToEvents(events, categoriesByTaskId), [events, categoriesByTaskId]);
+
+  const reload = useCallback(() => Promise.all([fetchTasks(days), fetchTaskCategories()]), [days, fetchTasks, fetchTaskCategories]);
+  const composer = useTaskComposer(reload);
+
+  // Phones open on a single day, desktops on the week — decided once, when the breakpoint is first known.
+  const initialViewSet = useRef(false);
   useEffect(() => {
-    if (!initialViewSet.current && screens.md !== undefined) {
-      initialViewSet.current = true;
-      setCalendarView(isMobile ? 'day' : 'week');
-    }
+    if (initialViewSet.current || screens.md === undefined) return;
+    initialViewSet.current = true;
+    setCalendarView(isMobile ? 'day' : 'week');
   }, [isMobile, screens.md, setCalendarView]);
 
   useEffect(() => {
-    fetchTasks(getDatesForView(calendarView));
-  }, [calendarView, selectedDate, fetchTasks, getDatesForView]);
+    void fetchTasks(days);
+  }, [days, fetchTasks]);
 
-  const handleRefresh = useCallback(
-    () => refresh(getDatesForView(calendarView)),
-    [refresh, getDatesForView, calendarView]
-  );
+  const openHour = (hourStart: Date) => {
+    const from = dayjs(hourStart).startOf('hour');
+    composer.open({ date: from, start: from, end: from.add(1, 'hour') });
+  };
 
-  const handleSelectEvent = useCallback(async (event: CalendarEvent) => {
-    setSelectedEvent(event);
-    setIsModalVisible(true);
-    setScheduleData(null);
-
-    if (event.resource?.type === 'fixed' && event.resource.task.id) {
-      setLoadingSchedule(true);
-      try {
-        const taskData = await fetchFixedTaskById(event.resource.task.id);
-        setScheduleData(taskData.scheduleEntity);
-      } catch {
-        // schedule data is optional; failure is non-blocking
-      } finally {
-        setLoadingSchedule(false);
-      }
+  const handleSelectSlot = ({ start, end, action }: SlotInfo) => {
+    if (action === 'doubleClick') return;
+    if (calendarView === 'month') {
+      composer.open({ date: dayjs(start) });
+      return;
     }
-  }, []);
+    // The hour's "+" is the only click target. A drag (or a long press on touch) still selects a range.
+    if (action === 'click') return;
+    composer.open({ date: dayjs(start), start: dayjs(start), end: dayjs(end) });
+  };
 
-  const handleSaveFixed = useCallback(
-    async (data: FixedTaskFormData, _id?: string, schedule?: ScheduleFormPayload) => {
-      try {
-        const newId = await createFixedTask(toFixedTaskPayload(data));
-        if (schedule && newId) {
-          await postNewScheduleForTask({
-            parentEntityId: newId,
-            repeatingEntityType: schedule.repeatingEntityType,
-            endsOnModel: schedule.endsOnModel ?? undefined,
-          });
-        }
-        setTaskModalOpen(false);
-        notification.success({ title: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
-        await Promise.all([fetchTasks(getDatesForView(calendarView)), fetchTaskCategories()]);
-      } catch {
-        notification.error({ title: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
-      }
-    },
-    [fetchTasks, fetchTaskCategories, getDatesForView, calendarView, notification, t]
-  );
-
-  const handleSaveDynamic = useCallback(
-    async (data: InputDynamicTask) => {
-      try {
-        await createDynamicTask(data);
-        setTaskModalOpen(false);
-        notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
-        await Promise.all([fetchTasks(getDatesForView(calendarView)), fetchTaskCategories()]);
-      } catch {
-        notification.error({ title: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
-      }
-    },
-    [fetchTasks, fetchTaskCategories, getDatesForView, calendarView, notification, t]
-  );
-
-  const eventStyleGetter = useCallback(
-    (event: CalendarEvent) => {
-      // Category bands take their colour from the category itself. Geometry has to come from CSS
-      // (react-big-calendar overwrites top/height/width/left from its own layout), so only the colour
-      // and a depth class are passed here; calendar-theme.css does the rest.
-      if (event.resource?.type === 'category') {
-        const depth = Math.min(event.resource.depth, 3);
-        return {
-          className: `th-category-band th-category-depth-${depth}`,
-          style: { '--th-category-color': argbToHex(event.resource.category.color) } as CSSProperties,
-        };
-      }
-
-      const colors = darkMode
-        ? { default: '#177ddc', fixed: '#49aa19', dynamic: '#d89614' }
-        : { default: '#1890ff', fixed: '#52c41a', dynamic: '#faad14' };
-      const backgroundColor =
-        event.resource?.type === 'fixed' ? colors.fixed
-        : event.resource?.type === 'dynamic' ? colors.dynamic
-        : colors.default;
-      return {
-        style: {
-          backgroundColor,
-          borderRadius: '6px',
-          opacity: 0.85,
-          color: 'white',
-          border: '0px',
-          display: 'block',
-          padding: '2px 6px',
-        },
-      };
-    },
-    [darkMode]
-  );
-
-  const calendarMessages = useMemo(() => ({
-    today: t('calendar.today'),
-    previous: t('calendar.previous'),
-    next: t('calendar.next'),
-    month: t('calendar.month'),
-    week: t('calendar.week'),
-    day: t('calendar.day'),
-    '3day': t('calendar.threeDayView'),
-  }), [t]);
-
-  const calendarFormats = useMemo(() => ({
-    timeGutterFormat: timeDisplayFormat,
-    eventTimeRangeFormat: () => '',
-    agendaTimeRangeFormat: () => '',
-  }), [timeDisplayFormat]);
+  const showsToday = !dayjs().isBefore(range.start, 'day') && !dayjs().isAfter(range.end, 'day');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <div style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
-        <Button icon={<ReloadOutlined />} onClick={handleRefresh} size={isMobile ? 'small' : 'middle'}>
-          {t('calendar.refresh')}
-        </Button>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setTaskModalOpen(true)}
-          size={isMobile ? 'small' : 'middle'}
-        >
-          {t('calendar.addTask')}
-        </Button>
-      </div>
+    <div className="th-planner-page">
+      <PlannerToolbar
+        title={formatRangeTitle(calendarView, selectedDate, range)}
+        view={calendarView}
+        onViewChange={setCalendarView}
+        onPrevious={() => setSelectedDate(shiftDate(calendarView, selectedDate, -1))}
+        onNext={() => setSelectedDate(shiftDate(calendarView, selectedDate, 1))}
+        onToday={() => setSelectedDate(new Date())}
+        isToday={dayjs(selectedDate).isSame(dayjs(), 'day')}
+        onReplan={() => void refresh(upcomingDays, days)}
+        canReplan={upcomingDays.length > 0}
+        busy={loading}
+        onAddTask={() => composer.open({ date: dayjs(selectedDate) })}
+      />
 
-      {error && <Alert type="error" title={error} showIcon style={{ marginBottom: '0.5rem' }} />}
-
-      {loading ? (
-        <Spin size="large" style={{ display: 'block', margin: '2rem auto' }} />
-      ) : (
-        <Calendar
-          localizer={localizer}
-          events={eventsWithCategories}
-          backgroundEvents={backgroundEvents}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ flex: 1 }}
-          view={calendarView as View}
-          onView={(v) => setCalendarView(v as CalendarView)}
-          date={selectedDate}
-          onNavigate={setSelectedDate}
-          views={calendarViews}
-          onSelectEvent={handleSelectEvent}
-          onDrillDown={(date) => { setSelectedDate(date); setCalendarView('day'); }}
-          eventPropGetter={eventStyleGetter}
-          culture={i18n.language?.startsWith('ru') ? 'ru' : 'en'}
-          messages={calendarMessages as Record<string, string>}
-          formats={calendarFormats}
-          components={{ event: CustomCalendarEvent }}
-        />
+      {calendarView === 'day' && (
+        <div className="th-planner-page__phone-strip">
+          <WeekStrip />
+          {showsToday && <TodaySummaryPill summary={summarizeDay(planned, new Date())} />}
+        </div>
       )}
 
+      {error && <Alert type="error" title={error} showIcon className="th-planner-page__error" />}
+
+      <PlannerCalendar
+        events={planned}
+        backgroundEvents={backgroundEvents}
+        loading={loading}
+        onSelectEvent={details.open}
+        onSelectSlot={handleSelectSlot}
+        onQuickAdd={openHour}
+      />
+
       <EventDetailModal
-        open={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        event={selectedEvent}
-        scheduleData={scheduleData}
-        loadingSchedule={loadingSchedule}
-        timeDisplayFormat={timeDisplayFormat}
+        open={details.isOpen}
+        onClose={details.close}
+        event={details.event}
+        scheduleEntity={details.scheduleEntity}
+        loadingSchedule={details.loadingSchedule}
       />
 
       <UnifiedTaskFormModal
-        open={taskModalOpen}
-        onCancel={() => setTaskModalOpen(false)}
-        onSaveFixed={handleSaveFixed}
-        onSaveDynamic={handleSaveDynamic}
-        defaultDate={selectedDate}
+        open={composer.isOpen}
+        prefill={composer.prefill}
+        onCancel={composer.close}
+        onSaveFixed={composer.saveFixed}
+        onSaveDynamic={composer.saveDynamic}
       />
     </div>
   );
 };
-

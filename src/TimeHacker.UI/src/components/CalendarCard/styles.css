@@ -1,0 +1,135 @@
+.th-calendar-card {
+  padding: 8px 10px 10px;
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-card);
+  background: var(--th-panel);
+  box-shadow: 0 6px 18px var(--th-shadow);
+}
+
+.th-calendar-card .ant-picker-calendar,
+.th-calendar-card .ant-picker-panel {
+  background: transparent;
+  border: 0;
+}
+
+.th-calendar-card__header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 0 6px;
+}
+
+.th-calendar-card__header button {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--th-radius-control);
+  background: transparent;
+  color: var(--th-text);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.th-calendar-card__header button:hover {
+  background: var(--th-lavender-100);
+  color: var(--th-indigo);
+}
+
+.th-calendar-card__title {
+  flex: 1;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: lowercase;
+  color: var(--th-text);
+}
+
+/* antd's mini calendar pins the grid to a fixed height (miniContentHeight), which spreads short rows apart. */
+.th-calendar-card .ant-picker-calendar .ant-picker-content {
+  height: auto;
+}
+
+.th-calendar-card .ant-picker-content thead th {
+  padding-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--th-text);
+}
+
+.th-calendar-card .ant-picker-content td {
+  padding: 2px 0;
+}
+
+.th-calendar-card__day {
+  margin: 0 auto;
+  width: 28px;
+  height: 22px;
+  line-height: 22px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--th-text);
+  transition: background-color 0.15s;
+}
+
+.th-calendar-card__day:hover {
+  background: var(--th-lavender-100);
+}
+
+.th-calendar-card__day.is-outside {
+  color: var(--th-text-muted);
+  opacity: 0.6;
+}
+
+.th-calendar-card__day.is-today {
+  font-weight: 700;
+  color: var(--th-indigo);
+}
+
+/* The planner's visible days: one continuous band per row, rounded where the range or the week ends. */
+.th-calendar-card__cell.is-in-range {
+  background: var(--th-lavender-200);
+}
+
+.th-calendar-card__cell.is-range-start {
+  border-top-left-radius: var(--th-radius-pill);
+  border-bottom-left-radius: var(--th-radius-pill);
+}
+
+.th-calendar-card__cell.is-range-end {
+  border-top-right-radius: var(--th-radius-pill);
+  border-bottom-right-radius: var(--th-radius-pill);
+}
+
+.th-calendar-card__cell.is-in-range .th-calendar-card__day:not(.is-selected) {
+  color: var(--th-navy);
+  font-weight: 600;
+}
+
+.th-calendar-card__cell.is-in-range .th-calendar-card__day:not(.is-selected):hover {
+  background: var(--th-panel);
+}
+
+.th-calendar-card__day.is-selected {
+  color: var(--th-on-primary);
+  background: var(--th-navy);
+  font-weight: 600;
+  opacity: 1;
+}
+
+.th-calendar-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--th-border);
+}

@@ -1,0 +1,51 @@
+.th-task-form .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.th-task-type {
+  margin-bottom: 16px;
+}
+
+.th-task-type__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.th-task-type__hint {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--th-text-muted);
+}
+
+.th-task-form__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.th-task-form__side {
+  margin-bottom: 16px;
+}
+
+.th-task-durations {
+  padding: 12px 14px 0;
+  border: 1px solid var(--th-border);
+  border-radius: var(--th-radius-card);
+}
+
+.th-task-durations__title {
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: var(--th-indigo);
+}
+
+@media (max-width: 767px) {
+  .th-task-form__columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}

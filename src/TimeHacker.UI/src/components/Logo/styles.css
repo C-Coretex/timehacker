@@ -1,0 +1,31 @@
+.th-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-decoration: none;
+  user-select: none;
+}
+
+.th-logo__tim {
+  display: inline-flex;
+  align-items: center;
+  color: var(--th-indigo);
+}
+
+.th-logo__clock {
+  width: 0.9em;
+  height: 1.05em;
+  margin: 0 1px -1px;
+  color: var(--th-primary);
+}
+
+.th-logo__hacker {
+  padding: 3px 5px;
+  border-radius: 3px;
+  color: var(--th-on-primary);
+  background: linear-gradient(120deg, var(--th-brand-purple), var(--th-primary));
+}

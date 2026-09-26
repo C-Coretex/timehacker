@@ -4,6 +4,7 @@ global using Refit;
 
 global using System.Net;
 
+global using TimeHacker.Domain.Constants;
 global using TimeHacker.Domain.Entities.Tasks;
 
 global using TimeHacker.Api.Models.Input.Tasks;

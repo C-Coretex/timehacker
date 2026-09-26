@@ -1,0 +1,23 @@
+.th-category-dots {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+}
+
+/* The ring keeps a pale category visible on a pale event, and a dark one on a dark event. */
+.th-category-dot {
+  flex: none;
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid color-mix(in srgb, var(--th-panel) 85%, transparent);
+  border-radius: 50%;
+  background: var(--th-dot-color);
+  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--th-text) 35%, transparent);
+}
+
+.th-category-dots__description {
+  font-size: 12px;
+  opacity: 0.85;
+}

@@ -13,7 +13,9 @@ public record InputDynamicTaskModel
 
     public IEnumerable<Guid> CategoryIds { get; init; } = [];
 
-    [Required] public required byte Priority { get; init; }
+    [Required]
+    [Range(PriorityConstants.Highest, PriorityConstants.Lowest)]
+    public required byte Priority { get; init; }
 
     [Required] public required TimeSpan MinTimeToFinish { get; init; }
 

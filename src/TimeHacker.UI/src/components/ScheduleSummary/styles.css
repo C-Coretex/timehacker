@@ -1,0 +1,28 @@
+.th-schedule-summary {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--th-radius-card);
+  background: var(--th-lavender-100);
+}
+
+.th-schedule-summary__rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--th-primary);
+}
+
+.th-schedule-summary__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+  color: var(--th-text-muted);
+}
+
+.th-schedule-summary__ends {
+  font-weight: 600;
+  color: var(--th-indigo);
+}

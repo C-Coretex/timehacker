@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useLayoutEffect } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 const DARK_MODE = 'dark-mode';
@@ -25,7 +25,8 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   const [darkMode, setDarkMode] = useState<boolean>(getInitialDarkMode);
 
-  useEffect(() => {
+  // Layout effect: the `.dark` class drives the --th-* variables, so it must land before the first paint.
+  useLayoutEffect(() => {
     localStorage.setItem(DARK_MODE, JSON.stringify(darkMode));
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);

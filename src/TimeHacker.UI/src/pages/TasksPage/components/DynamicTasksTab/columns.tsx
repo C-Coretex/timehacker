@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import type { ColumnType } from 'antd/es/table';
 import type { DynamicTaskReturnModel, CategoryReturnModel } from '../../../../api/types';
 import { CategoryTags } from '../../../../components/CategoryTags';
+import { PriorityTag } from '../../../../components/PriorityTag';
 
 const formatDuration = (value: string): string => {
   if (!value) return '-';
@@ -24,7 +25,12 @@ export const getDynamicTaskColumns = (
 ): ColumnType<DynamicTaskReturnModel>[] => [
   { title: t('tasks.name'), dataIndex: 'name', key: 'name' },
   { title: t('tasks.description'), dataIndex: 'description', key: 'description', responsive: ['md'] as Breakpoint[] },
-  { title: t('tasks.priority'), dataIndex: 'priority', key: 'priority', width: isMobile ? 60 : undefined },
+  {
+    title: t('tasks.priority'),
+    dataIndex: 'priority',
+    key: 'priority',
+    render: (priority: number) => <PriorityTag priority={priority} />,
+  },
   {
     title: t('tasks.categories'),
     dataIndex: 'categories',

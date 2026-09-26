@@ -1,120 +1,28 @@
-import { useMemo } from 'react';
 import type { FC } from 'react';
-import { Button, Calendar } from 'antd';
-import {
-  CalendarOutlined,
-  DoubleLeftOutlined,
-  DoubleRightOutlined,
-  LeftOutlined,
-  RightOutlined,
-} from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import type { CalendarView } from '../../contexts/CalendarDateContext';
+import { CalendarCard } from 'components/CalendarCard';
+import { useCalendarDate } from 'contexts/CalendarDateContext';
+import { useSettings } from 'contexts/SettingsContext';
+import { visibleRange } from 'utils/plannerRange';
 
-interface Props {
-  selectedDate: Date;
-  onSelect: (date: Date) => void;
-  currentView: CalendarView;
-  weekStartDay: number;
-}
-
-export const MiniCalendar: FC<Props> = ({ selectedDate, onSelect, currentView, weekStartDay }) => {
-  const selected = dayjs(selectedDate);
-
-  const rangeStart = useMemo(() => {
-    switch (currentView) {
-      case 'week': {
-        const diff = (selected.day() - weekStartDay + 7) % 7;
-        return selected.subtract(diff, 'day').startOf('day');
-      }
-      case '3day':
-        return selected.startOf('day');
-      case 'month':
-        return selected.startOf('month');
-      default:
-        return selected.startOf('day');
-    }
-  }, [selected, currentView, weekStartDay]);
-
-  const rangeEnd = useMemo(() => {
-    switch (currentView) {
-      case 'week':
-        return rangeStart.add(6, 'day').endOf('day');
-      case '3day':
-        return selected.add(2, 'day').endOf('day');
-      case 'month':
-        return selected.endOf('month');
-      default:
-        return selected.endOf('day');
-    }
-  }, [selected, currentView, rangeStart]);
+/** Sidebar month card that drives the planner: it tints the visible range and jumps the planner to a picked day. */
+export const MiniCalendar: FC = () => {
+  const navigate = useNavigate();
+  const { selectedDate, setSelectedDate, calendarView } = useCalendarDate();
+  const { weekStartDay } = useSettings();
+  // Day and month views need no tint: the selection, or the whole grid, already says what is shown.
+  const showsRange = calendarView === 'week' || calendarView === '3day';
 
   return (
-    <div className="mini-cal" style={{ padding: '4px 8px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-      <Calendar
-        fullscreen={false}
-        value={selected}
-        onSelect={(date) => onSelect(date.toDate())}
-        fullCellRender={(current, info) => {
-          if (info.type !== 'date') return info.originNode;
-          const inRange =
-            currentView !== 'day' &&
-            !current.isBefore(rangeStart, 'day') &&
-            !current.isAfter(rangeEnd, 'day');
-          if (!inRange) return info.originNode;
-          return (
-            <div style={{ background: 'rgba(22, 119, 255, 0.12)', borderRadius: 4 }}>
-              {info.originNode}
-            </div>
-          );
-        }}
-        headerRender={({ value, onChange }) => (
-          <div style={{ padding: '4px 0' }}>
-            <div style={{ textAlign: 'center', fontWeight: 600, fontSize: 13, marginBottom: 4 }}>
-              {value.format('MMMM YYYY')}
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
-              <Button
-                type="text"
-                size="small"
-                icon={<DoubleLeftOutlined />}
-                onClick={() => onChange(value.subtract(1, 'year'))}
-                aria-label="Previous year"
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<LeftOutlined />}
-                onClick={() => onChange(value.subtract(1, 'month'))}
-                aria-label="Previous month"
-              />
-              <Button
-                type="text"
-                size="small"
-                onClick={() => onChange(dayjs())}
-                aria-label="Today"
-              >
-                <CalendarOutlined />
-              </Button>
-              <Button
-                type="text"
-                size="small"
-                icon={<RightOutlined />}
-                onClick={() => onChange(value.add(1, 'month'))}
-                aria-label="Next month"
-              />
-              <Button
-                type="text"
-                size="small"
-                icon={<DoubleRightOutlined />}
-                onClick={() => onChange(value.add(1, 'year'))}
-                aria-label="Next year"
-              />
-            </div>
-          </div>
-        )}
-      />
-    </div>
+    <CalendarCard
+      className="th-mini-calendar"
+      value={dayjs(selectedDate)}
+      highlight={showsRange ? visibleRange(calendarView, selectedDate, weekStartDay) : undefined}
+      onChange={(date) => {
+        setSelectedDate(date.toDate());
+        navigate('/');
+      }}
+    />
   );
 };
-

@@ -1,0 +1,6 @@
+.th-digital-time {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}

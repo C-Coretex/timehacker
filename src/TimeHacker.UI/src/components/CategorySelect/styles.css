@@ -1,0 +1,6 @@
+.th-category-select__chip.ant-tag {
+  margin-inline-end: 4px;
+  padding: 0 8px;
+  border-radius: var(--th-radius-pill);
+  font-weight: 600;
+}

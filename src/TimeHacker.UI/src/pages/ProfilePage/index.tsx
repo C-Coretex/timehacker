@@ -1,24 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
-import {
-  App, Avatar, Button, Card, Divider, Form, Input, Spin, theme, Typography,
-} from 'antd';
-import {
-  CloseOutlined, EditOutlined, MailOutlined, PhoneOutlined, SaveOutlined, UserOutlined,
-} from '@ant-design/icons';
+import { App, Button, Form, Spin } from 'antd';
+import { EditOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
+import { api } from 'api/api';
+import { PageHeader } from 'components/PageHeader';
 import { useAuth } from 'contexts/AuthContext';
-import { api } from '../../api/api';
-import { getApiErrorMessage } from '../../utils/getApiErrorMessage';
+import { getApiErrorMessage } from 'utils/getApiErrorMessage';
 import { InfoRow } from './components/InfoRow';
+import { ProfileForm } from './components/ProfileForm';
+import type { ProfileFormValues } from './components/ProfileForm';
+import { ProfileHero } from './components/ProfileHero';
+import './styles.css';
 
+/** The signed-in user's profile: a banner, and their contact details shown or edited in place. */
 export const ProfilePage: FC = () => {
   const { user, fetchCurrentUser } = useAuth();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form] = Form.useForm();
-  const { token } = theme.useToken();
+  const [form] = Form.useForm<ProfileFormValues>();
   const { t } = useTranslation();
   const { message } = App.useApp();
 
@@ -27,14 +28,10 @@ export const ProfilePage: FC = () => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) {
-    return <Spin size="large" style={{ display: 'block', margin: '2rem auto' }} />;
+    return <Spin size="large" className="th-profile__loading" />;
   }
 
-  const initials = user.name
-    ? user.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
-    : '?';
-
-  const handleEdit = () => {
+  const startEditing = () => {
     form.setFieldsValue({
       name: user.name,
       phoneNumberForNotifications: user.phoneNumberForNotifications,
@@ -43,14 +40,14 @@ export const ProfilePage: FC = () => {
     setEditing(true);
   };
 
-  const handleCancel = () => {
+  const cancelEditing = () => {
     setEditing(false);
     form.resetFields();
   };
 
-  const handleSave = async () => {
+  const save = async () => {
     try {
-      const values = await form.validateFields();
+      const values = form.getFieldsValue();
       setSaving(true);
       await api.put('/api/users/me', {
         name: values.name,
@@ -69,65 +66,33 @@ export const ProfilePage: FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 16px' }}>
-      <Card>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 8 }}>
-          <Avatar size={80} style={{ backgroundColor: token.colorPrimary, fontSize: 32, fontWeight: 600 }}>
-            {initials}
-          </Avatar>
-          <Typography.Title level={4} style={{ marginTop: 12, marginBottom: 0 }}>
-            {user.name || t('profile.noNameSet')}
-          </Typography.Title>
-          {user.emailForNotifications && (
-            <Typography.Text type="secondary">{user.emailForNotifications}</Typography.Text>
-          )}
-        </div>
+    <div className="th-profile">
+      <PageHeader title={t('profile.title')} />
 
-        <Divider />
+      <ProfileHero
+        name={user.name}
+        email={user.emailForNotifications}
+        action={
+          !editing && (
+            <Button icon={<EditOutlined />} onClick={startEditing}>
+              {t('profile.editProfile')}
+            </Button>
+          )
+        }
+      />
 
-        {!editing ? (
-          <>
+      <section className="th-profile__card">
+        <h2 className="th-profile__card-title">{t('profile.details')}</h2>
+        {editing ? (
+          <ProfileForm form={form} saving={saving} onCancel={cancelEditing} onSave={() => void save()} />
+        ) : (
+          <div className="th-profile__rows">
             <InfoRow icon={<UserOutlined />} label={t('profile.name')} value={user.name} />
             <InfoRow icon={<MailOutlined />} label={t('profile.emailNotifications')} value={user.emailForNotifications} />
             <InfoRow icon={<PhoneOutlined />} label={t('profile.phoneNotifications')} value={user.phoneNumberForNotifications} />
-            <Divider />
-            <Button icon={<EditOutlined />} onClick={handleEdit} block>
-              {t('profile.editProfile')}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Form form={form} layout="vertical">
-              <Form.Item
-                label={t('profile.name')}
-                name="name"
-                rules={[{ required: true, message: t('profile.nameRequired') }]}
-              >
-                <Input prefix={<UserOutlined />} maxLength={64} />
-              </Form.Item>
-              <Form.Item
-                label={t('profile.emailNotifications')}
-                name="emailForNotifications"
-                rules={[{ pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: t('profile.invalidEmail') }]}
-              >
-                <Input prefix={<MailOutlined />} type="email" />
-              </Form.Item>
-              <Form.Item label={t('profile.phoneNotifications')} name="phoneNumberForNotifications">
-                <Input prefix={<PhoneOutlined />} />
-              </Form.Item>
-            </Form>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Button icon={<CloseOutlined />} onClick={handleCancel} style={{ flex: 1 }}>
-                {t('profile.cancel')}
-              </Button>
-              <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} loading={saving} style={{ flex: 1 }}>
-                {t('profile.save')}
-              </Button>
-            </div>
-          </>
+          </div>
         )}
-      </Card>
+      </section>
     </div>
   );
 };
-

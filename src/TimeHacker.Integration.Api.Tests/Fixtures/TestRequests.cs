@@ -39,7 +39,7 @@ internal static class TestRequests
         string name = "Standup",
         DateTime? start = null,
         DateTime? end = null,
-        byte priority = 5,
+        byte priority = PriorityConstants.Default,
         IEnumerable<Guid>? categoryIds = null,
         string? description = "daily standup")
     {
@@ -62,7 +62,7 @@ internal static class TestRequests
         TimeSpan? min = null,
         TimeSpan? max = null,
         TimeSpan? optimal = null,
-        byte priority = 5,
+        byte priority = PriorityConstants.Default,
         IEnumerable<Guid>? categoryIds = null,
         string? description = "reading")
         => new()

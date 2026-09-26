@@ -31,6 +31,7 @@
       "contexts/*": ["./src/contexts/*"],
       "hooks/*": ["./src/hooks/*"],
       "pages/*": ["./src/pages/*"],
+      "theme/*": ["./src/theme/*"],
       "types/*": ["./src/types/*"],
       "utils/*": ["./src/utils/*"],
       "i18n/*": ["./src/i18n/*"]

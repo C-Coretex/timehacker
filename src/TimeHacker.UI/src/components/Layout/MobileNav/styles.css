@@ -1,0 +1,41 @@
+.th-mobile-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 52px;
+  padding: 0 8px 0 16px;
+  border-bottom: 1px solid var(--th-border);
+  background: var(--th-panel);
+}
+
+.th-mobile-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.th-mobile-menu .ant-drawer-header {
+  padding: 8px 8px 8px 16px;
+}
+
+.th-mobile-menu .ant-drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+  background: var(--th-page);
+}
+
+/* The phone menu reads as a list of full-width rows, not a compact sidebar. */
+.th-mobile-menu .th-nav-row {
+  padding: 12px 12px;
+  font-size: 15px;
+}
+
+.th-mobile-menu .th-nav--secondary {
+  padding-top: 12px;
+  border-top: 1px solid var(--th-border);
+}

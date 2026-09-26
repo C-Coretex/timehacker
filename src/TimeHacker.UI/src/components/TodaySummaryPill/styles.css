@@ -1,0 +1,16 @@
+.th-summary-pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--th-radius-pill);
+  background: var(--th-lavender-200);
+  color: var(--th-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.th-summary-pill__urgent {
+  color: var(--th-priority-highest);
+}

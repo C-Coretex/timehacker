@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import type { FC } from 'react';
 import { App, Button, Table, Typography } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 import { useDynamicTasks } from '../../../../hooks/useDynamicTasks';
@@ -19,19 +19,9 @@ export const DynamicTasksTab: FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<DynamicTaskReturnModel | null>(null);
 
-  const openAddModal = useCallback(() => {
-    setEditingTask(null);
-    setModalOpen(true);
-  }, []);
-
-  const openEditModal = useCallback((task: DynamicTaskReturnModel) => {
+  const openModal = useCallback((task: DynamicTaskReturnModel | null) => {
     setEditingTask(task);
     setModalOpen(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setModalOpen(false);
-    setEditingTask(null);
   }, []);
 
   const handleDelete = useCallback((id: string) => {
@@ -46,29 +36,21 @@ export const DynamicTasksTab: FC = () => {
 
   const handleSave = useCallback(
     async (data: InputDynamicTask, id?: string) => {
-      try {
-        if (id) {
-          await updateTask(id, data);
-          notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskUpdated') });
-        } else {
-          await createTask(data);
-          notification.success({ title: t('tasks.success'), description: t('tasks.dynamicTaskAdded') });
-        }
-      } catch {
-        notification.error({ title: t('tasks.error'), description: t('tasks.dynamicTaskSaveFailed') });
-      } finally {
-        closeModal();
-      }
+      const saved = id ? await updateTask(id, data) : await createTask(data);
+      if (!saved) return;
+      notification.success({
+        title: t('tasks.success'),
+        description: id ? t('tasks.dynamicTaskUpdated') : t('tasks.dynamicTaskAdded'),
+      });
+      setModalOpen(false);
     },
-    [createTask, updateTask, closeModal, notification, t]
+    [createTask, updateTask, notification, t]
   );
-
-  const columns = getDynamicTaskColumns(isMobile, t, openEditModal, handleDelete);
 
   return (
     <>
       <div style={{ marginBottom: '1rem' }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal} size={isMobile ? 'small' : 'middle'}>
+        <Button type="primary" icon={<PlusCircleFilled />} iconPlacement="end" onClick={() => openModal(null)}>
           {t('tasks.addDynamicTask')}
         </Button>
       </div>
@@ -80,7 +62,7 @@ export const DynamicTasksTab: FC = () => {
       )}
 
       <Table
-        columns={columns}
+        columns={getDynamicTaskColumns(isMobile, t, openModal, handleDelete)}
         dataSource={tasks}
         loading={loading}
         rowKey="id"
@@ -91,7 +73,7 @@ export const DynamicTasksTab: FC = () => {
 
       <UnifiedTaskFormModal
         open={modalOpen}
-        onCancel={closeModal}
+        onCancel={() => setModalOpen(false)}
         onSaveFixed={() => {}}
         onSaveDynamic={handleSave}
         initialDynamicData={editingTask}
@@ -100,4 +82,3 @@ export const DynamicTasksTab: FC = () => {
     </>
   );
 };
-

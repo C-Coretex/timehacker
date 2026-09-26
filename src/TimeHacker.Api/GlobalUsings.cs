@@ -9,6 +9,7 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.ComponentModel.DataAnnotations;
 
+global using TimeHacker.Domain.Constants;
 global using TimeHacker.Domain.IModels;
 global using TimeHacker.Domain.Observability;
 global using TimeHacker.Domain.DTOs.RepeatingEntity;

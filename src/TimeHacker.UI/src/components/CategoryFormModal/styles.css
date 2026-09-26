@@ -1,0 +1,18 @@
+.th-category-form__identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+}
+
+.th-first-window {
+  display: grid;
+  gap: 12px;
+}
+
+.th-first-window__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--th-indigo);
+  font-weight: 500;
+}

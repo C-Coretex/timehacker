@@ -1,0 +1,34 @@
+.th-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.th-pill {
+  padding: 3px 12px;
+  border: 1px solid var(--th-lavender-200);
+  border-radius: var(--th-radius-pill);
+  background: var(--th-panel);
+  color: var(--th-indigo);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.th-pill:hover {
+  border-color: var(--th-indigo);
+}
+
+.th-pill.is-selected {
+  border-color: var(--th-navy);
+  background: var(--th-navy);
+  color: var(--th-on-primary);
+}
+
+.th-pill:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 2px;
+}

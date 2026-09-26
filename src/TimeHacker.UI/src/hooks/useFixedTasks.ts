@@ -2,14 +2,13 @@ import { useCallback } from 'react';
 import dayjs from 'dayjs';
 import {
   fetchFixedTasks,
-  createFixedTask,
+  createFixedTaskWithSchedule,
   updateFixedTask,
   deleteFixedTask,
 } from '../api/fixedTasks';
 import type { FixedTaskDisplayModel, InputFixedTask } from '../api/types';
+import type { SchedulePayload } from '../utils/buildSchedulePayload';
 import { useEntityCrud } from './useEntityCrud';
-
-export { postNewScheduleForTask } from '../api/fixedTasks';
 
 export const useFixedTasks = () => {
   const { items: tasks, loading, error, fetch: fetchTasks, withRefetch } = useEntityCrud<FixedTaskDisplayModel>({
@@ -31,22 +30,24 @@ export const useFixedTasks = () => {
     fetchErrorMessage: 'Failed to load tasks. Please check your network or API server connection.',
   });
 
+  /** Creates the task and its optional recurrence; resolves to the new id, or null when that failed. */
   const createTask = useCallback(
-    async (task: InputFixedTask): Promise<string> => createFixedTask(task),
-    []
-  );
-
-  const updateTask = useCallback(
-    async (id: string, task: InputFixedTask) => {
-      await withRefetch(() => updateFixedTask(id, task), 'Failed to update task.');
+    async (task: InputFixedTask, schedule?: SchedulePayload): Promise<string | null> => {
+      const result = await withRefetch(() => createFixedTaskWithSchedule(task, schedule), 'Failed to create task.');
+      return result.succeeded ? result.value : null;
     },
     [withRefetch]
   );
 
+  const updateTask = useCallback(
+    async (id: string, task: InputFixedTask): Promise<boolean> =>
+      (await withRefetch(() => updateFixedTask(id, task), 'Failed to update task.')).succeeded,
+    [withRefetch]
+  );
+
   const deleteTask = useCallback(
-    async (id: string) => {
-      await withRefetch(() => deleteFixedTask(id), 'Failed to delete task.');
-    },
+    async (id: string): Promise<boolean> =>
+      (await withRefetch(() => deleteFixedTask(id), 'Failed to delete task.')).succeeded,
     [withRefetch]
   );
 

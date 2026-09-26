@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useCategories } from '../../hooks/useCategories';
 import { argbToHex } from '../../utils/colorArgb';
+import './styles.css';
 
 /** Multi-select over the user's categories, bound to a form field holding category ids. */
 export const CategorySelect: FC<{ name?: string; required?: boolean }> = ({
@@ -27,6 +28,7 @@ export const CategorySelect: FC<{ name?: string; required?: boolean }> = ({
       <Select
         mode="multiple"
         allowClear
+        className="th-category-select"
         loading={loading}
         placeholder={t('taskForm.categoriesPlaceholder')}
         optionFilterProp="label"
@@ -37,7 +39,12 @@ export const CategorySelect: FC<{ name?: string; required?: boolean }> = ({
         tagRender={({ label, value, closable, onClose }) => {
           const category = categories.find((c) => c.id === value);
           return (
-            <Tag color={category ? argbToHex(category.color) : undefined} closable={closable} onClose={onClose} style={{ marginInlineEnd: 4 }}>
+            <Tag
+              className="th-category-select__chip"
+              color={category ? argbToHex(category.color) : undefined}
+              closable={closable}
+              onClose={onClose}
+            >
               {label}
             </Tag>
           );

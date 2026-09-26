@@ -1,35 +1,37 @@
-import type { FC } from 'react';
+import type { CSSProperties, FC } from 'react';
 import { Tooltip } from 'antd';
+import type { CategoryReturnModel } from 'api/types';
+import { argbToHex } from 'utils/colorArgb';
+import './styles.css';
 
-import type { CategoryReturnModel } from '../../api/types';
-import { argbToHex } from '../../utils/colorArgb';
+type DotCategory = Pick<CategoryReturnModel, 'id' | 'name' | 'description' | 'color'>;
 
 /**
- * A task's categories as colour circles, each naming itself on hover. Used where there is no room for
- * labels — a calendar event body, say.
+ * A task's categories as colour circles, each naming itself (and its description) on hover. Used where there
+ * is no room for labels — a planner event, a list row.
  */
-export const CategoryDots: FC<{ categories: CategoryReturnModel[]; size?: number }> = ({
-  categories,
-  size = 8,
-}) => {
+export const CategoryDots: FC<{ categories: DotCategory[] }> = ({ categories }) => {
   if (categories.length === 0) return null;
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, verticalAlign: 'middle' }}>
+    <span className="th-category-dots">
       {categories.map((category) => (
-        <Tooltip key={category.id} title={category.name}>
+        <Tooltip
+          key={category.id}
+          title={
+            <>
+              <strong>{category.name}</strong>
+              {category.description && <div className="th-category-dots__description">{category.description}</div>}
+            </>
+          }
+        >
+          {/* An empty title stops the host event's native tooltip from stacking under this one. */}
           <span
+            className="th-category-dot"
+            role="img"
             aria-label={category.name}
-            style={{
-              width: size,
-              height: size,
-              borderRadius: '50%',
-              backgroundColor: argbToHex(category.color),
-              // A pale category would otherwise vanish into the event body.
-              border: '1px solid rgba(0, 0, 0, 0.25)',
-              boxSizing: 'border-box',
-              flex: 'none',
-            }}
+            title=""
+            style={{ '--th-dot-color': argbToHex(category.color) } as CSSProperties}
           />
         </Tooltip>
       ))}

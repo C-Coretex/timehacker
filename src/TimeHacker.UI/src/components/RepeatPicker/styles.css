@@ -1,0 +1,35 @@
+.th-repeat {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.th-repeat__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--th-primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.th-repeat__trigger:disabled {
+  cursor: default;
+}
+
+.th-repeat__trigger:not(:disabled):hover {
+  text-decoration: underline;
+}
+
+.th-repeat__panel {
+  padding: 12px;
+  border-radius: var(--th-radius-card);
+  background: var(--th-lavender-100);
+}

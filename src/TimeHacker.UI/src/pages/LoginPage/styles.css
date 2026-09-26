@@ -1,0 +1,27 @@
+/* The login screen sits outside the shell, so it carries the app's pink → lavender glow itself. */
+.th-login {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 15% 20%, var(--th-gradient-pink), transparent 45%),
+    radial-gradient(circle at 85% 80%, var(--th-gradient-lavender), transparent 50%),
+    var(--th-page);
+}
+
+.th-login__card {
+  width: 100%;
+  max-width: 460px;
+  padding: 28px 28px 12px;
+  box-sizing: border-box;
+  border-radius: var(--th-radius-card);
+  background: var(--th-panel);
+  box-shadow: 0 18px 48px var(--th-shadow);
+}
+
+.th-login__title.ant-typography {
+  margin: 18px 0 4px;
+}

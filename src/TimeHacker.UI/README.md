@@ -11,7 +11,8 @@
 | HTTP Client | Axios |
 | Data Fetching | TanStack Query (React Query) |
 | UI Components | Ant Design |
-| Styling | Tailwind CSS |
+| Styling | Design tokens (`src/theme/`) → antd theme + `--th-*` CSS variables, plain per-component CSS |
+| Fonts | Inter (`@fontsource-variable/inter`), DSEG7 for the digital time field (`dseg`) |
 | Internationalization | i18next + react-i18next |
 | Date Handling | dayjs |
 | Calendar | react-big-calendar |
@@ -28,7 +29,8 @@ src/
 ├── contexts/     # React Context providers (Auth, Theme)
 ├── hooks/        # Custom React hooks (useQuery, useMutation, useFixedTasks, etc.)
 ├── i18n/         # Internationalization config and locale files (en, ru)
-├── pages/        # Page components (Calendar, Tasks, Profile, Settings, etc.)
+├── pages/        # Page components (Calendar, Today, Tasks, Categories, Profile, Settings, etc.)
+├── theme/        # Design palette (single colour source), antd theme, CSS variables, fonts
 ├── types/        # TypeScript type definitions
 ├── utils/        # Utility functions and helpers
 ├── App.tsx       # Root component with provider stack
@@ -113,21 +115,22 @@ import { useTranslation } from 'react-i18next';
 const { t, i18n } = useTranslation();
 
 // Use translations
-t('nav.calendar')
+t('nav.planning')
 
 // Change language
 i18n.changeLanguage('ru')
 ```
 
 **Translation Namespaces:**
-- `nav.*` - Navigation labels (calendar, tasks, categories, login, profile, etc.)
-- `greeting.*` - Time-based greetings (morning, afternoon, evening) + tagline
-- `header.*` - Summary statistics (fixedTasksLeft, dynamicTasksLeft, highPriority)
+- `nav.*` - Navigation labels (planning, to do, tasks, categories, settings, …)
+- `shell.*` - App-shell accessibility labels (menu open/close, main navigation)
+- `priority.*` - The 1 (Highest) – 5 (Lowest) priority labels
+- `today.*` - The "Tasks for today" page
 - `login.*` / `register.*` - Authentication form labels and messages
 - `profile.*` - Profile management UI
-- `settings.*` - Dark mode and language settings
-- `tasks.*` - Task CRUD labels, form fields, recurring schedule options
-- `calendar.*` - Calendar view names, refresh button, event details
+- `settings.*` - Theme, language, time format and week start
+- `tasks.*` / `taskForm.*` / `dynamicTaskForm.*` - Task tables and the task form
+- `calendar.*` - Planner views, toolbar, re-plan, today summary, event details
 
 ## Routing
 
@@ -135,11 +138,13 @@ Routes defined in `config/AppRoutes.tsx`:
 
 | Route | Component | Auth | Description |
 |-------|-----------|------|-------------|
-| `/` | CalendarPage | Required | Main calendar view (Month/Week/Day/3-Day) |
+| `/` | CalendarPage | Required | Planner (D/3D/W/M), quick-add on empty slots |
+| `/today` | TodayPage | Required | "Tasks for today" list (read-only) |
 | `/tasks` | TasksPage | Required | Tabbed fixed/dynamic task management |
+| `/categories` | CategoriesPage | Required | Categories and their time windows |
 | `/profile` | ProfilePage | Required | User profile view/edit |
 | `/about` | AboutPage | Public | About the application |
-| `/settings` | SettingsPage | Public | Dark mode toggle & language selector |
+| `/settings` | SettingsPage | Public | Light/dark theme tiles, language, time format, week start |
 | `/login` | LoginPage | Public | Login/registration tabs (outside Layout) |
 | `/*` | NotFoundPage | Public | 404 catch-all |
 
@@ -150,22 +155,28 @@ Routes defined in `config/AppRoutes.tsx`:
 
 **Layout:**
 - All routes except `/login` are wrapped in `<Layout>` component
-- Layout includes collapsible sidebar + header + content area
+- One backdrop for the whole app with a cursor-following glow (`Layout/CursorGradient`); the sidebar and
+  pages paint no surface of their own, only components do. Phones: sticky top bar + full-screen menu
 
 ## Key Components
 
-**Layout** (`components/Layout/index.tsx`)
-- Collapsible sidebar with logo & navigation menu
-- Header with time-based greeting, user name, and task summary badges
+**Layout** (`components/Layout/`)
+- `DesktopSidebar`: logo, section nav (`NavMenu`), the planner's month card (`MiniCalendar`, with the visible
+  week / 3 days as a band), then `AccountNav` (settings, about, profile, log out)
+- `MobileNav`: logo + hamburger opening the same `NavMenu` / `AccountNav` in a full-screen drawer
+- Desktop vs phone is decided in CSS at 768px (antd `md`), so the page never re-mounts on resize
 - Content area renders child routes via `<Outlet />`
-- Responsive: sidebar collapses to drawer on mobile (via `useIsMobile()`)
 
-**UnifiedTaskFormModal** (`components/UnifiedTaskFormModal.tsx`)
-- Create/edit modal for fixed tasks
-- Fields: Name, Description, Priority (1-10), Start/End timestamps (DatePicker)
-- **Create mode:** Optional recurring schedule section (type, type-specific fields, ends-on date/occurrence limit)
-- **Edit mode:** Read-only schedule metadata display (created date, last generated date, ends-on)
-- Returns `FixedTaskFormData` + optional `ScheduleFormPayload`
+**UnifiedTaskFormModal** (`components/UnifiedTaskFormModal/`)
+- Create/edit dialog for both task types (Fixed/Dynamic pill switch, locked when editing), full screen on phones
+- Shared fields: Name, Priority (1 Highest – 5 Lowest), Categories, Description
+- Fixed: `WhenFields` — calendar card with From/To clocks and the "⟳ repeats" picker (frequency pills,
+  weekday circles, month-day grid, yearly date, "Ends" pills; create only — editing shows the existing
+  recurrence read-only)
+- Dynamic: min/max/optimal duration as H:MM clocks
+- Every time and duration is a `ClockStepper`: a 7-segment clock that takes typed times ("1422", "12", "12:11"),
+  − / + buttons that move it by 5 minutes, and a picker in 5-minute steps
+- Returns `FixedTaskFormData` + optional `ScheduleFormPayload`, or `InputDynamicTask`
 
 **PrivateRoute** (`components/PrivateRoute/index.tsx`)
 - Route guard wrapper component
@@ -173,13 +184,19 @@ Routes defined in `config/AppRoutes.tsx`:
 - Shows loading spinner during auth check
 - Redirects to `/login` if user is not authenticated
 
-**CalendarPage** (`pages/CalendarPage/index.tsx`)
-- Calendar views: Month, Week, Day, custom 3-Day
+**CalendarPage** (`pages/CalendarPage/`)
+- Planner views: Month, Week, Day, custom 3-Day, switched from `PlannerToolbar` (rbc's own toolbar is off)
 - Fetches task timeline via `fetchTasksForDays()` API call
 - Converts API tasks to calendar events with proper date/time handling
-- Refresh button regenerates snapshots via `refreshTasksForDays()`
-- Event click shows detail modal with task information
-- Dark mode color adaptation for events
+- The magic-wand button re-plans (regenerates snapshots via `refreshTasksForDays()`) for visible days from today on
+- Hovering an empty hour shows a quick-add slot whose "+" opens the task form for that hour; dragging (or a
+  long press on touch) opens it for the selected range
+- Events adapt to their size (card → two lines → one line → "…") via CSS container queries, at 88px an hour;
+  each shows its category dots and description when there is room, Highest priority is ringed red, Lowest fades
+- Event click shows `EventDetailModal`; phones get a week strip + "tasks left today" summary in day view
+
+**TodayPage** (`pages/TodayPage/`)
+- Today's timeline as a list with re-plan / add-task buttons; read-only, since the API does not track completion
 
 **TasksPage** (`pages/TasksPage.tsx`)
 - Tabbed interface: Fixed Tasks / Dynamic Tasks
@@ -213,20 +230,26 @@ Routes defined in `config/AppRoutes.tsx`:
 ## Styling Approach
 
 **Component Library:**
-- Ant Design for all UI components (buttons, forms, modals, tables, menus, navigation, etc.)
+- Ant Design for all UI components (buttons, forms, modals, tables, etc.)
 
-**Utility Styling:**
-- Tailwind CSS for layout, spacing, responsive utilities, and custom colors
+**Design tokens** (`src/theme/`):
+- `palette.ts` is the single source of every colour (light + dark), radius and font
+- `antdTheme.ts` maps it onto antd seed/component tokens (`ConfigProvider` in `App.tsx`)
+- `cssVariables.ts` publishes it as `--th-*` custom properties (`:root` / `:root.dark`) for plain CSS —
+  antd scopes its own variables per component, so custom CSS reads `--th-*` only
+
+**Component styles:**
+- Plain `styles.css` next to the component, with `th-` prefixed class names
 
 **Dark Mode:**
-- Ant Design `theme.darkAlgorithm` applied via `ConfigProvider`
-- Tailwind `dark:` utility classes for custom styles
-- `"dark"` class toggled on `<html>` element by `ThemeContext`
+- Ant Design `theme.darkAlgorithm` + the dark palette applied via `ConfigProvider`
+- Switched from the Settings page (the only theme control)
+- `"dark"` class toggled on `<html>` by `ThemeContext` (in a layout effect, so the first paint is right),
+  which switches every `--th-*` variable
 
 **Responsive Design:**
-- `useIsMobile()` hook for conditional rendering/behavior
-- Ant Design Grid breakpoints for responsive layouts
-- Sidebar → drawer transition on mobile
+- Shell and page chrome switch in CSS at 768px (antd `md`)
+- `useIsMobile()` hook where behaviour (not just looks) differs, e.g. the planner's initial view
 
 ## Development
 
@@ -257,6 +280,7 @@ docker compose --profile dev up
 - `contexts` → `src/contexts`
 - `hooks` → `src/hooks`
 - `pages` → `src/pages`
+- `theme` → `src/theme`
 - `types` → `src/types`
 - `utils` → `src/utils`
 - `i18n` → `src/i18n`

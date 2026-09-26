@@ -14,7 +14,7 @@ const recurrenceCell = (scheduleEntity: ScheduleEntityReturnModel | null, t: TFu
 
   return (
     <Space orientation="vertical" size={0}>
-      <Tag color="blue">{recurrenceTypeLabel(scheduleEntity.repeatingEntity.entityType, t)}</Tag>
+      <Tag color="purple">{recurrenceTypeLabel(scheduleEntity.repeatingEntity.entityType, t)}</Tag>
       {scheduleEntity.endsOn && (
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
           {t('tasks.endsShort')}: {dayjs(scheduleEntity.endsOn).format('MMM D, YYYY')}

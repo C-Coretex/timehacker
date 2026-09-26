@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import path from 'path';
-import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import type { Plugin } from 'vite';
 
@@ -21,7 +20,7 @@ function spaFallbackForApp(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), spaFallbackForApp()],
+  plugins: [react(), spaFallbackForApp()],
   server: {
     watch: {
       // Polling stays opt-in via the env var docker-compose sets, which keeps a native
@@ -42,6 +41,7 @@ export default defineConfig({
       contexts: path.resolve(import.meta.dirname, 'src/contexts'),
       hooks: path.resolve(import.meta.dirname, 'src/hooks'),
       pages: path.resolve(import.meta.dirname, 'src/pages'),
+      theme: path.resolve(import.meta.dirname, 'src/theme'),
       types: path.resolve(import.meta.dirname, 'src/types'),
       utils: path.resolve(import.meta.dirname, 'src/utils'),
       i18n: path.resolve(import.meta.dirname, 'src/i18n'),

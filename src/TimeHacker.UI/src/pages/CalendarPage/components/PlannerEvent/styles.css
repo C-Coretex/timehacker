@@ -1,0 +1,278 @@
+/* ===== Task events =====
+   eventPropGetter tags each task host (.rbc-event) with .th-event-host, its type and its priority. The host
+   stays unpainted and, in day columns, becomes a size container; the inner .th-event paints and adapts,
+   because a container cannot query itself. Month-view events are sized by their content, so they get no
+   container and keep the base one-line look.
+
+   Tiers, in cascade order (container queries add no specificity, so later rules win):
+   one line (base) → two lines (38px) → description (54px) → card (72px × 110px) → phone rows,
+   then the two "…" fallbacks — too narrow, too short — which must beat everything above. At 88px an hour,
+   15px is ten minutes: the shortest task that still gets its name on screen. */
+.rbc-event.th-event-host {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.rbc-day-slot .rbc-event.th-event-host {
+  container: th-event / size;
+  min-height: 0;
+}
+
+.th-event-host--fixed {
+  --th-event-solid: var(--th-event-fixed);
+  --th-event-soft: var(--th-event-fixed-soft);
+  --th-event-row: var(--th-event-fixed-row);
+  --th-event-on-solid: var(--th-on-event);
+}
+
+.th-event-host--dynamic {
+  --th-event-solid: var(--th-event-dynamic);
+  --th-event-soft: var(--th-event-dynamic-soft);
+  --th-event-row: var(--th-event-dynamic-row);
+  --th-event-on-solid: var(--th-on-event-dynamic);
+}
+
+/* Base: one line — title, category dots, ⟳, and the time when there is width for it. */
+.th-event {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 1px 6px;
+  overflow: hidden;
+  border-radius: var(--th-radius-control);
+  background: var(--th-event-solid);
+  color: var(--th-event-on-solid);
+  font-size: 11px;
+  line-height: 13px;
+  text-align: left;
+}
+
+.th-event__description,
+.th-event__time,
+.th-event__inline-time,
+.th-event__more {
+  display: none;
+}
+
+.th-event__heading {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.th-event__title {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.th-event__repeat {
+  flex: none;
+  font-size: 10px;
+}
+
+.th-event__inline-time {
+  flex: none;
+  margin-left: auto;
+  padding-left: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.th-event__time {
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+/* A narrow (overlapped) event ends its time with "…" instead of cutting it off mid-character. */
+.th-event__time-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.th-event__description {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 14px;
+  opacity: 0.85;
+}
+
+/* One line with room to spare: the time joins the title. */
+@container th-event (min-width: 180px) {
+  .th-event__inline-time {
+    display: inline;
+  }
+}
+
+/* Two lines: title over time. */
+@container th-event (min-height: 38px) {
+  .th-event {
+    padding: 3px 8px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .th-event__inline-time {
+    display: none;
+  }
+
+  .th-event__time {
+    display: flex;
+  }
+}
+
+/* Room for a line of description between title and time. */
+@container th-event (min-height: 54px) {
+  .th-event__description {
+    display: -webkit-box;
+  }
+}
+
+/* A proper card: soft fill, the accent rail (first category, else the type), up to three description lines. */
+@container th-event (min-height: 72px) and (min-width: 110px) {
+  .th-event {
+    gap: 3px;
+    padding: 6px 8px 6px 12px;
+    background: var(--th-event-soft);
+    color: var(--th-text);
+    box-shadow: inset 4px 0 0 var(--th-event-accent, var(--th-event-solid));
+  }
+
+  .th-event__title {
+    font-size: 13px;
+  }
+
+  .th-event__repeat {
+    color: var(--th-primary);
+  }
+
+  .th-event__description {
+    -webkit-line-clamp: 3;
+    color: var(--th-text-muted);
+    opacity: 1;
+  }
+
+  .th-event__time {
+    margin-top: auto;
+    color: var(--th-text-muted);
+    opacity: 1;
+  }
+}
+
+/* Phones show a day as rows: stronger fill, title left, time (and ⟳) right, description beneath. */
+@media (max-width: 767px) {
+  @container th-event (min-width: 200px) {
+    .th-event {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-content: start;
+      gap: 2px 8px;
+      padding: 1px 10px;
+      background: var(--th-event-row);
+      color: var(--th-text);
+      box-shadow: none;
+    }
+
+    .th-event__inline-time {
+      display: none;
+    }
+
+    .th-event__time {
+      display: flex;
+      grid-row: 1;
+      grid-column: 2;
+      margin-top: 0;
+      color: var(--th-text);
+    }
+
+    .th-event__description {
+      grid-column: 1 / -1;
+      color: var(--th-text-muted);
+    }
+  }
+
+  @container th-event (min-width: 200px) and (min-height: 38px) {
+    .th-event {
+      padding: 6px 10px;
+    }
+  }
+}
+
+/* Too narrow for words (a phone week column): the design's "…" chip. */
+@container th-event (max-width: 44px) {
+  .th-event {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: var(--th-event-row);
+    color: var(--th-text);
+    box-shadow: none;
+  }
+
+  .th-event__heading,
+  .th-event__description,
+  .th-event__time {
+    display: none;
+  }
+
+  .th-event__more {
+    display: block;
+    font-weight: 700;
+  }
+}
+
+/* Too short for a line of text (under ten minutes): a solid bar with "…"; the tooltip names it. */
+@container th-event (max-height: 14.9px) {
+  .th-event {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: var(--th-event-solid);
+    color: var(--th-event-on-solid);
+    box-shadow: none;
+  }
+
+  .th-event__heading,
+  .th-event__description,
+  .th-event__time {
+    display: none;
+  }
+
+  /* Drawn, not typed: a glyph's dots sit on its baseline and fall out of a 7px bar. */
+  .th-event__more {
+    display: block;
+    width: 15px;
+    height: 3px;
+    font-size: 0;
+    background: radial-gradient(circle, currentColor 1.1px, transparent 1.5px) 0 50% / 5px 3px repeat-x;
+  }
+}
+
+/* ===== Priority =====
+   Highest (1) gets a red ring and Lowest (5) fades back. An outline, not a shadow: the card's accent rail
+   is already a box-shadow. */
+.th-event-host--highest .th-event {
+  outline: 2px solid var(--th-priority-highest);
+  outline-offset: -2px;
+}
+
+.th-event-host--lowest .th-event {
+  opacity: 0.6;
+}

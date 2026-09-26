@@ -4,6 +4,7 @@ import type {
     InputFixedTask,
     InputScheduleEntityModel,
 } from './types';
+import type { SchedulePayload } from '../utils/buildSchedulePayload';
 import { api } from './api';
 
 const API_BASE_URL = '/api/fixed-tasks';
@@ -31,6 +32,22 @@ export const postNewScheduleForTask = async (
 ): Promise<unknown> => {
     const response = await api.post(`${TASKS_API_URL}/schedules`, body);
     return response.data;
+};
+
+/** Creates the task, then attaches its recurrence — which needs the new id. Returns the task's id. */
+export const createFixedTaskWithSchedule = async (
+    task: InputFixedTask,
+    schedule?: SchedulePayload
+): Promise<string> => {
+    const id = await createFixedTask(task);
+    if (schedule) {
+        await postNewScheduleForTask({
+            parentEntityId: id,
+            repeatingEntityType: schedule.repeatingEntityType,
+            endsOnModel: schedule.endsOnModel ?? undefined,
+        });
+    }
+    return id;
 };
 
 export const updateFixedTask = async (id: string, task: InputFixedTask): Promise<void> => {

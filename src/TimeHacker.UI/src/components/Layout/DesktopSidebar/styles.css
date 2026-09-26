@@ -1,0 +1,61 @@
+/* No fill of its own: the sidebar sits on the shell's glow like the pages do. It clips only its orbit. */
+.th-sidebar {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.th-sidebar__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 20px 12px 16px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.th-sidebar__logo {
+  padding: 0 8px 6px;
+}
+
+.th-sidebar__spacer {
+  flex: 1;
+}
+
+.th-sidebar .th-mini-calendar {
+  padding: 6px 6px 8px;
+}
+
+.th-sidebar .th-mini-calendar .th-calendar-card__day {
+  width: 24px;
+  font-size: 11px;
+}
+
+.th-sidebar .th-mini-calendar .th-calendar-card__header button {
+  width: 20px;
+}
+
+.th-sidebar .th-mini-calendar .ant-picker-content thead th {
+  font-size: 9px;
+}
+
+.th-sidebar__orbit {
+  position: absolute;
+  top: 250px;
+  left: 70px;
+  width: 260px;
+  height: 260px;
+  fill: none;
+  stroke: var(--th-text-muted);
+  stroke-width: 0.6;
+  stroke-dasharray: 2 4;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.th-sidebar__orbit-dot {
+  fill: var(--th-text-muted);
+  stroke: none;
+}

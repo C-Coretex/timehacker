@@ -2,11 +2,8 @@ html,
 body {
   margin: 0;
   overflow-x: hidden;
-}
-
-@media (max-width: 575px) {
-  .ant-modal {
-    max-width: calc(100vw - 32px) !important;
-    margin: 16px auto !important;
-  }
+  font-family: var(--th-font-sans);
+  color: var(--th-text);
+  background: var(--th-page);
+  -webkit-font-smoothing: antialiased;
 }

@@ -11,19 +11,20 @@
     "start": "vite preview --host 0.0.0.0 --port 5173"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
+    "@ant-design/icons": "^6.3.4",
+    "@fontsource-variable/inter": "^5.3.0",
     "@tanstack/react-query": "^5.101.4",
-    "antd": "^6.6.0",
+    "antd": "^6.6.5",
     "axios": "^1.19.0",
     "dayjs": "^1.11.21",
+    "dseg": "^0.46.0",
     "i18next": "^26.3.6",
     "i18next-browser-languagedetector": "^8.2.1",
-    "react-i18next": "^17.0.11",
     "react": "^19.2.8",
     "react-big-calendar": "^1.20.0",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.2",
-    "tailwindcss": "^4.3.3"
+    "react-i18next": "^17.0.11",
+    "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

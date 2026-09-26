@@ -14,13 +14,13 @@ public sealed class FixedTasksApiTests(ApiTestFixture fixture) : ApiIntegrationT
     {
         var api = await CreateAuthenticatedApiAsync();
 
-        var create = await api.FixedTasks.Create(TestRequests.NewFixedTask("Standup", Start, End, priority: 7));
+        var create = await api.FixedTasks.Create(TestRequests.NewFixedTask("Standup", Start, End, priority: 2));
         create.StatusCode.Should().Be(HttpStatusCode.Created);
 
         var get = await api.FixedTasks.Get(create.Content);
         get.StatusCode.Should().Be(HttpStatusCode.OK);
         get.Content!.Name.Should().Be("Standup");
-        get.Content.Priority.Should().Be(7);
+        get.Content.Priority.Should().Be(2);
         get.Content.StartTimestamp.Should().Be(Start);
         get.Content.EndTimestamp.Should().Be(End);
     }
@@ -139,6 +139,33 @@ public sealed class FixedTasksApiTests(ApiTestFixture fixture) : ApiIntegrationT
         var id = (await api.FixedTasks.Create(TestRequests.NewFixedTask("Good", Start, End))).Content;
         var badUpdate = await api.FixedTasks.Update(id, TestRequests.NewFixedTask("Good", End, Start));
         badUpdate.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Theory, Trait("Endpoint", "Validation")]
+    [InlineData(0)]
+    [InlineData(6)]
+    public async Task Create_And_Update_Should_Return400_WhenPriorityOutOfRange(byte priority)
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        (await api.FixedTasks.Create(TestRequests.NewFixedTask(priority: priority))).ShouldBeValidationErrorFor("Priority");
+
+        var id = (await api.FixedTasks.Create(TestRequests.NewFixedTask())).Content;
+        (await api.FixedTasks.Update(id, TestRequests.NewFixedTask(priority: priority))).ShouldBeValidationErrorFor("Priority");
+        (await api.FixedTasks.Get(id)).Content!.Priority.Should().Be(PriorityConstants.Default);
+    }
+
+    [Theory, Trait("Endpoint", "Validation")]
+    [InlineData(PriorityConstants.Highest)]
+    [InlineData(PriorityConstants.Lowest)]
+    public async Task Create_Should_AcceptPriorityBounds(byte priority)
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var create = await api.FixedTasks.Create(TestRequests.NewFixedTask(priority: priority));
+
+        create.StatusCode.Should().Be(HttpStatusCode.Created);
+        (await api.FixedTasks.Get(create.Content)).Content!.Priority.Should().Be(priority);
     }
 
     [Fact, Trait("Endpoint", "Not found")]

@@ -27,7 +27,10 @@ export function describeRecurrence(repeatingEntity: ReturnRepeatingEntityModel, 
     case RepeatingEntityTypeEnum.MonthRepeatingEntity:
       return t('taskForm.repeatsMonthlyOnDay', { day: repeatingEntity.monthDayToRepeat });
     case RepeatingEntityTypeEnum.YearRepeatingEntity:
-      return t('taskForm.repeatsYearlyOnDay', { day: repeatingEntity.yearDayToRepeat });
+      // Stored as a day of the year; named as this year's date for that day.
+      return t('taskForm.repeatsYearlyOn', {
+        date: dayjs().startOf('year').add(repeatingEntity.yearDayToRepeat - 1, 'day').format('D MMMM'),
+      });
   }
 }
 

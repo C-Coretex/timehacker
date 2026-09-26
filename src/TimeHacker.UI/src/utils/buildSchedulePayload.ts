@@ -13,7 +13,8 @@ export interface SchedulePayload {
  * Shared by the task and category modals — both render that same section inside their own Form.
  */
 export function buildSchedulePayload(values: Record<string, unknown>): SchedulePayload | undefined {
-  if (!values.addSchedule || values.scheduleType == null) return undefined;
+  // No type chosen means "Does not repeat".
+  if (values.scheduleType == null) return undefined;
 
   let repeatingEntityType: InputRepeatingEntityType;
   switch (values.scheduleType as RepeatingEntityTypeEnum) {

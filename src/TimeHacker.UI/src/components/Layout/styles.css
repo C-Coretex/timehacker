@@ -1,0 +1,157 @@
+/* ===== Shell grid =====
+   One tree for both form factors: CSS picks the sidebar or the top bar, so the page never re-mounts when
+   antd's breakpoint hook settles after the first render. 768px is antd's `md`, which useIsMobile also uses. */
+.th-shell {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+  background: var(--th-page);
+}
+
+/* Stacked over the glow layer. The phone top bar does the same through its own sticky z-index. */
+.th-sidebar,
+.th-shell__main {
+  position: relative;
+  z-index: 1;
+}
+
+.th-shell__main {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px 12px 12px 0;
+}
+
+/* No fill: the page's own components carry the surfaces, and the glow shows between them. */
+.th-shell__panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 20px 24px;
+  overflow: auto;
+}
+
+.th-mobile-topbar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .th-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .th-sidebar {
+    display: none;
+  }
+
+  .th-mobile-topbar {
+    display: flex;
+  }
+
+  .th-shell__main {
+    padding: 0;
+  }
+
+  .th-shell__panel {
+    padding: 14px 14px 18px;
+  }
+}
+
+/* ===== Navigation rows (sidebar + phone menu) ===== */
+.th-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.th-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: var(--th-radius-control);
+  background: transparent;
+  color: var(--th-sidebar-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.th-nav-row:hover {
+  background: color-mix(in srgb, var(--th-nav-active-bg) 55%, transparent);
+  color: var(--th-sidebar-text);
+}
+
+.th-nav-row.is-active {
+  background: var(--th-nav-active-bg);
+  color: var(--th-nav-active-text);
+  font-weight: 600;
+}
+
+.th-nav-row:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 1px;
+}
+
+.th-nav-row__icon {
+  display: inline-flex;
+  font-size: 14px;
+}
+
+.th-nav-row__label {
+  flex: 1;
+}
+
+.th-nav-row__arrow {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* ===== Cursor-following glow =====
+   Soft radial blobs (cheaper than blurring a solid shape) that trail the pointer across the whole screen,
+   each from its own offset and speed. Without a pointer they rest top-left and bottom-right. */
+.th-cursor-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.th-cursor-gradient__blob {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  opacity: 0.9;
+  will-change: transform;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.th-cursor-gradient__blob--pink {
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(closest-side, var(--th-gradient-pink), transparent);
+  transform: translate(calc(var(--th-cursor-x, 60px) - 280px), calc(var(--th-cursor-y, 80px) - 280px));
+}
+
+.th-cursor-gradient__blob--lavender {
+  width: 520px;
+  height: 620px;
+  background: radial-gradient(closest-side, var(--th-gradient-lavender), transparent);
+  transition-duration: 1.4s;
+  transform: translate(calc(var(--th-cursor-x, 85vw) - 120px), calc(var(--th-cursor-y, 80vh) - 140px));
+}

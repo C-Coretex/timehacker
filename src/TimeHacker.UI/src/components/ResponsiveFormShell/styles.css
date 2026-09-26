@@ -1,0 +1,50 @@
+.th-form-shell .ant-modal-title {
+  font-weight: 700;
+}
+
+/* Shared by the forms inside the shell. */
+.th-form-hint {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--th-text-muted);
+}
+
+.th-form-after-card {
+  margin-top: 16px;
+}
+
+.th-form-shell__submit.ant-btn {
+  height: 44px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Phones: the form takes the whole screen and the submit bar sticks to the bottom. */
+@media (max-width: 767px) {
+  .th-form-shell .ant-modal {
+    top: 0;
+    max-width: 100vw;
+    margin: 0;
+    padding-bottom: 0;
+  }
+
+  .th-form-shell .ant-modal-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .th-form-shell .ant-modal-body {
+    flex: 1;
+  }
+
+  .th-form-shell .ant-modal-footer {
+    position: sticky;
+    bottom: 0;
+    padding-top: 12px;
+    background: var(--th-panel);
+  }
+}

@@ -1,20 +1,20 @@
+/* Local names for the shared --th-* tokens, so light and dark need no separate rules. */
 .aboutContainer {
-    --primary-color: #1890ff;
-    --text-color-primary: #333333;
-    --text-color-secondary: #666666;
-    --background-light: #f9f9f9;
-    --background-white: #ffffff;
-    --border-color: #e0e0e0;
-    --photo-bg-color: #e6f7ff;
-    --shadow-light: rgba(0, 0, 0, 0.1);
-    --shadow-medium: rgba(0, 0, 0, 0.05);
+    --primary-color: var(--th-indigo);
+    --text-color-primary: var(--th-text);
+    --text-color-secondary: var(--th-text-muted);
+    --background-light: var(--th-lavender-100);
+    --background-white: var(--th-panel);
+    --border-color: var(--th-border);
+    --photo-bg-color: var(--th-lavender-200);
+    --shadow-light: var(--th-shadow);
+    --shadow-medium: var(--th-shadow);
 }
 
 .aboutContainer {
     padding: 1.25rem;
     max-width: 56.25rem;
     margin: 0 auto;
-    font-family: Arial, sans-serif;
     color: var(--text-color-primary);
     font-size: 1rem;
 }
@@ -146,44 +146,6 @@
 .section p, .section ul {
     animation: fadeIn 1s ease-out forwards;
     animation-delay: 0.2s;
-}
-
-:global(.dark) .aboutContainer {
-    color: #e0e0e0;
-}
-
-:global(.dark) .section {
-    background-color: #1f1f1f;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
-}
-
-:global(.dark) .section h1,
-:global(.dark) .section h2 {
-    color: #4da3ff;
-}
-
-:global(.dark) .section p,
-:global(.dark) .section ul {
-    color: #d0d0d0;
-}
-
-:global(.dark) .developerCard {
-    background-color: #2a2a2a;
-    border-color: #444;
-    box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.3);
-}
-
-:global(.dark) .developerCard h3 {
-    color: #e0e0e0;
-}
-
-:global(.dark) .developerCard p {
-    color: #aaa;
-}
-
-:global(.dark) .developerPhoto {
-    background-color: #1a3a5c;
-    border-color: #4da3ff;
 }
 
 /* ===== Mobile responsive ===== */

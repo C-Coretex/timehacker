@@ -5,11 +5,13 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '../../api/api';
+import { Logo } from '../../components/Logo';
 import { getApiErrorMessage } from '../../utils/getApiErrorMessage';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoginForm } from './components/LoginForm';
 import { RegisterForm } from './components/RegisterForm';
 import type { LoginFormData, RegisterFormData } from './types';
+import './styles.css';
 
 export const LoginPage: FC = () => {
   const { t } = useTranslation();
@@ -67,51 +69,54 @@ export const LoginPage: FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: '2rem auto', padding: '0 16px' }}>
-      <Typography.Title level={2} style={{ marginBottom: 0 }}>
-        {t('login.welcome')}
-      </Typography.Title>
-      <Typography.Text type="secondary">{t('login.subtitle')}</Typography.Text>
+    <div className="th-login">
+      <div className="th-login__card">
+        <Logo />
+        <Typography.Title level={2} className="th-login__title">
+          {t('login.welcome')}
+        </Typography.Title>
+        <Typography.Text type="secondary">{t('login.subtitle')}</Typography.Text>
 
-      {authMessage && (
-        <Alert type="warning" title={authMessage} showIcon style={{ marginTop: '1rem' }} />
-      )}
-      {error && (
-        <Alert type="error" title={error} style={{ marginTop: '1rem' }} />
-      )}
+        {authMessage && (
+          <Alert type="warning" title={authMessage} showIcon style={{ marginTop: '1rem' }} />
+        )}
+        {error && (
+          <Alert type="error" title={error} style={{ marginTop: '1rem' }} />
+        )}
 
-      <Tabs
-        activeKey={activeTab}
-        onChange={(k) => setActiveTab(k as 'login' | 'register')}
-        style={{ marginTop: '1rem' }}
-        items={[
-          {
-            key: 'login',
-            label: t('login.loginButton'),
-            children: (
-              <LoginForm
-                form={loginForm}
-                loading={loading}
-                rememberMe={rememberMe}
-                onRememberMeChange={setRememberMe}
-                onFinish={handleLogin}
-                onDevLogin={handleDevLogin}
-              />
-            ),
-          },
-          {
-            key: 'register',
-            label: t('login.register'),
-            children: (
-              <RegisterForm
-                form={registerForm}
-                loading={loading}
-                onFinish={handleRegister}
-              />
-            ),
-          },
-        ]}
-      />
+        <Tabs
+          activeKey={activeTab}
+          onChange={(k) => setActiveTab(k as 'login' | 'register')}
+          style={{ marginTop: '1rem' }}
+          items={[
+            {
+              key: 'login',
+              label: t('login.loginButton'),
+              children: (
+                <LoginForm
+                  form={loginForm}
+                  loading={loading}
+                  rememberMe={rememberMe}
+                  onRememberMeChange={setRememberMe}
+                  onFinish={handleLogin}
+                  onDevLogin={handleDevLogin}
+                />
+              ),
+            },
+            {
+              key: 'register',
+              label: t('login.register'),
+              children: (
+                <RegisterForm
+                  form={registerForm}
+                  loading={loading}
+                  onFinish={handleRegister}
+                />
+              ),
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 };

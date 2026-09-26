@@ -24,9 +24,9 @@ export const getCategoryColumns = (
           display: 'inline-block',
           width: 18,
           height: 18,
-          borderRadius: 4,
+          borderRadius: '50%',
           background: argbToHex(color),
-          border: '1px solid rgba(0,0,0,0.15)',
+          border: '1px solid var(--th-border)',
         }}
       />
     ),
@@ -45,7 +45,7 @@ export const getCategoryColumns = (
       category.schedules.length === 0 ? (
         <Tag>{t('categories.noSchedules')}</Tag>
       ) : (
-        <Tag color="blue">{t('categories.scheduleCount', { count: category.schedules.length })}</Tag>
+        <Tag color="purple">{t('categories.scheduleCount', { count: category.schedules.length })}</Tag>
       ),
   },
   {

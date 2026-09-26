@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import type { FC } from 'react';
 import { App, Button, Table, Typography } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import { useFixedTasks, postNewScheduleForTask } from '../../../../hooks/useFixedTasks';
+import { useFixedTasks } from '../../../../hooks/useFixedTasks';
 import { UnifiedTaskFormModal } from '../../../../components/UnifiedTaskFormModal';
 import type { ScheduleFormPayload } from '../../../../components/UnifiedTaskFormModal';
 import type { FixedTaskDisplayModel, FixedTaskFormData } from '../../../../api/types';
@@ -15,25 +15,15 @@ import { getFixedTaskColumns } from './columns';
 export const FixedTasksTab: FC = () => {
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
-  const { tasks, loading, error, fetchTasks, createTask, updateTask, deleteTask } = useFixedTasks();
+  const { tasks, loading, error, createTask, updateTask, deleteTask } = useFixedTasks();
   const { notification, modal } = App.useApp();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<FixedTaskDisplayModel | null>(null);
 
-  const openAddModal = useCallback(() => {
-    setEditingTask(null);
-    setModalOpen(true);
-  }, []);
-
-  const openEditModal = useCallback((task: FixedTaskDisplayModel) => {
+  const openModal = useCallback((task: FixedTaskDisplayModel | null) => {
     setEditingTask(task);
     setModalOpen(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setModalOpen(false);
-    setEditingTask(null);
   }, []);
 
   const handleDelete = useCallback((id: string) => {
@@ -48,38 +38,22 @@ export const FixedTasksTab: FC = () => {
 
   const handleSave = useCallback(
     async (data: FixedTaskFormData, id?: string, schedule?: ScheduleFormPayload) => {
-      try {
-        const payload = toFixedTaskPayload(data);
-        if (id) {
-          await updateTask(id, payload);
-          notification.success({ title: t('tasks.success'), description: t('tasks.fixedTaskUpdated') });
-        } else {
-          const newId = await createTask(payload);
-          if (schedule) {
-            await postNewScheduleForTask({
-              parentEntityId: newId,
-              repeatingEntityType: schedule.repeatingEntityType,
-              endsOnModel: schedule.endsOnModel ?? undefined,
-            });
-          }
-          notification.success({ title: t('tasks.success'), description: t('tasks.fixedTaskAdded') });
-          await fetchTasks();
-        }
-      } catch {
-        notification.error({ title: t('tasks.error'), description: t('tasks.fixedTaskSaveFailed') });
-      } finally {
-        closeModal();
-      }
+      const payload = toFixedTaskPayload(data);
+      const saved = id ? await updateTask(id, payload) : (await createTask(payload, schedule)) !== null;
+      if (!saved) return;
+      notification.success({
+        title: t('tasks.success'),
+        description: id ? t('tasks.fixedTaskUpdated') : t('tasks.fixedTaskAdded'),
+      });
+      setModalOpen(false);
     },
-    [createTask, updateTask, fetchTasks, closeModal, notification, t]
+    [createTask, updateTask, notification, t]
   );
-
-  const columns = getFixedTaskColumns(isMobile, t, openEditModal, handleDelete);
 
   return (
     <>
       <div style={{ marginBottom: '1rem' }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal} size={isMobile ? 'small' : 'middle'}>
+        <Button type="primary" icon={<PlusCircleFilled />} iconPlacement="end" onClick={() => openModal(null)}>
           {t('tasks.addFixedTask')}
         </Button>
       </div>
@@ -91,7 +65,7 @@ export const FixedTasksTab: FC = () => {
       )}
 
       <Table
-        columns={columns}
+        columns={getFixedTaskColumns(isMobile, t, openModal, handleDelete)}
         dataSource={tasks}
         loading={loading}
         rowKey="id"
@@ -102,7 +76,7 @@ export const FixedTasksTab: FC = () => {
 
       <UnifiedTaskFormModal
         open={modalOpen}
-        onCancel={closeModal}
+        onCancel={() => setModalOpen(false)}
         onSaveFixed={handleSave}
         onSaveDynamic={() => {}}
         initialFixedData={editingTask ?? undefined}
@@ -111,4 +85,3 @@ export const FixedTasksTab: FC = () => {
     </>
   );
 };
-

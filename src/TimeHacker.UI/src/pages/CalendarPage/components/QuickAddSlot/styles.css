@@ -1,0 +1,34 @@
+/* The hour's "+" — shown while the hour is hovered (the dashed slot is calendar-theme.css), ringed when the
+   pointer is on it. Touch screens never show it; there a long press on an hour adds a task. */
+.th-quick-add {
+  display: none;
+}
+
+@media (hover: hover) {
+  .th-planner .rbc-day-slot .rbc-timeslot-group:hover .th-quick-add {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 0;
+    border-radius: 50%;
+    background: var(--th-primary);
+    color: var(--th-on-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: box-shadow 0.15s, background-color 0.15s;
+  }
+
+  .th-planner .rbc-day-slot .rbc-timeslot-group:hover .th-quick-add:hover {
+    background: var(--th-primary-hover);
+    box-shadow:
+      0 0 0 3px var(--th-panel),
+      0 0 0 5px var(--th-primary);
+  }
+}

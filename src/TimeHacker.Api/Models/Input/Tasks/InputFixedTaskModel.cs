@@ -14,6 +14,7 @@ public record InputFixedTaskModel
     public IEnumerable<Guid> CategoryIds { get; init; } = [];
 
     [Required]
+    [Range(PriorityConstants.Highest, PriorityConstants.Lowest)]
     public required byte Priority { get; init; }
 
     [Required]

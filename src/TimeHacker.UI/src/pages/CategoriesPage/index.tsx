@@ -1,66 +1,35 @@
 import { useCallback, useState } from 'react';
 import type { FC } from 'react';
 import { App, Button, Table, Typography } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
-import { useCategories } from '../../hooks/useCategories';
-import { useCategorySchedules } from '../../hooks/useCategorySchedules';
 import { CategoryFormModal } from '../../components/CategoryFormModal';
+import type { FirstCategoryWindow } from '../../components/CategoryFormModal/types';
 import { CategoryScheduleFormModal } from '../../components/CategoryScheduleFormModal';
-import type {
-  CategoryDisplayModel,
-  CategoryFormData,
-  CategoryScheduleDisplayModel,
-  CategoryScheduleFormData,
-  InputCategory,
-  InputCategorySchedule,
-} from '../../api/types';
-import type { SchedulePayload } from '../../utils/buildSchedulePayload';
+import { PageHeader } from '../../components/PageHeader';
+import type { CategoryDisplayModel, CategoryFormData } from '../../api/types';
+import { useCategories } from '../../hooks/useCategories';
+import { useCategoryScheduleEditor } from '../../hooks/useCategoryScheduleEditor';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { toCategoryPayload, toCategorySchedulePayload } from '../../utils/categoryPayloads';
 import { getCategoryColumns } from './columns';
 import { SchedulesPanel } from './SchedulesPanel';
 
-const toPayload = (data: CategoryFormData): InputCategory => ({
-  name: data.name,
-  description: data.description || undefined,
-  color: data.color,
-});
-
-const toSchedulePayload = (data: CategoryScheduleFormData): InputCategorySchedule => ({
-  description: data.description || undefined,
-  date: data.date.format('YYYY-MM-DD'),
-  startTime: data.startTime.format('HH:mm:ss'),
-  endTime: data.endTime.format('HH:mm:ss'),
-});
-
+/** Categories as a table; each row expands into the time windows that category occupies. */
 export const CategoriesPage: FC = () => {
   const { isMobile } = useIsMobile();
   const { t } = useTranslation();
-  const { categories, loading, error, fetchCategories, create, update, remove } = useCategories();
-  const schedules = useCategorySchedules({ onChanged: fetchCategories });
   const { notification, modal } = App.useApp();
+  const { categories, loading, error, fetchCategories, create, update, remove } = useCategories();
+  const windows = useCategoryScheduleEditor(fetchCategories);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryDisplayModel | null>(null);
 
-  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const [scheduleParent, setScheduleParent] = useState<CategoryDisplayModel | null>(null);
-  const [editingSchedule, setEditingSchedule] = useState<CategoryScheduleDisplayModel | null>(null);
-
-  const openAddModal = useCallback(() => {
-    setEditingCategory(null);
-    setModalOpen(true);
-  }, []);
-
-  const openEditModal = useCallback((category: CategoryDisplayModel) => {
+  const openModal = useCallback((category: CategoryDisplayModel | null) => {
     setEditingCategory(category);
     setModalOpen(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setModalOpen(false);
-    setEditingCategory(null);
   }, []);
 
   const handleDelete = useCallback(
@@ -77,103 +46,42 @@ export const CategoriesPage: FC = () => {
   );
 
   const handleSave = useCallback(
-    async (data: CategoryFormData, id?: string) => {
-      const payload = toPayload(data);
+    async (data: CategoryFormData, id?: string, firstWindow?: FirstCategoryWindow) => {
+      const payload = toCategoryPayload(data);
       if (id) {
-        await update(id, payload);
-        notification.success({
-          title: t('categories.success'),
-          description: t('categories.categoryUpdated'),
-        });
-      } else {
-        await create(payload);
-        notification.success({
-          title: t('categories.success'),
-          description: t('categories.categoryAdded'),
-        });
+        if (!(await update(id, payload))) return;
+        notification.success({ title: t('categories.success'), description: t('categories.categoryUpdated') });
+        setModalOpen(false);
+        return;
       }
-      closeModal();
-    },
-    [create, update, closeModal, notification, t]
-  );
 
-  const openAddScheduleModal = useCallback((category: CategoryDisplayModel) => {
-    setScheduleParent(category);
-    setEditingSchedule(null);
-    setScheduleModalOpen(true);
-  }, []);
-
-  const openEditScheduleModal = useCallback(
-    (category: CategoryDisplayModel, schedule: CategoryScheduleDisplayModel) => {
-      setScheduleParent(category);
-      setEditingSchedule(schedule);
-      setScheduleModalOpen(true);
-    },
-    []
-  );
-
-  const closeScheduleModal = useCallback(() => {
-    setScheduleModalOpen(false);
-    setScheduleParent(null);
-    setEditingSchedule(null);
-  }, []);
-
-  const handleDeleteSchedule = useCallback(
-    (schedule: CategoryScheduleDisplayModel) => {
-      modal.confirm({
-        title: t('categorySchedules.confirmDelete'),
-        content: t('categorySchedules.confirmDeleteMessage'),
-        okText: t('categorySchedules.delete'),
-        okType: 'danger',
-        onOk: () => schedules.remove(schedule.categoryId, schedule.id),
-      });
-    },
-    [schedules, modal, t]
-  );
-
-  const handleSaveSchedule = useCallback(
-    async (data: CategoryScheduleFormData, id?: string, recurrence?: SchedulePayload) => {
-      if (!scheduleParent) return;
-
-      const payload = toSchedulePayload(data);
-      if (id) {
-        await schedules.update(scheduleParent.id, id, payload);
-        notification.success({
-          title: t('categories.success'),
-          description: t('categorySchedules.scheduleUpdated'),
-        });
+      const newId = await create(payload);
+      if (!newId) return;
+      setModalOpen(false);
+      // Two calls, not one transaction: if the window fails the category still exists and the window can be
+      // added from its row, which the warning says.
+      const windowAdded =
+        !firstWindow ||
+        (await windows.createWindow(newId, toCategorySchedulePayload(firstWindow.schedule), firstWindow.recurrence));
+      if (windowAdded) {
+        notification.success({ title: t('categories.success'), description: t('categories.categoryAdded') });
       } else {
-        await schedules.create(scheduleParent.id, payload, recurrence);
-        notification.success({
-          title: t('categories.success'),
-          description: t('categorySchedules.scheduleAdded'),
-        });
+        notification.warning({ title: t('categories.categoryAdded'), description: t('categoryForm.windowFailed') });
       }
-      closeScheduleModal();
     },
-    [schedules, scheduleParent, closeScheduleModal, notification, t]
+    [create, update, windows, notification, t]
   );
-
-  const columns = getCategoryColumns(isMobile, t, openEditModal, handleDelete);
 
   return (
     <div>
-      <div style={{ marginBottom: '1rem' }}>
-        <Typography.Title level={isMobile ? 4 : 2} style={{ margin: 0 }}>
-          {t('categories.allCategories')}
-        </Typography.Title>
-      </div>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={openAddModal}
-          size={isMobile ? 'small' : 'middle'}
-        >
-          {t('categories.addCategory')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('categories.allCategories')}
+        actions={
+          <Button type="primary" icon={<PlusCircleFilled />} iconPlacement="end" onClick={() => openModal(null)}>
+            {t('categories.addCategory')}
+          </Button>
+        }
+      />
 
       {error && (
         <Typography.Text type="danger" style={{ display: 'block', marginBottom: 8 }}>
@@ -182,7 +90,7 @@ export const CategoriesPage: FC = () => {
       )}
 
       <Table
-        columns={columns}
+        columns={getCategoryColumns(isMobile, t, openModal, handleDelete)}
         dataSource={categories}
         loading={loading}
         rowKey="id"
@@ -195,9 +103,9 @@ export const CategoriesPage: FC = () => {
               category={category}
               isMobile={isMobile}
               t={t}
-              onAdd={openAddScheduleModal}
-              onEdit={openEditScheduleModal}
-              onDelete={handleDeleteSchedule}
+              onAdd={windows.openAdd}
+              onEdit={windows.openEdit}
+              onDelete={windows.remove}
             />
           ),
         }}
@@ -205,17 +113,17 @@ export const CategoriesPage: FC = () => {
 
       <CategoryFormModal
         open={modalOpen}
-        onCancel={closeModal}
+        onCancel={() => setModalOpen(false)}
         onSave={handleSave}
         initialData={editingCategory}
       />
 
       <CategoryScheduleFormModal
-        open={scheduleModalOpen}
-        onCancel={closeScheduleModal}
-        onSave={handleSaveSchedule}
-        categoryName={scheduleParent?.name ?? ''}
-        initialData={editingSchedule}
+        open={windows.isOpen}
+        onCancel={windows.close}
+        onSave={windows.save}
+        categoryName={windows.category?.name ?? ''}
+        initialData={windows.editing}
       />
     </div>
   );

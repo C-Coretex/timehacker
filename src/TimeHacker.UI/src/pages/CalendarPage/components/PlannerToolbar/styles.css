@@ -1,0 +1,112 @@
+.th-planner-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  margin-bottom: 12px;
+}
+
+.th-planner-toolbar__title {
+  margin: 0;
+  min-width: 190px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--th-text);
+}
+
+.th-planner-toolbar__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.th-planner-toolbar__paging {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--th-radius-control);
+  background: var(--th-lavender-100);
+}
+
+.th-planner-toolbar__paging button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--th-indigo);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.th-planner-toolbar__paging button:not(:disabled):hover {
+  background: var(--th-panel);
+}
+
+.th-planner-toolbar__paging button:disabled {
+  color: var(--th-text-muted);
+  opacity: 0.55;
+  cursor: default;
+}
+
+.th-planner-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Re-plan is the planner's signature action, so it gets the brand gradient rather than a quiet outline. */
+.th-planner-toolbar__replan.ant-btn:not(:disabled) {
+  border: 0;
+  background: linear-gradient(100deg, var(--th-brand-purple), var(--th-primary));
+  color: var(--th-on-primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--th-brand-purple) 30%, transparent);
+}
+
+.th-planner-toolbar__replan.ant-btn:not(:disabled):hover {
+  background: linear-gradient(100deg, var(--th-brand-purple), var(--th-primary-hover));
+  color: var(--th-on-primary);
+  filter: brightness(1.05);
+}
+
+/* Phones: title on its own row, and the design's round magenta action buttons. */
+@media (max-width: 767px) {
+  .th-planner-toolbar {
+    gap: 8px;
+  }
+
+  .th-planner-toolbar__title {
+    order: -2;
+    flex: 1;
+    min-width: 0;
+    font-size: 17px;
+  }
+
+  .th-planner-toolbar__actions {
+    order: -1;
+    margin-left: 0;
+  }
+
+  .th-planner-toolbar__controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .th-planner-toolbar__replan.ant-btn,
+  .th-planner-toolbar__add.ant-btn {
+    width: 32px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .th-planner-toolbar__replan-label,
+  .th-planner-toolbar__add-label {
+    display: none;
+  }
+}

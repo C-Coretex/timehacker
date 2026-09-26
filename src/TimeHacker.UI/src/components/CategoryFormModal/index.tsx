@@ -1,102 +1,98 @@
 import { useEffect } from 'react';
 import type { FC } from 'react';
-import { Modal, Form, Input, ColorPicker, Button } from 'antd';
+import { ColorPicker, Form, Input } from 'antd';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-import type { CategoryFormData } from '../../api/types';
+import { categoryColorPresets } from '../../theme/palette';
+import { buildSchedulePayload } from '../../utils/buildSchedulePayload';
 import { argbToHex, hexToArgb } from '../../utils/colorArgb';
-import { useIsMobile } from '../../hooks/useIsMobile';
+import { ResponsiveFormShell } from '../ResponsiveFormShell';
+import { FirstWindowFields } from './FirstWindowFields';
 import type { CategoryFormModalProps } from './types';
+import './styles.css';
 
-const DEFAULT_COLOR_HEX = '#1890ff';
+interface CategoryFormValues extends Record<string, unknown> {
+  name: string;
+  description?: string;
+  color: string;
+  withFirstWindow?: boolean;
+  date?: Dayjs;
+  startTime?: Dayjs;
+  endTime?: Dayjs;
+}
+
+const [DEFAULT_COLOR] = categoryColorPresets;
 
 /**
- * A category is just a label. Its dated time windows are managed separately, through
- * CategoryScheduleFormModal on the expanded row.
+ * A category is a label (name, colour, note). Creating one may also place its first time window; every
+ * other window is managed from the category's row through CategoryScheduleFormModal.
  */
-export const CategoryFormModal: FC<CategoryFormModalProps> = ({
-  open,
-  onCancel,
-  onSave,
-  initialData,
-}) => {
-  const [form] = Form.useForm();
+export const CategoryFormModal: FC<CategoryFormModalProps> = ({ open, onCancel, onSave, initialData }) => {
+  const [form] = Form.useForm<CategoryFormValues>();
   const { t } = useTranslation();
-  const { isMobile } = useIsMobile();
-
   const isEdit = !!initialData;
 
   useEffect(() => {
     if (!open) return;
-
-    if (initialData) {
-      form.setFieldsValue({
-        name: initialData.name,
-        description: initialData.description ?? '',
-        color: argbToHex(initialData.color),
-      });
-    } else {
-      form.resetFields();
-    }
+    form.resetFields();
+    form.setFieldsValue(
+      initialData
+        ? { name: initialData.name, description: initialData.description ?? '', color: argbToHex(initialData.color) }
+        : { color: DEFAULT_COLOR, date: dayjs() }
+    );
   }, [initialData, open, form]);
 
-  const handleFinish = (values: Record<string, unknown>) => {
-    const rawColor = values.color as { toHexString?: () => string } | string | undefined;
-    const hex =
-      typeof rawColor === 'string'
-        ? rawColor
-        : (rawColor?.toHexString?.() ?? DEFAULT_COLOR_HEX);
-
-    const data: CategoryFormData = {
-      name: values.name as string,
-      description: (values.description as string) ?? '',
-      color: hexToArgb(hex),
-    };
-
-    onSave(data, initialData?.id);
+  const handleFinish = (values: CategoryFormValues) => {
+    const data = { name: values.name, description: values.description ?? '', color: hexToArgb(values.color) };
+    const firstWindow =
+      !isEdit && values.withFirstWindow && values.date && values.startTime && values.endTime
+        ? {
+            schedule: { description: '', date: values.date, startTime: values.startTime, endTime: values.endTime },
+            recurrence: buildSchedulePayload(values),
+          }
+        : undefined;
+    onSave(data, initialData?.id, firstWindow);
   };
 
   return (
-    <Modal
+    <ResponsiveFormShell
       open={open}
-      forceRender
-      destroyOnHidden
-      title={isEdit ? t('categoryForm.editCategory') : t('categoryForm.addCategory')}
-      width={isMobile ? '100%' : 480}
       onCancel={onCancel}
-      footer={
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <Button type="primary" block size="large" onClick={() => form.submit()}>
-            {isEdit ? t('categoryForm.update') : t('categoryForm.create')}
-          </Button>
-          <Button type="text" block size="small" onClick={onCancel}>
-            {t('categoryForm.cancel')}
-          </Button>
-        </div>
-      }
+      title={isEdit ? t('categoryForm.editCategory') : t('categoryForm.addCategory')}
+      submitLabel={isEdit ? t('categoryForm.update') : t('categoryForm.addCategory')}
+      isEdit={isEdit}
+      width={isEdit ? 480 : 540}
+      onSubmit={() => form.submit()}
     >
-      <Form form={form} onFinish={handleFinish} layout="vertical">
-        <Form.Item
-          name="name"
-          label={t('categoryForm.name')}
-          rules={[{ required: true, message: t('categoryForm.nameRequired') }]}
-        >
-          <Input placeholder={t('categoryForm.namePlaceholder')} />
-        </Form.Item>
+      <Form form={form} layout="vertical" requiredMark={false} onFinish={handleFinish}>
+        {!isEdit && <p className="th-form-hint">{t('categoryForm.createHint')}</p>}
+
+        <div className="th-category-form__identity">
+          <Form.Item
+            name="name"
+            label={t('categoryForm.name')}
+            rules={[{ required: true, message: t('categoryForm.nameRequired') }]}
+          >
+            <Input placeholder={t('categoryForm.namePlaceholder')} />
+          </Form.Item>
+          <Form.Item
+            name="color"
+            label={t('categoryForm.color')}
+            initialValue={DEFAULT_COLOR}
+            getValueFromEvent={(color: { toHexString: () => string }) => color.toHexString()}
+          >
+            <ColorPicker disabledAlpha presets={[{ label: t('categoryForm.suggestedColors'), colors: [...categoryColorPresets] }]} />
+          </Form.Item>
+        </div>
 
         <Form.Item name="description" label={t('categoryForm.description')}>
-          <Input.TextArea rows={3} placeholder={t('categoryForm.descriptionPlaceholder')} />
+          <Input.TextArea rows={2} placeholder={t('categoryForm.descriptionPlaceholder')} />
         </Form.Item>
 
-        <Form.Item
-          name="color"
-          label={t('categoryForm.color')}
-          initialValue={DEFAULT_COLOR_HEX}
-          getValueFromEvent={(color: { toHexString: () => string }) => color.toHexString()}
-        >
-          <ColorPicker disabledAlpha showText />
-        </Form.Item>
+        {!isEdit && <FirstWindowFields />}
       </Form>
-    </Modal>
+    </ResponsiveFormShell>
   );
 };

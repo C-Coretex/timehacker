@@ -47,11 +47,13 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
         context.Db.Set<ScheduleEntity>().AddRange(dailyStandup, weeklySync);
         await context.Db.SaveChangesAsync(cancellationToken);
 
-        var standup = NewFixedTask(context, "Morning standup", priority: 4, today, 9, 0, 9, 30, dailyStandup.Id);
-        var lunch = NewFixedTask(context, "Lunch break", priority: 2, today, 12, 30, 13, 0);
-        var gymSession = NewFixedTask(context, "Gym session", priority: 6, today, 18, 0, 19, 0);
-        var dentist = NewFixedTask(context, "Dentist appointment", priority: 8, tomorrow, 10, 0, 11, 0);
-        var teamSync = NewFixedTask(context, "Team sync", priority: 5, dayAfter, 14, 0, 15, 0, weeklySync.Id);
+        // Priorities use the 1 (Highest) – 5 (Lowest) scale from PriorityConstants.
+        // Every task carries a description, since the planner shows it on the event whenever there is room.
+        var standup = NewFixedTask(context, "Morning standup", "Yesterday, today and blockers, in five minutes each.", priority: 2, today, 9, 0, 9, 30, dailyStandup.Id);
+        var lunch = NewFixedTask(context, "Lunch break", "Away from the screen, a proper meal.", priority: 5, today, 12, 30, 13, 0);
+        var gymSession = NewFixedTask(context, "Gym session", "Legs and core, then ten minutes of stretching.", priority: 3, today, 18, 0, 19, 0);
+        var dentist = NewFixedTask(context, "Dentist appointment", "Regular check-up. Bring the insurance card.", priority: 1, tomorrow, 10, 0, 11, 0);
+        var teamSync = NewFixedTask(context, "Team sync", "Weekly planning with the whole team.", priority: 3, dayAfter, 14, 0, 15, 0, weeklySync.Id);
 
         context.Db.Set<FixedTask>().AddRange(standup, lunch, gymSession, dentist, teamSync);
         await context.Db.SaveChangesAsync(cancellationToken);
@@ -76,10 +78,10 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
         if (alreadySeeded)
             return;
 
-        var readBook = NewDynamicTask(context, "Read a book", priority: 3, min: 20, max: 60, optimal: 30);
-        var spanish = NewDynamicTask(context, "Learn Spanish", priority: 5, min: 15, max: 45);
-        var codeReview = NewDynamicTask(context, "Code review", priority: 7, min: 30, max: 90, optimal: 45);
-        var meditate = NewDynamicTask(context, "Meditate", priority: 4, min: 10, max: 20);
+        var readBook = NewDynamicTask(context, "Read a book", "A chapter of the current novel, phone in another room.", priority: 3, min: 20, max: 60, optimal: 30);
+        var spanish = NewDynamicTask(context, "Learn Spanish", "One lesson plus ten flashcards.", priority: 2, min: 15, max: 45);
+        var codeReview = NewDynamicTask(context, "Code review", "Open pull requests, oldest first.", priority: 1, min: 30, max: 90, optimal: 45);
+        var meditate = NewDynamicTask(context, "Meditate", "Breathing exercise with the timer on.", priority: 4, min: 10, max: 20);
 
         context.Db.Set<DynamicTask>().AddRange(readBook, spanish, codeReview, meditate);
         await context.Db.SaveChangesAsync(cancellationToken);
@@ -116,6 +118,7 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
     private static FixedTask NewFixedTask(
         DevelopmentSeedContext context,
         string name,
+        string description,
         byte priority,
         DateOnly date,
         int startHour,
@@ -128,6 +131,7 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
             UserId = context.UserId,
             CreatedTimestamp = context.Now,
             Name = name,
+            Description = description,
             Priority = priority,
             StartTimestamp = date.ToDateTime(new TimeOnly(startHour, startMinute), DateTimeKind.Utc),
             EndTimestamp = date.ToDateTime(new TimeOnly(endHour, endMinute), DateTimeKind.Utc),
@@ -137,6 +141,7 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
     private static DynamicTask NewDynamicTask(
         DevelopmentSeedContext context,
         string name,
+        string description,
         byte priority,
         int min,
         int max,
@@ -146,6 +151,7 @@ internal sealed class TasksSeedStep : IDevelopmentSeedStep
             UserId = context.UserId,
             CreatedTimestamp = context.Now,
             Name = name,
+            Description = description,
             Priority = priority,
             MinTimeToFinish = TimeSpan.FromMinutes(min),
             MaxTimeToFinish = TimeSpan.FromMinutes(max),

@@ -1,0 +1,101 @@
+.th-clock-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--th-radius-control);
+  background: var(--th-lavender-100);
+}
+
+.th-clock-stepper__step {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--th-indigo);
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.th-clock-stepper__step:not(:disabled):hover {
+  background: var(--th-panel);
+}
+
+.th-clock-stepper__step:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.th-clock-stepper__step:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 1px;
+}
+
+.th-clock-stepper__picker.ant-picker {
+  width: 104px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--th-panel);
+}
+
+.th-clock-stepper__picker .ant-picker-input > input {
+  font-family: var(--th-font-digital);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--th-text);
+}
+
+.th-clock-stepper__picker .ant-picker-input > input::placeholder {
+  font-family: var(--th-font-sans);
+}
+
+.th-clock-stepper__picker .ant-picker-suffix,
+.th-clock-stepper__picker .ant-picker-clear {
+  color: var(--th-indigo);
+}
+
+/* ===== A column of labelled clock fields (From / To, the durations) =====
+   antd stacks horizontal labels on phones (flex: 0 0 100% under a five-class selector injected at runtime);
+   the design keeps "From [−][8:00][+]" on one line everywhere, so flex and max-width are forced.
+   --th-clock-label-width sizes the label column. */
+.th-clock-fields {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.th-clock-fields .ant-form-item {
+  margin-bottom: 0;
+}
+
+/* Top-aligned, so a hint or an error under the clock never drags its label down. */
+.th-clock-fields .ant-form-item .ant-form-item-row {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.th-clock-fields .ant-form-item .ant-form-item-row > .ant-form-item-label {
+  flex: 0 0 var(--th-clock-label-width, 52px) !important;
+  max-width: none !important;
+  padding: 0 !important;
+  text-align: left;
+}
+
+.th-clock-fields .ant-form-item .ant-form-item-row > .ant-form-item-control {
+  flex: 1 1 auto !important;
+  min-width: 0;
+  max-width: none !important;
+}
+
+/* ===== Picker popup =====
+   antd pads every time column so its last entry can scroll to the top, which lets the list scroll on into
+   blank space. Four classes: antd's own rule is three (:where() adds none). */
+.th-clock-popup.ant-picker-dropdown .ant-picker-time-panel .ant-picker-time-panel-column::after {
+  display: none;
+}

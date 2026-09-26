@@ -46,12 +46,12 @@ public sealed class DynamicTasksApiTests(ApiTestFixture fixture) : ApiIntegratio
         var categoryId = await NewCategoryId(api);
         var id = (await api.DynamicTasks.Create(TestRequests.NewDynamicTask("Old", categoryIds: [categoryId]))).Content;
 
-        var update = await api.DynamicTasks.Update(id, TestRequests.NewDynamicTask("New", priority: 9, categoryIds: [categoryId]));
+        var update = await api.DynamicTasks.Update(id, TestRequests.NewDynamicTask("New", priority: 1, categoryIds: [categoryId]));
         update.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var get = await api.DynamicTasks.Get(id);
         get.Content!.Name.Should().Be("New");
-        get.Content.Priority.Should().Be(9);
+        get.Content.Priority.Should().Be(1);
     }
 
     [Fact, Trait("Endpoint", "DELETE /api/dynamic-tasks/{id}")]
@@ -78,6 +78,36 @@ public sealed class DynamicTasksApiTests(ApiTestFixture fixture) : ApiIntegratio
         var badUpdate = await api.DynamicTasks.Update(id, TestRequests.NewDynamicTask(
             "Good", min: TimeSpan.FromMinutes(60), max: TimeSpan.FromMinutes(30), categoryIds: [categoryId]));
         badUpdate.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Theory, Trait("Endpoint", "Validation")]
+    [InlineData(0)]
+    [InlineData(6)]
+    public async Task Create_And_Update_Should_Return400_WhenPriorityOutOfRange(byte priority)
+    {
+        var api = await CreateAuthenticatedApiAsync();
+        var categoryId = await NewCategoryId(api);
+
+        (await api.DynamicTasks.Create(TestRequests.NewDynamicTask(priority: priority, categoryIds: [categoryId])))
+            .ShouldBeValidationErrorFor("Priority");
+
+        var id = (await api.DynamicTasks.Create(TestRequests.NewDynamicTask(categoryIds: [categoryId]))).Content;
+        (await api.DynamicTasks.Update(id, TestRequests.NewDynamicTask(priority: priority, categoryIds: [categoryId])))
+            .ShouldBeValidationErrorFor("Priority");
+        (await api.DynamicTasks.Get(id)).Content!.Priority.Should().Be(PriorityConstants.Default);
+    }
+
+    [Theory, Trait("Endpoint", "Validation")]
+    [InlineData(PriorityConstants.Highest)]
+    [InlineData(PriorityConstants.Lowest)]
+    public async Task Create_Should_AcceptPriorityBounds(byte priority)
+    {
+        var api = await CreateAuthenticatedApiAsync();
+
+        var create = await api.DynamicTasks.Create(TestRequests.NewDynamicTask(priority: priority, categoryIds: [await NewCategoryId(api)]));
+
+        create.StatusCode.Should().Be(HttpStatusCode.Created);
+        (await api.DynamicTasks.Get(create.Content)).Content!.Priority.Should().Be(priority);
     }
 
     [Fact, Trait("Endpoint", "POST /api/dynamic-tasks")]

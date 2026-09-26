@@ -1,0 +1,19 @@
+/* The design reads the labels above a thick rail; the whole rail is the brand lavender. The side margin
+   leaves room for the end labels, which antd centres on the rail's ends. */
+.th-priority-slider.ant-slider-with-marks {
+  margin: 22px 26px 6px;
+}
+
+.th-priority-slider .ant-slider-mark {
+  top: -22px;
+}
+
+.th-priority-slider .ant-slider-mark-text {
+  font-size: 11px;
+  color: var(--th-text-muted);
+  white-space: nowrap;
+}
+
+.th-priority-slider .ant-slider-mark-text-active {
+  color: var(--th-indigo);
+}

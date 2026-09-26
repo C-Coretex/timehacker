@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import { Typography } from 'antd';
 
 interface InfoRowProps {
   icon: ReactNode;
@@ -7,16 +6,15 @@ interface InfoRowProps {
   value: string | undefined;
 }
 
+/** One read-only profile field: icon tile, small label, value (a dash when unset). */
 export const InfoRow: FC<InfoRowProps> = ({ icon, label, value }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0' }}>
-    <span style={{ fontSize: 18, opacity: 0.6 }}>{icon}</span>
+  <div className="th-profile-row">
+    <span className="th-profile-row__icon" aria-hidden>
+      {icon}
+    </span>
     <div>
-      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-        {label}
-      </Typography.Text>
-      <br />
-      <Typography.Text strong>{value || '—'}</Typography.Text>
+      <div className="th-profile-row__label">{label}</div>
+      <div className={`th-profile-row__value${value ? '' : ' is-empty'}`}>{value || '—'}</div>
     </div>
   </div>
 );
-

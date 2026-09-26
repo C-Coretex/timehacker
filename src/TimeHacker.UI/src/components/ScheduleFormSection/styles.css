@@ -1,0 +1,84 @@
+.th-schedule-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.th-schedule-fields__detail {
+  display: grid;
+  gap: 2px;
+}
+
+.th-schedule-fields .ant-form-item {
+  margin-bottom: 10px;
+}
+
+.th-schedule-fields .ant-form-item-label > label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* "Every [− 2 +] days", "After [− 5 +] times" */
+.th-repeat-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--th-text);
+  font-size: 13px;
+}
+
+.th-repeat-count.ant-input-number {
+  width: 112px;
+}
+
+.th-repeat-ends {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+/* ===== Day circles (weekdays, days of the month) ===== */
+.th-weekdays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.th-month-days {
+  display: grid;
+  grid-template-columns: repeat(7, 28px);
+  gap: 4px;
+}
+
+.th-day-circle {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--th-lavender-200);
+  border-radius: 50%;
+  background: var(--th-panel);
+  color: var(--th-indigo);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.th-day-circle:hover {
+  border-color: var(--th-indigo);
+}
+
+.th-day-circle.is-selected {
+  border-color: var(--th-navy);
+  background: var(--th-navy);
+  color: var(--th-on-primary);
+}
+
+.th-day-circle:focus-visible {
+  outline: 2px solid var(--th-primary);
+  outline-offset: 2px;
+}

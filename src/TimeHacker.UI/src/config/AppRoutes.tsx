@@ -10,6 +10,7 @@ import { NotFoundPage } from 'pages/NotFoundPage';
 import { ProfilePage } from 'pages/ProfilePage';
 import { SettingsPage } from 'pages/SettingsPage';
 import { TasksPage } from 'pages/TasksPage';
+import { TodayPage } from 'pages/TodayPage';
 
 export const AppRoutes: RouteObject[] = [
   {
@@ -30,6 +31,10 @@ export const AppRoutes: RouteObject[] = [
           {
             index: true,
             element: <CalendarPage />,
+          },
+          {
+            path: 'today',
+            element: <TodayPage />,
           },
           {
             path: 'tasks',

@@ -23,13 +23,16 @@ export const useCategorySchedules = ({ onChanged }: UseCategorySchedulesOptions)
   const { notification } = App.useApp();
   const { t } = useTranslation();
 
+  // Resolves to whether the mutation went through; a failure has already been reported to the user.
   const run = useCallback(
-    async (action: () => Promise<unknown>, errorMessage: string) => {
+    async (action: () => Promise<unknown>, errorMessage: string): Promise<boolean> => {
       try {
         await action();
         await onChanged();
+        return true;
       } catch {
         notification.error({ title: t('errors.generic'), description: errorMessage });
+        return false;
       }
     },
     [notification, onChanged, t]

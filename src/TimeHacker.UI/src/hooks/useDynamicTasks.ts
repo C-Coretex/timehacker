@@ -15,21 +15,20 @@ export const useDynamicTasks = () => {
   });
 
   const createTask = useCallback(
-    async (task: InputDynamicTask): Promise<void> => { await createDynamicTask(task); },
-    []
+    async (task: InputDynamicTask): Promise<boolean> =>
+      (await withRefetch(() => createDynamicTask(task), 'Failed to create task.')).succeeded,
+    [withRefetch]
   );
 
   const updateTask = useCallback(
-    async (id: string, task: InputDynamicTask) => {
-      await withRefetch(() => updateDynamicTask(id, task), 'Failed to update task.');
-    },
+    async (id: string, task: InputDynamicTask): Promise<boolean> =>
+      (await withRefetch(() => updateDynamicTask(id, task), 'Failed to update task.')).succeeded,
     [withRefetch]
   );
 
   const deleteTask = useCallback(
-    async (id: string) => {
-      await withRefetch(() => deleteDynamicTask(id), 'Failed to delete task.');
-    },
+    async (id: string): Promise<boolean> =>
+      (await withRefetch(() => deleteDynamicTask(id), 'Failed to delete task.')).succeeded,
     [withRefetch]
   );
 

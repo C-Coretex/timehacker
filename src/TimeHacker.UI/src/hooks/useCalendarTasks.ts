@@ -51,13 +51,14 @@ export function useCalendarTasks() {
     [t]
   );
 
+  // Regenerates `dates` but reloads `visible`: re-planning skips past days that are still on screen.
   const refresh = useCallback(
-    async (dates: Date[]) => {
+    async (dates: Date[], visible: Date[] = dates) => {
       setLoading(true);
       setError(null);
       try {
         await refreshTasksForDays(dates);
-        await fetchTasks(dates);
+        await fetchTasks(visible);
       } catch (err: unknown) {
         setError(getApiErrorMessage(err) ?? t('calendar.refreshFailed'));
         setLoading(false);
